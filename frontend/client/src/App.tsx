@@ -1,5 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useGeneralStore } from "./store/generalStore";
+import Hall from "./screens/Hall";
+
+
 
 export default function App() {
   const [bears, increase] = useGeneralStore((store) => [
@@ -11,9 +14,8 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col ">
-        <p>{bears}</p>
-        <button onClick={() => increase(1)}>increase</button>
+      <div className="">
+        <Hall/>
       </div>
     </QueryClientProvider>
   );
