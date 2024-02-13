@@ -1,33 +1,31 @@
 import React from "react";
 import EditComponent from "./EditComponent";
+import {
+  EachHallAdditonalFeaturesType,
+  EachHallType,
+} from "../types/Hall.types";
 
-interface Props {
-  additionalFeatures: string[];
-}
+type props = {
+  additionalFeatures: EachHallAdditonalFeaturesType[];
+  setHallData: React.Dispatch<React.SetStateAction<EachHallType>>;
+};
 
-const MyComponent: React.FC<Props> = ({ additionalFeatures }) => {
+const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: props) => {
   return (
-    <div className="hall-additional-features flex justify-between bg-[#8c9ecd] w-full p-3 px-12 rounded-lg">
+    <div className="hall-additional-features flex justify-between bg-SAPBlue-300 w-full py-5 px-7 rounded-lg">
       <div className="hall-additional-features-info">
-        <h2 className="additional-features-text font-bold text-xl mb-3">Additional Features</h2>
-        { additionalFeatures.map((feature, index) => (
-          <h4 key={index} className="text-lg">{feature}</h4>
+        <h2 className="additional-features-text font-bold text-xl mb-3">
+          Additional Features
+        </h2>
+        {additionalFeatures.map((eachFeature) => (
+          <div className="flex flex-col">
+            <p className=" font-medium text-lg">{eachFeature.heading}</p>
+            <p>{eachFeature.desc}</p>
+          </div>
         ))}
       </div>
       <EditComponent />
     </div>
   );
 };
-
-const HallAdditionalFeatures: React.FC = () => {
-    const additionalFeatures = [
-        "Gorgeous ambiance", 
-        "In-house decorators make the venue more stunning", 
-        "In-house caterers serve delicious food",
-        "Convenient location"
-    ];
-
-    return <MyComponent additionalFeatures = { additionalFeatures } />;
-    };
-
 export default HallAdditionalFeatures;

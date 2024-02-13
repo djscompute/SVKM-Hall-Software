@@ -1,31 +1,34 @@
-import React from 'react';
-import EditComponent from './EditComponent';
-import HallCapacityInfo from './HallCapacityInfo';
+import { EachHallPartyAreaType, EachHallType } from "../types/Hall.types";
+import EditComponent from "./EditComponent";
+import HallCapacityInfo from "./HallCapacityInfo";
 
-export default function HallCapacity() {
+type props = {
+  partyArea: EachHallPartyAreaType[];
+  setHallData: React.Dispatch<React.SetStateAction<EachHallType>>;
+};
+
+export default function HallCapacity({ partyArea, setHallData }: props) {
+  const updateHallCapacity = () => {
+    // this function will be used to update the capacity in the hall ka database.
+    // then refetch the hall ka info.
+    // baadmai likhenge isko.
+    // once backend is setup
+  };
   return (
-    <div className="about-hall flex justify-between bg-[#8c9ecd] w-full p-3 px-12 rounded-lg">
-        <div className="hall-capacity w-11/12">
-            <h2 className="font-bold text-xl mb-3">Party Areas & Capacity</h2>
-            <div className="hall-capacity-info">
-                <HallCapacityInfo 
-                    name = {"Hall1"}
-                    seating = {500}
-                    capacity = {750}
-                />
-                <HallCapacityInfo 
-                    name = {"Hall2"}
-                    seating = {300}
-                    capacity = {450}
-                />
-                <HallCapacityInfo 
-                    name = {"Lawn"}
-                    seating = {1000}
-                    capacity = {1500}
-                />
-            </div>
+    <div className="about-hall flex justify-between bg-SAPBlue-300 w-full py-5 px-7 rounded-lg">
+      <div className="hall-capacity w-11/12">
+        <h2 className="font-bold text-xl mb-3">Party Areas & Capacity</h2>
+        <div className="hall-capacity-info">
+          {partyArea.map((eachPartyArea) => (
+            <HallCapacityInfo
+              name={eachPartyArea.areaName}
+              seating={eachPartyArea.seating}
+              capacity={eachPartyArea.capacity}
+            />
+          ))}
         </div>
-        <EditComponent />
+      </div>
+      <EditComponent />
     </div>
-  )
+  );
 }

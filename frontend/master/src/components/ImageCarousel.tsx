@@ -1,22 +1,36 @@
 import React from "react";
-import Carousel from "./Carousel";
+// import Carousel from "./Carousel";
+import { EachHallType } from "../types/Hall.types";
 
-const images = [
-    "https://www.bjp.org/files/photo-gallery/bjp-national-president-shri-amit-shah-addressing-meeting-of-eminent-citizens-and-intellectuals-at-bj-hall-mumbai-5-20170618-1528260118.jpg",
-    "https://media.weddingz.in/images/3700f1779bd2f3bfab9d03c76c8f6c48/babubhai-jagjivandas-hall-babubhai-jagjivandas-hall-3.jpg",
-    "https://images.venuebookingz.com/22130-1678439447-wm-babubhai-jagjivandas-hall-mumbai-1.jpg",
-]
+type props = {
+  images: string[];
+  setHallData: React.Dispatch<React.SetStateAction<EachHallType>>;
+};
 
-export default function ImageCarousel() {
+export default function ImageCarousel({ images }: props) {
   return (
-    <div className="image-carousel relative overflow-hidden rounded-xl">
-        <div className="images-image-carousel h-4/5 w-[calc(100% - 516px)]">
-            <Carousel>
-                {
-                    images.map((image, index) => <img key={index} src={image} className="h-full w-full object-cover rounded-xl" />)
-                }
-            </Carousel>
-        </div>
+    <div className="flex flex-col items-center w-full rounded-xl">
+      {/* <Carousel>
+          {images.map((image, index) => (
+            <img
+              key={index}
+              src={image}
+              className="h-full w-full object-cover rounded-xl"
+            />
+          ))}
+        </Carousel> */}
+      <p className=" text-xl font-semibold">IMAGES</p>
+      <div className="flex flex-col items-center w-full mb-20">
+        {images.map((image, index) => (
+          <div className=" relative w-1/2">
+            <img
+              key={index}
+              src={image}
+              className=" h-auto w-full m-1 object-cover rounded-xl"
+            />
+          </div>
+        ))}
+      </div>
     </div>
-  )
+  );
 }

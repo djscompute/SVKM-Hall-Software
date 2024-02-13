@@ -1,35 +1,55 @@
-import React, { useState } from 'react';
-import EditComponent from './EditComponent';
+import React, { useState } from "react";
+import EditComponent from "./EditComponent";
+import { EachHallType } from "../types/Hall.types";
 
-const paragraphStyles = {
-    WebkitLineClamp: 3,
-    WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
-    display: '-webkit-box',
-}
+type props = {
+  about: string[];
+  setHallData: React.Dispatch<React.SetStateAction<EachHallType>>;
+};
 
-export default function AboutHall() {
+export default function AboutHall({ about, setHallData }: props) {
+  const [isOpen, setIsOpen] = useState(false);
 
-    const [ isOpen, setIsOpen ] = useState(false);
-    
-    const toggleReadMore = () => setIsOpen(!isOpen);
+  const toggleReadMore = () => setIsOpen(!isOpen);
 
-    return (
-        <div className="about-hall flex justify-between bg-[#8c9ecd] w-full p-3 px-12 rounded-lg">
-            <div className="about-hall-info w-11/12">
-                <h2 className="font-bold text-xl mb-3">About this venue</h2>
-                <div className="about-hall text-lg" style={ isOpen ? null : paragraphStyles}>
-                    Babubhai Jagjivandas Hall, Juhu, Mumbai is a lovely venue to host your wedding and reception ceremony. It is located near the Prithvi Theatre and a close distance from Vile Parle Station which makes it easily accessible for all to reach there. Babubhai Jagjivandas Mumbai, Maharashtra serves scrumptious pure vegetarian food to their guests. The decor team takes care of the decoration for your big day.
-                    Babubhai Jagjivandas Hall has a lush green lawn that can accommodate a huge crowd for an open-air outdoor evening reception. It also has a banquet hall for having an indoor wedding or reception ceremony. BJ Hall Vile Parle has an inviting ambiance which makes everyone feel welcomed. The elegant décor of the venue makes it an ideal option for a grand wedding. Host your events at BJ Hall Mumbai to make them outstanding. Ticking all the right boxes, this one must certainly be on your cards.
-                </div>
-                { !isOpen ? (
-                    <button onClick={toggleReadMore} className="read-more-btn text-gray-700 font-semibold text-lg">Read More</button>
-                ) : (
-                    <button onClick={toggleReadMore} className="read-less-btn text-gray-700 font-semibold text-lg">Read Less</button>
-                )   
-                }
-            </div>
-            <EditComponent />
+  const updateHallAbout = () => {
+    // this function will be used to update the about in the hall ka database.
+    // then refetch the hall ka info.
+    // baadmai likhenge isko.
+    // once backend is setup
+  };
+
+  return (
+    <div className="about-hall flex justify-between bg-SAPBlue-300 w-full py-5 px-7 rounded-md">
+      <div className="about-hall-info w-11/12">
+        <h2 className="font-bold text-xl mb-3">About this venue</h2>
+        <div
+          className={`about-hall text-lg ${
+            isOpen ? "" : " h-24 overflow-hidden"
+          }`}
+          //   style={isOpen ? null : paragraphStyles}
+        >
+          {about.map((eachPara) => (
+            <p className="my-2">{eachPara}</p>
+          ))}
         </div>
-    )
+        {!isOpen ? (
+          <button
+            onClick={toggleReadMore}
+            className="read-more-btn text-gray-700 font-semibold text-lg"
+          >
+            Read More
+          </button>
+        ) : (
+          <button
+            onClick={toggleReadMore}
+            className="read-less-btn text-gray-700 font-semibold text-lg"
+          >
+            Read Less
+          </button>
+        )}
+      </div>
+      <EditComponent />
+    </div>
+  );
 }
