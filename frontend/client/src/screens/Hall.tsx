@@ -101,8 +101,9 @@ function Hall({ hallProps }: { hallProps: EachHallType }) {
                 <h1 className="text-2xl mt-4 font-extralight"><span className="font-medium text-SAPBlue-800">{feature.heading}</span> {feature.desc} </h1>
               )
             })}
-            <hr className="my-4"/>   
+            <hr className="my-5"/>   
             
+            <button className="border border-SAPBlue-800 hover:border-SAPBlue-900 rounded py-4 px-8 bg-transparent font-bold text-SAPBlue-800 hover:text-SAPBlue-900 transition duration-500">Place Request</button>
       </div>
     </div>
   );
