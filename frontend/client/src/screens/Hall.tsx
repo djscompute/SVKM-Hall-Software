@@ -4,25 +4,12 @@ import { RxDotFilled } from "react-icons/rx";
 
 import CalendarBook from '../components/CalendarBook.tsx'
 
-function Hall() {
-  const slides = [
-    {
-      url: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2670&q=80",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1661961112951-f2bfd1f253ce?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2672&q=80",
-    },
+import { EachHallType } from "../types/Hall.types.ts";
 
-    {
-      url: "https://images.unsplash.com/photo-1512756290469-ec264b7fbf87?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2253&q=80",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2671&q=80",
-    },
-  ];
+
+
+function Hall({ hallProps }: { hallProps: EachHallType }) {
+  const slides = hallProps.images
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -48,12 +35,12 @@ function Hall() {
 
   return (
     <div className="flex w-full flex-col">
-      <h1 className="text-center text-5xl font-semibold mt-10">Hall Name</h1>
+      <h1 className="text-center text-5xl font-light mt-10">Hall Name</h1>
       <div className="flex w-3/4 mx-auto max-xl:flex-col items-center">
         {/* Carousel */}
         <div className="max-w-[800px] h-[600px] relative m-auto py-16 px-4 group w-1/2 max-xl:w-full max-xl:max-w-[600px]">
           <div
-            style={{ backgroundImage: `url(${slides[currentIndex].url})` }}
+            style={{ backgroundImage: `url(${slides[currentIndex]})` }}
             className="w-full h-full rounded-2xl bg-center bg-cover duration-500"
           ></div>
           {/* Left Arrow */}
@@ -85,12 +72,37 @@ function Hall() {
         {/* Calendar */}
       </div>
       <div className="w-[95%] mx-auto my-10  border-[4px] rounded-xl border-SAPBlue-300 shadow-2xl shadow-black py-7 px-10 ">
-            <h1 className="text-4xl font-semibold">Details:</h1>                   
-            <h1 className="text-3xl  mt-7">Address:</h1>           
-            <h1 className="text-3xl  mt-4">Cost per Day:</h1>
-            <h1 className="text-3xl  mt-4">Number of Days:</h1>              
-            <h1 className="text-3xl  mt-4">Total Cost:</h1>           
+            <h1 className="text-3xl">Details:</h1>
 
+            <hr className="my-4"/>                   
+            <h1 className="text-2xl ">Address: {hallProps.location.desc1} {hallProps.location.desc2}</h1>
+            <iframe src={hallProps.location.iframe} width="600" height="450" className="mt-4"></iframe>
+            <hr className="my-4"/>                   
+
+
+            <h1 className="text-2xl ">Timings: {hallProps.timings.from} - {hallProps.timings.to}</h1>
+            <hr className="my-4"/>                   
+
+            <h1 className="text-2xl ">Our party areas:</h1>
+            {hallProps.partyArea.map((area)=>{
+              return(
+              <div className="border-2 border-SAPBlue-700 my-2 rounded-xl p-4">
+                  <h1 className="text-2xl ">Area: {area.areaName}</h1>
+                  <h1 className="text-2xl mt-4">Capacity: {area.capacity} seats</h1>
+                  <h1 className="text-2xl mt-4">Seating: {area.seating} seats</h1>
+              </div>
+              )
+            })}
+            <hr className="my-4"/>   
+
+            <h1 className="text-2xl ">Additional Features:</h1>
+            {hallProps.additionalFeatures.map((feature)=>{
+              return(
+                <h1 className="text-2xl mt-4 font-extralight"><span className="font-medium text-SAPBlue-800">{feature.heading}</span> {feature.desc} </h1>
+              )
+            })}
+            <hr className="my-4"/>   
+            
       </div>
     </div>
   );

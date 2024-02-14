@@ -43,7 +43,7 @@ const BookCalendar = () => {
             className="absolute h-full w-full card rounded-xl hover:cursor-pointer"
             onClick={flip}
           >
-            <div className="text-SAPBlue-900 text-center mx-auto my-auto h-full flex items-center">
+            <div className="text-SAPBlue-900 text-5xl font-extralight text-center mx-auto my-auto h-full flex items-center">
               <span className="mx-auto">
                 Click here to book <br />
                 OR
