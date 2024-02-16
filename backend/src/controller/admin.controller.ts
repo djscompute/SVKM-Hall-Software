@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import logger from "../utils/logger";
-import createUser from "../service/createUser";
-import authenticateUser from "../service/authUser";
+import createUser from "../service/createAdmin";
+import authenticateUser from "../service/authAdmin";
 import { signAccessToken, signRefreshToken } from "../utils/signToken";
-import getUserData from "../service/getUserData";
+import getUserData from "../service/getAdminData";
 import { createSession } from "../service/createSession";
 import { deleteSession } from "../service/deleteSession";
 
-export async function createUserHandler(req: Request, res: Response) {
+export async function createAdminHandler(req: Request, res: Response) {
   try {
     const userInstance = await createUser(req.body);
 
@@ -22,7 +22,7 @@ export async function createUserHandler(req: Request, res: Response) {
   }
 }
 
-export async function loginUserHandler(req: Request, res: Response) {
+export async function loginAdminHandler(req: Request, res: Response) {
   try {
     const userInstance = await authenticateUser(req.body);
 
@@ -40,7 +40,7 @@ export async function loginUserHandler(req: Request, res: Response) {
   }
 }
 
-export async function getUserHandler(req: Request, res: Response) {
+export async function getAdminHandler(req: Request, res: Response) {
   try {
     //@ts-ignore
     const email: string = req.userEmail;
@@ -53,7 +53,7 @@ export async function getUserHandler(req: Request, res: Response) {
   }
 }
 
-export async function logoutUserHandler(req: Request, res: Response) {
+export async function logoutAdminHandler(req: Request, res: Response) {
   try {
     //Clearing Cookies
     res.clearCookie("accessToken");

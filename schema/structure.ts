@@ -74,7 +74,7 @@ export type HallBookingType = {
 // This will be in Users Table
 // ================================================
 
-export type UserType = {
+export type adminType = {
   id: string; // UNIQUE KEY
   role: "MANAGER" | "MASTER"; // obvio
   password: string; // hashed

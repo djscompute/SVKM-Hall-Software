@@ -1,17 +1,18 @@
 import { Express, Request, Response } from "express";
 import {
-  addNoteHandler,
-  removeNoteHandler,
-} from "./controller/notes.controller";
+  addHallHandler,
+  removeHallHandler,
+  editHallHandler
+} from "./controller/hall.controller";
 import {
-  createUserHandler,
-  getUserHandler,
-  loginUserHandler,
-  logoutUserHandler,
-} from "./controller/user.controller";
+  createAdminHandler,
+  getAdminHandler,
+  loginAdminHandler,
+  logoutAdminHandler,
+} from "./controller/admin.controller";
 import { validateRequest, validateCookie } from "./middleware/validator";
-import { AddNotesZodSchema, RemoveNotesZodSchema } from "./schema/notes.schema";
-import { CreateUserZodSchema, LoginUserZodSchema } from "./schema/user.schema";
+import { AddHallZodSchema, RemoveHallZodSchema, EditHallZodSchema } from "./schema/hall.schema";
+import { CreateAdminZodSchema, LoginAdminZodSchema } from "./schema/admin.schema";
 
 export default function routes(app: Express) {
   //heathcheck route
@@ -21,38 +22,45 @@ export default function routes(app: Express) {
     },
   ]);
 
-  //Create a new user
-  app.post("/createUser", [
-    validateRequest(CreateUserZodSchema),
-    createUserHandler,
+  //Create a new admin
+  app.post("/createAdmin", [
+    validateRequest(CreateAdminZodSchema),
+    createAdminHandler,
   ]);
 
-  //Login a user
-  app.post("/loginUser", [
-    validateRequest(LoginUserZodSchema),
-    loginUserHandler,
+  //Login a admin
+  app.post("/loginAdmin", [
+    validateRequest(LoginAdminZodSchema),
+    loginAdminHandler,
   ]);
 
-  //Get user data
-  app.get("/getUser", [
+  //Get admin data
+  app.get("/getAdmin", [
     validateCookie,
-    getUserHandler
+    getAdminHandler
   ]);
 
-  //Add a new note
-  app.post("/addNote", [
+  //Add a new hall
+  app.post("/addHall", [
+    // validateCookie,
+    validateRequest(AddHallZodSchema),
+    addHallHandler,
+  ]);
+
+  //Remove a hall
+  app.delete("/removeHall/:id", [
     validateCookie,
-    validateRequest(AddNotesZodSchema),
-    addNoteHandler,
+    validateRequest(RemoveHallZodSchema),
+    removeHallHandler,
   ]);
 
-  //Remove a new note
-  app.delete("/removeNote/:id", [
+  //Edit a hall
+  app.delete("/editHall/:id", [
     validateCookie,
-    validateRequest(RemoveNotesZodSchema),
-    removeNoteHandler,
+    validateRequest(EditHallZodSchema),
+    editHallHandler,
   ]);
 
-  //Logout a user
-  app.get("/logoutUser", [logoutUserHandler]);
+  //Logout a admin
+  app.get("/logoutAdmin", [logoutAdminHandler]);
 }
