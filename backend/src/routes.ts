@@ -1,58 +1,77 @@
-import { Express, Request, Response } from "express";
+import { Express, NextFunction, Request, Response } from "express";
 import {
-  addNoteHandler,
-  removeNoteHandler,
-} from "./controller/notes.controller";
+  addHallHandler,
+  removeHallHandler,
+  editHallHandler,
+} from "./controller/hall.controller";
 import {
-  createUserHandler,
-  getUserHandler,
-  loginUserHandler,
-  logoutUserHandler,
-} from "./controller/user.controller";
+  createAdminHandler,
+  getAdminHandler,
+  loginAdminHandler,
+  logoutAdminHandler,
+} from "./controller/admin.controller";
 import { validateRequest, validateCookie } from "./middleware/validator";
-import { AddNotesZodSchema, RemoveNotesZodSchema } from "./schema/notes.schema";
-import { CreateUserZodSchema, LoginUserZodSchema } from "./schema/user.schema";
+import {
+  AddHallZodSchema,
+  RemoveHallZodSchema,
+} from "./schema/hall.schema";
+import {
+  CreateAdminZodSchema,
+  LoginAdminZodSchema,
+} from "./schema/admin.schema";
+import { requireMasterRole } from "./middleware/accessControl";
 
 export default function routes(app: Express) {
-  //heathcheck route
+  
   app.get("/healthCheck", [
     (req: Request, res: Response) => {
       return res.status(200).send("Hello World");
     },
   ]);
 
-  //Create a new user
-  app.post("/createUser", [
-    validateRequest(CreateUserZodSchema),
-    createUserHandler,
+  //Login a admin
+  app.post("/loginAdmin", [
+    validateRequest(LoginAdminZodSchema),
+    loginAdminHandler,
   ]);
 
-  //Login a user
-  app.post("/loginUser", [
-    validateRequest(LoginUserZodSchema),
-    loginUserHandler,
-  ]);
-
-  //Get user data
-  app.get("/getUser", [
+  //Create a new admin
+  app.post("/createAdmin", [
     validateCookie,
-    getUserHandler
+    validateRequest(CreateAdminZodSchema),
+    requireMasterRole,
+    createAdminHandler,
   ]);
 
-  //Add a new note
-  app.post("/addNote", [
+  //Get data of the admin who is sending the requests
+  app.get("/getCurrentAdmin", [validateCookie, getAdminHandler]);
+
+  // MAKE: route to get data of a specified user using unique email
+
+  //Add a new hall
+  app.post("/addHall", [
     validateCookie,
-    validateRequest(AddNotesZodSchema),
-    addNoteHandler,
+    requireMasterRole,
+    validateRequest(AddHallZodSchema),
+    addHallHandler,
   ]);
 
-  //Remove a new note
-  app.delete("/removeNote/:id", [
+  //Remove a hall
+  app.delete("/removeHall/:id", [
     validateCookie,
-    validateRequest(RemoveNotesZodSchema),
-    removeNoteHandler,
+    requireMasterRole,
+    validateRequest(RemoveHallZodSchema),
+    removeHallHandler,
   ]);
 
-  //Logout a user
-  app.get("/logoutUser", [logoutUserHandler]);
+  //Edit a hall
+  app.post("/editHall/:id", [
+    validateCookie,
+    requireMasterRole,
+    validateRequest(AddHallZodSchema),
+    editHallHandler,
+  ]);
+
+  //Logout a admin
+  app.get("/logoutAdmin", [logoutAdminHandler]);
 }
