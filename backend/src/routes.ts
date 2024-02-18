@@ -46,7 +46,7 @@ export default function routes(app: Express) {
   //Get data of the admin who is sending the requests
   app.get("/getCurrentAdmin", [validateCookie, getAdminHandler]);
 
-  // MAKE: route to get data of a specified user using unique email
+  // GET DATA OF A SPECIFIED USER USING UNIQUE EMAIL
 
   //Add a new hall
   app.post("/addHall", [
@@ -71,6 +71,12 @@ export default function routes(app: Express) {
     validateRequest(AddHallZodSchema),
     editHallHandler,
   ]);
+
+  // GET ALL HALLS
+
+  // GET INFO OF ONE HALL WITH _id
+
+  // FUTURE: GET ALL HALLS WHOM THE MANAGER HAS ACCESS TO
 
   //Logout a admin
   app.get("/logoutAdmin", [logoutAdminHandler]);
