@@ -1,0 +1,90 @@
+import { Request, Response, NextFunction } from "express";
+import { HallModel, EachHallType } from "../models/hall.model";
+
+export async function addHallHandler(req: Request, res: Response) {
+  try {
+    const {
+      name,
+      location,
+      about,
+      timings,
+      pricing,
+      capacity,
+      additionalFeatures,
+      images,
+    } = req.body as EachHallType;
+
+    const newHall = new HallModel({
+      name,
+      location,
+      about,
+      timings,
+      pricing,
+      capacity,
+      additionalFeatures,
+      images,
+    });
+    await newHall.save();
+
+    return res.status(200).json(newHall);
+  } catch (error: any) {
+    res.status(400).json({ name: error.name, message: error.message });
+  }
+}
+
+export async function removeHallHandler(req: Request, res: Response) {
+  try {
+    const hallId: string = req.params.id;
+
+    const removedHall = await HallModel.findByIdAndDelete(hallId);
+    if (!removedHall) {
+      return res.status(404).send("Hall not found");
+    }
+
+    return res.status(200).json(removedHall);
+  } catch (error: any) {
+    res.status(400).json({ name: error.name, message: error.message });
+  }
+}
+
+// UPDATE the whole fucking document.
+// THIS handler trusts that the frontend will never send a bad document data.
+export async function editHallHandler(req: Request, res: Response) {
+  try {
+    const {
+      name,
+      location,
+      about,
+      timings,
+      pricing,
+      capacity,
+      additionalFeatures,
+      images,
+    } = req.body as EachHallType;
+    const hallId: string = req.params.id;
+
+    const updatedHall = await HallModel.findByIdAndUpdate(
+      hallId,
+      {
+        name,
+        location,
+        about,
+        timings,
+        pricing,
+        capacity,
+        additionalFeatures,
+        images,
+      },
+      { new: true }
+    );
+    if (!updatedHall) {
+      return res
+        .status(404)
+        .send({ name: "Hall Not Found", message: "Hall not found" });
+    }
+
+    return res.status(200).json(updatedHall);
+  } catch (error: any) {
+    res.status(400).json({ name: error.name, message: error.message });
+  }
+}
