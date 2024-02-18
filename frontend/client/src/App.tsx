@@ -1,5 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useGeneralStore } from "./store/generalStore";
+import Hall from "./screens/Hall";
+import hallProps from "./constants/hallProps";
 import Card from './components/Card';
 import bj from "./assets/bj-hall.png"
 import nmims from "./assets/nmims-hall.jpg"
@@ -10,10 +12,15 @@ export default function App() {
     store.increase,
   ]);
 
+
+ 
   const queryClient = new QueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>
+      <div className="">
+        <Hall hallProps={hallProps}/>
+      </div>
       <div className="flex flex-wrap justify-around"></div>
         <Card 
           img= {bj}
