@@ -1,8 +1,8 @@
-import { Express, Request, Response } from "express";
+import { Express, NextFunction, Request, Response } from "express";
 import {
   addHallHandler,
   removeHallHandler,
-  editHallHandler
+  editHallHandler,
 } from "./controller/hall.controller";
 import {
   createAdminHandler,
@@ -11,21 +11,22 @@ import {
   logoutAdminHandler,
 } from "./controller/admin.controller";
 import { validateRequest, validateCookie } from "./middleware/validator";
-import { AddHallZodSchema, RemoveHallZodSchema, EditHallZodSchema } from "./schema/hall.schema";
-import { CreateAdminZodSchema, LoginAdminZodSchema } from "./schema/admin.schema";
+import {
+  AddHallZodSchema,
+  RemoveHallZodSchema,
+} from "./schema/hall.schema";
+import {
+  CreateAdminZodSchema,
+  LoginAdminZodSchema,
+} from "./schema/admin.schema";
+import { requireMasterRole } from "./middleware/accessControl";
 
 export default function routes(app: Express) {
-  //heathcheck route
+  
   app.get("/healthCheck", [
     (req: Request, res: Response) => {
       return res.status(200).send("Hello World");
     },
-  ]);
-
-  //Create a new admin
-  app.post("/createAdmin", [
-    validateRequest(CreateAdminZodSchema),
-    createAdminHandler,
   ]);
 
   //Login a admin
@@ -34,15 +35,23 @@ export default function routes(app: Express) {
     loginAdminHandler,
   ]);
 
-  //Get admin data
-  app.get("/getAdmin", [
+  //Create a new admin
+  app.post("/createAdmin", [
     validateCookie,
-    getAdminHandler
+    validateRequest(CreateAdminZodSchema),
+    requireMasterRole,
+    createAdminHandler,
   ]);
+
+  //Get data of the admin who is sending the requests
+  app.get("/getCurrentAdmin", [validateCookie, getAdminHandler]);
+
+  // MAKE: route to get data of a specified user using unique email
 
   //Add a new hall
   app.post("/addHall", [
-    // validateCookie,
+    validateCookie,
+    requireMasterRole,
     validateRequest(AddHallZodSchema),
     addHallHandler,
   ]);
@@ -50,14 +59,16 @@ export default function routes(app: Express) {
   //Remove a hall
   app.delete("/removeHall/:id", [
     validateCookie,
+    requireMasterRole,
     validateRequest(RemoveHallZodSchema),
     removeHallHandler,
   ]);
 
   //Edit a hall
-  app.delete("/editHall/:id", [
+  app.post("/editHall/:id", [
     validateCookie,
-    validateRequest(EditHallZodSchema),
+    requireMasterRole,
+    validateRequest(AddHallZodSchema),
     editHallHandler,
   ]);
 

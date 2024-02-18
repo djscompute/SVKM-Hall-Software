@@ -1,3 +1,10 @@
+
+///////////////////////////////////////////////////////////////////////
+// CAN BE OUT DATED
+// REFER MODELS FOLDER
+///////////////////////////////////////////////////////////////////////
+
+
 export type EachHallLocationType = {
   desc1: string; // short form of the location
   desc2: string; // full address of the location
@@ -28,6 +35,7 @@ export type EachHallAdditonalFeaturesType = {
 // ================================================
 export type EachHallType = {
   id: string; // UNIQUE KEY. This will be used to query Booking table in a certain time frame.
+  name: string; // damn i forgot this
   location: EachHallLocationType; // location of the hall
   about: string[]; // description of the hall. can be buletins
   timings: EachHallTimingType; // timing of opening and closing of the hall

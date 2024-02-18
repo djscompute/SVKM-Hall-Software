@@ -1,14 +1,31 @@
 import { Request, Response, NextFunction } from "express";
-import Admin, {Hall, hallType } from "../models/admin.model";
+import { HallModel, EachHallType } from "../models/hall.model";
 
 export async function addHallHandler(req: Request, res: Response) {
   try {
-    const { name, location, capacity, facilities, cost } = req.body as Pick< hallType, "name" | "location" | "capacity" | "facilities" | "cost">;
-    //@ts-ignore
-    
-    const newHall = new Hall({ name, location, capacity, facilities, cost });
+    const {
+      name,
+      location,
+      about,
+      timings,
+      pricing,
+      capacity,
+      additionalFeatures,
+      images,
+    } = req.body as EachHallType;
+
+    const newHall = new HallModel({
+      name,
+      location,
+      about,
+      timings,
+      pricing,
+      capacity,
+      additionalFeatures,
+      images,
+    });
     await newHall.save();
-   
+
     return res.status(200).json(newHall);
   } catch (error: any) {
     res.status(400).json({ name: error.name, message: error.message });
@@ -17,10 +34,9 @@ export async function addHallHandler(req: Request, res: Response) {
 
 export async function removeHallHandler(req: Request, res: Response) {
   try {
-    //@ts-ignore
     const hallId: string = req.params.id;
 
-    const removedHall = await Hall.findByIdAndDelete(hallId);
+    const removedHall = await HallModel.findByIdAndDelete(hallId);
     if (!removedHall) {
       return res.status(404).send("Hall not found");
     }
@@ -31,14 +47,40 @@ export async function removeHallHandler(req: Request, res: Response) {
   }
 }
 
+// UPDATE the whole fucking document.
+// THIS handler trusts that the frontend will never send a bad document data.
 export async function editHallHandler(req: Request, res: Response) {
   try {
-    const { name, location, capacity, facilities, cost } = req.body as Pick<hallType, "name" | "location" | "capacity" | "facilities" | "cost">;
+    const {
+      name,
+      location,
+      about,
+      timings,
+      pricing,
+      capacity,
+      additionalFeatures,
+      images,
+    } = req.body as EachHallType;
     const hallId: string = req.params.id;
 
-    const updatedHall = await Hall.findByIdAndUpdate(hallId, { name, location, capacity, facilities, cost }, { new: true });
+    const updatedHall = await HallModel.findByIdAndUpdate(
+      hallId,
+      {
+        name,
+        location,
+        about,
+        timings,
+        pricing,
+        capacity,
+        additionalFeatures,
+        images,
+      },
+      { new: true }
+    );
     if (!updatedHall) {
-      return res.status(404).send("Hall not found");
+      return res
+        .status(404)
+        .send({ name: "Hall Not Found", message: "Hall not found" });
     }
 
     return res.status(200).json(updatedHall);
@@ -46,4 +88,3 @@ export async function editHallHandler(req: Request, res: Response) {
     res.status(400).json({ name: error.name, message: error.message });
   }
 }
-

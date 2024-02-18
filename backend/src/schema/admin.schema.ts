@@ -2,28 +2,33 @@ import z from "zod";
 import { adminType } from "../models/admin.model";
 
 export const CreateAdminZodSchema = z.object({
-  body: z.object({
-    role: z.enum(['Master', 'Manager']).superRefine((val) => {
-      if (val !== "Master" && val !== "Manager") {
-        throw new Error("The role must be either 'Master' or 'Manager'.");
-      }
-      return true;
-    }),
-    username: z.string({
-      invalid_type_error: "The username can only be a string.",
-      required_error: "The username cannot be empty.",
-    }).min(5),
-    email: z.string({
-      invalid_type_error: "The email can only be string.",
-      required_error: "The email cannot be empty.",
+  body: z
+    .object({
+      role: z.enum(["MASTER", "MANAGER"]).superRefine((val) => {
+        if (val !== "MASTER" && val !== "MANAGER") {
+          throw new Error("The role must be either 'MASTER' or 'MANAGER'.");
+        }
+        return true;
+      }),
+      username: z
+        .string({
+          invalid_type_error: "New Admin username can only be a string.",
+          required_error: "New Admin username cannot be empty.",
+        })
+        .min(5),
+      email: z
+        .string({
+          invalid_type_error: "New Admin email can only be string.",
+          required_error: "New Admin email cannot be empty.",
+        })
+        .email("The email is not valid."),
+      password: z.string({
+        invalid_type_error: "New Admin password can only be a string.",
+        required_error: "New Admin password cannot be empty.",
+      }),
+      managedHall: z.array(z.string()).optional(),
     })
-    .email("The email is not valid."),
-    password: z.string({
-      invalid_type_error: "The password can only be a string.",
-      required_error: "The password cannot be empty.",
-    }),
-    managedHall: z.string().optional(),
-  }).strict(),
+    .strict(),
 });
 
 export const LoginAdminZodSchema = z.object({
@@ -31,14 +36,13 @@ export const LoginAdminZodSchema = z.object({
     .object({
       email: z
         .string({
-          invalid_type_error: "The email can only be string.",
-          required_error: "The email cannot be empty.",
+          invalid_type_error: "Admin email can only be string.",
+          required_error: "Admin email cannot be empty.",
         })
-        .email("The email is not valid."),
-
+        .email("Admin email is not valid."),
       password: z.string({
-        invalid_type_error: "The password can only be string.",
-        required_error: "The password cannot be empty.",
+        invalid_type_error: "Admin password can only be string.",
+        required_error: "Admin password cannot be empty.",
       }),
     })
     .strict(), // throws error if there is any unknown keys in the input

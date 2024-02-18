@@ -9,31 +9,35 @@ export interface adminType extends mongoose.Document {
   username: string;
   email: string;
   password: string;
-  managedHall?: string;
+  managedHall?: string[];
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
   comparePasswords(email: string, password: string): Promise<adminType>;
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
 }
-//type-customer
-export interface customerType extends mongoose.Document {
-  readonly _id: mongoose.Types.ObjectId;
-  username: string;
-  email?: string;
-  phone?: string;
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-}
+
+
+// export type EachHallType = {
+//   id: string; // UNIQUE KEY. This will be used to query Booking table in a certain time frame.
+//   location: EachHallLocationType; // location of the hall
+//   about: string[]; // description of the hall. can be buletins
+//   timings: EachHallTimingType; // timing of opening and closing of the hall
+//   partyArea: EachHallPartyAreaType[]; // sub areas spaces alloted in the  hall
+//   pricing: number | undefined; // pricing. can be either price per time OR ask manager for final qoutation
+//   additionalFeatures: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
+//   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
+// };
+
 //type-hall
-export interface hallType extends mongoose.Document {
-  readonly _id: mongoose.Types.ObjectId;
-  name: string;
-  location: string;
-  capacity: string;
-  facilities?: string[];
-  cost: string;
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-}
+// export interface hallType extends mongoose.Document {
+//   readonly _id: mongoose.Types.ObjectId;
+//   name: string;
+//   location: string;
+//   capacity: string;
+//   facilities?: string[];
+//   cost: string;
+//   readonly createdAt: Date;
+//   readonly updatedAt: Date;
+// }
 
 // Schema-admin
 const adminSchema = new mongoose.Schema<adminType>(
@@ -42,35 +46,27 @@ const adminSchema = new mongoose.Schema<adminType>(
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    managedHall: { type: String }
+    managedHall: { type: String },
   },
   { timestamps: true }
 );
 
-// Schema-customer
-const customerSchema = new mongoose.Schema<customerType>(
-  {
-    username: { type: String, required: true },
-    email: { type: String },
-    phone: { type: String },
-  },
-  { timestamps: true }
-);
 
-// Schema-hall
-const hallSchema = new mongoose.Schema<hallType>(
-  {
-    name: { type: String, required: true },
-    location: { type: String, required: true},
-    capacity: { type: String, required: true},
-    facilities: { type: [String] },
-    cost: {type: String, required: true }
-  },
-  { timestamps: true }
-);
+
+// // Schema-hall
+// const hallSchema = new mongoose.Schema<hallType>(
+//   {
+//     name: { type: String, required: true },
+//     location: { type: String, required: true },
+//     capacity: { type: String, required: true },
+//     facilities: { type: [String] },
+//     cost: { type: String, required: true },
+//   },
+//   { timestamps: true }
+// );
 
 //Password Encryption
-adminSchema.pre("save", async function(next) {
+adminSchema.pre("save", async function (next) {
   const admin = this as adminType;
   if (admin.isModified("password")) {
     admin.password = await bcrypt.hash(
@@ -85,7 +81,7 @@ adminSchema.pre("save", async function(next) {
 //Verifying Password
 adminSchema.method(
   "comparePasswords",
-  async function(
+  async function (
     inputEmail: string,
     inputPassword: string
   ): Promise<adminType> {
@@ -104,5 +100,5 @@ adminSchema.method(
 );
 
 const Admin = mongoose.model<adminType>("admin", adminSchema);
-export const Hall = mongoose.model<hallType>("hall", hallSchema);
+// export const Hall = mongoose.model<hallType>("hall", hallSchema);
 export default Admin;
