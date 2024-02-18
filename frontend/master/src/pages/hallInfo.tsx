@@ -5,7 +5,7 @@ import HallCapacity from "../components/HallCapacity";
 import HallPricing from "../components/HallPricing";
 import HallAdditionalFeatures from "../components/HallAdditionalFeatures";
 import ImageCarousel from "../components/ImageCarousel";
-import { useState } from "react";
+import React, { useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 
 const DummyHallInfo: EachHallType = {
@@ -36,6 +36,16 @@ const DummyHallInfo: EachHallType = {
       areaName: "Hall2",
       capacity: 1000,
       seating: 750,
+    },
+    {
+      areaName: "Area1",
+      capacity: 1000,
+      seating: 800,
+    },
+    {
+      areaName: "Hall1",
+      capacity: 1200,
+      seating: 1000,
     },
   ],
   pricing: 200,
