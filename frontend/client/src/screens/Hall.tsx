@@ -1,15 +1,23 @@
 import React, {  useState } from "react";
 import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
 import { RxDotFilled } from "react-icons/rx";
-
 import CalendarBook from '../components/CalendarBook.tsx'
+import { useParams } from "react-router-dom";
+import hallProps from "../constants/hallProps.tsx";
 
-import { EachHallType } from "../types/Hall.types.ts";
 
 
+function Hall() {
+  const { id } = useParams<{ id: string }>();
 
-function Hall({ hallProps }: { hallProps: EachHallType }) {
-  const slides = hallProps.images
+  // getHallbyID
+
+  const myHallProp = hallProps.find((hall) => hall._id === id);
+  if (!myHallProp) {
+    return <div>Hall not found</div>;
+  }
+
+  const slides = myHallProp.images
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -35,7 +43,7 @@ function Hall({ hallProps }: { hallProps: EachHallType }) {
 
   return (
     <div className="flex w-full flex-col">
-      <h1 className="text-center text-5xl font-light mt-10">Hall Name</h1>
+      <h1 className="text-center text-5xl font-light mt-10">{myHallProp.name}</h1>
       <div className="flex w-3/4 mx-auto max-xl:flex-col items-center">
         {/* Carousel */}
         <div className="max-w-[800px] h-[600px] relative m-auto py-16 px-4 group w-1/2 max-xl:w-full max-xl:max-w-[600px]">
@@ -75,16 +83,16 @@ function Hall({ hallProps }: { hallProps: EachHallType }) {
             <h1 className="text-3xl">Details:</h1>
 
             <hr className="my-4"/>                   
-            <h1 className="text-2xl ">Address: {hallProps.location.desc1} {hallProps.location.desc2}</h1>
-            <iframe src={hallProps.location.iframe} width="600" height="450" className="mt-4"></iframe>
+            <h1 className="text-2xl ">Address: {myHallProp.location.desc1} {myHallProp.location.desc2}</h1>
+            <iframe src={myHallProp.location.iframe} width="600" height="450" className="mt-4"></iframe>
             <hr className="my-4"/>                   
 
 
-            <h1 className="text-2xl ">Timings: {hallProps.timings.from} - {hallProps.timings.to}</h1>
+            <h1 className="text-2xl ">Timings: {myHallProp.timings.from} - {myHallProp.timings.to}</h1>
             <hr className="my-4"/>                   
 
             <h1 className="text-2xl ">Our party areas:</h1>
-            {hallProps.partyArea.map((area)=>{
+            {myHallProp.partyArea.map((area)=>{
               return(
               <div className="border-2 border-SAPBlue-700 my-2 rounded-xl p-4">
                   <h1 className="text-2xl ">Area: {area.areaName}</h1>
@@ -96,7 +104,7 @@ function Hall({ hallProps }: { hallProps: EachHallType }) {
             <hr className="my-4"/>   
 
             <h1 className="text-2xl ">Additional Features:</h1>
-            {hallProps.additionalFeatures.map((feature)=>{
+            {myHallProp.additionalFeatures.map((feature)=>{
               return(
                 <h1 className="text-2xl mt-4 font-extralight"><span className="font-medium text-SAPBlue-800">{feature.heading}</span> {feature.desc} </h1>
               )

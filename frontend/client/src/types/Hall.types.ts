@@ -22,6 +22,8 @@ export type EachHallLocationType = {
   };
   
   export type EachHallType = {
+    _id: string;
+    name: String;
     location: EachHallLocationType;
     about: string[];
     timings: EachHallTimingType;
