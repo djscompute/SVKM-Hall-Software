@@ -1,9 +1,7 @@
-
 ///////////////////////////////////////////////////////////////////////
 // CAN BE OUT DATED
 // REFER MODELS FOLDER
 ///////////////////////////////////////////////////////////////////////
-
 
 export type EachHallLocationType = {
   desc1: string; // short form of the location
@@ -17,33 +15,35 @@ export type EachHallTimingType = {
   to: string; // time till which the hall remains open on a day.
 };
 
-export type EachHallPartyAreaType = {
-  areaName: string; // name of the sub area in the hall
-  capacity: number; // capacity in peoples
-  seating: number; // seats
-};
-
 export type EachHallAdditonalFeaturesType = {
   heading: string; // heading of the additional feature. (eg. PODIUM )
   desc: string; // description about what the feature is
-  stats: string[]; // stats about the feature for example dimensions, duration, anything
+  stats?: string[]; // stats about the feature for example dimensions, duration, anything
   price?: number; //  price obviously per hour or something.
+};
+
+export type EachHallSlotDuration = {
+  session: string;
+  duration: string;
 };
 
 // ================================================
 // this will be in Halls Table
 // ================================================
-export type EachHallType = {
-  id: string; // UNIQUE KEY. This will be used to query Booking table in a certain time frame.
+export interface EachHallType {
+  readonly _id: string; // UNIQUE KEY. This will be used to query Booking table in a certain time frame.
   name: string; // damn i forgot this
   location: EachHallLocationType; // location of the hall
   about: string[]; // description of the hall. can be buletins
   timings: EachHallTimingType; // timing of opening and closing of the hall
-  partyArea: EachHallPartyAreaType[]; // sub areas spaces alloted in the  hall
+  capacity: string; // obvio
+  seating: string; // obvio
   pricing: number | undefined; // pricing. can be either price per time OR ask manager for final qoutation
   additionalFeatures: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
-};
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+}
 
 // ================================================
 // This will be in Customers Table
@@ -65,7 +65,6 @@ export type HallBookingType = {
   id: string; // UNIQUE KEY
   user: CustomerType; // the User who booked this hall
   features: EachHallAdditonalFeaturesType[]; // the Ammenities which the user has booked for himself
-  partyArea: EachHallPartyAreaType[]; // the Areas which he has booked for himself
   status: "CONFIRMED" | "TENTATIVE" | "EMPTY" | "DISABLED"; // payment and booking status is reflected here
   price: number; // obvio bro
   date: {
@@ -82,13 +81,16 @@ export type HallBookingType = {
 // This will be in Users Table
 // ================================================
 
-export type adminType = {
-  id: string; // UNIQUE KEY
-  role: "MANAGER" | "MASTER"; // obvio
-  password: string; // hashed
-  lastOnline: string; // not needed but daal denge
-  Halls: string[]; // will be id of the halls he has access to
-};
+export interface adminType {
+  readonly _id: string;
+  role: string;
+  username: string;
+  email: string;
+  password: string;
+  managedHalls?: string[];
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+}
 
 // ================================================
 // This will be in Messages Table
