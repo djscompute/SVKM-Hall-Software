@@ -3,10 +3,14 @@ import {
   addHallHandler,
   removeHallHandler,
   editHallHandler,
+  getAllHallsHandler,
+  getHallByIdHandler,
 } from "./controller/hall.controller";
 import {
   createAdminHandler,
+  getAdminByEmailHandler,
   getAdminHandler,
+  getHallsforAdminHandler,
   loginAdminHandler,
   logoutAdminHandler,
 } from "./controller/admin.controller";
@@ -17,6 +21,7 @@ import {
 } from "./schema/hall.schema";
 import {
   CreateAdminZodSchema,
+  EmailAdminZodSchema,
   LoginAdminZodSchema,
 } from "./schema/admin.schema";
 import { requireMasterRole } from "./middleware/accessControl";
@@ -47,6 +52,12 @@ export default function routes(app: Express) {
   app.get("/getCurrentAdmin", [validateCookie, getAdminHandler]);
 
   // GET DATA OF A SPECIFIED USER USING UNIQUE EMAIL
+  app.get("/getAdmin/:email", [
+    validateCookie,
+    validateRequest(EmailAdminZodSchema),
+    requireMasterRole,
+    getAdminByEmailHandler,
+  ]);
 
   //Add a new hall
   app.post("/addHall", [
@@ -73,10 +84,25 @@ export default function routes(app: Express) {
   ]);
 
   // GET ALL HALLS
+  app.get("/getAllHalls/", [
+    validateCookie,
+    getAllHallsHandler,
+  ]);
 
   // GET INFO OF ONE HALL WITH _id
+  app.get("/getHall/:id", [
+    validateCookie,
+    validateRequest(RemoveHallZodSchema),
+    getHallByIdHandler,
+  ]);
 
   // FUTURE: GET ALL HALLS WHOM THE MANAGER HAS ACCESS TO
+  app.get("/getHallsforAdmin/:email", [
+    validateCookie,
+    validateRequest(EmailAdminZodSchema),
+    requireMasterRole,
+    getHallsforAdminHandler,
+  ]);
 
   //Logout a admin
   app.get("/logoutAdmin", [logoutAdminHandler]);
