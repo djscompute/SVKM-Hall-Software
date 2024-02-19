@@ -7,9 +7,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col ">
-        {/* <p>{bears}</p>
-        <button onClick={() => increase(1)}>increase</button> */}
+      <div className="flex flex-col">
         <HallInfo />
       </div>
     </QueryClientProvider>

@@ -22,6 +22,11 @@ export type EachHallAdditonalFeaturesType = {
   price?: number; //  price obviously per hour or something.
 };
 
+export type EachHallSlotDuration = {
+  session: string;
+  duration: string;
+};
+
 // ================================================
 // this will be in Halls Table
 // ================================================

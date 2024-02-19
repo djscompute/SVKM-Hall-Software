@@ -4,7 +4,7 @@ import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import {
   EachHallAdditonalFeaturesType,
   EachHallType,
-} from "../types/Hall.types";
+} from "../../types/Hall.types";
 
 type props = {
   additionalFeatures: EachHallAdditonalFeaturesType[];
@@ -18,7 +18,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: props) => {
   const toggleModal = () => setModal(!modal);
 
   return (
-    <div className="hall-additional-features flex justify-between bg-SAPBlue-300 w-full py-5 px-7 rounded-lg">
+    <div className="hall-additional-features flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
       <div className="hall-additional-features-info">
         <h2 className="additional-features-text font-bold text-xl mb-3">
           Additional Features
