@@ -80,3 +80,39 @@ export async function logoutAdminHandler(req: Request, res: Response) {
     res.status(400).json({ name: error.name, message: error.message });
   }
 }
+
+export async function getAdminByEmailHandler(req: Request, res: Response) {
+  try {
+    const userEmail = req.params.email;
+
+    const user = await getUserData(userEmail);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json(user);
+  } catch (error: any) {
+    console.error("Error fetching user by email:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function getHallsforAdminHandler(req: Request, res: Response) {
+  try {
+    const userEmail = req.params.email;
+
+    const user = await getUserData(userEmail);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const managedHalls = user.managedHalls || null;
+
+    return res.status(200).json(managedHalls);
+  } catch (error: any) {
+    console.error("Error fetching user by email:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}

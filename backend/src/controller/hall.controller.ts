@@ -88,3 +88,27 @@ export async function editHallHandler(req: Request, res: Response) {
     res.status(400).json({ name: error.name, message: error.message });
   }
 }
+
+export async function getAllHallsHandler(req: Request, res: Response) {
+  try {
+    const allHalls = await HallModel.find();
+    return res.status(200).json(allHalls);
+  } catch (error: any) {
+    res.status(500).json({ name: error.name, message: error.message });
+  }
+}
+
+export async function getHallByIdHandler(req: Request, res: Response) {
+  try {
+    const hallId: string = req.params.id;
+
+    const hall = await HallModel.findById(hallId);
+    if (!hall) {
+      return res.status(404).json({ name: "Hall Not Found", message: "Hall not found" });
+    }
+
+    return res.status(200).json(hall);
+  } catch (error: any) {
+    res.status(500).json({ name: error.name, message: error.message });
+  }
+}

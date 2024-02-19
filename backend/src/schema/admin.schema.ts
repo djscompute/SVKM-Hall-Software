@@ -26,7 +26,7 @@ export const CreateAdminZodSchema = z.object({
         invalid_type_error: "New Admin password can only be a string.",
         required_error: "New Admin password cannot be empty.",
       }),
-      managedHall: z.array(z.string()).optional(),
+      managedHalls: z.array(z.string()).optional(),
     })
     .strict(),
 });
@@ -46,6 +46,15 @@ export const LoginAdminZodSchema = z.object({
       }),
     })
     .strict(), // throws error if there is any unknown keys in the input
+});
+
+export const EmailAdminZodSchema = z.object({
+  params: z.object({
+    email: z.string({
+      required_error: "Email cannot be empty",
+      invalid_type_error: "Email should be a string value.",
+    }),
+  }),
 });
 
 //type

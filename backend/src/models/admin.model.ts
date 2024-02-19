@@ -9,7 +9,7 @@ export interface adminType extends mongoose.Document {
   username: string;
   email: string;
   password: string;
-  managedHall?: string[];
+  managedHalls?: string[];
   readonly createdAt: Date;
   readonly updatedAt: Date;
   comparePasswords(email: string, password: string): Promise<adminType>;
@@ -46,7 +46,7 @@ const adminSchema = new mongoose.Schema<adminType>(
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    managedHall: { type: String },
+    managedHalls: { type: [String] },
   },
   { timestamps: true }
 );
