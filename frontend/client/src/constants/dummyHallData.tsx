@@ -1,6 +1,6 @@
 import { EachHallType } from "../types/Hall.types";
 
-const hallProps: EachHallType[] = [
+const dummyHallData: EachHallType[] = [
   {
     _id: "123",
     name: "BJ Hall",
@@ -12,19 +12,9 @@ const hallProps: EachHallType[] = [
     },
     about: ["Welcome to our hall!"],
     timings: { from: "9am", to: "10pm" },
-    partyArea: [
-      {
-        areaName: "Main Hall",
-        capacity: 200,
-        seating: 150,
-      },
-      {
-        areaName: "Lounge",
-        capacity: 50,
-        seating: 30,
-      },
-    ],
     pricing: undefined,
+    capacity: "500 people",
+    seating: "100 people",
     additionalFeatures: [
       {
         heading: "Projector",
@@ -42,6 +32,8 @@ const hallProps: EachHallType[] = [
       "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2098&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1542665952-14513db15293?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     ],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     _id: "456",
@@ -54,19 +46,9 @@ const hallProps: EachHallType[] = [
     },
     about: ["Welcome to our hall!"],
     timings: { from: "9am", to: "10pm" },
-    partyArea: [
-      {
-        areaName: "Main Hall",
-        capacity: 200,
-        seating: 150,
-      },
-      {
-        areaName: "Lounge",
-        capacity: 50,
-        seating: 30,
-      },
-    ],
     pricing: undefined,
+    capacity: "300 people",
+    seating: "50 people",
     additionalFeatures: [
       {
         heading: "Projector",
@@ -84,7 +66,9 @@ const hallProps: EachHallType[] = [
       "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2098&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1542665952-14513db15293?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     ],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
 ];
 
-export default hallProps;
+export default dummyHallData;

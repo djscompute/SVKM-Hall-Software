@@ -1,5 +1,5 @@
-import Card from "../components/Card";
-import hallProps from "../constants/hallProps.tsx";
+import Card from "../components/homePage/Card.tsx";
+import hallProps from "../constants/dummyHallData.tsx";
 
 function HomePage() {
   //getAllHalls
@@ -16,8 +16,8 @@ function HomePage() {
             name={hallProp.name}
             place={hallProp.location.desc1}
             numPhotos={hallProp.images.length}
-            minCapacity={hallProp.partyArea[1].capacity}
-            maxCapacity={hallProp.partyArea[0].capacity}
+            minCapacity={hallProp.capacity}
+            maxCapacity={hallProp.capacity}
             price={hallProp.pricing}
           />
         )

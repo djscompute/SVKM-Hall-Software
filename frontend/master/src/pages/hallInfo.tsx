@@ -5,7 +5,7 @@ import HallCapacity from "../components/hallInfo/HallCapacity";
 import HallPricing from "../components/hallInfo/HallPricing";
 import HallAdditionalFeatures from "../components/hallInfo/HallAdditionalFeatures";
 import ImageCarousel from "../components/hallInfo/ImageCarousel";
-import  { useState } from "react";
+import { useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 import "../styles/hallInfo.css";
 
@@ -63,7 +63,10 @@ export default function hallInfo() {
   };
   return (
     <div className="hall-info-container grid place-items-center gap-y-12 mx-auto w-11/12 pt-10 overflow-y-hidden">
-      <h1 className="text-5xl">Babubhai Jagjivandas Hall</h1>
+      <div className="flex flex-col items-center">
+        <p className="text-blue-700 font-semibold">Edit</p>
+        <h1 className="text-5xl">{hallData.name}</h1>
+      </div>
       {databaseHallData != hallData && (
         <div className="flex flex-col items-center gap-3">
           <p>Confirm the changes you just made</p>
