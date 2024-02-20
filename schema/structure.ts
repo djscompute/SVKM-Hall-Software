@@ -22,9 +22,13 @@ export type EachHallAdditonalFeaturesType = {
   price?: number; //  price obviously per hour or something.
 };
 
-export type EachHallSlotDuration = {
-  session: string;
-  duration: string;
+
+export type EachHallSessionType = {
+  _id: string;
+  active: boolean;
+  name: string;
+  from?: string;
+  to: string;
 };
 
 // ================================================
@@ -41,6 +45,43 @@ export interface EachHallType {
   pricing: number | undefined; // pricing. can be either price per time OR ask manager for final qoutation
   additionalFeatures: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
+  sessions: EachHallSessionType[];
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+}
+
+
+// ================================================
+// This will be in Bookings Table
+// ================================================
+export type HallBookingType = {
+  id: string; // UNIQUE KEY
+  user: CustomerType; // the User who booked this hall
+  features: EachHallAdditonalFeaturesType[]; // the Ammenities which the user has booked for himself
+  status: "CONFIRMED" | "TENTATIVE" | "EMPTY" | "DISABLED"; // payment and booking status is reflected here
+  price: number; // obvio bro
+  hallId: string;
+  session_id: string; // the sesison id
+  from: string; // starting time of session
+  to: string; // ending time of session
+  time: {
+    from: string; // start time
+    to: string; // end time
+  };
+};
+
+
+// ================================================
+// This will be in Admin Table
+// ================================================
+
+export interface adminType {
+  readonly _id: string;
+  role: string;
+  username: string;
+  email: string;
+  password: string;
+  managedHalls?: string[];
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
@@ -57,40 +98,6 @@ export type CustomerType = {
   address?: string; // address
   mobile?: string; // mobile number ( maybe UNIQUE )
 };
-
-// ================================================
-// This will be in Bookings Table
-// ================================================
-export type HallBookingType = {
-  id: string; // UNIQUE KEY
-  user: CustomerType; // the User who booked this hall
-  features: EachHallAdditonalFeaturesType[]; // the Ammenities which the user has booked for himself
-  status: "CONFIRMED" | "TENTATIVE" | "EMPTY" | "DISABLED"; // payment and booking status is reflected here
-  price: number; // obvio bro
-  date: {
-    from: string; // start date
-    to: string; // end date
-  };
-  time: {
-    from: string; // start time
-    to: string; // end time
-  };
-};
-
-// ================================================
-// This will be in Users Table
-// ================================================
-
-export interface adminType {
-  readonly _id: string;
-  role: string;
-  username: string;
-  email: string;
-  password: string;
-  managedHalls?: string[];
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-}
 
 // ================================================
 // This will be in Messages Table
