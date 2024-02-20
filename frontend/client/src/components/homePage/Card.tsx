@@ -3,7 +3,7 @@ import { faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import { faImages } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import hall from "../assets/hall.png";
+import hall from "../../assets/hall.png";
 
 export default function Card(props: any) {
   return (
