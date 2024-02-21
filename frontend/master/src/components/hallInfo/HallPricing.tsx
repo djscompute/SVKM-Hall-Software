@@ -9,10 +9,25 @@ type props = {
 };
 
 export default function HallPricing({ pricing, setHallData }: props) {
-
+  const [modalData, setModalData] = useState<number | undefined>(pricing);
   const [modal, setModal] = useState(false);
 
   const toggleModal = () => setModal(!modal);
+
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = parseFloat(event.target.value);
+    setModalData(value);
+  };
+
+  const updateHallPricing = () => {
+    if(modalData !== undefined) {
+      setHallData((prev) => ({
+        ...prev,
+        pricing: modalData,
+      }));
+      toggleModal();
+    }
+  }
 
   return (
     <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
@@ -34,16 +49,29 @@ export default function HallPricing({ pricing, setHallData }: props) {
           (<div className="modal-message fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50">
             <div className="message bg-white p-6 rounded w-3/5">
               <div className="flex gap-3 mb-5">
-                <h1 className="w-20 font-semibold">Party Areas & Capacity:</h1>
+                <h1 className="w-20 font-semibold">Pricing:</h1>
                 <div className="bg-black text-white h-24 px-5 py-2 rounded w-full ">
-                  <div className="hall-capacity-info">
-                    {pricing}
-                  </div>
+                  <textarea 
+                    name="pricing"
+                    value={modalData || ""}
+                    onChange={handleChange}
+                    className="bg-black text-white px-3 py-1 rounded w-full h-auto"
+                  />
                 </div>
               </div>
               <div className="buttons flex justify-end gap-3 mt-5">
-                <button className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300" onClick={toggleModal}>Cancel</button>
-                <button className="bg-SAPBlue-700 p-2 rounded text-white hover:bg-SAPBlue-900 transform active:scale-95 transition duration-300">Submit</button>
+                <button 
+                  className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300" 
+                  onClick={toggleModal}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="bg-SAPBlue-700 p-2 rounded text-white hover:bg-SAPBlue-900 transform active:scale-95 transition duration-300"
+                  onClick={updateHallPricing}
+                >
+                  Submit
+                </button>
               </div>
             </div>
           </div>

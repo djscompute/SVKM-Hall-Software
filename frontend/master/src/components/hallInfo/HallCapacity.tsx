@@ -20,10 +20,27 @@ export default function HallCapacity({
     // baadmai likhenge isko.
     // once backend is setup
   };
-
+  const [modalData, setModalData] = useState({capacity, seating});
   const [modal, setModal] = useState(false);
 
   const toggleModal = () => setModal(!modal);
+
+  const handleChange = (event: React.ChangeEvent<any>) => {
+    const { name, value } = event.target;
+    setModalData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const updateCapacityInfo = () => {
+    setHallData((prev) => ({
+      ...prev,
+      capacity: modalData.capacity,
+      seating: modalData.seating,
+    }));
+    toggleModal();
+  };
 
   return (
     <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
@@ -31,11 +48,11 @@ export default function HallCapacity({
         <h2 className="font-bold text-xl mb-3">Capacity and Seating</h2>
         <div className="flex ">
           <p>Capacity : </p>
-          <p>{capacity}</p>
+          <p>{modalData.capacity}</p>
         </div>
         <div className="flex ">
           <p>Seating : </p>
-          <p>{seating}</p>
+          <p>{modalData.seating}</p>
         </div>
       </div>
       <div className="hall-info-edit h-fit relative">
@@ -51,7 +68,27 @@ export default function HallCapacity({
                 <h1 className="w-20 font-semibold">
                   Edit Party Areas & Capacity
                 </h1>
-                <div className="bg-black text-white h-44 overflow-scroll px-5 py-2 rounded w-full "></div>
+                <div className="flex-col text-white px-5 py-2 rounded w-full ">
+                  <div className="flex w-full mb-2">
+                    <h1 className="w-0">Capacity:</h1>{" "}
+                    <textarea
+                      name="capacity"
+                      value={modalData.capacity}
+                      onChange={handleChange}
+                      className="bg-black text-white px-3 py-1 rounded w-full h-auto"
+                    />
+                  </div>
+                  <div className="flex">
+                    <h1 className="w-0 ">Seating:</h1>{" "}
+                    <textarea
+                      name="seating"
+                      value={modalData.seating}
+                      onChange={handleChange}
+                      className="bg-black text-white px-3 py-1 rounded w-full h-auto"
+                    />
+                  </div>
+                </div>
+                
               </div>
               {/* DO SOMETHING TO BE ABLE TO EDIT HERE */}
               <div className="buttons flex justify-end gap-3 mt-5">
@@ -61,7 +98,10 @@ export default function HallCapacity({
                 >
                   Cancel
                 </button>
-                <button className="bg-SAPBlue-700 p-2 rounded text-white hover:bg-SAPBlue-900 transform active:scale-95 transition duration-300">
+                <button 
+                  className="bg-SAPBlue-700 p-2 rounded text-white hover:bg-SAPBlue-900 transform active:scale-95 transition duration-300"
+                  onClick={updateCapacityInfo}
+                >
                   Submit
                 </button>
               </div>
