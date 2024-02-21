@@ -25,6 +25,8 @@ import {
   LoginAdminZodSchema,
 } from "./schema/admin.schema";
 import { requireMasterRole } from "./middleware/accessControl";
+import { AddBookingZodSchema } from "./schema/booking.schema";
+import { addBookingHandler } from "./controller/booking.controller";
 
 export default function routes(app: Express) {
   
@@ -102,6 +104,11 @@ export default function routes(app: Express) {
     validateRequest(EmailAdminZodSchema),
     requireMasterRole,
     getHallsforAdminHandler,
+  ]);
+
+  app.post("/addBooking", [
+    validateRequest(AddBookingZodSchema),
+    addBookingHandler,
   ]);
 
   //Logout a admin

@@ -97,7 +97,7 @@ export type CustomerType = {
   aadharNo?: string; // adhar no. ( dont know if this is required )
   panNo?: string; // pan no. ( dont know if this is required )
   address?: string; // address
-  mobile?: string; // mobile number ( maybe UNIQUE )
+  mobile: string; // mobile number ( maybe UNIQUE )
 };
 
 // ================================================
