@@ -29,6 +29,7 @@ export type EachHallSessionType = {
   name: string;
   from?: string;
   to: string;
+  price: { categoryName: string; price: number }[];
 };
 
 // ================================================
