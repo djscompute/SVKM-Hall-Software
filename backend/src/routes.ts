@@ -25,8 +25,8 @@ import {
   LoginAdminZodSchema,
 } from "./schema/admin.schema";
 import { requireMasterRole } from "./middleware/accessControl";
-import { AddBookingZodSchema } from "./schema/booking.schema";
-import { addBookingHandler } from "./controller/booking.controller";
+import { AddBookingZodSchema, getSessionZodSchema } from "./schema/booking.schema";
+import { addBookingHandler, getSessionHandler } from "./controller/booking.controller";
 
 export default function routes(app: Express) {
   
@@ -109,6 +109,12 @@ export default function routes(app: Express) {
   app.post("/addBooking", [
     validateRequest(AddBookingZodSchema),
     addBookingHandler,
+  ]);
+
+  //Get Session between from and to
+  app.get("/getSession", [
+    validateRequest(getSessionZodSchema),
+    getSessionHandler,
   ]);
 
   //Logout a admin

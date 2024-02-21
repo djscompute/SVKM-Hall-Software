@@ -35,3 +35,17 @@ export const AddBookingZodSchema = z.object({
     }),
   }),
 });
+
+//Zod Schema for /getSession route
+export const getSessionZodSchema = z.object({
+  query: z.object({
+    from: z.string().refine((from) => from.trim() !== '', {
+      message: "from cannot be empty",
+      path: ['from'],
+    }),
+    to: z.string().refine((to) => to.trim() !== '', {
+      message: "to cannot be empty",
+      path: ['to'],
+    }),
+  }),
+});
