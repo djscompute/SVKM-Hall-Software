@@ -36,7 +36,7 @@ export const AddBookingZodSchema = z.object({
   }),
 });
 
-//Zod Schema for /getSession route
+//Zod Schema for getting a session by {from, to}
 export const getSessionZodSchema = z.object({
   query: z.object({
     from: z.string().refine((from) => from.trim() !== '', {
@@ -48,4 +48,11 @@ export const getSessionZodSchema = z.object({
       path: ['to'],
     }),
   }),
+});
+
+//Zod schema for getting a session by ID
+export const getSessionByIdZodSchema = z.object({
+  query: z.object({
+    _id: z.string()
+  })
 });

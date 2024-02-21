@@ -35,7 +35,7 @@ export async function addBookingHandler(req: Request, res: Response) {
   }
 }
 
-//Handler function to get Session details during a range
+//Handler to get Session details during a range including user info
 export async function getSessionHandler(req: Request, res: Response) {
   try {
     const { from, to } = req.query;
@@ -46,7 +46,44 @@ export async function getSessionHandler(req: Request, res: Response) {
     return res.status(200).json(bookings);
   } catch (error) {
     console.error("Error in getSessionHandler:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({  message: "Internal server error", error:error});
   }
 }
 
+//Handler to get session details during a range excluding the user info
+export async function getSessionHandlerWithoutUser(req: Request, res: Response) {
+  try {
+    const { from, to } = req.query;
+    const bookings = await BookingModel.find({ from: { $gte: from }, to: { $lte: to } });
+    if (bookings.length === 0) {
+      return res.status(200).json({ message: "No bookings found for the specified range." });
+    }
+    // Remove the user object from the response
+    const bookingsWithoutUser = bookings.map(booking => {
+      const { user, ...bookingWithoutUser } = booking.toObject();
+      return bookingWithoutUser;
+    });
+
+    return res.status(200).json(bookingsWithoutUser);
+  } catch (error) {
+    console.error("Error in getSessionHandlerWithUserRemoved:", error);
+    res.status(500).json({ message: "Internal server error", error:error});
+  }
+}
+
+//Handler to get session by ID
+export async function getSessionByIdHandler(req: Request, res: Response) {
+  try {
+    const { _id } = req.query;
+    const booking = await BookingModel.findById(_id);
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    return res.status(200).json(booking);
+  } catch (error) {
+    console.error("Error in getSessionByIdHandler:", error);
+    res.status(500).json({ message: "Internal server error", error:error});
+  }
+}

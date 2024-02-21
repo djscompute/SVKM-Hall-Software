@@ -25,8 +25,8 @@ import {
   LoginAdminZodSchema,
 } from "./schema/admin.schema";
 import { requireMasterRole } from "./middleware/accessControl";
-import { AddBookingZodSchema, getSessionZodSchema } from "./schema/booking.schema";
-import { addBookingHandler, getSessionHandler } from "./controller/booking.controller";
+import { AddBookingZodSchema, getSessionByIdZodSchema, getSessionZodSchema } from "./schema/booking.schema";
+import { addBookingHandler, getSessionByIdHandler, getSessionHandler, getSessionHandlerWithoutUser } from "./controller/booking.controller";
 
 export default function routes(app: Express) {
   
@@ -115,6 +115,18 @@ export default function routes(app: Express) {
   app.get("/getSession", [
     validateRequest(getSessionZodSchema),
     getSessionHandler,
+  ]);
+
+  //Get Session between from and to without user
+  app.get("/getSessionWithoutUser", [
+    validateRequest(getSessionZodSchema),
+    getSessionHandlerWithoutUser,
+  ]);
+
+  //Get Session by ID
+  app.get("/getSessionByID", [
+    validateRequest(getSessionByIdZodSchema),
+    getSessionByIdHandler,
   ]);
 
   //Logout a admin
