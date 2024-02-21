@@ -1,4 +1,5 @@
 import { Express, NextFunction, Request, Response } from "express";
+import multer from "multer";
 import {
   addHallHandler,
   removeHallHandler,
@@ -25,6 +26,11 @@ import {
   LoginAdminZodSchema,
 } from "./schema/admin.schema";
 import { requireMasterRole } from "./middleware/accessControl";
+
+// ImageHandler
+import { uploadImageHandler } from "./controller/image.controller";
+const upload = multer({ dest: "uploads/" });
+
 
 export default function routes(app: Express) {
   
@@ -106,4 +112,8 @@ export default function routes(app: Express) {
 
   //Logout a admin
   app.get("/logoutAdmin", [logoutAdminHandler]);
+
+  //Uploading image
+  app.post("/uploadImage", upload.single("image"), uploadImageHandler);
+
 }

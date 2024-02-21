@@ -5,11 +5,13 @@ import cookieParser from "cookie-parser";
 import logger from "./utils/logger";
 import connectToDB from "./utils/connect";
 import routes from "./routes";
+import cors from 'cors'
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors()); // Add this line to enable CORS
 // app.use(errorHandler);
 
 routes(app);
