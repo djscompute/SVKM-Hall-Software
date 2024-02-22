@@ -149,7 +149,6 @@ export default function HallLocation({ location, setHallData }: props) {
                     src={modalIframeUrl}
                     width="400"
                     height="200"
-                    loading="lazy"
                     // @ts-ignore
                     allowFullScreen=""
                     // @ts-ignore

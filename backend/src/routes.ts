@@ -23,6 +23,8 @@ import {
   LoginAdminZodSchema,
 } from "./schema/admin.schema";
 import { requireMasterRole } from "./middleware/accessControl";
+import { AddBookingZodSchema } from "./schema/booking.schema";
+import { addBookingHandler } from "./controller/booking.controller";
 
 // ImageHandler
 import { uploadImageHandler } from "./controller/image.controller";
@@ -103,6 +105,11 @@ export default function routes(app: Express) {
     requireMasterRole,
     validateRequest(EmailAdminZodSchema),
     getHallsforAdminHandler,
+  ]);
+
+  app.post("/addBooking", [
+    validateRequest(AddBookingZodSchema),
+    addBookingHandler,
   ]);
 
   //Logout a admin
