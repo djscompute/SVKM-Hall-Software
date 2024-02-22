@@ -36,6 +36,26 @@ export const AddBookingZodSchema = z.object({
   }),
 });
 
+//Zod Schema for getting a session by {from, to}
+export const getSessionZodSchema = z.object({
+  query: z.object({
+    from: z.string().refine((from) => from.trim() !== '', {
+      message: "from cannot be empty",
+      path: ['from'],
+    }),
+    to: z.string().refine((to) => to.trim() !== '', {
+      message: "to cannot be empty",
+      path: ['to'],
+    }),
+  }),
+});
+
+//Zod schema for getting a session by ID
+export const getSessionByIdZodSchema = z.object({
+  query: z.object({
+    _id: z.string()
+  })
+});
 // THIS IS A FUNCITON TO CREATE UTC STANDARD TIME DATETIME STRING.
 // ZOD SUPPORTS ONLY UTC STANDARD TIME
 // function createDateTimeString(year:number, month:number, day:number, hour:number) {
