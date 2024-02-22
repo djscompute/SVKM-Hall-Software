@@ -20,10 +20,12 @@ export type EachHallAdditonalFeaturesType = {
   price?: number; //  price obviously per hour or something.
 };
 
-
-export type EachHallSlotDuration = {
-  session: string;
-  duration: string;
+export type EachHallSessionType = {
+  _id: string;
+  active: boolean;
+  name: string;
+  from?: string;
+  to: string;
 };
 
 // ================================================
@@ -40,6 +42,7 @@ export interface EachHallType {
   pricing: number | undefined; // pricing. can be either price per time OR ask manager for final qoutation
   additionalFeatures: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
+  sessions: EachHallSessionType[];
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }

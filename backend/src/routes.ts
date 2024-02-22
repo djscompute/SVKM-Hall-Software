@@ -1,4 +1,5 @@
 import { Express, NextFunction, Request, Response } from "express";
+import multer from "multer";
 import {
   addHallHandler,
   removeHallHandler,
@@ -15,19 +16,24 @@ import {
   logoutAdminHandler,
 } from "./controller/admin.controller";
 import { validateRequest, validateCookie } from "./middleware/validator";
-import {
-  AddHallZodSchema,
-  RemoveHallZodSchema,
-} from "./schema/hall.schema";
+import { AddHallZodSchema, RemoveHallZodSchema } from "./schema/hall.schema";
 import {
   CreateAdminZodSchema,
   EmailAdminZodSchema,
   LoginAdminZodSchema,
 } from "./schema/admin.schema";
 import { requireMasterRole } from "./middleware/accessControl";
+import { AddBookingZodSchema, getSessionByIdZodSchema, getSessionZodSchema } from "./schema/booking.schema";
+import { addBookingHandler, getSessionByIdHandler, getSessionHandler, getSessionHandlerWithoutUser } from "./controller/booking.controller";
+
+// ImageHandler
+import { uploadImageHandler } from "./controller/image.controller";
+import { UploadImageZodSchema } from "./schema/image.schema";
+
+// const upload = multer({ dest: "uploads/" });
+const upload = multer({ storage: multer.memoryStorage() });
 
 export default function routes(app: Express) {
-  
   app.get("/healthCheck", [
     (req: Request, res: Response) => {
       return res.status(200).send("Hello World");
@@ -84,10 +90,7 @@ export default function routes(app: Express) {
   ]);
 
   // GET ALL HALLS
-  app.get("/getAllHalls/", [
-    validateCookie,
-    getAllHallsHandler,
-  ]);
+  app.get("/getAllHalls/", [validateCookie, getAllHallsHandler]);
 
   // GET INFO OF ONE HALL WITH _id
   app.get("/getHall/:id", [
@@ -99,11 +102,44 @@ export default function routes(app: Express) {
   // FUTURE: GET ALL HALLS WHOM THE MANAGER HAS ACCESS TO
   app.get("/getHallsforAdmin/:email", [
     validateCookie,
-    validateRequest(EmailAdminZodSchema),
     requireMasterRole,
+    validateRequest(EmailAdminZodSchema),
     getHallsforAdminHandler,
+  ]);
+
+  app.post("/addBooking", [
+    validateRequest(AddBookingZodSchema),
+    addBookingHandler,
+  ]);
+
+  //Get Session between from and to
+  app.get("/getSession", [
+    validateRequest(getSessionZodSchema),
+    getSessionHandler,
+  ]);
+
+  //Get Session between from and to without user
+  app.get("/getSessionWithoutUser", [
+    validateRequest(getSessionZodSchema),
+    getSessionHandlerWithoutUser,
+  ]);
+
+  //Get Session by ID
+  app.get("/getSessionByID", [
+    validateRequest(getSessionByIdZodSchema),
+    getSessionByIdHandler,
   ]);
 
   //Logout a admin
   app.get("/logoutAdmin", [logoutAdminHandler]);
+
+  //Uploading image
+  app.post(
+    "/uploadImage",
+    // validateCookie,
+    requireMasterRole,
+    validateRequest(UploadImageZodSchema),
+    upload.single("image"),
+    uploadImageHandler
+  );
 }

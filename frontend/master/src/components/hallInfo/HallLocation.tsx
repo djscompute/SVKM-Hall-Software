@@ -57,8 +57,8 @@ export default function HallLocation({ location, setHallData }: props) {
               height="200"
               loading="lazy"
               // @ts-ignore
-              allowfullscreen=""
-              referrerpolicy="no-referrer-when-downgrade"
+              allowFullScreen=""
+              referrerPolicy="no-referrer-when-downgrade"
             />
           )}
         </div>
@@ -149,12 +149,11 @@ export default function HallLocation({ location, setHallData }: props) {
                     src={modalIframeUrl}
                     width="400"
                     height="200"
-                    loading="lazy"
                     // @ts-ignore
-                    allowfullscreen=""
+                    allowFullScreen=""
                     // @ts-ignore
                     loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
+                    referrerPolicy="no-referrer-when-downgrade"
                   />
                 </div>
               </div>

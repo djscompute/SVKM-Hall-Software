@@ -8,6 +8,7 @@ import ImageCarousel from "../components/hallInfo/ImageCarousel";
 import { useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 import "../styles/hallInfo.css";
+import HallSessions from "../components/hallInfo/HallSessions";
 
 const DummyHallInfo: EachHallType = {
   _id: "1",
@@ -18,7 +19,7 @@ const DummyHallInfo: EachHallType = {
       "Babubhai Jagjivandas Hall, 1, N S Rd Number 3, Navpada, JVPD Scheme, Vile Parle West, Mumbai, Maharashtra 400056. Babubhai Jagjivandas Hall, 1, N S Rd Number 3, Navpada, JVPD Scheme, Vile Parle West, Mumbai, Maharashtra 400056",
     gmapurl: "https://maps.app.goo.gl/8fenAeRK5RJ2LZLc8",
     iframe: `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.006039443071!2d72.83461397510128!3d19.107390982103663!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c9c676018b43%3A0x75f29a4205098f99!2sSVKM&#39;s%20Dwarkadas%20J.%20Sanghvi%20College%20of%20Engineering!5e0!3m2!1sen!2sin!4v1708336595862!5m2!1sen!2sin`,
-    // `<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.006039443071!2d72.83461397510128!3d19.107390982103663!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c9c676018b43%3A0x75f29a4205098f99!2sSVKM&#39;s%20Dwarkadas%20J.%20Sanghvi%20College%20of%20Engineering!5e0!3m2!1sen!2sin!4v1708336595862!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`,
+    // `<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.006039443071!2d72.83461397510128!3d19.107390982103663!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c9c676018b43%3A0x75f29a4205098f99!2sSVKM&#39;s%20Dwarkadas%20J.%20Sanghvi%20College%20of%20Engineering!5e0!3m2!1sen!2sin!4v1708336595862!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>`,
   },
   about: [
     "Babubhai Jagjivandas Hall, Juhu, Mumbai is a lovely venue to host your wedding and reception ceremony. It is located near the Prithvi Theatre and a close distance from Vile Parle Station which makes it easily accessible for all to reach there. Babubhai Jagjivandas Mumbai, Maharashtra serves scrumptious pure vegetarian food to their guests.",
@@ -40,6 +41,21 @@ const DummyHallInfo: EachHallType = {
     {
       heading: "In-house decorators",
       desc: "In-house decorators make the venue more stunning",
+    },
+  ],
+  sessions: [
+    {
+      _id: "12390812nlkas",
+      active: true,
+      name: "Morning first session",
+      to: "12:00 pm",
+    },
+    {
+      _id: "asdouijlqw918209",
+      active: true,
+      name: "Morning 7 hours",
+      from: "8:00 am",
+      to: "12:00 pm",
     },
   ],
   images: [
@@ -97,6 +113,7 @@ export default function hallInfo() {
         setHallData={setHallData}
       />
       <HallPricing pricing={hallData.pricing} setHallData={setHallData} />
+      <HallSessions sessions={hallData.sessions} setHallData={setHallData} />
       <HallAdditionalFeatures
         additionalFeatures={hallData.additionalFeatures}
         setHallData={setHallData}

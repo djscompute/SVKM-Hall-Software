@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 // import Carousel from "./Carousel";
 import { EachHallType } from "../../types/Hall.types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 
 type props = {
   images: string[];
@@ -17,6 +18,47 @@ export default function ImageCarousel({ images, setHallData }: props) {
       };
     });
   };
+
+  // ImageHandler
+  const [newImage, setNewImage] = useState<File | null>(null);
+
+  const handleImageUpload = async () => {
+    if (!newImage) return;
+    try {
+      const formData = new FormData();
+      formData.append("image", newImage);
+      const response = await axios.post(
+        "http://localhost:3000/uploadImage",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      const { imageUrl } = response.data;
+      setHallData((prev) => ({ ...prev, images: [...prev.images, imageUrl] }));
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setNewImage(file || null);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    setNewImage(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  // ImageHandler
 
   function updatePosition(str: string, increment: boolean) {
     setHallData((prev) => {
@@ -77,6 +119,37 @@ export default function ImageCarousel({ images, setHallData }: props) {
             </div>
           </div>
         ))}
+        {/* Image upload */}
+        <div
+          className="relative w-1/2 my-2 border-2 border-dashed border-gray-400 rounded-lg flex flex-col items-center justify-center"
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+        >
+          <label
+            htmlFor="fileInput"
+            className="cursor-pointer w-full h-full text-center p-6"
+          >
+            <span className="border-2 p-3 block w-3/4 mx-auto my-5">Choose or drag image here</span>
+            {/* Display the path of the uploaded image */}
+            {newImage && (
+              <p className="text-sm text-gray-600 my-4 mt-[-15px] ">{newImage.name}</p>
+            )}
+            <input
+              type="file"
+              id="fileInput"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <button
+              className={`px-4 py-2  text-white rounded  focus:outline-none ${!newImage?'bg-gray-400':''}  ${newImage?'bg-SAPBlue-800 hover:bg-SAPBlue-900':''}`}
+              onClick={handleImageUpload}
+              disabled={!newImage}
+            >
+              Upload
+            </button>
+          </label>
+        </div>
         {!images && <p>NO IMAGES</p>}
       </div>
     </div>
