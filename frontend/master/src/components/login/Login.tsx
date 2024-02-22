@@ -22,7 +22,7 @@ const Login: React.FC = () => {
         const data = await response.data;
         login(email, password);
 
-        // window.location.href = "/";
+        window.location.href = "/";
       } else {
         setErrorMessage("Invalid login credentials");
       }
