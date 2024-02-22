@@ -1,11 +1,11 @@
 import express from "express";
 import config from "config";  
+import cors from 'cors'
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import logger from "./utils/logger";
 import connectToDB from "./utils/connect";
 import routes from "./routes";
-import cors from 'cors'
 
 const app = express();
 

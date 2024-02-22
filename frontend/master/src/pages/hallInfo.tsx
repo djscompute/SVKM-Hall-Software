@@ -8,6 +8,7 @@ import ImageCarousel from "../components/hallInfo/ImageCarousel";
 import { useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 import "../styles/hallInfo.css";
+import HallSessions from "../components/hallInfo/HallSessions";
 
 const DummyHallInfo: EachHallType = {
   _id: "1",
@@ -40,6 +41,21 @@ const DummyHallInfo: EachHallType = {
     {
       heading: "In-house decorators",
       desc: "In-house decorators make the venue more stunning",
+    },
+  ],
+  sessions: [
+    {
+      _id: "12390812nlkas",
+      active: true,
+      name: "Morning first session",
+      to: "12:00 pm",
+    },
+    {
+      _id: "asdouijlqw918209",
+      active: true,
+      name: "Morning 7 hours",
+      from: "8:00 am",
+      to: "12:00 pm",
     },
   ],
   images: [
@@ -97,6 +113,7 @@ export default function hallInfo() {
         setHallData={setHallData}
       />
       <HallPricing pricing={hallData.pricing} setHallData={setHallData} />
+      <HallSessions sessions={hallData.sessions} setHallData={setHallData} />
       <HallAdditionalFeatures
         additionalFeatures={hallData.additionalFeatures}
         setHallData={setHallData}
