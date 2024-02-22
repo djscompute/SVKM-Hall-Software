@@ -22,16 +22,21 @@ export type EachHallAdditonalFeaturesType = {
   price?: number; //  price obviously per hour or something.
 };
 
-export type EachHallSlotDuration = {
-  session: string;
-  duration: string;
+
+export type EachHallSessionType = {
+  _id: string;
+  active: boolean;
+  name: string;
+  from?: string;
+  to: string;
+  price: { categoryName: string; price: number }[];
 };
 
 // ================================================
 // this will be in Halls Table
 // ================================================
-export interface EachHallType extends mongoose.Document {
-  readonly _id: mongoose.Types.ObjectId; // UNIQUE KEY. This will be used to query Booking table in a certain time frame.
+export interface EachHallType {
+  readonly _id: string; // UNIQUE KEY. This will be used to query Booking table in a certain time frame.
   name: string; // damn i forgot this
   location: EachHallLocationType; // location of the hall
   about: string[]; // description of the hall. can be buletins
@@ -41,6 +46,7 @@ export interface EachHallType extends mongoose.Document {
   pricing: number | undefined; // pricing. can be either price per time OR ask manager for final qoutation
   additionalFeatures: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
+  sessions: EachHallSessionType[];
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
