@@ -53,6 +53,17 @@ export const AddHallZodSchema = z.object({
       })
     ),
     images: z.array(z.string(stringErrorHandler("images"))).optional(),
+    sessions: z.array(
+      z.object({
+        active: z.boolean(),
+        name: z.string(),
+        from: z.string(),
+        to: z.string(),
+        price: z.array(
+          z.object({ categoryName: z.string(), price: z.number() })
+        ),
+      })
+    ),
   }),
 });
 

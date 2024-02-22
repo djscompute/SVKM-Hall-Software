@@ -23,7 +23,7 @@ export const AddBookingZodSchema = z.object({
         price: z.number(stringErrorHandler("price")),
       })
     ),
-    status: z.enum(["CONFIRMED", "TENTATIVE", "EMPTY", "DISABLED"]),
+    status: z.enum(["CONFIRMED", "TENTATIVE", "EMPTY", "DISABLED", "ENQUIRY"]),
     price: z.number(stringErrorHandler("price")),
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
@@ -36,8 +36,17 @@ export const AddBookingZodSchema = z.object({
   }),
 });
 
+export const RemoveBookingZodSchema = z.object({
+  params: z.object({
+    id: z.string({
+      required_error: "Id cannot be empty",
+      invalid_type_error: "Id should be a string value.",
+    }),
+  }),
+});
+
 //Zod Schema for getting a session by {from, to}
-export const getSessionZodSchema = z.object({
+export const getBookingZodSchema = z.object({
   query: z.object({
     from: z.string().refine((from) => from.trim() !== '', {
       message: "from cannot be empty",
@@ -51,7 +60,7 @@ export const getSessionZodSchema = z.object({
 });
 
 //Zod schema for getting a session by ID
-export const getSessionByIdZodSchema = z.object({
+export const getBookingByIdZodSchema = z.object({
   query: z.object({
     _id: z.string()
   })

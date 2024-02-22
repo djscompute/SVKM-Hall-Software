@@ -23,8 +23,8 @@ import {
   LoginAdminZodSchema,
 } from "./schema/admin.schema";
 import { requireMasterRole } from "./middleware/accessControl";
-import { AddBookingZodSchema, getSessionByIdZodSchema, getSessionZodSchema } from "./schema/booking.schema";
-import { addBookingHandler, getSessionByIdHandler, getSessionHandler, getSessionHandlerWithoutUser } from "./controller/booking.controller";
+import { AddBookingZodSchema, RemoveBookingZodSchema, getBookingByIdZodSchema, getBookingZodSchema } from "./schema/booking.schema";
+import { addBookingHandler, editBookingHandler, getBookingByIdHandler, getBookingHandler, getBookingHandlerWithoutUser, removeBookingHandler } from "./controller/booking.controller";
 
 // ImageHandler
 import { uploadImageHandler } from "./controller/image.controller";
@@ -85,6 +85,7 @@ export default function routes(app: Express) {
   app.post("/editHall/:id", [
     validateCookie,
     requireMasterRole,
+    validateRequest(RemoveHallZodSchema),
     validateRequest(AddHallZodSchema),
     editHallHandler,
   ]);
@@ -112,22 +113,37 @@ export default function routes(app: Express) {
     addBookingHandler,
   ]);
 
-  //Get Session between from and to
-  app.get("/getSession", [
-    validateRequest(getSessionZodSchema),
-    getSessionHandler,
+  app.post("/editBooking/:id", [
+    validateCookie,
+    requireMasterRole,
+    validateRequest(RemoveBookingZodSchema),
+    validateRequest(AddBookingZodSchema),
+    editBookingHandler,
   ]);
 
-  //Get Session between from and to without user
-  app.get("/getSessionWithoutUser", [
-    validateRequest(getSessionZodSchema),
-    getSessionHandlerWithoutUser,
+  app.post("/removeBooking/:id", [
+    validateCookie,
+    requireMasterRole,
+    validateRequest(RemoveBookingZodSchema),
+    removeBookingHandler,
   ]);
 
-  //Get Session by ID
-  app.get("/getSessionByID", [
-    validateRequest(getSessionByIdZodSchema),
-    getSessionByIdHandler,
+  //Get Booking between from and to
+  app.get("/getBooking", [
+    validateRequest(getBookingZodSchema),
+    getBookingHandler,
+  ]);
+
+  //Get Booking between from and to without user
+  app.get("/getBookingWithoutUser", [
+    validateRequest(getBookingZodSchema),
+    getBookingHandlerWithoutUser,
+  ]);
+
+  //Get Booking by ID
+  app.get("/getBookingByID", [
+    validateRequest(getBookingByIdZodSchema),
+    getBookingByIdHandler,
   ]);
 
   //Logout a admin
