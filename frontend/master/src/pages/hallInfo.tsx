@@ -48,14 +48,15 @@ const DummyHallInfo: EachHallType = {
       _id: "12390812nlkas",
       active: true,
       name: "Morning first session",
-      to: "12:00 pm",
+      from: "3:40:00.000Z",
+      to: "20:30:00.000Z",
     },
     {
       _id: "asdouijlqw918209",
       active: true,
       name: "Morning 7 hours",
-      from: "8:00 am",
-      to: "12:00 pm",
+      from: "3:40:00.000Z",
+      to: "20:30:00.000Z",
     },
   ],
   images: [

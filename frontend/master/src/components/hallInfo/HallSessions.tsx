@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
-import {
-  EachHallSessionType,
-  EachHallType,
-} from "../../types/Hall.types";
+import { EachHallSessionType, EachHallType } from "../../types/Hall.types";
 import ToggleSwitch from "../toggleSwitch/toggleSwitch";
+import BasicTimePicker from "./BasicTimePicker";
+import { convertUTCTimeTo12HourFormat } from "../../utils/convertUTCTimeTo12HourFormat";
 
 type Props = {
   sessions: EachHallSessionType[];
@@ -42,7 +41,8 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   };
 
   const handleAddItem = () => {
-    if (newItem.name.trim() !== "" && newItem.to.trim() !== "") {
+    console.log(newItem);
+    if (newItem.name.trim() !== "" && newItem.to && newItem.from) {
       if (editIndex !== -1) {
         const updatedList = [...editedSessions];
         updatedList[editIndex] = newItem;
@@ -99,11 +99,17 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
               <div className="flex justify-between">
                 <div className="flex gap-2 bg-white px-2 rounded-md">
                   <span>From:</span>
-                  <span className="">{eachSession.from || "NAN"}</span>
+                  <span className="">
+                    {eachSession.from
+                      ? convertUTCTimeTo12HourFormat(eachSession.from)
+                      : "NAN"}
+                  </span>
                 </div>
                 <div className="flex gap-2 bg-white px-2 rounded-md">
                   <span>To:</span>
-                  <span className="">{eachSession.to}</span>
+                  <span className="">
+                    {convertUTCTimeTo12HourFormat(eachSession.to)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -144,12 +150,17 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                           <div className="flex gap-2 bg-white rounded-md">
                             <span>From:</span>
                             <span className="">
-                              {eachSession.from || "NAN"}
+                              {eachSession.from
+                                ? convertUTCTimeTo12HourFormat(eachSession.from)
+                                : "NAN"}
                             </span>
                           </div>
                           <div className="flex gap-2 bg-white px-2 rounded-md">
                             <span>To:</span>
-                            <span className="">{eachSession.to}</span>
+                            <span className="">
+                              {convertUTCTimeTo12HourFormat(eachSession.to)}
+                              {/* {eachSession.to} asdasd */}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -178,27 +189,27 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                       onChange={(e) =>
                         setNewItem({ ...newItem, name: e.target.value })
                       }
-                      className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
+                      className="bg-gray-100 text-black px-5 py-3 rounded resize-none flex-grow border border-stone-300"
                       placeholder="Name"
                     />
                     <div className="flex justify-between gap-2">
-                      <input
-                        type="text"
-                        value={newItem.from}
-                        onChange={(e) =>
-                          setNewItem({ ...newItem, from: e.target.value })
+                      <BasicTimePicker
+                        timePickerName="From"
+                        timeModifier={(newTimeString) =>
+                          setNewItem((prev) => ({
+                            ...prev,
+                            from: newTimeString,
+                          }))
                         }
-                        className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
-                        placeholder="From eg: 8:00 am"
                       />
-                      <input
-                        type="text"
-                        value={newItem.to}
-                        onChange={(e) =>
-                          setNewItem({ ...newItem, to: e.target.value })
+                      <BasicTimePicker
+                        timePickerName="To"
+                        timeModifier={(newTimeString) =>
+                          setNewItem((prev) => ({
+                            ...prev,
+                            to: newTimeString,
+                          }))
                         }
-                        className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
-                        placeholder="To eg: 12:00pm"
                       />
                     </div>
                     <div className="flex gap-2">
