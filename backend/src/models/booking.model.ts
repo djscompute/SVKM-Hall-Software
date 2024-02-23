@@ -31,7 +31,7 @@ export interface HallBookingType extends mongoose.Document {
   readonly _id: mongoose.Types.ObjectId;
   user: CustomerType;
   features: EachHallAdditonalFeaturesType[];
-  status: "CONFIRMED" | "TENTATIVE" | "EMPTY" | "DISABLED";
+  status: "CONFIRMED" | "TENTATIVE" | "EMPTY" | "DISABLED" | "ENQUIRY";
   price: number;
   hallId: string;
   session_id: string;
