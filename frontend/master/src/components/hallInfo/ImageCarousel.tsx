@@ -2,7 +2,7 @@ import React, { useState } from "react";
 // import Carousel from "./Carousel";
 import { EachHallType } from "../../types/Hall.types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
+import axiosInstance from "../../config/axiosInstance";
 
 type props = {
   images: string[];
@@ -27,7 +27,7 @@ export default function ImageCarousel({ images, setHallData }: props) {
     try {
       const formData = new FormData();
       formData.append("image", newImage);
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         "http://localhost:3000/uploadImage",
         formData,
         {
@@ -129,10 +129,14 @@ export default function ImageCarousel({ images, setHallData }: props) {
             htmlFor="fileInput"
             className="cursor-pointer w-full h-full text-center p-6"
           >
-            <span className="border-2 p-3 block w-3/4 mx-auto my-5">Choose or drag image here</span>
+            <span className="border-2 p-3 block w-3/4 mx-auto my-5">
+              Choose or drag image here
+            </span>
             {/* Display the path of the uploaded image */}
             {newImage && (
-              <p className="text-sm text-gray-600 my-4 mt-[-15px] ">{newImage.name}</p>
+              <p className="text-sm text-gray-600 my-4 mt-[-15px] ">
+                {newImage.name}
+              </p>
             )}
             <input
               type="file"
@@ -142,7 +146,9 @@ export default function ImageCarousel({ images, setHallData }: props) {
               onChange={handleFileChange}
             />
             <button
-              className={`px-4 py-2  text-white rounded  focus:outline-none ${!newImage?'bg-gray-400':''}  ${newImage?'bg-SAPBlue-800 hover:bg-SAPBlue-900':''}`}
+              className={`px-4 py-2  text-white rounded  focus:outline-none ${
+                !newImage ? "bg-gray-400" : ""
+              }  ${newImage ? "bg-SAPBlue-800 hover:bg-SAPBlue-900" : ""}`}
               onClick={handleImageUpload}
               disabled={!newImage}
             >

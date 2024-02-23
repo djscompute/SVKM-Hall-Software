@@ -23,8 +23,20 @@ import {
   LoginAdminZodSchema,
 } from "./schema/admin.schema";
 import { requireMasterRole } from "./middleware/accessControl";
-import { AddBookingZodSchema, RemoveBookingZodSchema, getBookingByIdZodSchema, getBookingZodSchema } from "./schema/booking.schema";
-import { addBookingHandler, editBookingHandler, getBookingByIdHandler, getBookingHandler, getBookingHandlerWithoutUser, removeBookingHandler } from "./controller/booking.controller";
+import {
+  AddBookingZodSchema,
+  RemoveBookingZodSchema,
+  getBookingByIdZodSchema,
+  getBookingZodSchema,
+} from "./schema/booking.schema";
+import {
+  addBookingHandler,
+  editBookingHandler,
+  getBookingByIdHandler,
+  getBookingHandler,
+  getBookingHandlerWithoutUser,
+  removeBookingHandler,
+} from "./controller/booking.controller";
 
 // ImageHandler
 import { uploadImageHandler } from "./controller/image.controller";
@@ -152,7 +164,11 @@ export default function routes(app: Express) {
   //Uploading image
   app.post(
     "/uploadImage",
-    // validateCookie,
+    validateCookie,
+    (res, req, next) => {
+      console.log("HERE");
+      next();
+    },
     requireMasterRole,
     validateRequest(UploadImageZodSchema),
     upload.single("image"),

@@ -39,6 +39,7 @@ export function validateCookie(
 ) {
   try {
     const { accessToken, refreshToken }: CookieType = req.cookies;
+    console.log("ACCESS ", accessToken, refreshToken);
     //Verify Access Token
     jwt.verify(
       accessToken,
