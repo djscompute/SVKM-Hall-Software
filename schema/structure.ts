@@ -10,11 +10,6 @@ export type EachHallLocationType = {
   iframe?: string; // google map iframe embed to display on page
 };
 
-export type EachHallTimingType = {
-  from: string; // time from which the halls opens on the day.
-  to: string; // time till which the hall remains open on a day.
-};
-
 export type EachHallAdditonalFeaturesType = {
   heading: string; // heading of the additional feature. (eg. PODIUM )
   desc: string; // description about what the feature is
@@ -40,7 +35,6 @@ export interface EachHallType {
   name: string; // damn i forgot this
   location: EachHallLocationType; // location of the hall
   about: string[]; // description of the hall. can be buletins
-  timings: EachHallTimingType; // timing of opening and closing of the hall
   capacity: string; // obvio
   seating: string; // obvio
   pricing: number | undefined; // pricing. can be either price per time OR ask manager for final qoutation

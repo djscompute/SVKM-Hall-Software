@@ -1,6 +1,5 @@
 import HallLocation from "../components/hallInfo/HallLocation";
 import AboutHall from "../components/hallInfo/AboutHall";
-import HallSlotInfo from "../components/hallInfo/HallSlotInfo";
 import HallCapacity from "../components/hallInfo/HallCapacity";
 import HallPricing from "../components/hallInfo/HallPricing";
 import HallAdditionalFeatures from "../components/hallInfo/HallAdditionalFeatures";
@@ -26,12 +25,8 @@ const DummyHallInfo: EachHallType = {
     "The decor team takes care of the decoration for your big day. Babubhai Jagjivandas Hall has a lush green lawn that can accommodate a huge crowd for an open-air outdoor evening reception. It also has a banquet hall for having an indoor wedding or reception ceremony.",
     "BJ Hall Vile Parle has an inviting ambiance which makes everyone feel welcomed. The elegant décor of the venue makes it an ideal option for a grand wedding. Host your events at BJ Hall Mumbai to make them outstanding. Ticking all the right boxes, this one must certainly be on your cards.",
   ],
-  timings: {
-    from: "11:00 AM",
-    to: "11:00 PM",
-  },
-  capacity: "500",
-  seating: "100",
+  capacity: "500 people",
+  seating: "100 seats",
   pricing: 200,
   additionalFeatures: [
     {
@@ -107,7 +102,6 @@ export default function hallInfo() {
       )}
       <HallLocation location={hallData.location} setHallData={setHallData} />
       <AboutHall about={hallData.about} setHallData={setHallData} />
-      <HallSlotInfo timing={hallData.timings} setHallData={setHallData} />
       <HallCapacity
         capacity={hallData.capacity}
         seating={hallData.seating}

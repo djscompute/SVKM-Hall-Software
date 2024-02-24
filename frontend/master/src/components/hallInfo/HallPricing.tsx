@@ -14,20 +14,20 @@ export default function HallPricing({ pricing, setHallData }: props) {
 
   const toggleModal = () => setModal(!modal);
 
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(event.target.value);
     setModalData(value);
   };
 
   const updateHallPricing = () => {
-    if(modalData !== undefined) {
+    if (modalData !== undefined) {
       setHallData((prev) => ({
         ...prev,
         pricing: modalData,
       }));
       toggleModal();
     }
-  }
+  };
 
   return (
     <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
@@ -45,28 +45,27 @@ export default function HallPricing({ pricing, setHallData }: props) {
           className="show-on-hover h-6 cursor-pointer opacity-50 hover:opacity-100"
           onClick={toggleModal}
         />
-        {modal &&
-          (<div className="modal-message fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50">
+        {modal && (
+          <div className="modal-message fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50">
             <div className="message bg-white p-6 rounded w-3/5">
-              <div className="flex gap-3 mb-5">
+              <div className="flex items-center gap-3 mb-5">
                 <h1 className="w-20 font-semibold">Pricing:</h1>
-                <div className="bg-black text-white h-24 px-5 py-2 rounded w-full ">
-                  <textarea 
-                    name="pricing"
-                    value={modalData || ""}
-                    onChange={handleChange}
-                    className="bg-black text-white px-3 py-1 rounded w-full h-auto"
-                  />
-                </div>
+                <input
+                  type="number"
+                  name="pricing"
+                  value={modalData || ""}
+                  onChange={handleChange}
+                  className=" bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full h-auto"
+                />
               </div>
               <div className="buttons flex justify-end gap-3 mt-5">
-                <button 
-                  className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300" 
+                <button
+                  className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300"
                   onClick={toggleModal}
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   className="bg-SAPBlue-700 p-2 rounded text-white hover:bg-SAPBlue-900 transform active:scale-95 transition duration-300"
                   onClick={updateHallPricing}
                 >

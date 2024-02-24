@@ -93,15 +93,15 @@ export default function ImageCarousel({ images, setHallData }: props) {
             />
             <div className="flex justify-evenly">
               <button
-                className="w-full bg-red-500 text-xl text-white rounded-bl-xl py-1 border-2 border-black border-r-0"
+                className="w-full bg-red-500 text-xl text-white rounded-bl-xl py-1 border-2 border-black"
                 onClick={() => deleteImage(imageSrc)}
               >
                 Del
               </button>
               <button
                 className={`w-full  ${
-                  index == 0 ? "bg-gray-300" : "bg-blue-500"
-                } text-xl text-white  py-1 border-2 border-black border-r-0`}
+                  index == 0 ? "bg-gray-400" : "bg-blue-500"
+                } text-xl text-white  py-1  border-y-2 border-black`}
                 onClick={() => updatePosition(imageSrc, false)}
                 disabled={index == 0}
               >
@@ -109,8 +109,8 @@ export default function ImageCarousel({ images, setHallData }: props) {
               </button>
               <button
                 className={`w-full  ${
-                  index == images.length - 1 ? "bg-gray-300" : "bg-blue-500"
-                } text-xl text-white  py-1 border-2 border-black border-r-0`}
+                  index == images.length - 1 ? "bg-gray-400" : "bg-blue-500"
+                } text-xl text-white  py-1 rounded-br-xl border-2 border-black`}
                 onClick={() => updatePosition(imageSrc, true)}
                 disabled={index == images.length - 1}
               >
