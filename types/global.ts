@@ -84,8 +84,8 @@ export interface adminType {
 // This will be in Customers Table
 // ================================================
 export type CustomerType = {
-  id: string; // unique customer id
-  name: string; // name
+  readonly _id: string; // unique customer id
+  username: string; // name
   email?: string; // email ( maybe UNIQUE KEY )
   aadharNo?: string; // adhar no. ( dont know if this is required )
   panNo?: string; // pan no. ( dont know if this is required )

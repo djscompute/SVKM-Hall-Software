@@ -1,20 +1,17 @@
 import mongoose from "mongoose";
+// @ts-ignore
+import { CustomerType } from "../../../types/global"
+export type { CustomerType }
 
-//type-customer
-export interface customerType extends mongoose.Document {
-  readonly _id: mongoose.Types.ObjectId;
-  username: string;
-  email?: string;
-  phone?: string;
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-}
 // Schema-customer
-const customerSchema = new mongoose.Schema<customerType>(
+export const CustomerSchema = new mongoose.Schema<CustomerType>(
   {
     username: { type: String, required: true },
     email: { type: String },
-    phone: { type: String },
+    aadharNo: { type: String },
+    panNo: { type: String },
+    address: { type: String },
+    mobile: { type: String, required: true },
   },
   { timestamps: true }
 );

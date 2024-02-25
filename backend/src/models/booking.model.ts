@@ -1,23 +1,18 @@
 import mongoose, { mongo } from "mongoose";
 import { EachHallAdditonalFeaturesType } from "./hall.model";
+// @ts-ignore
+import { CustomerType , HallBookingType } from "../../../types/global";
+export type { CustomerType, HallBookingType }
+import { CustomerSchema } from "./customer.model";
 
-export type CustomerType = {
-  name: string;
-  email?: string;
-  aadharNo?: string;
-  panNo?: string;
-  address?: string;
-  mobile: string;
-};
-
-const CustomerSchema = new mongoose.Schema<CustomerType>({
-  name: { type: String, required: true },
-  email: { type: String },
-  aadharNo: { type: String },
-  panNo: { type: String },
-  address: { type: String },
-  mobile: { type: String, required: true },
-});
+// export const CustomerSchema = new mongoose.Schema<CustomerType>({
+//   username: { type: String, required: true },
+//   email: { type: String },
+//   aadharNo: { type: String },
+//   panNo: { type: String },
+//   address: { type: String },
+//   mobile: { type: String, required: true },
+// });
 
 const HallAdditonalFeaturesSchema =
   new mongoose.Schema<EachHallAdditonalFeaturesType>({
@@ -26,24 +21,6 @@ const HallAdditonalFeaturesSchema =
     stats: { type: [String], required: true },
     price: { type: Number },
   });
-
-export interface HallBookingType extends mongoose.Document {
-  readonly _id: mongoose.Types.ObjectId;
-  user: CustomerType;
-  features: EachHallAdditonalFeaturesType[];
-  status: "CONFIRMED" | "TENTATIVE" | "EMPTY" | "DISABLED" | "ENQUIRY";
-  price: number;
-  hallId: string;
-  session_id: string;
-  from: string;
-  to: string;
-  time: {
-    from: string;
-    to: string;
-  };
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-}
 
 const BookingSchema = new mongoose.Schema<HallBookingType>(
   {
