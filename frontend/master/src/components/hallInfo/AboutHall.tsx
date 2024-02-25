@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
-import { EachHallType } from "../../types/Hall.types";
+import { EachHallLocationType, EachHallType } from "../../types/Hall.types";
 
 type Props = {
   about: string[];
