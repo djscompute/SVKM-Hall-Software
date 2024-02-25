@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////////////
 
 export type EachHallLocationType = {
-  readonly _id: string;
+  readonly _id?: string;
   desc1: string; // short form of the location
   desc2: string; // full address of the location
   gmapurl?: string; // google map url for the place
@@ -12,7 +12,7 @@ export type EachHallLocationType = {
 };
 
 export type EachHallAdditonalFeaturesType = {
-  readonly _id: string;
+  readonly _id?: string;
   heading: string; // heading of the additional feature. (eg. PODIUM )
   desc: string; // description about what the feature is
   stats?: string[]; // stats about the feature for example dimensions, duration, anything
@@ -20,7 +20,7 @@ export type EachHallAdditonalFeaturesType = {
 };
 
 export type EachHallSessionType = {
-  readonly _id: string;
+  readonly _id?: string;
   active: boolean;
   name: string;
   from?: string;
@@ -32,7 +32,7 @@ export type EachHallSessionType = {
 // this will be in Halls Table
 // ================================================
 export interface EachHallType {
-  readonly _id: string; // UNIQUE KEY. This will be used to query Booking table in a certain time frame.
+  readonly _id?: string; // UNIQUE KEY. This will be used to query Booking table in a certain time frame.
   name: string; // damn i forgot this
   location: EachHallLocationType; // location of the hall
   about: string[]; // description of the hall. can be buletins
@@ -42,8 +42,8 @@ export interface EachHallType {
   additionalFeatures?: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
   sessions: EachHallSessionType[];
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
+  readonly createdAt?: Date;
+  readonly updatedAt?: Date;
 }
 
 // ================================================

@@ -1,13 +1,15 @@
-import HallLocation from "../components/hallInfo/HallLocation";
-import AboutHall from "../components/hallInfo/AboutHall";
-import HallCapacity from "../components/hallInfo/HallCapacity";
-import HallPricing from "../components/hallInfo/HallPricing";
-import HallAdditionalFeatures from "../components/hallInfo/HallAdditionalFeatures";
-import ImageCarousel from "../components/hallInfo/ImageCarousel";
+import HallLocation from "../components/editHall/HallLocation";
+import AboutHall from "../components/editHall/AboutHall";
+import HallCapacity from "../components/editHall/HallCapacity";
+import HallPricing from "../components/editHall/HallPricing";
+import HallAdditionalFeatures from "../components/editHall/HallAdditionalFeatures";
+import ImageCarousel from "../components/editHall/ImageCarousel";
 import { useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 import "../styles/hallInfo.css";
-import HallSessions from "../components/hallInfo/HallSessions";
+import HallSessions from "../components/editHall/HallSessions";
+import { useMutation } from "@tanstack/react-query";
+import axiosInstance from "../config/axiosInstance";
 
 const DummyHallInfo: EachHallType = {
   _id: "1",
@@ -86,7 +88,7 @@ const DummyHallInfo: EachHallType = {
   updatedAt: new Date(),
 };
 
-export default function hallInfo() {
+export default function EditHall() {
   // do not update this state.
   // this state is here to maintain the unupdated version of the hall in the database and compare to our local updated version.
   const [databaseHallData, setDatabaseHallData] =
@@ -96,6 +98,11 @@ export default function hallInfo() {
   const updateHallData = () => {
     // send to /edit hall to update the data
   };
+
+  const { data } = useMutation({
+    mutationFn: () => axiosInstance.post(`/editHall/{hallID}`, {}),
+  });
+
   return (
     <div className="hall-info-container grid place-items-center gap-y-12 mx-auto w-11/12 pt-10 overflow-y-hidden">
       <div className="flex flex-col items-center">
@@ -108,7 +115,7 @@ export default function hallInfo() {
           <div className="flex gap-5">
             <button
               className=" bg-green-500 p-1 px-2 rounded-md text-xl font-semibold text-white"
-              onClick={updateHallData}
+              // onClick={updateHallData}
             >
               Confirm
             </button>
