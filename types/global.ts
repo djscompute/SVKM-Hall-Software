@@ -4,6 +4,7 @@
 ///////////////////////////////////////////////////////////////////////
 
 export type EachHallLocationType = {
+  readonly _id: string;
   desc1: string; // short form of the location
   desc2: string; // full address of the location
   gmapurl?: string; // google map url for the place
@@ -11,15 +12,15 @@ export type EachHallLocationType = {
 };
 
 export type EachHallAdditonalFeaturesType = {
+  readonly _id: string;
   heading: string; // heading of the additional feature. (eg. PODIUM )
   desc: string; // description about what the feature is
   stats?: string[]; // stats about the feature for example dimensions, duration, anything
   price?: number; //  price obviously per hour or something.
 };
 
-
 export type EachHallSessionType = {
-  _id: string;
+  readonly _id: string;
   active: boolean;
   name: string;
   from?: string;
@@ -37,14 +38,13 @@ export interface EachHallType {
   about: string[]; // description of the hall. can be buletins
   capacity: string; // obvio
   seating: string; // obvio
-  pricing: number | undefined; // pricing. can be either price per time OR ask manager for final qoutation
-  additionalFeatures: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
+  pricing: string | undefined; // pricing. can be either price per time OR ask manager for final qoutation
+  additionalFeatures?: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
   sessions: EachHallSessionType[];
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
-
 
 // ================================================
 // This will be in Bookings Table
@@ -64,7 +64,6 @@ export type HallBookingType = {
     to: string; // end time
   };
 };
-
 
 // ================================================
 // This will be in Admin Table
