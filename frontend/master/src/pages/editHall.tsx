@@ -1,19 +1,21 @@
-import HallLocation from "../components/hallInfo/HallLocation";
-import AboutHall from "../components/hallInfo/AboutHall";
-import HallSlotInfo from "../components/hallInfo/HallSlotInfo";
-import HallCapacity from "../components/hallInfo/HallCapacity";
-import HallPricing from "../components/hallInfo/HallPricing";
-import HallAdditionalFeatures from "../components/hallInfo/HallAdditionalFeatures";
-import ImageCarousel from "../components/hallInfo/ImageCarousel";
+import HallLocation from "../components/editHall/HallLocation";
+import AboutHall from "../components/editHall/AboutHall";
+import HallCapacity from "../components/editHall/HallCapacity";
+import HallPricing from "../components/editHall/HallPricing";
+import HallAdditionalFeatures from "../components/editHall/HallAdditionalFeatures";
+import ImageCarousel from "../components/editHall/ImageCarousel";
 import { useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 import "../styles/hallInfo.css";
-import HallSessions from "../components/hallInfo/HallSessions";
+import HallSessions from "../components/editHall/HallSessions";
+import { useMutation } from "@tanstack/react-query";
+import axiosInstance from "../config/axiosInstance";
 
 const DummyHallInfo: EachHallType = {
   _id: "1",
   name: "DJ Hall",
   location: {
+    _id: "120912309",
     desc1: "Juhu, Mumbai",
     desc2:
       "Babubhai Jagjivandas Hall, 1, N S Rd Number 3, Navpada, JVPD Scheme, Vile Parle West, Mumbai, Maharashtra 400056. Babubhai Jagjivandas Hall, 1, N S Rd Number 3, Navpada, JVPD Scheme, Vile Parle West, Mumbai, Maharashtra 400056",
@@ -26,19 +28,17 @@ const DummyHallInfo: EachHallType = {
     "The decor team takes care of the decoration for your big day. Babubhai Jagjivandas Hall has a lush green lawn that can accommodate a huge crowd for an open-air outdoor evening reception. It also has a banquet hall for having an indoor wedding or reception ceremony.",
     "BJ Hall Vile Parle has an inviting ambiance which makes everyone feel welcomed. The elegant décor of the venue makes it an ideal option for a grand wedding. Host your events at BJ Hall Mumbai to make them outstanding. Ticking all the right boxes, this one must certainly be on your cards.",
   ],
-  timings: {
-    from: "11:00 AM",
-    to: "11:00 PM",
-  },
-  capacity: "500",
-  seating: "100",
-  pricing: 200,
+  capacity: "500 people",
+  seating: "100 seats",
+  pricing: "200 per day",
   additionalFeatures: [
     {
+      _id: "asdasdasd212",
       heading: "Gorgeous Ambience",
       desc: " We have got a very good ambience",
     },
     {
+      _id: "asdasdasdadwerw23",
       heading: "In-house decorators",
       desc: "In-house decorators make the venue more stunning",
     },
@@ -48,14 +48,35 @@ const DummyHallInfo: EachHallType = {
       _id: "12390812nlkas",
       active: true,
       name: "Morning first session",
-      to: "12:00 pm",
+      from: "3:40:00.000Z",
+      to: "20:30:00.000Z",
+      price: [
+        {
+          categoryName: "Student",
+          price: 2000,
+        },
+        {
+          categoryName: "Politician",
+          price: 4000,
+        },
+      ],
     },
     {
       _id: "asdouijlqw918209",
       active: true,
       name: "Morning 7 hours",
-      from: "8:00 am",
-      to: "12:00 pm",
+      from: "3:40:00.000Z",
+      to: "20:30:00.000Z",
+      price: [
+        {
+          categoryName: "Student",
+          price: 2000,
+        },
+        {
+          categoryName: "Politician",
+          price: 4000,
+        },
+      ],
     },
   ],
   images: [
@@ -67,7 +88,7 @@ const DummyHallInfo: EachHallType = {
   updatedAt: new Date(),
 };
 
-export default function hallInfo() {
+export default function EditHall() {
   // do not update this state.
   // this state is here to maintain the unupdated version of the hall in the database and compare to our local updated version.
   const [databaseHallData, setDatabaseHallData] =
@@ -77,6 +98,11 @@ export default function hallInfo() {
   const updateHallData = () => {
     // send to /edit hall to update the data
   };
+
+  const { data } = useMutation({
+    mutationFn: () => axiosInstance.post(`/editHall/{hallID}`, {}),
+  });
+
   return (
     <div className="hall-info-container grid place-items-center gap-y-12 mx-auto w-11/12 pt-10 overflow-y-hidden">
       <div className="flex flex-col items-center">
@@ -89,7 +115,7 @@ export default function hallInfo() {
           <div className="flex gap-5">
             <button
               className=" bg-green-500 p-1 px-2 rounded-md text-xl font-semibold text-white"
-              onClick={updateHallData}
+              // onClick={updateHallData}
             >
               Confirm
             </button>
@@ -106,7 +132,6 @@ export default function hallInfo() {
       )}
       <HallLocation location={hallData.location} setHallData={setHallData} />
       <AboutHall about={hallData.about} setHallData={setHallData} />
-      <HallSlotInfo timing={hallData.timings} setHallData={setHallData} />
       <HallCapacity
         capacity={hallData.capacity}
         seating={hallData.seating}
@@ -114,10 +139,12 @@ export default function hallInfo() {
       />
       <HallPricing pricing={hallData.pricing} setHallData={setHallData} />
       <HallSessions sessions={hallData.sessions} setHallData={setHallData} />
-      <HallAdditionalFeatures
-        additionalFeatures={hallData.additionalFeatures}
-        setHallData={setHallData}
-      />
+      {hallData.additionalFeatures && (
+        <HallAdditionalFeatures
+          additionalFeatures={hallData.additionalFeatures}
+          setHallData={setHallData}
+        />
+      )}
       <ImageCarousel images={hallData.images} setHallData={setHallData} />
     </div>
   );

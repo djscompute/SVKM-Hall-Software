@@ -20,10 +20,27 @@ export default function HallCapacity({
     // baadmai likhenge isko.
     // once backend is setup
   };
-
+  const [modalData, setModalData] = useState({ capacity, seating });
   const [modal, setModal] = useState(false);
 
   const toggleModal = () => setModal(!modal);
+
+  const handleChange = (event: React.ChangeEvent<any>) => {
+    const { name, value } = event.target;
+    setModalData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const updateCapacityInfo = () => {
+    setHallData((prev) => ({
+      ...prev,
+      capacity: modalData.capacity,
+      seating: modalData.seating,
+    }));
+    toggleModal();
+  };
 
   return (
     <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
@@ -47,11 +64,30 @@ export default function HallCapacity({
         {modal && (
           <div className="modal-message fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50">
             <div className="message bg-white p-6 rounded w-3/5">
-              <div className="flex gap-3 mb-5">
-                <h1 className="w-20 font-semibold">
+              <div className="flex flex-col gap-3 mb-5">
+                <h1 className="text-center text-lg font-semibold">
                   Edit Party Areas & Capacity
                 </h1>
-                <div className="bg-black text-white h-44 overflow-scroll px-5 py-2 rounded w-full "></div>
+                <div className="flex flex-col px-5 py-2 rounded w-full gap-5">
+                  <div className="flex items-center justify-between gap-4">
+                    <h1 className="">Capacity:</h1>
+                    <input
+                      name="capacity"
+                      value={modalData.capacity}
+                      onChange={handleChange}
+                      className="w-3/4 bg-gray-100 border border-gray-300 p-3 rounded h-auto"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <h1 className="">Seating:</h1>
+                    <input
+                      name="seating"
+                      value={modalData.seating}
+                      onChange={handleChange}
+                      className="w-3/4 bg-gray-100 border border-gray-300 p-3 rounded h-auto"
+                    />
+                  </div>
+                </div>
               </div>
               {/* DO SOMETHING TO BE ABLE TO EDIT HERE */}
               <div className="buttons flex justify-end gap-3 mt-5">
@@ -61,7 +97,10 @@ export default function HallCapacity({
                 >
                   Cancel
                 </button>
-                <button className="bg-SAPBlue-700 p-2 rounded text-white hover:bg-SAPBlue-900 transform active:scale-95 transition duration-300">
+                <button
+                  className="bg-SAPBlue-700 p-2 rounded text-white hover:bg-SAPBlue-900 transform active:scale-95 transition duration-300"
+                  onClick={updateCapacityInfo}
+                >
                   Submit
                 </button>
               </div>

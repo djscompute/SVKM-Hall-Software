@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
-import {
-  EachHallSessionType,
-  EachHallType,
-} from "../../types/Hall.types";
+import { EachHallSessionType, EachHallType } from "../../types/Hall.types";
 import ToggleSwitch from "../toggleSwitch/toggleSwitch";
+import BasicTimePicker from "./BasicTimePicker";
+import { convertUTCTimeTo12HourFormat } from "../../utils/convertUTCTimeTo12HourFormat";
 
 type Props = {
   sessions: EachHallSessionType[];
@@ -23,6 +22,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
     active: false,
     to: "",
     from: "",
+    price: [],
   });
   const [editIndex, setEditIndex] = useState<number>(-1);
 
@@ -42,7 +42,8 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   };
 
   const handleAddItem = () => {
-    if (newItem.name.trim() !== "" && newItem.to.trim() !== "") {
+    console.log(newItem);
+    if (newItem.name.trim() !== "" && newItem.to && newItem.from) {
       if (editIndex !== -1) {
         const updatedList = [...editedSessions];
         updatedList[editIndex] = newItem;
@@ -57,6 +58,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
         active: false,
         to: "",
         from: "",
+        price: [],
       });
     }
   };
@@ -73,6 +75,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
       active: false,
       to: "",
       from: "",
+      price: [],
     });
     setEditIndex(-1);
   };
@@ -99,11 +102,17 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
               <div className="flex justify-between">
                 <div className="flex gap-2 bg-white px-2 rounded-md">
                   <span>From:</span>
-                  <span className="">{eachSession.from || "NAN"}</span>
+                  <span className="">
+                    {eachSession.from
+                      ? convertUTCTimeTo12HourFormat(eachSession.from)
+                      : "NAN"}
+                  </span>
                 </div>
                 <div className="flex gap-2 bg-white px-2 rounded-md">
                   <span>To:</span>
-                  <span className="">{eachSession.to}</span>
+                  <span className="">
+                    {convertUTCTimeTo12HourFormat(eachSession.to)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -121,7 +130,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
 
         {modal && (
           <div className="modal-message fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50">
-            <div className="message bg-white p-6 rounded w-3/5">
+            <div className="message bg-white p-6 max-h-screen rounded w-3/5">
               <div className="flex flex-col gap-3 mb-5">
                 <h2 className="font-bold text-xl mb-3 text-center">
                   Edit Hall Sessions
@@ -130,42 +139,73 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                   {editedSessions.map((eachSession, index) => (
                     <div
                       key={index}
-                      className="flex items-center mb-3 border-y border-gray-300 px-2 gap-5"
+                      className={`flex flex-col items-center w-full mb-3 ${
+                        eachSession.active ? " " : "opacity-30"
+                      } border-y border-gray-300 px-2 gap-5`}
                     >
-                      <div className="flex flex-col w-full">
-                        {/* <div className="flex">
+                      <div className={`flex items-center w-full gap-5`}>
+                        <div className="flex flex-col w-full">
+                          {/* <div className="flex">
                             <span className=" text-xs">session id:</span>
                             <span className=" text-xs">{eachSession._id}</span>
                         </div> */}
-                        <p className="font-medium text-lg">
-                          {eachSession.name}
-                        </p>
-                        <div className="flex justify-between">
-                          <div className="flex gap-2 bg-white rounded-md">
-                            <span>From:</span>
-                            <span className="">
-                              {eachSession.from || "NAN"}
-                            </span>
-                          </div>
-                          <div className="flex gap-2 bg-white px-2 rounded-md">
-                            <span>To:</span>
-                            <span className="">{eachSession.to}</span>
+                          <p className="font-medium text-lg">
+                            {eachSession.name}
+                          </p>
+                          <div className="flex justify-between">
+                            <div className="flex gap-2 bg-white rounded-md">
+                              <span>From:</span>
+                              <span className="">
+                                {eachSession.from
+                                  ? convertUTCTimeTo12HourFormat(
+                                      eachSession.from
+                                    )
+                                  : "NAN"}
+                              </span>
+                            </div>
+                            <div className="flex gap-2 bg-white px-2 rounded-md">
+                              <span>To:</span>
+                              <span className="">
+                                {convertUTCTimeTo12HourFormat(eachSession.to)}
+                                {/* {eachSession.to} asdasd */}
+                              </span>
+                            </div>
                           </div>
                         </div>
+                        <div className="flex gap-2 items-center justify-evenly">
+                          <button
+                            className="bg-blue-700 p-2 rounded text-white hover:bg-blue-500 transform active:scale-95 transition duration-300"
+                            onClick={() => handleEditItem(index)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300"
+                            onClick={() => handleDeleteItem(index)}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex gap-2 items-center justify-evenly">
-                        <button
-                          className="bg-blue-700 p-2 rounded text-white hover:bg-blue-500 transform active:scale-95 transition duration-300"
-                          onClick={() => handleEditItem(index)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300"
-                          onClick={() => handleDeleteItem(index)}
-                        >
-                          Delete
-                        </button>
+                      <div className="flex flex-col items-center justify-center w-full">
+                        <div className="flex justify-evenly w-full text-sm font-semibold">
+                          <span className="border border-gray-600 border-r-0 w-full text-center">
+                            Category
+                          </span>
+                          <span className="border border-gray-600 w-full text-center">
+                            Price
+                          </span>
+                        </div>
+                        {eachSession.price.map((eachSessionPrice) => (
+                          <div className="flex justify-evenly w-full text-sm">
+                            <span className="border border-gray-600 border-r-0  w-full text-center">
+                              {eachSessionPrice.categoryName}
+                            </span>
+                            <span className="border border-gray-600 w-full text-center">
+                              {eachSessionPrice.price}
+                            </span>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   ))}
@@ -178,27 +218,27 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                       onChange={(e) =>
                         setNewItem({ ...newItem, name: e.target.value })
                       }
-                      className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
+                      className="bg-gray-100 text-black px-5 py-3 rounded resize-none flex-grow border border-stone-300"
                       placeholder="Name"
                     />
                     <div className="flex justify-between gap-2">
-                      <input
-                        type="text"
-                        value={newItem.from}
-                        onChange={(e) =>
-                          setNewItem({ ...newItem, from: e.target.value })
+                      <BasicTimePicker
+                        timePickerName="From"
+                        timeModifier={(newTimeString) =>
+                          setNewItem((prev) => ({
+                            ...prev,
+                            from: newTimeString,
+                          }))
                         }
-                        className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
-                        placeholder="From eg: 8:00 am"
                       />
-                      <input
-                        type="text"
-                        value={newItem.to}
-                        onChange={(e) =>
-                          setNewItem({ ...newItem, to: e.target.value })
+                      <BasicTimePicker
+                        timePickerName="To"
+                        timeModifier={(newTimeString) =>
+                          setNewItem((prev) => ({
+                            ...prev,
+                            to: newTimeString,
+                          }))
                         }
-                        className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
-                        placeholder="To eg: 12:00pm"
                       />
                     </div>
                     <div className="flex gap-2">
