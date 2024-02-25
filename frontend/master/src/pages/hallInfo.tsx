@@ -13,6 +13,7 @@ const DummyHallInfo: EachHallType = {
   _id: "1",
   name: "DJ Hall",
   location: {
+    _id: "120912309",
     desc1: "Juhu, Mumbai",
     desc2:
       "Babubhai Jagjivandas Hall, 1, N S Rd Number 3, Navpada, JVPD Scheme, Vile Parle West, Mumbai, Maharashtra 400056. Babubhai Jagjivandas Hall, 1, N S Rd Number 3, Navpada, JVPD Scheme, Vile Parle West, Mumbai, Maharashtra 400056",
@@ -27,13 +28,15 @@ const DummyHallInfo: EachHallType = {
   ],
   capacity: "500 people",
   seating: "100 seats",
-  pricing: 200,
+  pricing: "200 per day",
   additionalFeatures: [
     {
+      _id: "asdasdasd212",
       heading: "Gorgeous Ambience",
       desc: " We have got a very good ambience",
     },
     {
+      _id: "asdasdasdadwerw23",
       heading: "In-house decorators",
       desc: "In-house decorators make the venue more stunning",
     },
@@ -45,6 +48,16 @@ const DummyHallInfo: EachHallType = {
       name: "Morning first session",
       from: "3:40:00.000Z",
       to: "20:30:00.000Z",
+      price: [
+        {
+          categoryName: "Student",
+          price: 2000,
+        },
+        {
+          categoryName: "Politician",
+          price: 4000,
+        },
+      ],
     },
     {
       _id: "asdouijlqw918209",
@@ -52,6 +65,16 @@ const DummyHallInfo: EachHallType = {
       name: "Morning 7 hours",
       from: "3:40:00.000Z",
       to: "20:30:00.000Z",
+      price: [
+        {
+          categoryName: "Student",
+          price: 2000,
+        },
+        {
+          categoryName: "Politician",
+          price: 4000,
+        },
+      ],
     },
   ],
   images: [
@@ -109,10 +132,12 @@ export default function hallInfo() {
       />
       <HallPricing pricing={hallData.pricing} setHallData={setHallData} />
       <HallSessions sessions={hallData.sessions} setHallData={setHallData} />
-      <HallAdditionalFeatures
-        additionalFeatures={hallData.additionalFeatures}
-        setHallData={setHallData}
-      />
+      {hallData.additionalFeatures && (
+        <HallAdditionalFeatures
+          additionalFeatures={hallData.additionalFeatures}
+          setHallData={setHallData}
+        />
+      )}
       <ImageCarousel images={hallData.images} setHallData={setHallData} />
     </div>
   );

@@ -4,18 +4,18 @@ import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { EachHallType } from "../../types/Hall.types";
 
 type props = {
-  pricing: number | undefined;
+  pricing: string | undefined;
   setHallData: React.Dispatch<React.SetStateAction<EachHallType>>;
 };
 
 export default function HallPricing({ pricing, setHallData }: props) {
-  const [modalData, setModalData] = useState<number | undefined>(pricing);
+  const [modalData, setModalData] = useState<string | undefined>(pricing);
   const [modal, setModal] = useState(false);
 
   const toggleModal = () => setModal(!modal);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(event.target.value);
+    const value = event.target.value;
     setModalData(value);
   };
 
