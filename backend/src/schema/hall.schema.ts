@@ -33,10 +33,6 @@ export const AddHallZodSchema = z.object({
       iframe: z.string(stringErrorHandler("location.iframe")).optional(),
     }),
     about: z.array(z.string(stringErrorHandler("about"))),
-    timings: z.object({
-      from: z.string(stringErrorHandler("timings.from")),
-      to: z.string(stringErrorHandler("timings.to")),
-    }),
     capacity: z.string(stringErrorHandler("capacity")),
     seating: z.string(stringErrorHandler("seatings")),
     pricing: z.string(stringErrorHandler("pricing")).optional(),

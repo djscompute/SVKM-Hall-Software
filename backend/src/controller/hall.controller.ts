@@ -7,24 +7,22 @@ export async function addHallHandler(req: Request, res: Response) {
       name,
       location,
       about,
-      timings,
       pricing,
       capacity,
       additionalFeatures,
       images,
-      sessions
+      sessions,
     } = req.body as EachHallType;
 
     const newHall = new HallModel({
       name,
       location,
       about,
-      timings,
       pricing,
       capacity,
       additionalFeatures,
       images,
-      sessions
+      sessions,
     });
     await newHall.save();
 
@@ -57,12 +55,11 @@ export async function editHallHandler(req: Request, res: Response) {
       name,
       location,
       about,
-      timings,
       pricing,
       capacity,
       additionalFeatures,
       images,
-      sessions
+      sessions,
     } = req.body as EachHallType;
     const hallId: string = req.params.id;
 
@@ -72,12 +69,11 @@ export async function editHallHandler(req: Request, res: Response) {
         name,
         location,
         about,
-        timings,
         pricing,
         capacity,
         additionalFeatures,
         images,
-        sessions
+        sessions,
       },
       { new: true }
     );
@@ -108,7 +104,9 @@ export async function getHallByIdHandler(req: Request, res: Response) {
 
     const hall = await HallModel.findById(hallId);
     if (!hall) {
-      return res.status(404).json({ name: "Hall Not Found", message: "Hall not found" });
+      return res
+        .status(404)
+        .json({ name: "Hall Not Found", message: "Hall not found" });
     }
 
     return res.status(200).json(hall);
