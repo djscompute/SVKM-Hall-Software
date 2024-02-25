@@ -28,10 +28,6 @@ export type EachHallSessionType = {
   price: { categoryName: string; price: number }[];
 };
 
-export type meowType = {
-  name:string
-}
-
 // ================================================
 // this will be in Halls Table
 // ================================================
