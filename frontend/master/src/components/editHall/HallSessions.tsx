@@ -17,7 +17,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   const [editedSessions, setEditedSessions] =
     useState<EachHallSessionType[]>(modalData);
   const [newItem, setNewItem] = useState<EachHallSessionType>({
-    _id: "asasd218",
     name: "",
     active: false,
     to: "",
@@ -54,7 +53,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
       }
       setNewItem({
         name: "",
-        _id: "random id here",
         active: false,
         to: "",
         from: "",
@@ -71,7 +69,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   const handleDontEditItem = () => {
     setNewItem({
       name: "",
-      _id: "random id here",
       active: false,
       to: "",
       from: "",
@@ -94,10 +91,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
         <div className="about-hall text-lg">
           {sessions.map((eachSession, index) => (
             <div key={index} className="flex flex-col mb-3">
-              {/* <div className="flex">
-                <span className=" text-xs">session id:</span>
-                <span className=" text-xs">{eachSession._id}</span>
-              </div> */}
               <p className="font-medium text-lg">{eachSession.name}</p>
               <div className="flex justify-between">
                 <div className="flex gap-2 bg-white px-2 rounded-md">
@@ -145,10 +138,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                     >
                       <div className={`flex items-center w-full gap-5`}>
                         <div className="flex flex-col w-full">
-                          {/* <div className="flex">
-                            <span className=" text-xs">session id:</span>
-                            <span className=" text-xs">{eachSession._id}</span>
-                        </div> */}
                           <p className="font-medium text-lg">
                             {eachSession.name}
                           </p>
