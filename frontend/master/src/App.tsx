@@ -8,9 +8,9 @@ import Login from "./components/login/Login";
 import NotFoundPage from "./pages/NotFoundPage";
 import AddHall from "./pages/addHall";
 // import ProtectedRoute from '../src/components/ProtectedRoute';
+export const queryClient = new QueryClient();
 
 export default function App() {
-  const queryClient = new QueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -18,7 +18,6 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   const [editedFeatures, setEditedFeatures] =
     useState<EachHallAdditonalFeaturesType[]>(modalData);
   const [newItem, setNewItem] = useState<EachHallAdditonalFeaturesType>({
-    _id: "",
     heading: "",
     desc: "",
   });
@@ -49,7 +48,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
       } else {
         setEditedFeatures([...editedFeatures, newItem]);
       }
-      setNewItem({ _id: "", heading: "", desc: "" });
+      setNewItem({  heading: "", desc: "" });
     }
   };
 
@@ -59,7 +58,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   };
 
   const handleDontEditItem = () => {
-    setNewItem({ _id: "", heading: "", desc: "" });
+    setNewItem({ heading: "", desc: "" });
     setEditIndex(-1);
   };
 
