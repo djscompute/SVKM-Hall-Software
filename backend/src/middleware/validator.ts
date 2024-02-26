@@ -39,7 +39,6 @@ export function validateCookie(
 ) {
   try {
     const { accessToken, refreshToken }: CookieType = req.cookies;
-    console.log("ACCESS ", accessToken, refreshToken);
     //Verify Access Token
     jwt.verify(
       accessToken,
@@ -47,7 +46,6 @@ export function validateCookie(
       (error: jwt.VerifyErrors | null, decoded) => {
         if (!error) {
           const { email, role, username } = decoded as jwtPayloadToken;
-          console.log("ROLS IS 1 ", role);
           //@ts-ignore
           req.userEmail = email;
           //@ts-ignore
@@ -61,7 +59,6 @@ export function validateCookie(
             refreshToken,
             PRIVATE_REFRESH_KEY
           ) as jwtPayloadToken;
-          console.log("ROLS IS 2 ", role);
 
           //Sign new cookies
           signAccessToken(res, { username, email, role });
