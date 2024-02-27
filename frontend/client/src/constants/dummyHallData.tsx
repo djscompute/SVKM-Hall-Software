@@ -39,7 +39,7 @@ const dummyHallData: EachHallType[] = [
     _id: "456",
     name: "NMIMS Hall",
     location: {
-      desc1: "1, N S Rd Number 3, Navpada, JVPD Scheme",
+      desc1: "1, N S Rd Number 3, Navpada, JVPD Scheme, lorem ipsum dolor sit amet ",
       desc2: "Vile Parle West, Mumbai, Maharashtra 400056",
       iframe:
         "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15080.001689782257!2d72.8371015!3d19.1076374!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c9c6505a00af%3A0x13b8ff72726ae189!2sBabubhai%20Jagjivandas%20Hall!5e0!3m2!1sen!2sin!4v1707924301059!5m2!1sen!2sin",

@@ -12,9 +12,8 @@ function HomePage() {
             key={hallProp._id} 
             id={hallProp._id}
             img={hallProp.images[0]}
-            tagline={hallProp.about}
             name={hallProp.name}
-            place={hallProp.location.desc1}
+            place={"1, N S Rd Number 3, Navpada, JVPD Scheme, lorem ipsum dolor sit amet "}
             numPhotos={hallProp.images.length}
             minCapacity={hallProp.capacity}
             maxCapacity={hallProp.capacity}

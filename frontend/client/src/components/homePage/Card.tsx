@@ -8,16 +8,46 @@ import hall from "../../assets/hall.png";
 export default function Card(props: any) {
   return (
     <Link to={`/halls/${props.id}`}>
-      <div className="bg-slate-100 rounded-lg m-4 w-[400px] aspect-[4/3] drop-shadow-2xl h-[380px] border-2 border-slate-300">
-        <div className="bg-SAPBlue-500 text-center h-[35px] pt-[6px] text-[15px] font-semibold text-white font-sans rounded-se-lg rounded-ss-lg">
-          {props.tagline}
-        </div>
+      <div className="
+      bg-slate-100 
+        rounded-lg 
+        m-4 
+        w-[280px]
+        mb:w-[400px] 
+        aspect-[4/3] 
+        drop-shadow-2xl 
+        pb-4 border-2 
+        border-slate-300
+      ">
         <div className="w-full">
           <FontAwesomeIcon
             icon={faCircleInfo}
-            className="fixed drop-shadow-xl text-white m-[10px] text-2xl top-8 z-5"
+            className="
+            fixed 
+            drop-shadow-xl 
+            text-white 
+            m-[10px] 
+            text-2xl 
+            top-1 
+            z-5"
           />
-          <div className="flex flex-row w-[110px] justify-center rounded-full drop-shadow-xl p-1 fixed text-white m-[10px] text-2xl mt-8 z-5 bg-white left-2/3 top-[155px]">
+          <div className="
+          flex 
+          flex-row 
+          w-[110px] 
+          justify-center 
+          rounded-full 
+          drop-shadow-xl 
+          p-1 
+          fixed 
+          text-white 
+          m-[10px] 
+          text-2xl 
+          mt-8 
+          z-5 
+          bg-white 
+          right-1 
+          top-[125px]">
             <FontAwesomeIcon
               icon={faImages}
               className="text-pink-600 text-xl "
@@ -32,10 +62,10 @@ export default function Card(props: any) {
           />
         </div>
         <div className="px-4 pt-2 block font-bold text-black">{props.name}</div>
-        <div className="px-4 block font-semibold text-slate-600">
+        <div className="px-4 block font-semibold text-left text-slate-600 w-full">
           {props.place}
         </div>
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-wrap justify-between">
           <div className="px-4 block font-semibold text-slate-600">
             <FontAwesomeIcon icon={faPeopleGroup} className="mr-2" />
             {props.minCapacity}-{props.maxCapacity}

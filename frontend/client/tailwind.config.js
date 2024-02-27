@@ -16,6 +16,9 @@ export default {
         "SAPBlue-900": "#0070f2",
       }
     },
+    screens: {
+      'mb': '400px',
+    }
   },
   plugins: [],
 }
