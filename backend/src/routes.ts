@@ -108,7 +108,7 @@ export default function routes(app: Express) {
   ]);
 
   // GET ALL HALLS
-  app.get("/getAllHalls/", [validateCookie, getAllHallsHandler]);
+  app.get("/getAllHalls/", [getAllHallsHandler]);
 
   // GET INFO OF ONE HALL WITH _id
   app.get("/getHall/:id", [
