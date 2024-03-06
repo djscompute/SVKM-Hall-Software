@@ -41,7 +41,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   };
 
   const handleAddItem = () => {
-    console.log(newItem);
     if (newItem.name.trim() !== "" && newItem.to && newItem.from) {
       if (editIndex !== -1) {
         const updatedList = [...editedSessions];
@@ -84,6 +83,55 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
     setEditIndex(-1);
   };
 
+  const handleAddPrice = () => {
+    if (newItem.price.length < 5) {
+      // Limit the number of prices to add
+      setNewItem((prev) => ({
+        ...prev,
+        price: [...prev.price, { categoryName: "", price: 0 }],
+      }));
+    }
+  };
+
+  const handleEditPrice = (index: number) => {
+    // Implement the logic to edit the price at the specified index
+    // You can set the edited price to newItem or use a separate state for editing
+  };
+
+  const handleDeletePrice = (index: number) => {
+    setNewItem((prev) => ({
+      ...prev,
+      price: prev.price.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handlePriceChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const { name, value } = e.target;
+
+    setNewItem((prev) => {
+      const updatedPrices = [...prev.price];
+      if (name == "price") {
+        updatedPrices[index] = {
+          ...updatedPrices[index],
+          [name]: parseInt(value),
+        };
+      } else {
+        updatedPrices[index] = {
+          ...updatedPrices[index],
+          [name]: value,
+        };
+      }
+
+      return {
+        ...prev,
+        price: updatedPrices,
+      };
+    });
+  };
+
   return (
     <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
       <div className="hall-additional-features-info w-11/12">
@@ -107,6 +155,21 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                     {convertUTCTimeTo12HourFormat(eachSession.to)}
                   </span>
                 </div>
+              </div>
+              <div className=" mt-2 mb-3">
+                {eachSession.price.map((eachSessionPrice, index) => (
+                  <div
+                    className="flex justify-evenly w-full text-sm"
+                    key={index}
+                  >
+                    <span className="border border-gray-600 border-r-0  w-full text-center">
+                      {eachSessionPrice.categoryName}
+                    </span>
+                    <span className="border border-gray-600 w-full text-center">
+                      {eachSessionPrice.price}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
@@ -133,10 +196,10 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                     <div
                       key={index}
                       className={`flex flex-col items-center w-full mb-3 ${
-                        eachSession.active ? " " : "opacity-30"
+                        eachSession.active ? " " : "opacity-100"
                       } border-y border-gray-300 px-2 gap-5`}
                     >
-                      <div className={`flex items-center w-full gap-5`}>
+                      <div className="flex items-center w-full gap-5">
                         <div className="flex flex-col w-full">
                           <p className="font-medium text-lg">
                             {eachSession.name}
@@ -156,7 +219,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                               <span>To:</span>
                               <span className="">
                                 {convertUTCTimeTo12HourFormat(eachSession.to)}
-                                {/* {eachSession.to} asdasd */}
                               </span>
                             </div>
                           </div>
@@ -185,8 +247,11 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                             Price
                           </span>
                         </div>
-                        {eachSession.price.map((eachSessionPrice) => (
-                          <div className="flex justify-evenly w-full text-sm">
+                        {eachSession.price.map((eachSessionPrice, index) => (
+                          <div
+                            className="flex justify-evenly w-full text-sm"
+                            key={index}
+                          >
                             <span className="border border-gray-600 border-r-0  w-full text-center">
                               {eachSessionPrice.categoryName}
                             </span>
@@ -230,6 +295,41 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                         }
                       />
                     </div>
+                    <div className="flex flex-col gap-2">
+                      {newItem.price.map((priceItem, index) => (
+                        <div key={index} className="flex gap-2">
+                          <input
+                            type="text"
+                            name="categoryName"
+                            value={priceItem.categoryName}
+                            onChange={(e) => handlePriceChange(e, index)}
+                            className="bg-gray-100 text-black px-5 py-3 rounded resize-none flex-grow border border-stone-300"
+                            placeholder="Category"
+                          />
+
+                          <input
+                            type="number"
+                            name="price"
+                            value={priceItem.price}
+                            onChange={(e) => handlePriceChange(e, index)}
+                            className="bg-gray-100 text-black px-5 py-3 rounded resize-none flex-grow border border-stone-300"
+                            placeholder="Price"
+                          />
+                          <button
+                            className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 focus:outline-none"
+                            onClick={() => handleDeletePrice(index)}
+                          >
+                            -
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        className="bg-green-300 text-white p-2 rounded-md hover:bg-green-400 focus:outline-none"
+                        onClick={handleAddPrice}
+                      >
+                        +
+                      </button>
+                    </div>
                     <div className="flex gap-2">
                       <span>is Active</span>
                       <ToggleSwitch
@@ -243,7 +343,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                       />
                     </div>
                   </div>
-                  {editIndex != -1 && (
+                  {editIndex !== -1 && (
                     <button
                       className="bg-red-700 p-2 rounded text-white hover:bg-green-500 transform active:scale-95 transition duration-300"
                       onClick={handleDontEditItem}
