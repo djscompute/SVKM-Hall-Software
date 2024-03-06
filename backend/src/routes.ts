@@ -112,7 +112,6 @@ export default function routes(app: Express) {
 
   // GET INFO OF ONE HALL WITH _id
   app.get("/getHall/:id", [
-    validateCookie,
     validateRequest(RemoveHallZodSchema),
     getHallByIdHandler,
   ]);

@@ -2,19 +2,23 @@ import { useQuery } from "@tanstack/react-query";
 import Card from "../components/homePage/Card";
 import axiosInstance from "../config/axiosInstance.ts";
 // import { EachHallType } from "../types/Hall.types.ts";
-import {EachHallType} from "../../../../types/global.ts"
+import { EachHallType } from "../../../../types/global.ts";
 
 function HomePage() {
   //getAllHalls
   // hallProps
 
-  const { data, error, isFetching, status } = useQuery({
+  const { data, error, isFetching } = useQuery({
     queryKey: ["allhalls"],
     queryFn: async () => {
       const response = await axiosInstance.get("getAllHalls");
       return response.data as EachHallType[];
     },
   });
+
+  if (isFetching) {
+    return <div>Fetching Info</div>;
+  }
 
   return (
     <div className="flex flex-col items-center">
