@@ -14,9 +14,8 @@ type Props = {
 const HallSessions = ({ sessions, setHallData }: Props) => {
   const [modalData, setModalData] = useState<EachHallSessionType[]>(sessions);
   const [modal, setModal] = useState(false);
-  const [editedSessions, setEditedSessions] = useState<EachHallSessionType[]>(
-    modalData
-  );
+  const [editedSessions, setEditedSessions] =
+    useState<EachHallSessionType[]>(modalData);
   const [newItem, setNewItem] = useState<EachHallSessionType>({
     name: "",
     active: false,
@@ -85,7 +84,8 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   };
 
   const handleAddPrice = () => {
-    if (newItem.price.length < 5) {  // Limit the number of prices to add
+    if (newItem.price.length < 5) {
+      // Limit the number of prices to add
       setNewItem((prev) => ({
         ...prev,
         price: [...prev.price, { categoryName: "", price: 0 }],
@@ -113,10 +113,17 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
 
     setNewItem((prev) => {
       const updatedPrices = [...prev.price];
-      updatedPrices[index] = {
-        ...updatedPrices[index],
-        [name]: value,
-      };
+      if (name == "price") {
+        updatedPrices[index] = {
+          ...updatedPrices[index],
+          [name]: parseInt(value),
+        };
+      } else {
+        updatedPrices[index] = {
+          ...updatedPrices[index],
+          [name]: value,
+        };
+      }
 
       return {
         ...prev,
@@ -148,6 +155,21 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                     {convertUTCTimeTo12HourFormat(eachSession.to)}
                   </span>
                 </div>
+              </div>
+              <div className=" mt-2 mb-3">
+                {eachSession.price.map((eachSessionPrice, index) => (
+                  <div
+                    className="flex justify-evenly w-full text-sm"
+                    key={index}
+                  >
+                    <span className="border border-gray-600 border-r-0  w-full text-center">
+                      {eachSessionPrice.categoryName}
+                    </span>
+                    <span className="border border-gray-600 w-full text-center">
+                      {eachSessionPrice.price}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
@@ -276,7 +298,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                     <div className="flex flex-col gap-2">
                       {newItem.price.map((priceItem, index) => (
                         <div key={index} className="flex gap-2">
-                      
                           <input
                             type="text"
                             name="categoryName"
@@ -285,7 +306,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                             className="bg-gray-100 text-black px-5 py-3 rounded resize-none flex-grow border border-stone-300"
                             placeholder="Category"
                           />
-                          
+
                           <input
                             type="number"
                             name="price"
@@ -294,12 +315,20 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                             className="bg-gray-100 text-black px-5 py-3 rounded resize-none flex-grow border border-stone-300"
                             placeholder="Price"
                           />
-                          <button className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 focus:outline-none" onClick={() => handleDeletePrice(index)}>
+                          <button
+                            className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 focus:outline-none"
+                            onClick={() => handleDeletePrice(index)}
+                          >
                             -
                           </button>
                         </div>
                       ))}
-                      <button className="bg-green-300 text-white p-2 rounded-md hover:bg-green-400 focus:outline-none" onClick={handleAddPrice}>+</button>
+                      <button
+                        className="bg-green-300 text-white p-2 rounded-md hover:bg-green-400 focus:outline-none"
+                        onClick={handleAddPrice}
+                      >
+                        +
+                      </button>
                     </div>
                     <div className="flex gap-2">
                       <span>is Active</span>
