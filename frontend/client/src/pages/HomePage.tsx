@@ -30,7 +30,7 @@ function HomePage() {
             id={hallProp._id}
             img={hallProp.images[0]}
             name={hallProp.name}
-            place={"1, N S Rd Number 3, Navpada, JVPD Scheme, lorem ipsum dolor sit amet "}
+            place={hallProp.location.desc1}
             numPhotos={hallProp.images.length}
             minCapacity={hallProp.capacity}
             maxCapacity={hallProp.capacity}
