@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
 import { RxDotFilled } from "react-icons/rx";
-import CalendarBook from "../components/homePage/CalendarBook.tsx";
+// import CalendarBook from "../components/homePage/CalendarBook.tsx";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../config/axiosInstance.ts";
@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { convertUTCTimeTo12HourFormat } from "../utils/convertUTCTimeTo12HourFormat.tsx";
 import { Carousel } from "@material-tailwind/react";
+import Calendar from "../components/calendar.tsx";
 function Hall() {
   const { id } = useParams<{ id: string }>();
 
@@ -30,53 +31,29 @@ function Hall() {
     return <div>Fetching Info</div>;
   }
 
-  const prevSlide = () => {
-    if (!data?.images) return;
-    const isFirstSlide = currentIndex === 0;
-    const newIndex = isFirstSlide ? data?.images.length - 1 : currentIndex - 1;
-    setCurrentIndex(newIndex);
-  };
-
-  const nextSlide = () => {
-    if (!data?.images) return;
-    const isLastSlide = currentIndex === data?.images.length - 1;
-    const newIndex = isLastSlide ? 0 : currentIndex + 1;
-    setCurrentIndex(newIndex);
-  };
-
-  const goToSlide = (slideIndex: React.SetStateAction<number>) => {
-    setCurrentIndex(slideIndex);
-  };
-
   return (
     <>
       {data ? (
         <div className="flex w-full flex-col">
           <h1 className="text-center text-5xl font-light mt-10">{data.name}</h1>
+          {/* Carousel */}
           <div className="w-3/4 mx-auto items-center">
-            {/* Carousel */}
-            <Carousel transition={{ duration: 1 }} className="rounded-xl my-6">
-              <img
-                src={data.images[0]}
-                className="h-[80vh] w-full object-cover"
-              />
-              <img
-                src={data.images[1]}
-                className="h-[80vh] w-full object-cover"
-              />
-              <img
-                src={data.images[2]}
-                className="h-[80vh] w-full object-cover"
-              />
+            <Carousel
+              placeholder={"Hall Image Carousel"}
+              transition={{ duration: 1 }}
+              className="rounded-xl my-6"
+            >
+              {data.images.map((eachImageSrc) => (
+                <img
+                  src={eachImageSrc}
+                  className="h-[80vh] w-full object-cover"
+                />
+              ))}
             </Carousel>
-
-            {/* Carousel */}
-
-            {/* Calendar */}
-            <div className="py-16 w-1/2 max-xl:w-full max-xl:max-w-[600px] mx-auto">
-              <CalendarBook />
-            </div>
-            {/* Calendar */}
+          </div>
+          {/* Calender */}
+          <div className="bg-red-200 w-full">
+            <Calendar />
           </div>
           {/* Hall Location */}
           <div className="w-[95%] mx-auto my-5  border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
@@ -145,7 +122,6 @@ function Hall() {
               <p>{data.seating}</p>
             </div>
           </div>
-          
 
           <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
             <h2 className="font-bold text-xl mb-3">Additional Features</h2>
@@ -158,43 +134,43 @@ function Hall() {
               ))}
             </div>
           </div>
-         
+
           <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
-        <div className="about-hall text-lg">
-          {data.sessions.map((eachSession, index) => (
-            <div key={index} className="flex flex-col mb-3">
-              <p className="font-medium text-lg">{eachSession.name}</p>
-              <div className="flex justify-between">
-                <div className="flex gap-2 bg-white px-2 rounded-md">
-                  <span>From:</span>
-                  <span className="">
-                    {eachSession.from
-                      ? convertUTCTimeTo12HourFormat(eachSession.from)
-                      : "NAN"}
-                  </span>
+            <div className="about-hall text-lg">
+              {data.sessions.map((eachSession, index) => (
+                <div key={index} className="flex flex-col mb-3">
+                  <p className="font-medium text-lg">{eachSession.name}</p>
+                  <div className="flex justify-between">
+                    <div className="flex gap-2 bg-white px-2 rounded-md">
+                      <span>From:</span>
+                      <span className="">
+                        {eachSession.from
+                          ? convertUTCTimeTo12HourFormat(eachSession.from)
+                          : "NAN"}
+                      </span>
+                    </div>
+                    <div className="flex gap-2 bg-white px-2 rounded-md">
+                      <span>To:</span>
+                      <span className="">
+                        {convertUTCTimeTo12HourFormat(eachSession.to)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex gap-2 bg-white px-2 rounded-md">
-                  <span>To:</span>
-                  <span className="">
-                    {convertUTCTimeTo12HourFormat(eachSession.to)}
-                  </span>
-                </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-        </div>
-          
-        <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
-        <div className="flex flex-col w-full">
-        <h2 className="font-bold text-xl mb-3">Pricing</h2>
-        {data.pricing ? (
-          <p className="text-lg">{data.pricing}</p>
-        ) : (
-          <p>No pricing set for this hall. Edit to set the Price</p>
-        )}
-      </div>
-        </div>
+          </div>
+
+          <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
+            <div className="flex flex-col w-full">
+              <h2 className="font-bold text-xl mb-3">Pricing</h2>
+              {data.pricing ? (
+                <p className="text-lg">{data.pricing}</p>
+              ) : (
+                <p>No pricing set for this hall. Edit to set the Price</p>
+              )}
+            </div>
+          </div>
           <button className="border border-SAPBlue-800 hover:border-SAPBlue-900 rounded py-4 px-8 bg-transparent font-bold text-SAPBlue-800 hover:text-SAPBlue-900 transition duration-500">
             Place Request
           </button>

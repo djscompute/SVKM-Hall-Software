@@ -66,9 +66,9 @@ const Calendar = () => {
   const trailingDays = totalSlots - (firstDayOfMonth + daysInMonth);
 
 
-  useEffect(() => {
-    console.log(currentDate);
-  }, [currentDate]);
+  // useEffect(() => {
+  //   console.log(currentDate);
+  // }, [currentDate]);
   
 
   
