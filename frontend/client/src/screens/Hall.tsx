@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { convertUTCTimeTo12HourFormat } from "../utils/convertUTCTimeTo12HourFormat.tsx";
 import { Carousel } from "@material-tailwind/react";
-import Calendar from "../components/calendar.tsx";
+import Calendar from "../components/Calender/calendar.tsx";
 function Hall() {
   const { id } = useParams<{ id: string }>();
 

@@ -46,6 +46,13 @@ export interface EachHallType {
   readonly updatedAt?: Date;
 }
 
+export type bookingStatusType =
+  | "CONFIRMED"
+  | "TENTATIVE"
+  | "EMPTY"
+  | "DISABLED"
+  | "ENQUIRY";
+
 // ================================================
 // This will be in Bookings Table
 // ================================================
@@ -53,7 +60,7 @@ export type HallBookingType = {
   id: string; // UNIQUE KEY
   user: CustomerType; // the User who booked this hall
   features: EachHallAdditonalFeaturesType[]; // the Ammenities which the user has booked for himself
-  status: "CONFIRMED" | "TENTATIVE" | "EMPTY" | "DISABLED" | "ENQUIRY"; // payment and booking status is reflected here
+  status: bookingStatusType; // payment and booking status is reflected here
   price: number; // obvio bro
   hallId: string;
   session_id: string; // the sesison id

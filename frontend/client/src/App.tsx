@@ -3,7 +3,7 @@ import Hall from "./screens/Hall";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import HallDetails from "./pages/HallDetails";
-import Calendar from "./components/calendar";
+import Calendar from "./components/Calender/calendar";
 
 export default function App() {
   const queryClient = new QueryClient();
