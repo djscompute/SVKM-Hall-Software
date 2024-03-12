@@ -1,0 +1,30 @@
+admin login
+{
+    "email":"admin1@gmail.com",
+    "password":"admin1"
+}
+
+add booking
+{
+    "user": {
+        "username": "Mohammed",
+        "mobile": "9833734905"
+    },
+    "features": [
+        {
+            "heading": "2 seats",
+            "price": 1000
+        }
+    ],
+    "status":"CONFIRMED",
+    "price":100000,
+    "hallId":"65db8eda81de755a5f377c83",
+    "session_id":"65db8eda81de755a5f377c87",
+    "from": "2024-03-14T03:40:00.000Z",
+    "to": "2024-03-14T20:30:00.000Z",
+    "time":{
+        "from":"T03:40:00.000Z",
+        "to":"20:30:00.000Z"
+    }
+}
+

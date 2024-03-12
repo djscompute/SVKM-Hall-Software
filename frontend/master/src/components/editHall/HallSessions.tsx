@@ -4,8 +4,8 @@ import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { EachHallSessionType, EachHallType } from "../../types/Hall.types";
 import ToggleSwitch from "../toggleSwitch/toggleSwitch";
 import BasicTimePicker from "./BasicTimePicker";
-import { convertUTCTimeTo12HourFormat } from "../../utils/convertUTCTimeTo12HourFormat";
-
+import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat";
+// convert_IST_TimeString_To12HourFormat
 type Props = {
   sessions: EachHallSessionType[];
   setHallData: React.Dispatch<React.SetStateAction<EachHallType>>;
@@ -145,14 +145,14 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                   <span>From:</span>
                   <span className="">
                     {eachSession.from
-                      ? convertUTCTimeTo12HourFormat(eachSession.from)
+                      ? convert_IST_TimeString_To12HourFormat(eachSession.from)
                       : "NAN"}
                   </span>
                 </div>
                 <div className="flex gap-2 bg-white px-2 rounded-md">
                   <span>To:</span>
                   <span className="">
-                    {convertUTCTimeTo12HourFormat(eachSession.to)}
+                    {convert_IST_TimeString_To12HourFormat(eachSession.to)}
                   </span>
                 </div>
               </div>
@@ -209,7 +209,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                               <span>From:</span>
                               <span className="">
                                 {eachSession.from
-                                  ? convertUTCTimeTo12HourFormat(
+                                  ? convert_IST_TimeString_To12HourFormat(
                                       eachSession.from
                                     )
                                   : "NAN"}
@@ -218,7 +218,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                             <div className="flex gap-2 bg-white px-2 rounded-md">
                               <span>To:</span>
                               <span className="">
-                                {convertUTCTimeTo12HourFormat(eachSession.to)}
+                                {convert_IST_TimeString_To12HourFormat(eachSession.to)}
                               </span>
                             </div>
                           </div>

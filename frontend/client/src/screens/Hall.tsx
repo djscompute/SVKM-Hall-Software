@@ -8,7 +8,7 @@ import axiosInstance from "../config/axiosInstance.ts";
 import { EachHallType } from "../types/Hall.types.ts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
-import { convertUTCTimeTo12HourFormat } from "../utils/convertUTCTimeTo12HourFormat.tsx";
+import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat.tsx";
 import { Carousel } from "@material-tailwind/react";
 import Calendar from "../components/Calender/calendar.tsx";
 function Hall() {
@@ -25,7 +25,7 @@ function Hall() {
   const [isOpen, setIsOpen] = useState(false);
   const toggleReadMore = () => setIsOpen(!isOpen);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  // const [currentIndex, setCurrentIndex] = useState(0);
 
   if (isFetching) {
     return <div>Fetching Info</div>;
@@ -52,7 +52,8 @@ function Hall() {
             </Carousel>
           </div>
           {/* Calender */}
-          <div className="bg-red-200 w-full">
+          <div className="w-full">
+            <h1 className=" text-3xl text-center my-2">Bookings</h1>
             <Calendar />
           </div>
           {/* Hall Location */}
@@ -145,14 +146,14 @@ function Hall() {
                       <span>From:</span>
                       <span className="">
                         {eachSession.from
-                          ? convertUTCTimeTo12HourFormat(eachSession.from)
+                          ? convert_IST_TimeString_To12HourFormat(eachSession.from)
                           : "NAN"}
                       </span>
                     </div>
                     <div className="flex gap-2 bg-white px-2 rounded-md">
                       <span>To:</span>
                       <span className="">
-                        {convertUTCTimeTo12HourFormat(eachSession.to)}
+                        {convert_IST_TimeString_To12HourFormat(eachSession.to)}
                       </span>
                     </div>
                   </div>

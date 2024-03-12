@@ -50,6 +50,7 @@ const Calendar = () => {
     currentDate.getMonth() + 1,
     0
   ).getDate();
+  
   const firstDayOfMonth = new Date(
     currentDate.getFullYear(),
     currentDate.getMonth(),

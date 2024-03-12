@@ -1,8 +1,12 @@
 import mongoose, { mongo } from "mongoose";
 import { EachHallAdditonalFeaturesType } from "./hall.model";
 // @ts-ignore
-import { CustomerType , HallBookingType } from "../../../types/global";
-export type { CustomerType, HallBookingType }
+import {
+  CustomerType,
+  HallBookingType,
+  bookingStatusType,
+} from "../../../types/global";
+export type { CustomerType, HallBookingType, bookingStatusType };
 import { CustomerSchema } from "./customer.model";
 
 // export const CustomerSchema = new mongoose.Schema<CustomerType>({
@@ -17,9 +21,9 @@ import { CustomerSchema } from "./customer.model";
 const HallAdditonalFeaturesSchema =
   new mongoose.Schema<EachHallAdditonalFeaturesType>({
     heading: { type: String, required: true },
-    desc: { type: String, required: true },
-    stats: { type: [String], required: true },
-    price: { type: Number },
+    desc: { type: String},
+    stats: { type: [String]},
+    price: { type: Number, required: true  },
   });
 
 const BookingSchema = new mongoose.Schema<HallBookingType>(
@@ -31,7 +35,7 @@ const BookingSchema = new mongoose.Schema<HallBookingType>(
     features: [HallAdditonalFeaturesSchema],
     status: {
       type: String,
-      enum: ["CONFIRMED", "TENTATIVE", "EMPTY", "DISABLED"],
+      enum: ["CONFIRMED", "TENTATIVE", "EMPTY", "DISABLED", "ENQUIRY"],
       required: true,
     },
     price: { type: Number, required: true },

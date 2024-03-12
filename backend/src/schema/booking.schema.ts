@@ -8,7 +8,7 @@ const stringErrorHandler = (fieldName: string) => ({
 export const AddBookingZodSchema = z.object({
   body: z.object({
     user: z.object({
-      name: z.string(stringErrorHandler("name")),
+      username: z.string(stringErrorHandler("name")),
       email: z.string(stringErrorHandler("email")).email().optional(),
       aadharNo: z.string(stringErrorHandler("aadharNo")).optional(),
       panNo: z.string(stringErrorHandler("panNo")).optional(),

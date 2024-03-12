@@ -1,5 +1,5 @@
 import { EachHallSessionType, EachHallType } from "../../types/Hall.types";
-import { convertUTCTimeTo12HourFormat } from "../../utils/convertUTCTimeTo12HourFormat";
+import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat";
 
 type Props = {
   sessions: EachHallSessionType[];
@@ -22,14 +22,14 @@ const HallSessions = ({ sessions}: Props) => {
                   <span>From:</span>
                   <span className="">
                     {eachSession.from
-                      ? convertUTCTimeTo12HourFormat(eachSession.from)
+                      ? convert_IST_TimeString_To12HourFormat(eachSession.from)
                       : "NAN"}
                   </span>
                 </div>
                 <div className="flex gap-2 bg-white px-2 rounded-md">
                   <span>To:</span>
                   <span className="">
-                    {convertUTCTimeTo12HourFormat(eachSession.to)}
+                    {convert_IST_TimeString_To12HourFormat(eachSession.to)}
                   </span>
                 </div>
               </div>
