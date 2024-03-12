@@ -10,14 +10,45 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { convertUTCTimeTo12HourFormat } from "../utils/convertUTCTimeTo12HourFormat.tsx";
 import { Carousel } from "@material-tailwind/react";
+
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+
 function Hall() {
   const { id } = useParams<{ id: string }>();
+
+  const [toastShown, setToastShown] = useState(false)
 
   const { data, error, isFetching, status } = useQuery({
     queryKey: ["allhalls"],
     queryFn: async () => {
-      const response = await axiosInstance.get(`getHall/${id}`);
-      return response.data as EachHallType;
+      try{
+        const response = await axiosInstance.get(`getHall/${id}`);
+  
+        const promise = new Promise((resolve) => setTimeout(resolve, 1000)); 
+          if(!toastShown) //Toast message to appear only once
+          {
+            toast.promise(
+              promise,
+              {
+                pending: 'Fetching hall...', 
+                success: 'Hall fetched successfully!', 
+                error: 'Failed to fetch Hall. Please try again.', 
+              }
+            );
+            setToastShown(true)
+          }
+  
+        return response.data as EachHallType;
+        }catch (error) {   
+          if(!toastShown){  
+          setToastShown(true)
+          console.log(toastShown)
+          toast.error('Failed to fetch Halls. Please try again.');
+          }
+          
+          throw error;
+        }
     },
   });
 
@@ -27,9 +58,14 @@ function Hall() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   if (isFetching) {
-    return <div>Fetching Info</div>;
+    return (
+      <>
+        <ToastContainer position="top-right"/>
+        <div>Fetching Info</div>
+      </>
+    );
   }
-
+  
   const prevSlide = () => {
     if (!data?.images) return;
     const isFirstSlide = currentIndex === 0;
@@ -50,6 +86,9 @@ function Hall() {
 
   return (
     <>
+      <ToastContainer position="top-right"/>
+     {data && <div>
+    
       {data ? (
         <div className="flex w-full flex-col">
           <h1 className="text-center text-5xl font-light mt-10">{data.name}</h1>
@@ -201,9 +240,10 @@ function Hall() {
         </div>
       ) : (
         <div>
-          <h1>NO SUCH HALL EXISTS</h1>
+          <h1 className="text-3xl font-semibold my-5 text-center">NO SUCH HALL EXISTS</h1>
         </div>
       )}
+      </div>}
     </>
   );
 }
