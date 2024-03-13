@@ -16,6 +16,12 @@ export async function addBookingHandler(req: Request, res: Response) {
       time,
     } = req.body as HallBookingType;
 
+    if (from >= to) {
+      return res.status(400).json({
+        message: "'from' time must be less than 'to' time.",
+      });
+    }
+
     // Check for existing bookings within the specified time range
     const existingBookings = await BookingModel.find({
       hallId,
