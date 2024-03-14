@@ -18,13 +18,13 @@ add booking
     ],
     "status":"CONFIRMED",
     "price":100000,
-    "hallId":"65db8eda81de755a5f377c83",
-    "session_id":"65db8eda81de755a5f377c87",
-    "from": "2024-03-14T03:40:00.000Z",
-    "to": "2024-03-14T20:30:00.000Z",
+    "hallId":"65f0b5f8d07e42db1abb8cb4",
+    "session_id":"123123123asdasdasd123123123",
+    "from": "2024-03-15T08:00:00",
+    "to": "2024-03-15T12:00:00",
     "time":{
-        "from":"T03:40:00.000Z",
-        "to":"20:30:00.000Z"
+        "from":"08:00:00",
+        "to":"12:00:00"
     }
 }
 

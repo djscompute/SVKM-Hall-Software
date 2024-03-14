@@ -1,7 +1,4 @@
-import React, { useState } from "react";
-import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
-import { RxDotFilled } from "react-icons/rx";
-// import CalendarBook from "../components/homePage/CalendarBook.tsx";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../config/axiosInstance.ts";
@@ -54,7 +51,7 @@ function Hall() {
           {/* Calender */}
           <div className="w-full">
             <h1 className=" text-3xl text-center my-2">Bookings</h1>
-            <Calendar />
+            <Calendar hallId={id as string} HallData={data} />
           </div>
           {/* Hall Location */}
           <div className="w-[95%] mx-auto my-5  border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
@@ -146,7 +143,9 @@ function Hall() {
                       <span>From:</span>
                       <span className="">
                         {eachSession.from
-                          ? convert_IST_TimeString_To12HourFormat(eachSession.from)
+                          ? convert_IST_TimeString_To12HourFormat(
+                              eachSession.from
+                            )
                           : "NAN"}
                       </span>
                     </div>

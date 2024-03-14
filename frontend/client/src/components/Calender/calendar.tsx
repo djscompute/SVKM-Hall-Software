@@ -1,8 +1,11 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
-import { bookingStatusType } from "../../types/Hall.types";
+import { useState } from "react";
+import { EachHallType, bookingStatusType } from "../../types/Hall.types";
 import EachDay from "./eachDay";
 import EachMobileDay from "./eachMobileDay";
+import dayjs from "dayjs";
+import axiosInstance from "../../config/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
 
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -40,22 +43,50 @@ const dummySlotData: dummyDataType[] = [
   },
 ];
 
+type Props = {
+  hallId: string;
+  HallData: EachHallType;
+};
+
 //calendar
-const Calendar = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+const Calendar = ({ hallId, HallData }: Props) => {
+  const [currentDate, setCurrentDate] = useState(
+    dayjs().startOf("month").toDate()
+  );
   const [selectedMobileDate, setSelectedMobileDate] = useState<number>(1);
 
-  const daysInMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
-    0
-  ).getDate();
-  
-  const firstDayOfMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    1
-  ).getDay();
+  const startDate = dayjs(currentDate)
+    .startOf("month")
+    .format("YYYY-MM-DD[T]00:00:00");
+  const endDate = dayjs(currentDate)
+    .endOf("month")
+    .format("YYYY-MM-DD[T]23:59:59");
+
+  const {
+    data: allBookingData,
+    error,
+    isFetching,
+  } = useQuery({
+    queryKey: [`bookings-${startDate}-${endDate}`],
+    queryFn: async () => {
+      const response = await axiosInstance.get("getBooking", {
+        params: {
+          from: startDate,
+          to: endDate,
+        },
+      });
+      console.log(response.data);
+      // sort based of from
+      response.data.sort((a: any, b: any) => dayjs(a.from).diff(dayjs(b.from)));
+      return response.data;
+    },
+  });
+
+  console.log(allBookingData);
+
+  const daysInMonth = dayjs(currentDate).daysInMonth();
+
+  const firstDayOfMonth = dayjs(currentDate).startOf("month").day();
 
   const onNextMonth = () => {
     setCurrentDate(
@@ -71,6 +102,13 @@ const Calendar = () => {
 
   const totalSlots = Math.ceil((firstDayOfMonth + daysInMonth) / 7) * 7;
   const trailingDays = totalSlots - (firstDayOfMonth + daysInMonth);
+
+  if (isFetching)
+    return (
+      <>
+        <p>LOADING</p>
+      </>
+    );
 
   return (
     <div className=" flex justify-center items-center">
@@ -129,9 +167,11 @@ const Calendar = () => {
           {Array.from({ length: daysInMonth }, (_, i) => (
             <EachDay
               i={i + 1}
-              dummySlotData={dummySlotData}
+              currentDate={currentDate}
+              HallSessionsArray={HallData.sessions}
               selectedMobileDate={selectedMobileDate}
               setSelectedMobileDate={setSelectedMobileDate}
+              allBookingData={allBookingData}
             />
           ))}
           {/* trailing spare days */}
