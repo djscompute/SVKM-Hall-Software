@@ -1,31 +1,49 @@
 import { useQuery } from "@tanstack/react-query";
 import Card from "../components/homePage/Card";
 import axiosInstance from "../config/axiosInstance.ts";
-// import { EachHallType } from "../types/Hall.types.ts";
 import { EachHallType } from "../../../../types/global.ts";
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { useState } from "react";
 
 function HomePage() {
-  //getAllHalls
-  // hallProps
-
+  const [toastShown, setToastShown] = useState(false)
   const { data, error, isFetching } = useQuery({
     queryKey: ["allhalls"],
     queryFn: async () => {
-      const response = await axiosInstance.get("getAllHalls");
-      return response.data as EachHallType[];
+      try {
+        const response = await axiosInstance.get("getAllHalls");
+        const promise = new Promise((resolve) => setTimeout(resolve, 1000)); 
+        if(!toastShown) //Toast message to appear only once
+        {
+          toast.promise(
+            promise,
+            {
+              pending: 'Fetching halls...', 
+              success: 'Halls fetched successfully!', 
+              error: 'Failed to fetch Halls. Please try again.', 
+            }
+          );
+          setToastShown(true)
+        }
+        return response.data as EachHallType[];
+      } catch (error) {   
+          
+        toast.error('Failed to fetch Halls. Please try again.');
+        
+        setToastShown(true)
+        throw error;
+      }
     },
   });
 
-  if (isFetching) {
-    return <div>Fetching Info</div>;
-  }
-
   return (
     <div className="flex flex-col items-center">
-      <h1 className=" text-3xl font-semibold my-5">All Halls</h1>
+      
+      {!data?<h1 className="text-3xl font-semibold my-5">Loading...</h1>:<h1 className="text-3xl font-semibold my-5">All Halls</h1>}
       <div className="flex flex-wrap justify-around w-full">
         {data?.map((hallProp) => (
-          <Card
+          <Card 
             key={hallProp._id}
             id={hallProp._id}
             img={hallProp.images[0]}
@@ -39,6 +57,7 @@ function HomePage() {
           />
         ))}
       </div>
+      <ToastContainer position="top-right"/>
     </div>
   );
 }
