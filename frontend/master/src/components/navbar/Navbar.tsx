@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
-import { useGeneralStore } from "../../store/generalStore";
 
 const NavBar = () => {
   const [open, setOpen] = useState(false);
@@ -10,15 +9,6 @@ const NavBar = () => {
     store.isAuthenticated,
     store.logout,
   ]);
-
-  const [setLoginToastTrue] = useGeneralStore((store)=>[
-    store.setLoginToastTrue
-  ])
-
-  const logoutHandler = () =>{
-    setLoginToastTrue();
-    logout();
-  }
 
   return (
     <>
@@ -67,7 +57,7 @@ const NavBar = () => {
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
               {isAuthenticated ? (
                 <span
-                  onClick={logoutHandler}
+                  onClick={logout}
                   className="whitespace-nowrap text-base font-medium text-red-500 hover:text-red-900 cursor-pointer"
                 >
                   Log Out

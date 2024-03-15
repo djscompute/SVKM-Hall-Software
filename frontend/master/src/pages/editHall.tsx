@@ -13,9 +13,6 @@ import axiosInstance from "../config/axiosInstance";
 import { useParams } from "react-router-dom";
 import { queryClient } from "../App";
 
-import { ToastContainer, toast } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
-
 // const DummyHallInfo: EachHallType = {
 //   _id: "1",
 //   name: "DJ Hall",
@@ -98,9 +95,6 @@ export default function EditHall() {
 
   const [hallData, setHallData] = useState<EachHallType | undefined>(undefined);
 
-  const [toastShown, setToastShown] = useState(false)
-
-
   const {
     data: databaseHallData,
     // error,
@@ -109,37 +103,10 @@ export default function EditHall() {
   } = useQuery({
     queryKey: [`getHall/${HallID}`],
     queryFn: async () => {
-      try{
       console.log("FETCHING");
       const response = await axiosInstance.get(`getHall/${HallID}`);
-
-      const promise = new Promise((resolve) => setTimeout(resolve, 1000)); 
-      if(!toastShown) //Toast message to appear only once
-      {
-        toast.promise(
-          promise,
-          {
-            pending: 'Fetching hall...', 
-            success: 'Hall fetched successfully!', 
-            error: 'Failed to fetch Hall. Please try again.', 
-          }
-        );
-        setToastShown(true)
-        
-      }
-
       setHallData(response.data);
       return response.data as EachHallType;
-      }catch(error){
-        if(!toastShown){  
-          setToastShown(true)
-          console.log(toastShown)
-          toast.error('Failed to fetch Halls. Please try again.');
-          }
-          
-          throw error;
-        
-      }
     },
   });
 
@@ -169,7 +136,6 @@ export default function EditHall() {
 
   return (
     <div className="hall-info-container grid place-items-center gap-y-12 mx-auto w-11/12 pt-10 overflow-y-hidden">
- <ToastContainer position="top-right"/>
       {databaseHallData && hallData && (
         <>
           <div className="flex flex-col items-center">
@@ -177,12 +143,10 @@ export default function EditHall() {
             <input
               className="text-5xl text-center border border-gray-400"
               value={hallData.name}
-              onChange={(e) =>{                
+              onChange={(e) =>
                 setHallData((prev) => {
                   if (prev) return { ...prev, name: e.target.value };
                 })
-                
-              }
               }
             />
           </div>
@@ -192,9 +156,7 @@ export default function EditHall() {
               <div className="flex gap-5">
                 <button
                   className=" bg-green-500 p-1 px-2 rounded-md text-xl font-semibold text-white"
-                  onClick={() => {editHallMutation.mutate()
-                    toast("Changes updated successfully")
-                  }}
+                  onClick={() => editHallMutation.mutate()}
                 >
                   Confirm
                 </button>
