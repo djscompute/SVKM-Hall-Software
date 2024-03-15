@@ -52,7 +52,13 @@ function EachDay({
   });
 
   // filter only the bookings of this current Day
-  allBookingData = allBookingData.filter((obj) => dayjs(obj.from).isSame(myDayJSObject, "day"));
+  allBookingData = allBookingData.filter((obj) =>
+    dayjs(obj.from).isSame(myDayJSObject, "day")
+  );
+
+  if (i == 15) {
+    console.log(i, allBookingData);
+  }
 
   // convert "08:00:00" to "${aaj-ka-din}T"08:00:00""
   const completeDateSessions = HallSessionsArray.map((element) => {
