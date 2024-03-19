@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useAuthStore from "../../store/authStore";
 import axiosInstance from "../../config/axiosInstance";
-import { useGeneralStore } from "../../store/generalStore";
 
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
@@ -15,12 +14,6 @@ const Login: React.FC = () => {
     store.login,
   ]);
 
-  const [loginToast, setLoginToastTrue, setLoginToastFalse] = useGeneralStore((store)=>[
-    store.loginToast,
-    store.setLoginToastTrue,
-    store.setLoginToastFalse
-  ])
-
   const handleLogin = async () => {
     try {
       const response = await axiosInstance.post("/loginAdmin", {
@@ -30,7 +23,6 @@ const Login: React.FC = () => {
 
       if (response.status === 200) {
         const data = await response.data;
-        setLoginToastTrue();
         login(email, password);
         window.location.href = "/";
       } else {

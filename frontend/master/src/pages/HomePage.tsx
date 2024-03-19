@@ -1,64 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
 import Card from "../components/homePage/Card";
-import hallProps from "../constants/dummyHallData.tsx";
 import axiosInstance from "../config/axiosInstance.ts";
 import { EachHallType } from "../types/Hall.types.ts";
-
-import { useGeneralStore } from "../store/generalStore.ts";
-
-
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useEffect, useState } from "react";
-
 
 function HomePage() {
-  //getAllHalls
-  // hallProps
-  const [toastShown, setToastShown] = useState(false)
-
-  const [loginToast, setLoginToastFalse] = useGeneralStore((store)=>[
-    store.loginToast,
-    store.setLoginToastFalse
-  ])
-
-  useEffect(() => {
-   if(loginToast==true)
-   {
-    console.log("Logged in")
-    toast("Logged in")
-    setLoginToastFalse();
-   }
-  }, [])
-
-  const { data, error, isFetching, status } = useQuery({
+  const { data, error, isFetching } = useQuery({
     queryKey: ["allhalls"],
     queryFn: async () => {
       try {
-        const response = await axiosInstance.get("getAllHalls");
-        const promise = new Promise((resolve) => setTimeout(resolve, 1000)); 
-        if(!toastShown) //Toast message to appear only once
-        {
-          toast.promise(
-            promise,
-            {
-              pending: 'Fetching halls...', 
-              success: 'Halls fetched successfully!', 
-              error: 'Failed to fetch Halls. Please try again.', 
-            }
-          );
-          setToastShown(true)
-        }
+        const responsePromise = axiosInstance.get("getAllHalls");
+        toast.promise(responsePromise, {
+          pending: "Fetching halls...",
+          success: "Latest Halls Data Fetched !",
+          error: "Failed to fetch Halls. Please try again.",
+        });
+        const response = await responsePromise;
         return response.data as EachHallType[];
-      } catch (error) {   
-          
-        toast.error('Failed to fetch Halls. Please try again.');
-        
-        setToastShown(true)
+      } catch (error) {
+        toast.error("Failed to fetch Halls. Please try again.");
         throw error;
       }
     },
   });
+
 
   return (
     <div className="flex flex-col items-center">
@@ -79,7 +45,7 @@ function HomePage() {
           />
         ))}
       </div>
-      <ToastContainer position="top-right"/>
+      <ToastContainer position="top-right" />
     </div>
   );
 }
