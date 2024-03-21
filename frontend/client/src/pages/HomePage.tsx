@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Card from "../components/homePage/Card";
 import axiosInstance from "../config/axiosInstance.ts";
+// import { EachHallType } from "../types/Hall.types.ts";
 import { EachHallType } from "../../../../types/global.ts";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -24,6 +25,10 @@ function HomePage() {
       }
     },
   });
+
+  if (isFetching) {
+    return <div>Fetching Info</div>;
+  }
 
   return (
     <div className="flex flex-col items-center">

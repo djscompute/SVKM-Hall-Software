@@ -37,14 +37,6 @@ function Hall() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  if (isFetching) {
-    return (
-      <>
-        <div>Fetching Info</div>
-      </>
-    );
-  }
-
   const prevSlide = () => {
     if (!data?.images) return;
     const isFirstSlide = currentIndex === 0;
@@ -62,6 +54,14 @@ function Hall() {
   const goToSlide = (slideIndex: React.SetStateAction<number>) => {
     setCurrentIndex(slideIndex);
   };
+
+  if (isFetching) {
+    return (
+      <>
+        <div>Fetching Info</div>
+      </>
+    );
+  }
 
   return (
     <>

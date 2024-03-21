@@ -88,9 +88,7 @@ export default function EditHall() {
               <div className="flex gap-5">
                 <button
                   className=" bg-green-500 p-1 px-2 rounded-md text-xl font-semibold text-white"
-                  onClick={() => {
-                    editHallMutation.mutate();
-                  }}
+                  onClick={() => editHallMutation.mutate()}
                 >
                   Confirm
                 </button>
