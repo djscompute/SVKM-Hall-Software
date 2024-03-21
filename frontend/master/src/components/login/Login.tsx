@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import useAuthStore from "../../store/authStore";
 import axiosInstance from "../../config/axiosInstance";
 
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Login: React.FC = () => {
@@ -16,14 +16,23 @@ const Login: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axiosInstance.post("/loginAdmin", {
+      const responsePromise = axiosInstance.post("/loginAdmin", {
         email,
         password,
       });
 
+      toast.promise(responsePromise, {
+        success: "LOGGED IN",
+        pending: "logging in...",
+        error: "Failed to log in. check ur email, password",
+      });
+
+      const response = await responsePromise;
+
       if (response.status === 200) {
         const data = await response.data;
         login(email, password);
+        console.log(data);
         window.location.href = "/";
       } else {
         setErrorMessage("Invalid login credentials");
@@ -34,14 +43,6 @@ const Login: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if(loginToast)
-    {
-      toast("Logged out")
-      setLoginToastFalse()
-    }
-  }, [])
-  
   return (
     <div className="flex justify-center items-center h-screen">
       <div>
@@ -88,7 +89,6 @@ const Login: React.FC = () => {
           </div>
         )}
       </div>
-      <ToastContainer position="top-right"/>
     </div>
   );
 };

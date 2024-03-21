@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { convertUTCTimeTo12HourFormat } from "../utils/convertUTCTimeTo12HourFormat.tsx";
 import { Carousel } from "@material-tailwind/react";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function Hall() {
@@ -27,8 +27,6 @@ function Hall() {
         const response = await responsePromise;
         return response.data as EachHallType;
       } catch (error) {
-        toast.error("Failed to fetch Halls. Please try again.");
-
         throw error;
       }
     },
@@ -42,7 +40,6 @@ function Hall() {
   if (isFetching) {
     return (
       <>
-        <ToastContainer position="top-right" />
         <div>Fetching Info</div>
       </>
     );
@@ -68,7 +65,6 @@ function Hall() {
 
   return (
     <>
-      <ToastContainer position="top-right" />
       {data && (
         <div>
           {data ? (

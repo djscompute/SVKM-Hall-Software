@@ -12,7 +12,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosInstance from "../config/axiosInstance";
 import { useParams } from "react-router-dom";
 import { queryClient } from "../App";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function EditHall() {
@@ -20,27 +20,21 @@ export default function EditHall() {
 
   const [hallData, setHallData] = useState<EachHallType | undefined>(undefined);
 
-  const {
-    data: databaseHallData,
-    // error,
-    // isFetching,
-    // status,
-  } = useQuery({
+  const { data: databaseHallData } = useQuery({
     queryKey: [`getHall/${HallID}`],
     queryFn: async () => {
       try {
         console.log("FETCHING");
         const responsePromise = axiosInstance.get(`getHall/${HallID}`);
         toast.promise(responsePromise, {
-          pending: "Updating...",
-          success: "Hall Edited!",
-          error: "Failed to Edit Hall. Please try again.",
+          pending: "Updating with latest data...",
+          success: "Fetched Hall Data",
+          error: "Failed to fetch hall Data",
         });
         const response = await responsePromise;
         setHallData(response.data);
         return response.data as EachHallType;
       } catch (error) {
-        toast.error("Failed to fetch Halls. Please try again.");
         throw error;
       }
     },
@@ -49,30 +43,31 @@ export default function EditHall() {
   const editHallMutation = useMutation({
     mutationFn: async () => {
       console.log(hallData);
-      const response = await axiosInstance.post(
+      const responsePromise = axiosInstance.post(
         `/editHall/${HallID}`,
         hallData
       );
+      toast.promise(responsePromise, {
+        pending: "Updating...",
+        success: "Hall Edited!",
+        error: "Failed to Edit Hall. Please try again.",
+      });
+      const response = await responsePromise;
       console.log(response.data);
     },
     onSuccess: async () => {
       console.log("REVALIDATING");
-      // do a hot toast here
       await queryClient.refetchQueries({
         queryKey: [`getHall/${HallID}`],
       });
     },
     onError: (error) => {
       console.log(error);
-      // show the below line in react hot toast
-      // @ts-ignore
-      console.log(error.response.data.issues[0].message);
     },
   });
 
   return (
     <div className="hall-info-container grid place-items-center gap-y-12 mx-auto w-11/12 pt-10 overflow-y-hidden">
-      <ToastContainer position="top-right" />
       {databaseHallData && hallData && (
         <>
           <div className="flex flex-col items-center">
@@ -95,7 +90,6 @@ export default function EditHall() {
                   className=" bg-green-500 p-1 px-2 rounded-md text-xl font-semibold text-white"
                   onClick={() => {
                     editHallMutation.mutate();
-                    toast("Changes updated successfully");
                   }}
                 >
                   Confirm

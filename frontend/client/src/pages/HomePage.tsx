@@ -2,9 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import Card from "../components/homePage/Card";
 import axiosInstance from "../config/axiosInstance.ts";
 import { EachHallType } from "../../../../types/global.ts";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useState } from "react";
 
 function HomePage() {
   const { data, error, isFetching } = useQuery({
@@ -51,7 +50,6 @@ function HomePage() {
           </div>
         </>
       )}
-      <ToastContainer position="top-right" />
     </div>
   );
 }

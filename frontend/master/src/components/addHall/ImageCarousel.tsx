@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-// import Carousel from "./Carousel";
 import { EachHallType } from "../../types/Hall.types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axiosInstance from "../../config/axiosInstance";
 
 type props = {
