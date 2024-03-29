@@ -32,16 +32,14 @@ function HomePage() {
       <div className="flex flex-wrap justify-around w-full">
         {data?.map((hallProp) => (
           <Card
+            _id={hallProp._id}
             key={hallProp._id}
-            id={hallProp._id}
-            img={hallProp.images[0]}
-            tagline={hallProp.about}
+            images={hallProp.images}
             name={hallProp.name}
-            place={hallProp.location.desc1}
-            numPhotos={hallProp.images.length}
-            minCapacity={hallProp.capacity}
-            maxCapacity={hallProp.capacity}
-            price={hallProp.pricing}
+            location={hallProp.location}
+            capacity={hallProp.capacity}
+            seating={hallProp.seating}
+            pricing={hallProp.pricing}
           />
         ))}
       </div>

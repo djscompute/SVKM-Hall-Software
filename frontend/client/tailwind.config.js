@@ -16,9 +16,6 @@ module.exports = withMT({
         "SAPBlue-800": "#3f6eb6",
         "SAPBlue-900": "#0070f2",
       }
-    },
-    screens: {
-      'mb': '400px',
     }
   },
   plugins: [],
