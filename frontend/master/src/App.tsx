@@ -7,20 +7,56 @@ import NavBar from "./components/navbar/Navbar";
 import Login from "./components/login/Login";
 import NotFoundPage from "./pages/NotFoundPage";
 import AddHall from "./pages/addHall";
-// import ProtectedRoute from '../src/components/ProtectedRoute';
+import { ToastContainer } from "react-toastify";
+import ProtectedRoute from "./components/ProtectedRoute";
 export const queryClient = new QueryClient();
 
 export default function App() {
-
   return (
     <QueryClientProvider client={queryClient}>
       <NavBar />
+      <ToastContainer position="top-right" />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/addnewhall" element={<AddHall />} />
-        <Route path="/halls/:id" element={<EditHall />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/error" element={<NotFoundPage />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/addnewhall"
+          element={
+            <ProtectedRoute>
+              <AddHall />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/halls/:id"
+          element={
+            <ProtectedRoute>
+              <EditHall />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <ProtectedRoute>
+              <Login />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/error"
+          element={
+            <ProtectedRoute>
+              <NotFoundPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </QueryClientProvider>
   );
