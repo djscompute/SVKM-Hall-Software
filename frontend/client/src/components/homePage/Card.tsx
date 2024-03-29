@@ -8,46 +8,13 @@ import hall from "../../assets/hall.png";
 export default function Card(props: any) {
   return (
     <Link to={`/halls/${props.id}`}>
-      <div className="
-      bg-slate-100 
-        rounded-lg 
-        m-4 
-        w-[280px]
-        mb:w-[400px] 
-        aspect-[4/3] 
-        drop-shadow-2xl 
-        pb-4 border-2 
-        border-slate-300
-      ">
+      <div className=" bg-slate-100 rounded-lg m-4 w-[280px] mb:w-[400px] aspect-[4/3] drop-shadow-2xl pb-4 border-2 border-slate-300">
         <div className="w-full">
           <FontAwesomeIcon
             icon={faCircleInfo}
-            className="
-            fixed 
-            drop-shadow-xl 
-            text-white 
-            m-[10px] 
-            text-2xl 
-            top-1 
-            z-5"
+            className="fixed drop-shadow-xl text-white m-[10px] text-2xl top-1 z-5"
           />
-          <div className="
-          flex 
-          flex-row 
-          w-[110px] 
-          justify-center 
-          rounded-full 
-          drop-shadow-xl 
-          p-1 
-          fixed 
-          text-white 
-          m-[10px] 
-          text-2xl 
-          mt-8 
-          z-5 
-          bg-white 
-          right-1 
-          top-[125px]">
+          <div className="flex flex-row w-[110px] justify-center rounded-full drop-shadow-xl p-1 fixed text-white m-[10px] text-2xl mt-8 z-5 bg-white right-1 top-[125px]">
             <FontAwesomeIcon
               icon={faImages}
               className="text-pink-600 text-xl "
@@ -57,7 +24,7 @@ export default function Card(props: any) {
             </span>
           </div>
           <img
-            className="top-0 w-[400px] h-[200px] rounded-ee-lg rounded-es-lg z-0"
+            className="top-0 w-[400px] h-[200px] rounded-md z-0"
             src={props.img}
           />
         </div>
