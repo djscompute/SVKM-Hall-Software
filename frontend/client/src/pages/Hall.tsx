@@ -62,6 +62,7 @@ function Hall() {
       </>
     );
   }
+  let finalIframeUrl = data?.location.iframe?.replace(/&#39;/g, "'");
 
   return (
     <>
@@ -69,7 +70,7 @@ function Hall() {
         <div>
           {data ? (
             <div className="flex w-full flex-col">
-              <h1 className="text-center text-5xl font-light mt-10">
+              <h1 className="text-center text-5xl mt-10">
                 {data.name}
               </h1>
               <div className="w-3/4 mx-auto items-center">
@@ -79,27 +80,13 @@ function Hall() {
                   transition={{ duration: 1 }}
                   className="rounded-xl my-6"
                 >
-                  <img
-                    src={data.images[0]}
-                    className="h-[80vh] w-full object-cover"
-                  />
-                  <img
-                    src={data.images[1]}
-                    className="h-[80vh] w-full object-cover"
-                  />
-                  <img
-                    src={data.images[2]}
-                    className="h-[80vh] w-full object-cover"
-                  />
+                  {data.images.map((eachImgSrc) => (
+                    <img
+                      src={eachImgSrc}
+                      className="h-[80vh] w-full object-cover"
+                    />
+                  ))}
                 </Carousel>
-
-                {/* Carousel */}
-
-                {/* Calendar */}
-                <div className="py-16 w-1/2 max-xl:w-full max-xl:max-w-[600px] mx-auto">
-                  <CalendarBook />
-                </div>
-                {/* Calendar */}
               </div>
               {/* Hall Location */}
               <div className="w-[95%] mx-auto my-5  border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
@@ -123,12 +110,17 @@ function Hall() {
                   />
                   <span className="ml-1 ">View on map</span>
                 </a>
-                <iframe
-                  src={data.location.iframe}
-                  width="600"
-                  height="450"
-                  className="mt-4"
-                ></iframe>
+                {finalIframeUrl && (
+                  <iframe
+                    src={finalIframeUrl}
+                    width="600"
+                    height="450"
+                    loading="lazy"
+                    // @ts-ignore
+                    allowFullScreen=""
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                )}
                 <hr className="my-4" />
               </div>
 
@@ -185,36 +177,49 @@ function Hall() {
               </div>
 
               <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
-                <div className="about-hall text-lg">
-                  {data.sessions.map((eachSession, index) => (
-                    <div key={index} className="flex flex-col mb-3">
-                      <p className="font-medium text-lg">{eachSession.name}</p>
-                      <div className="flex justify-between">
-                        <div className="flex gap-2 bg-white px-2 rounded-md">
-                          <span>From:</span>
-                          <span className="">
-                            {eachSession.from
-                              ? convertUTCTimeTo12HourFormat(eachSession.from)
-                              : "NAN"}
-                          </span>
-                        </div>
-                        <div className="flex gap-2 bg-white px-2 rounded-md">
-                          <span>To:</span>
-                          <span className="">
-                            {convertUTCTimeTo12HourFormat(eachSession.to)}
-                          </span>
-                        </div>
+                {data.sessions.map((eachSession, index) => (
+                  <div key={index} className="flex flex-col mb-3">
+                    <p className="font-medium text-lg">{eachSession.name}</p>
+                    <div className="flex justify-between">
+                      <div className="flex gap-2 bg-white px-2 rounded-md">
+                        <span>From:</span>
+                        <span className="">
+                          {eachSession.from
+                            ? convertUTCTimeTo12HourFormat(eachSession.from)
+                            : "NAN"}
+                        </span>
+                      </div>
+                      <div className="flex gap-2 bg-white px-2 rounded-md">
+                        <span>To:</span>
+                        <span className="">
+                          {convertUTCTimeTo12HourFormat(eachSession.to)}
+                        </span>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    <div className=" mt-2 mb-3">
+                      {eachSession.price.map((eachSessionPrice, index) => (
+                        <div
+                          className="flex justify-evenly w-full"
+                          key={index}
+                        >
+                          <span className="border border-gray-600 border-r-0  w-full text-center">
+                            {eachSessionPrice.categoryName}
+                          </span>
+                          <span className="border border-gray-600 w-full text-center">
+                            {eachSessionPrice.price}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
                 <div className="flex flex-col w-full">
                   <h2 className="font-bold text-xl mb-3">Pricing</h2>
                   {data.pricing ? (
-                    <p className="text-lg">{data.pricing}</p>
+                    <p className="text-lg">₹ {data.pricing}/hr</p>
                   ) : (
                     <p>No pricing set for this hall. Edit to set the Price</p>
                   )}
