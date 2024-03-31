@@ -2,6 +2,7 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { convertISO_To_IST, convertIST_To_ISO } from "../../utils/ISO-IST";
 // import { useState } from "react";
 
 type Props = {
@@ -13,13 +14,20 @@ export default function BasicTimePicker({
   timePickerName,
   timeModifier,
 }: Props) {
-  // Function to handle time selection
   const handleTimeChange = (newTime: any) => {
-    // Convert the selected time to UTC
-    const stringArray = new Date(newTime).toISOString().split("T");
-    const utcTime: any = stringArray[1];
-    timeModifier(utcTime);
-    console.log("utcTime", utcTime);
+    // Function to handle time selection
+    
+    // console.log("newTime.date", newTime.$d);
+    const isoString = newTime.$d.toISOString();
+    // console.log("isoString ", isoString);
+    const istString = convertISO_To_IST(isoString);
+    // console.log("istString ", istString);
+
+    const onlyTime = istString.split("T")[1];
+
+    console.log(onlyTime);
+
+    timeModifier(onlyTime);
   };
 
   return (

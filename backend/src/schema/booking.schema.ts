@@ -8,7 +8,7 @@ const stringErrorHandler = (fieldName: string) => ({
 export const AddBookingZodSchema = z.object({
   body: z.object({
     user: z.object({
-      name: z.string(stringErrorHandler("name")),
+      username: z.string(stringErrorHandler("name")),
       email: z.string(stringErrorHandler("email")).email().optional(),
       aadharNo: z.string(stringErrorHandler("aadharNo")).optional(),
       panNo: z.string(stringErrorHandler("panNo")).optional(),
@@ -27,8 +27,8 @@ export const AddBookingZodSchema = z.object({
     price: z.number(stringErrorHandler("price")),
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
-    from: z.string(stringErrorHandler("from")).datetime(),
-    to: z.string(stringErrorHandler("to")).datetime(),
+    from: z.string(stringErrorHandler("from")),
+    to: z.string(stringErrorHandler("to")),
     time: z.object({
       from: z.string(stringErrorHandler("time.from")),
       to: z.string(stringErrorHandler("time.to")),

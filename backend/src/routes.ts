@@ -99,11 +99,6 @@ export default function routes(app: Express) {
     requireMasterRole,
     validateRequest(RemoveHallZodSchema),
     validateRequest(AddHallZodSchema),
-    // @ts-ignore
-    (res, req, next) => {
-      console.log("HERE");
-      next();
-    },
     editHallHandler,
   ]);
 
@@ -126,6 +121,11 @@ export default function routes(app: Express) {
 
   app.post("/addBooking", [
     validateRequest(AddBookingZodSchema),
+    // @ts-ignore
+    (res, req, next) => {
+      // console.log("HERE");
+      next();
+    },
     addBookingHandler,
   ]);
 

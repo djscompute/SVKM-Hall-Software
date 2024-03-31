@@ -42,9 +42,9 @@ function AddHall() {
     sessions: [
       {
         active: true,
-        name: "Morning first session",
-        from: "3:40:00.000Z",
-        to: "20:30:00.000Z",
+        name: "Morning First session",
+        from: "8:00:00",
+        to: "12:00:00",
         price: [
           {
             categoryName: "Student",
@@ -58,9 +58,25 @@ function AddHall() {
       },
       {
         active: true,
-        name: "Morning 7 hours",
-        from: "3:40:00.000Z",
-        to: "20:30:00.000Z",
+        name: "Afternoon Session",
+        from: "13:00:00",
+        to: "17:00:00",
+        price: [
+          {
+            categoryName: "Student",
+            price: 2000,
+          },
+          {
+            categoryName: "Politician",
+            price: 4000,
+          },
+        ],
+      },
+      {
+        active: true,
+        name: "Night Session",
+        from: "18:00:00",
+        to: "22:00:00",
         price: [
           {
             categoryName: "Student",
