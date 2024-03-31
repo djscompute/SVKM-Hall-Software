@@ -1,32 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import useAuthStore from "../../store/authStore";
-import axiosInstance from "../../config/axiosInstance";
-import { toast } from "react-toastify";
 
 const NavBar = () => {
   const [open, setOpen] = useState(false);
 
-  const [isAuthenticated, logout] = useAuthStore((store) => [
-    store.isAuthenticated,
-    store.logout,
-  ]);
-
-  const handleLogout = async () => {
-    try {
-      const response = await axiosInstance.get("/logoutAdmin");
-      if (response.status === 200) {
-        const data = await response.data;
-        logout();
-        toast.success("logged Out");
-        console.log(data);
-      } else {
-        toast.error("error while logging you out.");
-      }
-    } catch (error) {
-      console.error("Error during authentication:", error);
-    }
-  };
 
   return (
     <>
@@ -72,23 +49,6 @@ const NavBar = () => {
                 Home
               </Link>
             </nav>
-            <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-              {isAuthenticated ? (
-                <span
-                  onClick={handleLogout}
-                  className="whitespace-nowrap text-base font-medium text-red-500 hover:text-red-900 cursor-pointer"
-                >
-                  Log Out
-                </span>
-              ) : (
-                <Link
-                  to="/login"
-                  className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
-                >
-                  Sign in
-                </Link>
-              )}
-            </div>
           </div>
         </div>
         {/*
@@ -155,23 +115,6 @@ const NavBar = () => {
                 >
                   Home
                 </Link>
-              </div>
-              <div className="">
-                {isAuthenticated ? (
-                  <span
-                    onClick={handleLogout}
-                    className="whitespace-nowrap text-base font-medium text-red-500 hover:text-red-900 cursor-pointer"
-                  >
-                    Log Out
-                  </span>
-                ) : (
-                  <Link
-                    to="/login"
-                    className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
-                  >
-                    Sign in
-                  </Link>
-                )}
               </div>
             </div>
           </div>

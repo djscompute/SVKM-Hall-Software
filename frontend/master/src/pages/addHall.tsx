@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../config/axiosInstance";

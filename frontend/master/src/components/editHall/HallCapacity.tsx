@@ -14,12 +14,6 @@ export default function HallCapacity({
   seating,
   setHallData,
 }: props) {
-  const updateHallCapacity = () => {
-    // this function will be used to update the capacity in the hall ka database.
-    // then refetch the hall ka info.
-    // baadmai likhenge isko.
-    // once backend is setup
-  };
   const [modalData, setModalData] = useState({ capacity, seating });
   const [modal, setModal] = useState(false);
 

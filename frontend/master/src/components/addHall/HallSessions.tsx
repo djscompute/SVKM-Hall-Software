@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { EachHallSessionType, EachHallType } from "../../types/Hall.types";
 import ToggleSwitch from "../toggleSwitch/toggleSwitch";
 import BasicTimePicker from "./BasicTimePicker";

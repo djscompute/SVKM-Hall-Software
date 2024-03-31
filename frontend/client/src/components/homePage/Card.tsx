@@ -1,52 +1,59 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import { faImages } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import hall from "../../assets/hall.png";
+import { EachHallType } from "../../types/Hall.types";
 
-export default function Card(props: any) {
+export default function Card(
+  props: Pick<
+    EachHallType,
+    "name" | "_id" | "capacity" | "images" | "location" | "pricing" | "seating"
+  >
+) {
+  console.log(props);
   return (
-    <Link to={`/halls/${props.id}`}>
-      <div className="bg-slate-100 rounded-lg m-4 w-[400px] aspect-[4/3] drop-shadow-2xl h-[380px] border-2 border-slate-300">
-        <div className="bg-SAPBlue-500 text-center h-[35px] pt-[6px] text-[15px] font-semibold text-white font-sans rounded-se-lg rounded-ss-lg">
-          {props.tagline}
+    <Link
+      to={`/halls/${props._id}`}
+      className="flex flex-col rounded-lg bg-white w-full lg:w-1/3 m-3 md:m-10 lg:m-0 drop-shadow-2xl pb-4 border-2 border-gray-300 "
+    >
+      {/* IMAGE PART */}
+      <div className="flex justify-center w-full relative">
+        <FontAwesomeIcon
+          icon={faCircleInfo}
+          className="absolute drop-shadow-xl text-white top-5 left-5 z-10 h-6 w-6 shadow-md"
+        />
+        <div className=" absolute bottom-5 right-5 flex flex-row items-center justify-center rounded-md p-1 px-2 text-white bg-white z-10 ">
+          <FontAwesomeIcon icon={faImages} className="text-pink-600" />
+          <span className="font-medium text-black">
+            &nbsp;{props.images?.length} photos
+          </span>
         </div>
-        <div className="w-full">
-          <FontAwesomeIcon
-            icon={faCircleInfo}
-            className="fixed drop-shadow-xl text-white m-[10px] text-2xl top-8 z-5"
-          />
-          <div className="flex flex-row w-[110px] justify-center rounded-full drop-shadow-xl p-1 fixed text-white m-[10px] text-2xl mt-8 z-5 bg-white left-2/3 top-[155px]">
-            <FontAwesomeIcon
-              icon={faImages}
-              className="text-pink-600 text-xl "
-            />
-            <span className="font-medium text-sm text-slate-900">
-              &nbsp;{props.numPhotos} photos
-            </span>
-          </div>
-          <img
-            className="top-0 w-[400px] h-[200px] rounded-ee-lg rounded-es-lg z-0"
-            src={props.img}
-          />
+        <img
+          className=" rounded-md z-0"
+          src={props.images ? props.images[0] : "null"}
+        />
+      </div>
+      {/* TEXT PART */}
+      <div className="flex flex-col px-5 py-2">
+        <span className="font-bold text-center text-base sm:text-xl text-black">
+          {props.name}
+        </span>
+        <span className="font-medium w-full">{props.location.desc1}</span>
+        <div className="flex flex-wrap justify-between">
+          <span className="text-gray-800">
+            seating:
+            <span className="text-black">{props.seating}</span>
+          </span>
+          <span className="text-gray-800">
+            capacity:
+            <span className="text-black">{props.capacity}</span>
+          </span>
         </div>
-        <div className="px-4 pt-2 block font-bold text-black">{props.name}</div>
-        <div className="px-4 block font-semibold text-slate-600">
-          {props.place}
-        </div>
-        <div className="flex flex-row justify-between">
-          <div className="px-4 block font-semibold text-slate-600">
-            <FontAwesomeIcon icon={faPeopleGroup} className="mr-2" />
-            {props.minCapacity}-{props.maxCapacity}
-          </div>
-          <div className="px-4 block font-semibold font-6 text-slate-900">
-            ₹ {props.price}{" "}
-            <span className="font-medium text-slate-600">/ Person</span>
-          </div>
-        </div>
-        <div className="flex flex-row justify-end">
-          <button className="block font-semibold text-pink-600 border-2 border-pink-600 hover:bg-pink-600 hover:text-white mx-4 mt-2 px-5 py-2 rounded-full">
+        <div className="flex flex-row items-center justify-between mt-3">
+          <span className="block text-gray-800">
+            pricing: <span className="font-medium text-black">₹{props.pricing}/hr</span>
+          </span>
+          <button className="text-pink-600 border-2 text-sm sm:text-base border-pink-600 hover:bg-pink-600 hover:text-white px-4 py-1 rounded-full">
             Check Availability
           </button>
         </div>
@@ -54,15 +61,3 @@ export default function Card(props: any) {
     </Link>
   );
 }
-
-Card.defaultProps = {
-  id: "0",
-  img: hall,
-  tagline: "Hall's tagline",
-  name: "Hall's Name",
-  place: "Hall's Location",
-  numPhotos: 10,
-  minCapacity: 30,
-  maxCapacity: 100,
-  price: 900,
-};

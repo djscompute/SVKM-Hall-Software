@@ -159,7 +159,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
               <div className=" mt-2 mb-3">
                 {eachSession.price.map((eachSessionPrice, index) => (
                   <div
-                    className="flex justify-evenly w-full text-sm"
+                    className="flex justify-evenly w-full"
                     key={index}
                   >
                     <span className="border border-gray-600 border-r-0  w-full text-center">
