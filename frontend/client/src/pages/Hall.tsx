@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import CalendarBook from "../components/homePage/CalendarBook.tsx";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../config/axiosInstance.ts";
 import { EachHallType } from "../types/Hall.types.ts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
-import { convertUTCTimeTo12HourFormat } from "../utils/convertUTCTimeTo12HourFormat.tsx";
+import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat.tsx";
 import { Carousel } from "@material-tailwind/react";
 import { toast } from "react-toastify";
+import Calendar from "../components/Calender/calendar.tsx";
 import "react-toastify/dist/ReactToastify.css";
 
 function Hall() {
@@ -70,9 +70,7 @@ function Hall() {
         <div>
           {data ? (
             <div className="flex w-full flex-col">
-              <h1 className="text-center text-5xl mt-10">
-                {data.name}
-              </h1>
+              <h1 className="text-center text-5xl mt-10">{data.name}</h1>
               <div className="w-3/4 mx-auto items-center">
                 {/* Carousel */}
                 {/* @ts-ignore */}
@@ -88,6 +86,7 @@ function Hall() {
                   ))}
                 </Carousel>
               </div>
+              <Calendar hallId={id as string} HallData={data} />
               {/* Hall Location */}
               <div className="w-[95%] mx-auto my-5  border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
                 <h1 className="text-3xl">Details:</h1>
@@ -185,23 +184,24 @@ function Hall() {
                         <span>From:</span>
                         <span className="">
                           {eachSession.from
-                            ? convertUTCTimeTo12HourFormat(eachSession.from)
+                            ? convert_IST_TimeString_To12HourFormat(
+                                eachSession.from
+                              )
                             : "NAN"}
                         </span>
                       </div>
                       <div className="flex gap-2 bg-white px-2 rounded-md">
                         <span>To:</span>
                         <span className="">
-                          {convertUTCTimeTo12HourFormat(eachSession.to)}
+                          {convert_IST_TimeString_To12HourFormat(
+                            eachSession.to
+                          )}
                         </span>
                       </div>
                     </div>
                     <div className=" mt-2 mb-3">
                       {eachSession.price.map((eachSessionPrice, index) => (
-                        <div
-                          className="flex justify-evenly w-full"
-                          key={index}
-                        >
+                        <div className="flex justify-evenly w-full" key={index}>
                           <span className="border border-gray-600 border-r-0  w-full text-center">
                             {eachSessionPrice.categoryName}
                           </span>
