@@ -76,6 +76,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
         },
       });
       console.log(response.data);
+      if (response.data.message == "No bookings found for the specified range.") return []
       // sort based of from
       response.data.sort((a: any, b: any) => dayjs(a.from).diff(dayjs(b.from)));
       return response.data;
@@ -109,6 +110,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
         <p>LOADING</p>
       </>
     );
+  
 
   return (
     <div className=" flex justify-center items-center">

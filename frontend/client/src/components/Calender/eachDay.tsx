@@ -52,13 +52,9 @@ function EachDay({
   });
 
   // filter only the bookings of this current Day
-  allBookingData = allBookingData.filter((obj) =>
+  allBookingData = allBookingData?.filter((obj) =>
     dayjs(obj.from).isSame(myDayJSObject, "day")
   );
-
-  if (i == 15) {
-    console.log(i, allBookingData);
-  }
 
   // convert "08:00:00" to "${aaj-ka-din}T"08:00:00""
   const completeDateSessions = HallSessionsArray.map((element) => {
@@ -81,7 +77,7 @@ function EachDay({
   const finalArr: any[] = [];
   completeDateSessions.forEach((eachSession) => {
     let clashing: boolean = false;
-    allBookingData.forEach((eachBooking) => {
+    allBookingData?.forEach((eachBooking) => {
       if (
         areTimeIntervalsOverlapping(eachSession, eachBooking) &&
         !finalArr.includes(eachBooking)
