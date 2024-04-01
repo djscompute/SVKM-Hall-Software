@@ -3,6 +3,9 @@ import { devtools, persist } from "zustand/middleware";
 
 interface AuthState {
   isAuthenticated: boolean;
+  user: {
+    email: string;
+  } | null;
 }
 
 interface AuthActions {
@@ -14,11 +17,12 @@ const useAuthStore = create<AuthState & AuthActions>()(
   persist(
     devtools((set) => ({
       isAuthenticated: false,
+      user: null,
       login: (email, password) => {
-        set({ isAuthenticated: true });
+        set({ isAuthenticated: true, user: { email: email } });
       },
       logout: () => {
-        set({ isAuthenticated: false });
+        set({ isAuthenticated: false, user: null });
       },
     })),
     {

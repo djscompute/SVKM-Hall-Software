@@ -4,14 +4,18 @@ import axiosInstance from "../config/axiosInstance.ts";
 import { EachHallType } from "../types/Hall.types.ts";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useAuthStore from "../store/authStore.ts";
 
 function HomePage() {
+  const user = useAuthStore((store) => store.user);
+  console.log(user);
   const { data, isFetching } = useQuery({
     queryKey: ["allhalls"],
     queryFn: async () => {
       try {
-        const responsePromise = axiosInstance.get("getAllHalls");
-        console.log("FETCHING");
+        const responsePromise = axiosInstance.get(
+          `getHallsforAdmin/${user?.email}`
+        );
         toast.promise(responsePromise, {
           pending: "Fetching halls...",
           success: "Latest Halls Data Fetched !",

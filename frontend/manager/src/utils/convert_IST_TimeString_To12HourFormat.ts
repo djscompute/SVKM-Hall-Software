@@ -11,21 +11,21 @@ export const convert_IST_TimeString_To12HourFormat = (
 ): string => {
   // timeString should be of format "08:00:00" which is in IST
   // NOT "08:00:00.000Z"
-  try {
-    const currentDate = dayjs();
-    const dateString = currentDate.format("YYYY-MM-DD");
-    const completeISTString = `${dateString}T${timeString}`;
-    const istTime = dayjs.tz(completeISTString, "Asia/Kolkata");
-    return istTime.format("h:mm A");
-  } catch (err) {
-    console.log(`ERROR WHILE doing ${timeString} ${err}`);
-    return "SUS";
-  }
+  const currentDate = dayjs();
+
+  const dateString = currentDate.format("YYYY-MM-DD");
+
+  const completeISTString = `${dateString}T${timeString}`;
+
+  const istTime = dayjs.tz(completeISTString, "Asia/Kolkata");
+
+  return istTime.format("h:mm A");
 };
 
-// const currentDate = dayjs();
-// const dateString = currentDate.format("YYYY-MM-DD");
-// const completeISTString = `${dateString}T${timeString}`;
-// const istTime = dayjs.tz(completeISTString, "Asia/Kolkata");
-// const formattedTime = istTime.format("h:mm A");
-// return formattedTime;
+export const convert_IST_DateTimeString_To12HourFormat = (
+  dateTimeString: string
+): string => {
+  const istTime = dayjs.tz(dateTimeString, "Asia/Kolkata");
+
+  return istTime.format("h:mm A");
+};

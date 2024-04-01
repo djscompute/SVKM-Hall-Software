@@ -22,7 +22,10 @@ import {
   EmailAdminZodSchema,
   LoginAdminZodSchema,
 } from "./schema/admin.schema";
-import { requireMasterRole } from "./middleware/accessControl";
+import {
+  requireManagerRole,
+  requireMasterRole,
+} from "./middleware/accessControl";
 import {
   AddBookingZodSchema,
   RemoveBookingZodSchema,
@@ -114,7 +117,7 @@ export default function routes(app: Express) {
   // FUTURE: GET ALL HALLS WHOM THE MANAGER HAS ACCESS TO
   app.get("/getHallsforAdmin/:email", [
     validateCookie,
-    requireMasterRole,
+    requireManagerRole,
     validateRequest(EmailAdminZodSchema),
     getHallsforAdminHandler,
   ]);

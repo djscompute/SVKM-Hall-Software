@@ -4,7 +4,7 @@ admin login
     "password":"admin1"
 }
 
-add booking
+add booking 1
 {
     "user": {
         "username": "Mohammed",
@@ -19,12 +19,37 @@ add booking
     "status":"CONFIRMED",
     "price":100000,
     "hallId":"65f0b5f8d07e42db1abb8cb4",
-    "session_id":"123123123asdasdasd123123123",
-    "from": "2024-03-15T08:00:00",
-    "to": "2024-03-15T12:00:00",
+    "session_id":"65f0b5f8d07e42db1abb8cb8",
+    "from": "2024-04-04T08:00:00",
+    "to": "2024-04-04T12:00:00",
     "time":{
         "from":"08:00:00",
         "to":"12:00:00"
+    }
+}
+
+
+add booking 2
+{
+    "user": {
+        "username": "Mohammed",
+        "mobile": "9833734905"
+    },
+    "features": [
+        {
+            "heading": "2 seats",
+            "price": 1000
+        }
+    ],
+    "status":"ENQUIRY",
+    "price":100000,
+    "hallId":"65f0b5f8d07e42db1abb8cb4",
+    "session_id":"65f0b5f8d07e42db1abb8cbb",
+    "from": "2024-04-04T13:00:00",
+    "to": "2024-04-04T17:00:00",
+    "time":{
+        "from":"13:00:00",
+        "to":"17:00:00"
     }
 }
 
