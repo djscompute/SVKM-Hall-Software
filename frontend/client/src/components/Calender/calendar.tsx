@@ -9,40 +9,6 @@ import { useQuery } from "@tanstack/react-query";
 
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 
-type dummyDataType = {
-  from: string;
-  to: string;
-  status: bookingStatusType;
-  initial: string;
-};
-
-const dummySlotData: dummyDataType[] = [
-  {
-    from: "8:00am",
-    to: "12:00pm",
-    status: "CONFIRMED",
-    initial: "C",
-  },
-  {
-    from: "1:00pm",
-    to: "4:00pm",
-    status: "ENQUIRY",
-    initial: "E",
-  },
-  {
-    from: "5:00pm",
-    to: "8:00pm",
-    status: "TENTATIVE",
-    initial: "T",
-  },
-  {
-    from: "9:00pm",
-    to: "12:00am",
-    status: "EMPTY",
-    initial: "O",
-  },
-];
-
 type Props = {
   hallId: string;
   HallData: EachHallType;
@@ -76,7 +42,8 @@ const Calendar = ({ hallId, HallData }: Props) => {
         },
       });
       console.log(response.data);
-      if (response.data.message == "No bookings found for the specified range.") return []
+      if (response.data.message == "No bookings found for the specified range.")
+        return [];
       // sort based of from
       response.data.sort((a: any, b: any) => dayjs(a.from).diff(dayjs(b.from)));
       return response.data;
@@ -110,7 +77,6 @@ const Calendar = ({ hallId, HallData }: Props) => {
         <p>LOADING</p>
       </>
     );
-  
 
   return (
     <div className=" flex justify-center items-center">
@@ -169,6 +135,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
           {Array.from({ length: daysInMonth }, (_, i) => (
             <EachDay
               i={i + 1}
+              hallId={hallId}
               currentDate={currentDate}
               HallSessionsArray={HallData.sessions}
               selectedMobileDate={selectedMobileDate}
@@ -187,7 +154,15 @@ const Calendar = ({ hallId, HallData }: Props) => {
 
         {/* SLOT FOR EACH DAY ON MOBILE VERSION */}
         <div className=" block lg:hidden mt-10">
-          <EachMobileDay dummySlotData={dummySlotData} i={selectedMobileDate} />
+          <EachMobileDay
+            i={selectedMobileDate}
+            hallId={hallId}
+            currentDate={currentDate}
+            HallSessionsArray={HallData.sessions}
+            selectedMobileDate={selectedMobileDate}
+            setSelectedMobileDate={setSelectedMobileDate}
+            allBookingData={allBookingData}
+          />
         </div>
       </div>
     </div>

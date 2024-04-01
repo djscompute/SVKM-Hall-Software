@@ -1,7 +1,82 @@
+import dayjs from "dayjs";
+import { HallBookingType } from "../../../../../types/global";
 import { bookingStatusType } from "../../types/Hall.types";
+import isBetween from "dayjs/plugin/isBetween"; // Import the timezone plugin
+import { convert_IST_DateTimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat";
+
+dayjs.extend(isBetween);
+
+type Props = {
+  i: number;
+  hallId: string;
+  currentDate: Date;
+  HallSessionsArray: any[];
+  allBookingData: HallBookingType[];
+  selectedMobileDate: number;
+  setSelectedMobileDate: React.Dispatch<React.SetStateAction<number>>;
+};
 
 // @ts-ignore
-function EachMobileDay({ dummySlotData, i }) {
+function EachMobileDay({
+  i,
+  hallId,
+  currentDate,
+  HallSessionsArray,
+  allBookingData,
+  selectedMobileDate,
+  setSelectedMobileDate,
+}: Props) {
+  const myDayJSObject = dayjs(currentDate).add(i - 1, "day");
+
+  // sort sessions in acsending order
+  HallSessionsArray.sort((a, b) => {
+    let fromA = a.from.toLowerCase();
+    let fromB = b.from.toLowerCase();
+    if (fromA < fromB) return -1;
+    if (fromA > fromB) return 1;
+    return 0;
+  });
+
+  // filter only the bookings of this current Day
+  allBookingData = allBookingData?.filter((obj) =>
+    dayjs(obj.from).isSame(myDayJSObject, "day")
+  );
+
+  // convert "08:00:00" to "${aaj-ka-din}T"08:00:00""
+  const completeDateSessions = HallSessionsArray.map((element) => {
+    return {
+      ...element,
+      from: `${myDayJSObject.format("YYYY-MM-DD")}T${element.from}`,
+      to: `${myDayJSObject.format("YYYY-MM-DD")}T${element.to}`,
+    };
+  });
+
+  function areTimeIntervalsOverlapping(interval1: any, interval2: any) {
+    const from1 = dayjs(interval1.from);
+    const to1 = dayjs(interval1.to);
+    const from2 = dayjs(interval2.from);
+    const to2 = dayjs(interval2.to);
+
+    return from1.isBefore(to2) && to1.isAfter(from2);
+  }
+
+  const finalArr: any[] = [];
+  completeDateSessions.forEach((eachSession) => {
+    let clashing: boolean = false;
+    allBookingData?.forEach((eachBooking) => {
+      if (
+        areTimeIntervalsOverlapping(eachSession, eachBooking) &&
+        !finalArr.includes(eachBooking)
+      ) {
+        finalArr.push(eachBooking);
+        clashing = true;
+      }
+    });
+    if (!clashing && !finalArr.includes(eachSession)) {
+      finalArr.push(eachSession);
+    }
+  });
+
   const getSlotColour = (status: bookingStatusType) => {
     switch (status) {
       case "ENQUIRY":
@@ -14,13 +89,6 @@ function EachMobileDay({ dummySlotData, i }) {
         return "bg-white";
     }
   };
-  function shuffleArray(array: any[]) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1)); // Random index from 0 to i
-      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-    }
-    return array;
-  }
   return (
     <div
       key={`day-${i}`}
@@ -30,10 +98,10 @@ function EachMobileDay({ dummySlotData, i }) {
         {i}
       </span>
       {/* SLOT INFO */}
-      {dummySlotData && (
+      {finalArr && (
         <>
           <div className="flex flex-col items-center justify-start gap-1 w-full  ">
-            {shuffleArray(dummySlotData).map((eachSlotInfo) => (
+            {finalArr.map((eachSlotInfo) => (
               <div
                 className={`flex justify-between w-full 
               ${getSlotColour(eachSlotInfo.status)}
@@ -42,7 +110,8 @@ function EachMobileDay({ dummySlotData, i }) {
               `}
               >
                 <span>
-                  {eachSlotInfo.from}-{eachSlotInfo.to}
+                  {convert_IST_DateTimeString_To12HourFormat(eachSlotInfo.from)}
+                  -{convert_IST_DateTimeString_To12HourFormat(eachSlotInfo.to)}
                 </span>
                 {eachSlotInfo.initial !== "O" && (
                   <span>{eachSlotInfo.initial}</span>
@@ -50,9 +119,15 @@ function EachMobileDay({ dummySlotData, i }) {
               </div>
             ))}
           </div>
-          <button className="bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 mt-1 rounded-md">
+          <a
+            className="bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 mt-1 rounded-md"
+            href={`${hallId}/${dayjs(currentDate)
+              .add(i - 1, "day")
+              .format("YYYY-MM-DD")}`}
+            target="_blank"
+          >
             ENQUIRE
-          </button>
+          </a>
         </>
       )}
     </div>

@@ -12,6 +12,7 @@ dayjs.extend(isBetween);
 
 type Props = {
   i: number;
+  hallId: string;
   currentDate: Date;
   HallSessionsArray: any[];
   allBookingData: HallBookingType[];
@@ -22,6 +23,7 @@ type Props = {
 // @ts-ignore
 function EachDay({
   i,
+  hallId,
   currentDate,
   HallSessionsArray,
   allBookingData,
@@ -128,9 +130,15 @@ function EachDay({
               </div>
             ))}
           </div>
-          <button className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 mt-1 rounded-md">
+          <a
+            className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 mt-1 rounded-md"
+            href={`${hallId}/${dayjs(currentDate)
+              .add(i - 1, "day")
+              .format("YYYY-MM-DD")}`}
+            target="_blank"
+          >
             ENQUIRE
-          </button>
+          </a>
         </>
       )}
     </div>
