@@ -7,8 +7,9 @@ import { toast } from "react-toastify";
 const NavBar = () => {
   const [open, setOpen] = useState(false);
 
-  const [isAuthenticated, logout] = useAuthStore((store) => [
+  const [isAuthenticated, user, logout] = useAuthStore((store) => [
     store.isAuthenticated,
+    store.user,
     store.logout,
   ]);
 
@@ -74,12 +75,18 @@ const NavBar = () => {
             </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
               {isAuthenticated ? (
-                <span
-                  onClick={handleLogout}
-                  className="whitespace-nowrap text-base font-medium text-red-500 hover:text-red-900 cursor-pointer"
-                >
-                  Log Out
-                </span>
+                <div className="flex items-center gap-2">
+                  <span>
+                    <span className=" text-gray-500">manager</span>{" "}
+                    {user?.email}
+                  </span>
+                  <span
+                    onClick={handleLogout}
+                    className="whitespace-nowrap text-base font-medium text-red-500 hover:text-red-900 cursor-pointer"
+                  >
+                    Log Out
+                  </span>
+                </div>
               ) : (
                 <Link
                   to="/login"
@@ -158,12 +165,18 @@ const NavBar = () => {
               </div>
               <div className="">
                 {isAuthenticated ? (
-                  <span
-                    onClick={handleLogout}
-                    className="whitespace-nowrap text-base font-medium text-red-500 hover:text-red-900 cursor-pointer"
-                  >
-                    Log Out
-                  </span>
+                  <div className="flex flex-col gap-2">
+                    <span>
+                      <span className=" text-gray-500">manager</span>{" "}
+                      {user?.email}
+                    </span>
+                    <span
+                      onClick={handleLogout}
+                      className="whitespace-nowrap text-base font-medium text-red-500 hover:text-red-900 cursor-pointer"
+                    >
+                      Log Out
+                    </span>
+                  </div>
                 ) : (
                   <Link
                     to="/login"

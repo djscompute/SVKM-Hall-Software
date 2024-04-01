@@ -8,6 +8,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Hall from "./pages/Hall";
+import Booking from "./pages/Booking";
 export const queryClient = new QueryClient();
 
 export default function App() {
@@ -29,6 +30,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Hall />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/booking/:bookingId"
+          element={
+            <ProtectedRoute>
+              <Booking />
             </ProtectedRoute>
           }
         />

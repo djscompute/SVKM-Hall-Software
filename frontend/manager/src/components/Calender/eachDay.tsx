@@ -4,9 +4,7 @@ import {
   HallBookingType,
   bookingStatusType,
 } from "../../../../../types/global";
-import {
-  convert_IST_TimeString_To12HourFormat,
-} from "../../utils/convert_IST_TimeString_To12HourFormat";
+import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat";
 
 import isBetween from "dayjs/plugin/isBetween"; // Import the timezone plugin
 
@@ -118,6 +116,7 @@ function EachDay({
                 </span>
                 {eachSessionGroup.subarray.map((eachBookingInfo) => (
                   <a
+                    href={`/booking/${eachBookingInfo._id}`}
                     className={`flex flex-col justify-between items-center w-full ${getSlotColour(
                       eachBookingInfo.status
                     )} px-2 overflow-x-auto cursor-pointer`}
