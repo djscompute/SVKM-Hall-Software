@@ -28,8 +28,7 @@ export async function addBookingHandler(req: Request, res: Response) {
 
     // Check for overlapping time slots with non-empty or non-enquiry statuses
     const overlappingBooking = existingBookings.find(
-      // (booking) => booking.status !== "EMPTY" && booking.status !== "ENQUIRY"
-      (booking) => booking.status !== "EMPTY" && booking.status != "ENQUIRY"
+      (booking) => booking.status == "CONFIRMED"
     );
 
     if (overlappingBooking) {
@@ -84,8 +83,7 @@ export async function editBookingHandler(req: Request, res: Response) {
 
     // Check for overlapping time slots with non-empty or non-enquiry statuses
     const overlappingBooking = existingBookings.find(
-      // (booking) => booking.status !== "EMPTY" && booking.status !== "ENQUIRY"
-      (booking) => booking.status !== "EMPTY"
+      (booking) => booking.status == "CONFIRMED"
     );
 
     if (overlappingBooking) {
