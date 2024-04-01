@@ -16,7 +16,6 @@ function BookADay() {
 
   const {
     data: HallData,
-    error,
     isFetching,
   } = useQuery({
     queryKey: ["allhalls"],
@@ -65,6 +64,10 @@ function BookADay() {
       </select>
       <span className=" font-semibold text-2xl mt-10">
         IDHAR AUR FORM KE FEILDS CHAHIYE
+      </span>
+      <span>
+        need feilds for mobile number, First Name, Last Name, Email (optional),
+        ( Adhar No or pan No ){" "}
       </span>
     </div>
   );
