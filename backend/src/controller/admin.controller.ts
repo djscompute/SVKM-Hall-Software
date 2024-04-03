@@ -7,6 +7,7 @@ import getUserData from "../service/getAdminData";
 import { createSession } from "../service/createSession";
 import { deleteSession } from "../service/deleteSession";
 import { AuthenticatedRequest } from "../types/requests";
+import { HallModel } from "../models/hall.model";
 
 export async function createAdminHandler(req: Request, res: Response) {
   try {
@@ -110,7 +111,14 @@ export async function getHallsforAdminHandler(req: Request, res: Response) {
 
     const managedHalls = user.managedHalls || null;
 
-    return res.status(200).json(managedHalls);
+    const allManagedHallsArray = await Promise.all(
+      managedHalls?.map(async (eachHallId) => {
+        const hall = await HallModel.findById(eachHallId);
+        return hall;
+      }) || []
+    );
+
+    return res.status(200).json(allManagedHallsArray);
   } catch (error: any) {
     console.error("Error fetching user by email:", error);
     return res.status(500).json({ message: "Internal server error" });

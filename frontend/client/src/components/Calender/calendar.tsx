@@ -6,6 +6,7 @@ import EachMobileDay from "./eachMobileDay";
 import dayjs from "dayjs";
 import axiosInstance from "../../config/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
+import Legends from "./legends";
 
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -112,6 +113,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
             <path d="M7.125 13.25L0.875 7L7.125 0.75" stroke="black" />
           </svg>
         </div>
+        <Legends />
 
         {/* CALENDER GRId */}
         <div className="grid grid-cols-7 gap-[2px]">

@@ -54,7 +54,7 @@ export default function Card(
             pricing: <span className="font-medium text-black">₹{props.pricing}/hr</span>
           </span>
           <button className="text-pink-600 border-2 text-sm sm:text-base border-pink-600 hover:bg-pink-600 hover:text-white px-4 py-1 rounded-full">
-            Check Availability
+            Edit Hall
           </button>
         </div>
       </div>

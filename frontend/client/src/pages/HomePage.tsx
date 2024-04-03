@@ -31,22 +31,19 @@ function HomePage() {
   }
 
   return (
-    <div className="flex flex-col items-center">
-      <h1 className=" text-3xl font-semibold my-5">All Halls</h1>
-      <div className="flex flex-wrap justify-around w-full ">
-        {data?.map((hallProp) => (
-          <Card
-            _id={hallProp._id}
-            key={hallProp._id}
-            images={hallProp.images}
-            name={hallProp.name}
-            location={hallProp.location}
-            capacity={hallProp.capacity}
-            seating={hallProp.seating}
-            pricing={hallProp.pricing}
-          />
-        ))}
-      </div>
+    <div className="flex flex-wrap justify-around w-full mt-10">
+      {data?.map((hallProp) => (
+        <Card
+          _id={hallProp._id}
+          key={hallProp._id}
+          images={hallProp.images}
+          name={hallProp.name}
+          location={hallProp.location}
+          capacity={hallProp.capacity}
+          seating={hallProp.seating}
+          pricing={hallProp.pricing}
+        />
+      ))}
     </div>
   );
 }

@@ -182,7 +182,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
                   Cancel
                 </button>
                 <button
-                  className="bg-SAPBlue-700 p-2 rounded text-white hover:bg-SAPBlue-900 transform active:scale-95 transition duration-300"
+                  className="bg-sapblue-700 p-2 rounded text-white hover:bg-sapblue-900 transform active:scale-95 transition duration-300"
                   onClick={handleFormSubmit}
                 >
                   Submit

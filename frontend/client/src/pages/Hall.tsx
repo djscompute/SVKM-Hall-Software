@@ -88,7 +88,7 @@ function Hall() {
               </div>
               <Calendar hallId={id as string} HallData={data} />
               {/* Hall Location */}
-              <div className="w-[95%] mx-auto my-5  border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
+              <div className="w-[95%] mx-auto my-5  border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
                 <h1 className="text-3xl">Details:</h1>
                 <hr className="my-4" />
                 <h1 className="text-2xl ">
@@ -125,7 +125,7 @@ function Hall() {
               </div>
 
               {/* About Hall */}
-              <div className="w-[95%] mx-auto my-5  border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
+              <div className="w-[95%] mx-auto my-5  border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
                 <h2 className=" font-bold text-xl mb-3">About this venue</h2>
                 <div
                   className={`flex flex-col text-lg ${
@@ -152,7 +152,7 @@ function Hall() {
               </div>
 
               {/* Seating and capacity */}
-              <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
+              <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
                 <h2 className="font-bold text-xl mb-3">Capacity and Seating</h2>
                 <div className="flex ">
                   <p>Capacity : </p>
@@ -164,7 +164,7 @@ function Hall() {
                 </div>
               </div>
 
-              <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
+              <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
                 <h2 className="font-bold text-xl mb-3">Additional Features</h2>
                 <div className="about-hall text-lg">
                   {data.additionalFeatures?.map((feature, index) => (
@@ -176,7 +176,7 @@ function Hall() {
                 </div>
               </div>
 
-              <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
+              <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
                 {data.sessions.map((eachSession, index) => (
                   <div key={index} className="flex flex-col mb-3">
                     <p className="font-medium text-lg">{eachSession.name}</p>
@@ -216,7 +216,7 @@ function Hall() {
                 ))}
               </div>
 
-              <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-SAPBlue-300 shadow-2xl py-7 px-10 ">
+              <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
                 <div className="flex flex-col w-full">
                   <h2 className="font-bold text-xl mb-3">Pricing</h2>
                   {data.pricing ? (
@@ -226,7 +226,7 @@ function Hall() {
                   )}
                 </div>
               </div>
-              <button className="border border-SAPBlue-800 hover:border-SAPBlue-900 rounded py-4 px-8 bg-transparent font-bold text-SAPBlue-800 hover:text-SAPBlue-900 transition duration-500">
+              <button className="border border-sapblue-800 hover:border-sapblue-900 rounded py-4 px-8 bg-transparent font-bold text-sapblue-800 hover:text-sapblue-900 transition duration-500">
                 Place Request
               </button>
             </div>

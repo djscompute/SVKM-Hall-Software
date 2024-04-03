@@ -23,7 +23,7 @@ export type EachHallSessionType = {
   readonly _id?: string;
   active: boolean;
   name: string;
-  from?: string;
+  from: string;
   to: string;
   price: { categoryName: string; price: number }[];
 };
@@ -81,7 +81,7 @@ export interface adminType {
   username: string;
   email: string;
   password: string;
-  managedHalls?: string[];
+  managedHalls?: string[];  // id of the halls which he has the access to
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }

@@ -23,16 +23,12 @@ export const AddBookingZodSchema = z.object({
         price: z.number(stringErrorHandler("price")),
       })
     ),
-    status: z.enum(["CONFIRMED", "TENTATIVE", "EMPTY", "DISABLED", "ENQUIRY"]),
+    status: z.enum(["CONFIRMED", "TENTATIVE", "CANCELLED", "ENQUIRY"]),
     price: z.number(stringErrorHandler("price")),
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
     from: z.string(stringErrorHandler("from")),
-    to: z.string(stringErrorHandler("to")),
-    time: z.object({
-      from: z.string(stringErrorHandler("time.from")),
-      to: z.string(stringErrorHandler("time.to")),
-    }),
+    to: z.string(stringErrorHandler("to"))
   }),
 });
 
@@ -48,13 +44,13 @@ export const RemoveBookingZodSchema = z.object({
 //Zod Schema for getting a session by {from, to}
 export const getBookingZodSchema = z.object({
   query: z.object({
-    from: z.string().refine((from) => from.trim() !== '', {
+    from: z.string().refine((from) => from.trim() !== "", {
       message: "from cannot be empty",
-      path: ['from'],
+      path: ["from"],
     }),
-    to: z.string().refine((to) => to.trim() !== '', {
+    to: z.string().refine((to) => to.trim() !== "", {
       message: "to cannot be empty",
-      path: ['to'],
+      path: ["to"],
     }),
   }),
 });
@@ -62,8 +58,8 @@ export const getBookingZodSchema = z.object({
 //Zod schema for getting a session by ID
 export const getBookingByIdZodSchema = z.object({
   query: z.object({
-    _id: z.string()
-  })
+    _id: z.string(),
+  }),
 });
 // THIS IS A FUNCITON TO CREATE UTC STANDARD TIME DATETIME STRING.
 // ZOD SUPPORTS ONLY UTC STANDARD TIME

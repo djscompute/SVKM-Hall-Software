@@ -9,6 +9,7 @@ import HallPricing from "../components/addHall/HallPricing";
 import HallSessions from "../components/addHall/HallSessions";
 import HallAdditionalFeatures from "../components/addHall/HallAdditionalFeatures";
 import ImageCarousel from "../components/addHall/ImageCarousel";
+import { queryClient } from "../App";
 
 function AddHall() {
   const [hallData, setHallData] = useState<EachHallType>({
@@ -31,12 +32,9 @@ function AddHall() {
     pricing: "200 per day",
     additionalFeatures: [
       {
-        heading: "Gorgeous Ambience",
-        desc: " We have got a very good ambience",
-      },
-      {
-        heading: "In-house decorators",
-        desc: "In-house decorators make the venue more stunning",
+        heading: "Dining Area",
+        desc: "We have a dinign area with exceptional ambience.",
+        price: 0,
       },
     ],
     sessions: [
@@ -105,9 +103,10 @@ function AddHall() {
           console.log(error);
         }),
     mutationKey: ["addhall"],
-    onSuccess: () => {
-      // revalidate the query for getting all halls data.
-      // set the halldata back to default Hall Data
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: [`allhalls`],
+      });
     },
   });
 

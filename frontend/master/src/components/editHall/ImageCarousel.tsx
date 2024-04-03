@@ -146,7 +146,7 @@ export default function ImageCarousel({ images, setHallData }: props) {
             <button
               className={`px-4 py-2  text-white rounded  focus:outline-none ${
                 !newImage ? "bg-gray-400" : ""
-              }  ${newImage ? "bg-SAPBlue-800 hover:bg-SAPBlue-900" : ""}`}
+              }  ${newImage ? "bg-sapblue-800 hover:bg-sapblue-900" : ""}`}
               onClick={handleImageUpload}
               disabled={!newImage}
             >
