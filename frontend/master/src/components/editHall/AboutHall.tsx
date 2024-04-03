@@ -65,7 +65,7 @@ export default function AboutHall({ about, setHallData }: Props) {
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-md">
+    <div className="about-hall flex justify-between bg-blue-100 w-[80%] md:w-[90%] lg:w-full py-5 px-7 rounded-md">
       <div className="about-hall-info w-11/12">
         <h2 className=" font-bold text-xl mb-3">About this venue</h2>
         <div
@@ -115,7 +115,7 @@ export default function AboutHall({ about, setHallData }: Props) {
                       className="flex items-center justify-between  border-b border-gray-300"
                     >
                       <span className="p-4">{item}</span>
-                      <div className="flex gap-2">
+                      <div className="flex flex-col gap-3 mb-5 sm:flex-row">
                         <button
                           className="bg-blue-700 p-2 rounded text-white hover:bg-blue-500 transform active:scale-95 transition duration-300"
                           onClick={() => handleEditItem(index)}

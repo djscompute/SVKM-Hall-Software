@@ -75,7 +75,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
+    <div className="about-hall flex justify-between bg-blue-100 w-[80%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
       <div className="hall-additional-features-info w-11/12">
         <h2 className="font-bold text-xl mb-3">Additional Features</h2>
         <div className="about-hall text-lg">
@@ -110,12 +110,12 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
                       key={index}
                       className="flex items-center justify-between mb-1 border-b border-gray-300"
                     >
-                      <div className="flex flex-col w-full gap-1">
+                      <div className="flex flex-col w-full gap-1 sm:flex-row">
                         <span className=" font-semibold">{item.heading}</span>
                         <span className="">{item.desc}</span>
                         <span className="">Rs. {item.price}</span>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <button
                           className="bg-blue-700 p-2 rounded text-white hover:bg-blue-500 transform active:scale-95 transition duration-300"
                           onClick={() => handleEditItem(index)}
@@ -132,7 +132,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
                     </li>
                   ))}
                 </ul>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <textarea
                     value={newItem.heading}
                     onChange={(e) =>

@@ -37,7 +37,7 @@ export default function HallCapacity({
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
+    <div className="about-hall flex justify-between bg-blue-100 w-[80%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
       <div className="flex flex-col w-11/12">
         <h2 className="font-bold text-xl mb-3">Capacity and Seating</h2>
         <div className="flex ">

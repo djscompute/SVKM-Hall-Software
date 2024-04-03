@@ -65,7 +65,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
+    <div className="about-hall flex justify-between bg-blue-100 w-[60%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
       <div className="flex flex-col gap-3 mb-5 w-full">
         <h2 className="font-bold text-xl mb-3 text-center">
           Edit Hall Sessions
@@ -103,7 +103,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2 items-center justify-evenly">
+                <div className="flex flex-col items-center sm:flex-row w-full gap-5">
                   <button
                     className="bg-blue-700 p-2 rounded text-white hover:bg-blue-500 transform active:scale-95 transition duration-300"
                     onClick={() => handleEditItem(index)}
@@ -150,7 +150,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
               className="bg-gray-100 text-black px-5 py-3 rounded resize-none flex-grow border border-stone-300"
               placeholder="Name"
             />
-            <div className="flex justify-between gap-2">
+            <div className="flex flex-col gap-2 justify-between sm:flex-row sm:gap-2">
               <BasicTimePicker
                 timePickerName="From"
                 timeModifier={(newTimeString) =>
