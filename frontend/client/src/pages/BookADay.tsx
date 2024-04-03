@@ -1,29 +1,42 @@
 import dayjs from "dayjs";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../config/axiosInstance";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { EachHallType } from "../types/Hall.types";
+import {
+  EachHallAdditonalFeaturesType,
+  EachHallType,
+} from "../types/Hall.types";
 import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { queryClient } from "../App";
 
 function BookADay() {
   const { id, day } = useParams();
   const [selectedSessionId, setSelectedSessionId] = useState<string>();
-  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [selectedCategory, setSelectedCategory] = useState<string>();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [aadharNumber, setAadharNumber] = useState("");
+  const [panCard, setPanCard] = useState("");
+  const [address, setAddress] = useState("");
+  const [errors, setErrors] = useState({ name: "", mobileNumber: "" });
+  const [selectedFeatures, setSelectedFeatures] = useState<{
+    [key: string]: EachHallAdditonalFeaturesType;
+  }>({});
+  const [price, setPrice] = useState<number>();
 
   const dayjsObject = dayjs(day);
   const humanReadableDate = dayjsObject.format("MMMM D, YYYY");
 
   const { data: HallData, isFetching } = useQuery({
-    queryKey: ["allhalls"],
+    queryKey: ["bookings"],
     queryFn: async () => {
       try {
         const responsePromise = axiosInstance.get(`getHall/${id}`);
         toast.promise(responsePromise, {
           pending: "Fetching hall...",
-          // success: "Hall fetched successfully!",
           error: "Failed to fetch Hall. Please try again.",
         });
         const response = await responsePromise;
@@ -34,41 +47,135 @@ function BookADay() {
     },
   });
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
-  const onSubmit = (data: any) => console.log(data);
-  console.log(errors);
+  const addBookingMutation = useMutation({
+    mutationFn: () =>
+      axiosInstance
+        .post(`/addBooking`, {
+          user: {
+            username: name,
+            email: email,
+            aadharNo: aadharNumber,
+            panNo: panCard,
+            address: address,
+            mobile: mobileNumber,
+          },
+          features: Object.values(selectedFeatures),
+          status: "ENQUIRY",
+          price: price,
+          hallId: id,
+          session_id: selectedSessionId,
+          from: `${day}T${
+            HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
+              ?.from
+          }`,
+          to: `${day}T${
+            HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
+              ?.to
+          }`,
+        })
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        }),
+    mutationKey: ["addhall"],
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: [`bookings`],
+      });
+    },
+  });
 
-  const featureNames =
-    HallData?.additionalFeatures?.map((feature) => feature.heading) || [];
-  const watchedFeatures = watch(featureNames);
+  const handleSubmit = () => {
+    console.log("running");
+    let hasErrors = false;
+    let newErrors = { name: "", mobileNumber: "" };
 
-  console.log(watchedFeatures);
+    if (!name) {
+      newErrors.name = "Name is required";
+      hasErrors = true;
+      setErrors(newErrors);
+      return;
+    }
+    if (!mobileNumber) {
+      newErrors.mobileNumber = "Mobile number is required";
+      hasErrors = true;
+      setErrors(newErrors);
+      return;
+    }
+    setErrors({ name: "", mobileNumber: "" });
+
+    if (!hasErrors) {
+      const yes = {
+        user: {
+          username: name,
+          email: email,
+          aadharNo: aadharNumber,
+          panNo: panCard,
+          address: address,
+          mobile: mobileNumber,
+        },
+        features: Object.values(selectedFeatures),
+        status: "ENQUIRY",
+        price: price,
+        hallId: id,
+        session_id: selectedSessionId,
+        from: `${day}T${
+          HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
+            ?.from
+        }`,
+        to: `${day}T${
+          HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
+        }`,
+      };
+      console.log(yes);
+      addBookingMutation.mutate();
+    }
+  };
+
+  const handleCheckboxChange = (feature: EachHallAdditonalFeaturesType) => {
+    setSelectedFeatures((prevSelectedFeatures) => {
+      if (prevSelectedFeatures[feature._id!]) {
+        // If the feature is already selected, remove it from the selected features
+        const updatedFeatures = { ...prevSelectedFeatures };
+        delete updatedFeatures[feature._id!];
+        return updatedFeatures;
+      } else {
+        // If the feature is not selected, add it to the selected features
+        return { ...prevSelectedFeatures, [feature._id!]: feature };
+      }
+    });
+  };
 
   useEffect(() => {
-    if (HallData) {
-      const selectedFeaturesPrices = HallData.additionalFeatures
-        .filter((feature) => watchedFeatures[feature.heading])
-        .reduce((acc, curr) => acc + curr.price, 0);
-      setTotalPrice((Number(HallData.pricing) || 0) + selectedFeaturesPrices);
-    }
-  }, [watchedFeatures, HallData]);
+    let totalPrice = Object.values(selectedFeatures).reduce(
+      (acc, feature) => acc + feature.price,
+      0
+    );
+    const slctdsession = HallData?.sessions.find(
+      (ss) => ss._id == selectedSessionId
+    );
+    totalPrice +=
+      slctdsession?.price.find((e) => e.categoryName == selectedCategory)
+        ?.price || 0;
+    setPrice(totalPrice);
+  }, [selectedFeatures, selectedSessionId, selectedCategory]);
 
-  if (isFetching) return <h1>Loading</h1>;
+  useEffect(() => {
+    setSelectedSessionId(HallData?.sessions[0]._id);
+    setSelectedCategory(HallData?.sessions[0].price[0].categoryName);
+  }, [HallData]);
 
   return (
-    <div className="flex flex-col items-center pt-10 gap-3">
-      <h1 className=" text-3xl font-semibold">
-        Book HallName for {humanReadableDate}
+    <div className="flex flex-col items-center py-10 gap-3">
+      <h1 className="text-3xl font-semibold">
+        Book {HallData?.name} for {humanReadableDate}
       </h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-10">
-        <h1>Price {totalPrice}</h1>
+      <span>Estimated Price : ₹{price}</span>
+      <div className="flex flex-col gap-4">
         <select
-          className=" px-2 py-1 rounded-md"
+          className="p-2 rounded-md"
           value={selectedSessionId}
           onChange={(e) => {
             setSelectedSessionId(e.target.value);
@@ -90,42 +197,96 @@ function BookADay() {
             </option>
           ))}
         </select>
+        {selectedSessionId && (
+          <select
+            className="p-2 rounded-md"
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+            }}
+          >
+            {HallData?.sessions
+              .find((ss) => ss._id == selectedSessionId)
+              ?.price?.map((eachSessionCategory) => (
+                <option
+                  key={eachSessionCategory.categoryName}
+                  value={eachSessionCategory.categoryName}
+                  className={`flex flex-col text-center`}
+                >
+                  {eachSessionCategory.categoryName} - ₹
+                  {eachSessionCategory.price}
+                </option>
+              ))}
+          </select>
+        )}
         <input
+          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           type="text"
-          placeholder=" Name"
-          {...register(" Name", { required: true })}
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
-        <input type="email" placeholder="Email" {...register("Email", {})} />
+        {errors.name && <p className="text-red-500">{errors.name}</p>}
         <input
+          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          type="email"
+          placeholder="Email Id"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           type="tel"
           placeholder="Mobile Number"
-          {...register("Mobile Number", { required: true })}
+          value={mobileNumber}
+          onChange={(e) => setMobileNumber(e.target.value)}
         />
+        {errors.mobileNumber && (
+          <p className="text-red-500">{errors.mobileNumber}</p>
+        )}
         <input
+          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           type="number"
           placeholder="Aadhar Number"
-          {...register("Aadhar Number", { required: true, max: 12, min: 12 })}
+          value={aadharNumber}
+          onChange={(e) => setAadharNumber(e.target.value)}
+        />
+        <input
+          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          type="text"
+          placeholder="Pan Card"
+          value={panCard}
+          onChange={(e) => setPanCard(e.target.value)}
+        />
+        <input
+          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          type="text"
+          placeholder="Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
         />
         <h6>Additional Features</h6>
         {HallData?.additionalFeatures?.map((eachFeature) => (
-          <span>
+          <span className="flex items-center gap-2" key={eachFeature.heading}>
             <input
               type="checkbox"
-              id={eachFeature.heading}
-              placeholder={eachFeature.heading}
-              {...register(eachFeature.heading)}
+              id={eachFeature._id}
+              checked={!!selectedFeatures[eachFeature._id!]}
+              onChange={() => handleCheckboxChange(eachFeature)}
             />
-            <label htmlFor={eachFeature.heading}>
-              {" "}
-              {eachFeature.desc} Rs{eachFeature.price}
+            <label htmlFor={eachFeature._id}>
+              {eachFeature.heading} - ₹{eachFeature.price}
             </label>
           </span>
         ))}
-        <input
-          type="submit"
+        <button
+          onClick={handleSubmit}
           className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
-        />
-      </form>
+          value="Submit"
+        >
+          Enquire
+        </button>
+      </div>
     </div>
   );
 }

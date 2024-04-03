@@ -21,9 +21,9 @@ import { CustomerSchema } from "./customer.model";
 const HallAdditonalFeaturesSchema =
   new mongoose.Schema<EachHallAdditonalFeaturesType>({
     heading: { type: String, required: true },
-    desc: { type: String},
-    stats: { type: [String]},
-    price: { type: Number, required: true  },
+    desc: { type: String },
+    stats: { type: [String] },
+    price: { type: Number, required: true },
   });
 
 const BookingSchema = new mongoose.Schema<HallBookingType>(
@@ -43,10 +43,6 @@ const BookingSchema = new mongoose.Schema<HallBookingType>(
     session_id: { type: String, required: true },
     from: { type: String, required: true },
     to: { type: String, required: true },
-    time: {
-      from: { type: String, required: true },
-      to: { type: String, required: true },
-    },
   },
   { timestamps: true }
 );

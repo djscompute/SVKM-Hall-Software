@@ -124,11 +124,6 @@ export default function routes(app: Express) {
 
   app.post("/addBooking", [
     validateRequest(AddBookingZodSchema),
-    // @ts-ignore
-    (res, req, next) => {
-      // console.log("HERE");
-      next();
-    },
     addBookingHandler,
   ]);
 

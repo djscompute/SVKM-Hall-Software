@@ -28,11 +28,7 @@ export const AddBookingZodSchema = z.object({
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
     from: z.string(stringErrorHandler("from")),
-    to: z.string(stringErrorHandler("to")),
-    time: z.object({
-      from: z.string(stringErrorHandler("time.from")),
-      to: z.string(stringErrorHandler("time.to")),
-    }),
+    to: z.string(stringErrorHandler("to"))
   }),
 });
 

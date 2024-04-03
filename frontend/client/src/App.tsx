@@ -6,9 +6,9 @@ import NavBar from "./components/navbar/Navbar";
 import { ToastContainer } from "react-toastify";
 import BookADay from "./pages/BookADay";
 
-export default function App() {
-  const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <NavBar />

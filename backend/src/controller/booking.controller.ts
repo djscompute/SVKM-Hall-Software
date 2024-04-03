@@ -49,6 +49,7 @@ export async function addBookingHandler(req: Request, res: Response) {
       time,
     });
     await newBooking.save();
+    console.log("added new booking");
 
     return res.status(200).json(newBooking);
   } catch (error: any) {
