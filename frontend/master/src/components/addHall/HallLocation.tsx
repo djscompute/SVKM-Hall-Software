@@ -18,7 +18,7 @@ export default function HallLocation({ location, setHallData }: props) {
   };
   let finalIframeUrl = location.iframe?.replace(/&#39;/g, "'");
   return (
-    <div className="hall-location flex flex-col gap-3 justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
+    <div className="hall-location flex flex-col gap-3 justify-between bg-blue-100 w-[60%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
       <p className="w-full text-center text-xl font-semibold mb-2">Location</p>
       <div className="flex gap-3 items-center">
         <h1 className="w-1/5 ">Small Address:</h1>{" "}
@@ -79,12 +79,13 @@ export default function HallLocation({ location, setHallData }: props) {
             className="bg-black text-white px-3 py-1 rounded w-full h-auto"
           />
         </div>
-        <div className=" flex gap-2 items-center mt-2">
+        <div className="flex flex-col gap-2 items-center mt-2 sm:flex-row sm:items-center">
           <p>Preview of the embed here 👉🏻</p>
           <iframe
             src={finalIframeUrl}
-            width="400"
-            height="200"
+            className="w-[250px] h-[250px] lg:w-[450px] lg:h-[300px]"
+            //width="400"
+            //height="200"
             // @ts-ignore
             allowFullScreen=""
             // @ts-ignore

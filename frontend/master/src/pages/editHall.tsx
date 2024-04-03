@@ -67,13 +67,13 @@ export default function EditHall() {
   });
 
   return (
-    <div className="hall-info-container grid place-items-center gap-y-12 mx-auto w-11/12 pt-10 overflow-y-hidden">
+    <div className="hall-info-container justify-center grid place-items-center gap-y-12 mx-auto w-auto lg:w-11/12 pt-10 overflow-y-hidden">
       {databaseHallData && hallData && (
         <>
           <div className="flex flex-col items-center">
             <p className="text-blue-700 font-semibold">Edit</p>
             <input
-              className="text-5xl text-center border border-gray-400"
+              className="text-3xl md:text-4xl lg:text-5xl text-center border border-gray-400"
               value={hallData.name}
               onChange={(e) => {
                 setHallData((prev) => {

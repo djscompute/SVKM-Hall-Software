@@ -13,7 +13,7 @@ export default function HallPricing({ pricing, setHallData }: props) {
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
+    <div className="about-hall flex justify-between bg-blue-100 w-[60%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
       <div className="flex items-center gap-3 mb-5 w-full">
         <h1 className="w-20 font-semibold">Pricing:</h1>
         <input

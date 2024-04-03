@@ -76,7 +76,7 @@ export default function ImageCarousel({ images, setHallData }: props) {
   }
 
   return (
-    <div className="flex flex-col items-center w-full rounded-xl">
+    <div className="flex flex-col items-center w-[60%] md:w-[90%] lg:w-full rounded-xl">
       <p className=" text-xl font-semibold">IMAGES</p>
       <div className="flex flex-col items-center w-full">
         {images.map((imageSrc, index) => (

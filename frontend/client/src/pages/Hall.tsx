@@ -98,22 +98,23 @@ function Hall() {
                     <div>{data.location.desc2}</div>
                   </div>
                 </h1>
-                <a
-                  href={data.location.gmapurl}
-                  className="flex items-center bg-blue-300 w-[10%] my-2 p-1 rounded-md border-2 border-blue-400"
-                  target="_blank"
-                >
-                  <FontAwesomeIcon
-                    className="text-red-600"
-                    icon={faLocationDot}
-                  />
-                  <span className="ml-1 ">View on map</span>
-                </a>
+                  <a
+                    href={data.location.gmapurl}
+                    className="flex items-center justify-center bg-blue-300 w-auto md:w-32 lg:w-40 my-2 p-1 rounded-md border-2 border-blue-400"
+                    target="_blank"
+                  >
+                    <FontAwesomeIcon
+                      className="text-red-600"
+                      icon={faLocationDot}
+                    />
+                    <span className="ml-1 ">View on map</span>
+                  </a>
                 {finalIframeUrl && (
                   <iframe
                     src={finalIframeUrl}
-                    width="600"
-                    height="450"
+                    className="w-full h-72 md:w-96 md:h-80 lg:w-[40%] "
+                    //width="600"
+                    //height="450"
                     loading="lazy"
                     // @ts-ignore
                     allowFullScreen=""
