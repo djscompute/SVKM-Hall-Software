@@ -56,7 +56,7 @@ export default function AboutHall({ about, setHallData }: Props) {
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-md">
+    <div className="about-hall flex justify-between bg-blue-100 w-[60%] md:w-[90%] lg:w-full py-5 px-7 rounded-md">
       <div className="flex flex-col w-full gap-3 mb-5">
         <h2 className="font-bold text-xl mb-3 text-center">About</h2>
         <ul className="max-h-80 overflow-scroll">

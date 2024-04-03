@@ -133,7 +133,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
+    <div className="about-hall flex justify-between bg-blue-100 w-[80%] md:w-[90%] lg:w-full  py-5 px-7 rounded-lg">
       <div className="hall-additional-features-info w-11/12">
         <h2 className="font-bold text-xl mb-3">Hall Sessions</h2>
         <div className="about-hall text-lg">
@@ -199,12 +199,12 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                         eachSession.active ? " " : "opacity-100"
                       } border-y border-gray-300 px-2 gap-5`}
                     >
-                      <div className="flex items-center w-full gap-5">
+                      <div className="flex flex-col items-center sm:flex-row w-full gap-5">
                         <div className="flex flex-col w-full">
                           <p className="font-medium text-lg">
                             {eachSession.name}
                           </p>
-                          <div className="flex justify-between">
+                          <div className="flex justify-between ">
                             <div className="flex gap-2 bg-white rounded-md">
                               <span>From:</span>
                               <span className="">
@@ -275,7 +275,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                       className="bg-gray-100 text-black px-5 py-3 rounded resize-none flex-grow border border-stone-300"
                       placeholder="Name"
                     />
-                    <div className="flex justify-between gap-2">
+                   <div className="flex flex-col gap-2 justify-between sm:flex-row sm:gap-2">
                       <BasicTimePicker
                         timePickerName="From"
                         timeModifier={(newTimeString) =>
@@ -297,7 +297,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                     </div>
                     <div className="flex flex-col gap-2">
                       {newItem.price.map((priceItem, index) => (
-                        <div key={index} className="flex gap-2">
+                        <div key={index} className="flex flex-col gap-2">
                           <input
                             type="text"
                             name="categoryName"

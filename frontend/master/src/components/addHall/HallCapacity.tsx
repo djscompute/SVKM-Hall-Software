@@ -21,7 +21,7 @@ export default function HallCapacity({
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
+    <div className="about-hall flex justify-between bg-blue-100 w-[60%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
       <div className="flex flex-col gap-3 mb-5 w-full">
         <h1 className="text-center text-lg font-semibold">
           Capacity And Seatings

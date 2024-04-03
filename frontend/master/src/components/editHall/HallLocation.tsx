@@ -33,7 +33,7 @@ export default function HallLocation({ location, setHallData }: props) {
   let finalIframeUrl = location.iframe?.replace(/&#39;/g, "'");
   let modalIframeUrl = modalData.iframe?.replace(/&#39;/g, "'");
   return (
-    <div className="hall-location flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
+    <div className="hall-location flex justify-between bg-blue-100 w-[80%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
       <div className="hall-location-main-info w-11/12">
         <h2 className="font-bold text-xl mb-3">Location</h2>
         <div className="hall-location-map flex flex-col items-start gap-5">
@@ -52,8 +52,9 @@ export default function HallLocation({ location, setHallData }: props) {
           {location.iframe && (
             <iframe
               src={finalIframeUrl}
-              width="400"
-              height="200"
+              className="w-[250px] h-[250px] lg:w-[450px] lg:h-[300px]"
+              //width="400"
+              //height="200"
               loading="lazy"
               // @ts-ignore
               allowFullScreen=""
@@ -76,7 +77,7 @@ export default function HallLocation({ location, setHallData }: props) {
                 Location
               </p>
               <div className="flex gap-3 items-center">
-                <h1 className="w-1/5 ">Small Address:</h1>{" "}
+                <h1 className="w-1/3 md:w-1/5 lg:w-1/5 ">Small Address:</h1>{" "}
                 <textarea
                   name="desc1"
                   value={modalData.desc1}
@@ -85,7 +86,7 @@ export default function HallLocation({ location, setHallData }: props) {
                 />
               </div>
               <div className="flex gap-3 items-center">
-                <h1 className="w-1/5 ">Full Address:</h1>
+                <h1 className="w-1/3 md:w-1/5 lg:w-1/5 ">Full Address:</h1>
                 <textarea
                   name="desc2"
                   value={modalData.desc2}
@@ -95,7 +96,7 @@ export default function HallLocation({ location, setHallData }: props) {
               </div>
               <div className=" flex flex-col">
                 <div className="flex gap-3 items-center  ">
-                  <h1 className="w-1/5 ">Google Map Places Link</h1>{" "}
+                  <h1 className="w-1/3 md:w-1/5 lg:w-1/5 ">Google Map Places Link</h1>{" "}
                   <textarea
                     name="gmapurl"
                     value={modalData.gmapurl}
@@ -106,13 +107,13 @@ export default function HallLocation({ location, setHallData }: props) {
                 <p className=" w-full text-center mt-1">
                   Example Google map places url :
                   <a
-                    className=" text-blue-600 underline"
+                    className=" text-blue-600 underline "
                     href="https://maps.app.goo.gl/8fenAeRK5RJ2LZLc8"
                   >
                     https://maps.app.goo.gl/8fenAeRK5RJ2LZLc8
                   </a>
                 </p>
-                <div className=" flex gap-2 items-center mt-1">
+                <div className="flex flex-col gap-2 items-center sm:flex-row sm:items-center mt-1">
                   <p>Test the google map link here 👉🏻</p>
                   <a
                     href={modalData.gmapurl}
@@ -129,7 +130,7 @@ export default function HallLocation({ location, setHallData }: props) {
               </div>
               <div className=" flex flex-col">
                 <div className="flex gap-3 items-center  ">
-                  <h1 className="w-1/5 ">Google Map Embed</h1>{" "}
+                  <h1 className="w-1/3 md:w-1/5 lg:w-1/5  ">Google Map Embed</h1>{" "}
                   <textarea
                     name="iframe"
                     value={modalData.iframe}
@@ -137,7 +138,7 @@ export default function HallLocation({ location, setHallData }: props) {
                     className="bg-black text-white px-3 py-1 rounded w-full h-auto"
                   />
                 </div>
-                <div className=" flex gap-2 items-center mt-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center mt-2">
                   <p>Preview of the embed here 👉🏻</p>
                   {/* <div
                     dangerouslySetInnerHTML={{
@@ -146,8 +147,9 @@ export default function HallLocation({ location, setHallData }: props) {
                   ></div> */}
                   <iframe
                     src={modalIframeUrl}
-                    width="400"
-                    height="200"
+                    className="w-[200px] h-[200px] lg:w-[400px] md:w-[400px] lg:h-[200px] md:h-[200px]"
+                    //width="400"
+                    //height="200"
                     // @ts-ignore
                     allowFullScreen=""
                     // @ts-ignore
@@ -156,7 +158,7 @@ export default function HallLocation({ location, setHallData }: props) {
                   />
                 </div>
               </div>
-              <div className="buttons flex justify-end gap-3 mt-5">
+              <div className="buttons flex justify-end gap-3 mt-20">
                 <button
                   className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300"
                   onClick={toggleModal}

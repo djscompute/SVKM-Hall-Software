@@ -117,7 +117,7 @@ function AddHall() {
   };
 
   return (
-    <div className="hall-info-container grid place-items-center gap-y-12 mx-auto w-11/12 pt-10 overflow-y-hidden">
+    <div className="hall-info-container justify-center grid place-items-center gap-y-12 mx-auto w-auto lg:w-11/12 pt-10 overflow-y-hidden">
       <div className="flex flex-col items-center">
         <p className="text-blue-700 font-semibold">Add New Hall</p>
         <input
@@ -125,7 +125,7 @@ function AddHall() {
           onChange={(e) =>
             setHallData((prev) => ({ ...prev, name: e.target.value }))
           }
-          className="text-5xl text-center border border-gray-300"
+          className="text-3xl md:text-4xl lg:text-5xl text-center border border-gray-400"
         />
       </div>
       <HallLocation location={hallData.location} setHallData={setHallData} />
