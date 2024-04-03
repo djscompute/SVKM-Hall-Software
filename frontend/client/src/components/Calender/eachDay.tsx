@@ -1,12 +1,10 @@
 import dayjs from "dayjs";
 import { HallBookingType } from "../../../../../types/global";
-import { bookingStatusType } from "../../types/Hall.types";
-import {
-  convert_IST_DateTimeString_To12HourFormat,
-  convert_IST_TimeString_To12HourFormat,
-} from "../../utils/convert_IST_TimeString_To12HourFormat";
+import { convert_IST_DateTimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat";
 
 import isBetween from "dayjs/plugin/isBetween"; // Import the timezone plugin
+import { getSlotColour } from "../../utils/getSlotColour";
+import { getSlotAbbreviation } from "../../utils/getSlotAbb";
 
 dayjs.extend(isBetween);
 
@@ -31,18 +29,6 @@ function EachDay({
   setSelectedMobileDate,
 }: Props) {
   const myDayJSObject = dayjs(currentDate).add(i - 1, "day");
-  const getSlotColour = (status: bookingStatusType) => {
-    switch (status) {
-      case "ENQUIRY":
-        return "bg-blue-200";
-      case "CONFIRMED":
-        return "bg-red-200";
-      case "TENTATIVE":
-        return "bg-orange-200";
-      default:
-        return "bg-white";
-    }
-  };
 
   // sort sessions in acsending order
   HallSessionsArray.sort((a, b) => {
@@ -124,9 +110,8 @@ function EachDay({
                   {convert_IST_DateTimeString_To12HourFormat(eachSlotInfo.from)}
                   -{convert_IST_DateTimeString_To12HourFormat(eachSlotInfo.to)}
                 </span>
-                {eachSlotInfo.initial !== "O" && (
-                  <span>{eachSlotInfo.initial}</span>
-                )}
+
+                <span>{getSlotAbbreviation(eachSlotInfo.status)}</span>
               </div>
             ))}
           </div>

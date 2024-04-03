@@ -1,18 +1,30 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import axiosInstance from "../config/axiosInstance";
 import { toast } from "react-toastify";
-import { EachHallType, HallBookingType } from "../../../../types/global";
+import {
+  EachHallType,
+  HallBookingType,
+  bookingStatusType,
+} from "../../../../types/global";
 import { useParams } from "react-router-dom";
 import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
 import { useState } from "react";
+import { queryClient } from "../App";
+
+const possibleBookingTypes: bookingStatusType[] = [
+  "CONFIRMED",
+  "TENTATIVE",
+  "CANCELLED",
+  "ENQUIRY",
+];
 
 function Booking() {
   const { bookingId } = useParams<{ bookingId: string }>();
   const [hallData, setHallData] = useState<EachHallType>();
 
   const { data, error, isFetching } = useQuery({
-    queryKey: ["allhalls"],
+    queryKey: [`booking/${bookingId}`],
     queryFn: async () => {
       try {
         const responsePromise = axiosInstance.get(
@@ -37,11 +49,38 @@ function Booking() {
     },
   });
 
+  const editBookingStatus = useMutation({
+    mutationFn: async (newStatus: bookingStatusType) => {
+      console.log(hallData);
+      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
+        ...data,
+        status: newStatus,
+      });
+      toast.promise(responsePromise, {
+        pending: "Updating...",
+        success: "Booking Status Edited!",
+        error: "Failed to Booking Hall. Please Reload and try again.",
+      });
+      const response = await responsePromise;
+      console.log(response.data);
+    },
+    onSuccess: async () => {
+      console.log("REVALIDATING");
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${bookingId}`],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   if (isFetching) return <h1>Loading</h1>;
   return (
-    <div className="flex flex-col items-center my-10 w-11/12 sm:w-3/4 lg:w-1/2 mx-auto gap-1">
+    <div className="flex flex-col items-center my-10 w-11/12 sm:w-3/4 lg:w-1/2 mx-auto">
+      <span className=" text-lg font-medium">User</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">name : </span>
+        <span className="w-full text-left">Name : </span>
         <span className="w-full text-right">{data?.user.username}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
@@ -64,6 +103,7 @@ function Booking() {
         <span className="w-full text-left">Pan No. : </span>
         <span className="w-full text-right">{data?.user.panNo || "-"}</span>
       </div>
+      <span className=" text-lg font-medium">Slot</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">From : </span>
         <span className="w-full text-right">
@@ -94,7 +134,7 @@ function Booking() {
           <span className="w-full text-right">{hallData?.name || "-"}</span>
         </div>
       )}
-      <span>Additonal Features</span>
+      <span className=" text-lg font-medium">Additonal Features</span>
       {/* FEATURES WALA IS LEFT TO MADE ONCE SATVAM DOES HIS PART */}
       {data?.features.map((eachFeature) => (
         <div className="flex flex-col w-full mb-2">
@@ -110,18 +150,22 @@ function Booking() {
             <span>price : </span>
             <span>{eachFeature.price || "-"}</span>
           </div>
-          <div className="flex items-start justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>stats : </span>
-            <div className="flex flex-col">
-              {eachFeature.stats?.length
-                ? eachFeature.stats?.map((eachStr) => (
-                    <span>{eachStr || "-"}</span>
-                  ))
-                : "-"}
-            </div>
-          </div>
         </div>
       ))}
+      <span className=" mb-3">STATUS: {data?.status}</span>
+      <select
+        value={data?.status}
+        onChange={(e) => {
+          // Your logic here
+          console.log(e.target.value);
+          editBookingStatus.mutate(e.target.value as bookingStatusType);
+        }}
+        className="px-2 py-1 rounded-md border border-gray-400"
+      >
+        {possibleBookingTypes.map((eachBooktingType) => (
+          <option value={eachBooktingType}>{eachBooktingType}</option>
+        ))}
+      </select>
     </div>
   );
 }

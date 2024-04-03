@@ -67,7 +67,7 @@ export default function EditHall() {
   });
 
   return (
-    <div className="hall-info-container grid place-items-center gap-y-12 mx-auto w-11/12 pt-10 overflow-y-hidden">
+    <div className="relative grid place-items-center gap-y-12 mx-auto w-11/12 pt-10 overflow-y-hidden">
       {databaseHallData && hallData && (
         <>
           <div className="flex flex-col items-center">
@@ -83,7 +83,7 @@ export default function EditHall() {
             />
           </div>
           {JSON.stringify(databaseHallData) !== JSON.stringify(hallData) && (
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-3 fixed top-5 bg-white px-3 py-2 border-gray-400 rounded-md shadow-md">
               <p>Confirm the changes you just made</p>
               <div className="flex gap-5">
                 <button

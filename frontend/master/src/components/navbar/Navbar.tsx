@@ -77,7 +77,7 @@ const NavBar = () => {
               {isAuthenticated ? (
                 <div className="flex items-center gap-2">
                   <span>
-                    <span className=" text-gray-500">manager</span>{" "}
+                    <span className=" text-gray-500">master</span>{" "}
                     {user?.email}
                   </span>
                   <span
@@ -167,7 +167,7 @@ const NavBar = () => {
                 {isAuthenticated ? (
                   <div className="flex flex-col gap-2">
                     <span>
-                      <span className=" text-gray-500">manager</span>{" "}
+                      <span className=" text-gray-500">master</span>{" "}
                       {user?.email}
                     </span>
                     <span

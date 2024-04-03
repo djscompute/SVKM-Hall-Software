@@ -9,12 +9,12 @@ module.exports = withMT({
   theme: {
     extend: {
       colors: {
-        "SAPBlue-100": "#bcc4de",
-        "SAPBlue-300": "#8c9ecd",
-        "SAPBlue-500": "#6f89c3",
-        "SAPBlue-700": "#5076ba",
-        "SAPBlue-800": "#3f6eb6",
-        "SAPBlue-900": "#0070f2",
+        "sapblue-100": "#bcc4de",
+        "sapblue-300": "#8c9ecd",
+        "sapblue-500": "#6f89c3",
+        "sapblue-700": "#5076ba",
+        "sapblue-800": "#3f6eb6",
+        "sapblue-900": "#0070f2",
       }
     }
   },

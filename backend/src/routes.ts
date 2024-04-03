@@ -134,7 +134,7 @@ export default function routes(app: Express) {
 
   app.post("/editBooking/:id", [
     validateCookie,
-    requireMasterRole,
+    requireManagerRole,
     validateRequest(RemoveBookingZodSchema),
     validateRequest(AddBookingZodSchema),
     editBookingHandler,
