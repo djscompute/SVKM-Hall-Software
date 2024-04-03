@@ -16,7 +16,7 @@ export type EachHallAdditonalFeaturesType = {
   heading: string; // heading of the additional feature. (eg. PODIUM )
   desc: string; // description about what the feature is
   stats?: string[]; // stats about the feature for example dimensions, duration, anything
-  price?: number; //  price obviously per hour or something.
+  price: number; //  price obviously per hour or something.
 };
 
 export type EachHallSessionType = {
