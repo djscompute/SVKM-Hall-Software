@@ -44,8 +44,7 @@ export const AddHallZodSchema = z.object({
           .array(z.string(stringErrorHandler("additionalFeatures.stats")))
           .optional(),
         price: z
-          .string(stringErrorHandler("additionalFeatures.price"))
-          .optional(),
+          .number(stringErrorHandler("additionalFeatures.price"))
       })
     ),
     images: z.array(z.string(stringErrorHandler("images"))).optional(),
