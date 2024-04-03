@@ -20,6 +20,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   const [newItem, setNewItem] = useState<EachHallAdditonalFeaturesType>({
     heading: "",
     desc: "",
+    price: 0,
   });
   const [editIndex, setEditIndex] = useState<number>(-1);
 
@@ -39,7 +40,11 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   };
 
   const handleAddItem = () => {
-    if (newItem.heading.trim() !== "" && newItem.desc.trim() !== "") {
+    if (
+      newItem.heading.trim() !== "" &&
+      newItem.desc.trim() !== "" &&
+      newItem.price >= 0
+    ) {
       if (editIndex !== -1) {
         const updatedList = [...editedFeatures];
         updatedList[editIndex] = newItem;
@@ -48,7 +53,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
       } else {
         setEditedFeatures([...editedFeatures, newItem]);
       }
-      setNewItem({  heading: "", desc: "" });
+      setNewItem({ heading: "", desc: "", price: 0 });
     }
   };
 
@@ -58,7 +63,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   };
 
   const handleDontEditItem = () => {
-    setNewItem({ heading: "", desc: "" });
+    setNewItem({ heading: "", desc: "", price: 0 });
     setEditIndex(-1);
   };
 
@@ -78,6 +83,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
             <div key={index} className="flex flex-col mb-3">
               <p className="font-medium text-lg">{feature.heading}</p>
               <p>{feature.desc}</p>
+              <p>Rs. {feature.price}</p>
             </div>
           ))}
         </div>
@@ -107,6 +113,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
                       <div className="flex flex-col w-full gap-1">
                         <span className=" font-semibold">{item.heading}</span>
                         <span className="">{item.desc}</span>
+                        <span className="">Rs. {item.price}</span>
                       </div>
                       <div className="flex gap-2">
                         <button
@@ -141,6 +148,15 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
                     }
                     className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
                     placeholder="Description"
+                  />
+                  <textarea
+                    required
+                    value={newItem.price}
+                    onChange={(e) =>
+                      setNewItem({ ...newItem, price: Number(e.target.value) })
+                    }
+                    className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
+                    placeholder="Price"
                   />
                   {editIndex != -1 && (
                     <button
