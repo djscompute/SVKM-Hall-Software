@@ -10,6 +10,7 @@ import {
 import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
 import { useState, useEffect } from "react";
 import { queryClient } from "../App";
+import { isValidEmail } from "../utils/validateEmail";
 
 function BookADay() {
   const { id, day } = useParams();
@@ -21,7 +22,7 @@ function BookADay() {
   const [aadharNumber, setAadharNumber] = useState("");
   const [panCard, setPanCard] = useState("");
   const [address, setAddress] = useState("");
-  const [errors, setErrors] = useState({ name: "", mobileNumber: "" });
+  const [errors, setErrors] = useState({ name: "",email:"", mobileNumber: "" });
   const [selectedFeatures, setSelectedFeatures] = useState<{
     [key: string]: EachHallAdditonalFeaturesType;
   }>({});
@@ -90,7 +91,7 @@ function BookADay() {
   const handleSubmit = () => {
     console.log("running");
     let hasErrors = false;
-    let newErrors = { name: "", mobileNumber: "" };
+    let newErrors = { name: "",email:"", mobileNumber: "" };
 
     if (!name) {
       newErrors.name = "Name is required";
@@ -98,13 +99,22 @@ function BookADay() {
       setErrors(newErrors);
       return;
     }
+    if (!email) {
+      newErrors.email = "Email Address is required";
+      hasErrors = true;
+      setErrors(newErrors);
+      return;
+    }else if (!isValidEmail(email)) {
+      newErrors.email = "Please enter a valid email address";
+      hasErrors = true;
+    }
     if (!mobileNumber) {
       newErrors.mobileNumber = "Mobile number is required";
       hasErrors = true;
       setErrors(newErrors);
       return;
     }
-    setErrors({ name: "", mobileNumber: "" });
+    setErrors({ name: "",email:"", mobileNumber: "" });
 
     if (!hasErrors) {
       const yes = {
@@ -233,6 +243,9 @@ function BookADay() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+        {errors.email && (
+          <p className="text-red-500">{errors.email}</p>
+        )}
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           type="tel"
