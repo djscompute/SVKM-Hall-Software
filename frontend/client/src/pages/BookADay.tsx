@@ -213,8 +213,7 @@ function BookADay() {
                   value={eachSessionCategory.categoryName}
                   className={`flex flex-col text-center`}
                 >
-                  {eachSessionCategory.categoryName} - ₹
-                  {eachSessionCategory.price}
+                  {eachSessionCategory.categoryName}
                 </option>
               ))}
           </select>
