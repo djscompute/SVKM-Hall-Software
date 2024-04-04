@@ -171,6 +171,7 @@ function Hall() {
                     <div key={index} className="flex flex-col mb-3">
                       <p className="font-medium text-lg">{feature.heading}</p>
                       <p>{feature.desc}</p>
+                      <p>Rs. {feature.price}</p>
                     </div>
                   ))}
                 </div>
