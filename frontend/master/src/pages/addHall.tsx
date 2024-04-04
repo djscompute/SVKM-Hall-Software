@@ -28,7 +28,6 @@ function AddHall() {
       "BJ Hall Vile Parle has an inviting ambiance which makes everyone feel welcomed. The elegant décor of the venue makes it an ideal option for a grand wedding. Host your events at BJ Hall Mumbai to make them outstanding. Ticking all the right boxes, this one must certainly be on your cards.",
     ],
     capacity: "500 people",
-    seating: "100 seats",
     pricing: "200 per day",
     additionalFeatures: [
       {
@@ -132,7 +131,6 @@ function AddHall() {
       <AboutHall about={hallData.about} setHallData={setHallData} />
       <HallCapacity
         capacity={hallData.capacity}
-        seating={hallData.seating}
         setHallData={setHallData}
       />
       <HallPricing pricing={hallData.pricing} setHallData={setHallData} />

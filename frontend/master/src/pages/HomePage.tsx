@@ -38,7 +38,6 @@ function HomePage() {
             name={hallProp.name}
             location={hallProp.location}
             capacity={hallProp.capacity}
-            seating={hallProp.seating}
             pricing={hallProp.pricing}
           />
         ))}

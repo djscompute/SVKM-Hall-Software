@@ -7,7 +7,7 @@ import { EachHallType } from "../../types/Hall.types";
 export default function Card(
   props: Pick<
     EachHallType,
-    "name" | "_id" | "capacity" | "images" | "location" | "pricing" | "seating"
+    "name" | "_id" | "capacity" | "images" | "location" | "pricing" 
   >
 ) {
   console.log(props);
@@ -40,10 +40,6 @@ export default function Card(
         </span>
         <span className="font-medium w-full">{props.location.desc1}</span>
         <div className="flex flex-wrap justify-between">
-          <span className="text-gray-800">
-            seating:
-            <span className="text-black">{props.seating}</span>
-          </span>
           <span className="text-gray-800">
             capacity:
             <span className="text-black">{props.capacity}</span>

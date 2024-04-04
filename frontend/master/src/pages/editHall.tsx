@@ -117,7 +117,6 @@ export default function EditHall() {
           />
           <HallCapacity
             capacity={hallData.capacity}
-            seating={hallData.seating}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }

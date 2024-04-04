@@ -5,16 +5,14 @@ import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 
 type props = {
   capacity: string;
-  seating: string;
   setHallData: React.Dispatch<React.SetStateAction<EachHallType>>;
 };
 
 export default function HallCapacity({
   capacity,
-  seating,
   setHallData,
 }: props) {
-  const [modalData, setModalData] = useState({ capacity, seating });
+  const [modalData, setModalData] = useState({ capacity });
   const [modal, setModal] = useState(false);
 
   const toggleModal = () => setModal(!modal);
@@ -31,7 +29,6 @@ export default function HallCapacity({
     setHallData((prev) => ({
       ...prev,
       capacity: modalData.capacity,
-      seating: modalData.seating,
     }));
     toggleModal();
   };
@@ -39,14 +36,10 @@ export default function HallCapacity({
   return (
     <div className="about-hall flex justify-between bg-blue-100 w-[80%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
       <div className="flex flex-col w-11/12">
-        <h2 className="font-bold text-xl mb-3">Capacity and Seating</h2>
+        <h2 className="font-bold text-xl mb-3">Capacity</h2>
         <div className="flex ">
           <p>Capacity : </p>
           <p>{capacity}</p>
-        </div>
-        <div className="flex ">
-          <p>Seating : </p>
-          <p>{seating}</p>
         </div>
       </div>
       <div className="hall-info-edit h-fit relative">
@@ -68,15 +61,6 @@ export default function HallCapacity({
                     <input
                       name="capacity"
                       value={modalData.capacity}
-                      onChange={handleChange}
-                      className="w-3/4 bg-gray-100 border border-gray-300 p-3 rounded h-auto"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between gap-4">
-                    <h1 className="">Seating:</h1>
-                    <input
-                      name="seating"
-                      value={modalData.seating}
                       onChange={handleChange}
                       className="w-3/4 bg-gray-100 border border-gray-300 p-3 rounded h-auto"
                     />

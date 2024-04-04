@@ -153,14 +153,10 @@ function Hall() {
 
               {/* Seating and capacity */}
               <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
-                <h2 className="font-bold text-xl mb-3">Capacity and Seating</h2>
+                <h2 className="font-bold text-xl mb-3">Capacity</h2>
                 <div className="flex ">
                   <p>Capacity : </p>
                   <p>{data.capacity}</p>
-                </div>
-                <div className="flex ">
-                  <p>Seating : </p>
-                  <p>{data.seating}</p>
                 </div>
               </div>
 
