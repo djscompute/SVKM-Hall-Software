@@ -212,17 +212,6 @@ function Hall() {
                   </div>
                 ))}
               </div>
-
-              <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
-                <div className="flex flex-col w-full">
-                  <h2 className="font-bold text-xl mb-3">Pricing</h2>
-                  {data.pricing ? (
-                    <p className="text-lg">₹ {data.pricing}/hr</p>
-                  ) : (
-                    <p>No pricing set for this hall. Edit to set the Price</p>
-                  )}
-                </div>
-              </div>
               <button className="border border-sapblue-800 hover:border-sapblue-900 rounded py-4 px-8 bg-transparent font-bold text-sapblue-800 hover:text-sapblue-900 transition duration-500">
                 Place Request
               </button>

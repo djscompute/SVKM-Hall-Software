@@ -42,7 +42,6 @@ function HomePage() {
             name={hallProp.name}
             location={hallProp.location}
             capacity={hallProp.capacity}
-            pricing={hallProp.pricing}
           />
         ))}
       </div>

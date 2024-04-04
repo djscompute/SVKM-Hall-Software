@@ -34,7 +34,6 @@ export const AddHallZodSchema = z.object({
     }),
     about: z.array(z.string(stringErrorHandler("about"))),
     capacity: z.string(stringErrorHandler("capacity")),
-    pricing: z.string(stringErrorHandler("pricing")).optional(),
     additionalFeatures: z.array(
       z.object({
         heading: z.string(stringErrorHandler("additionalFeatures.heading")),

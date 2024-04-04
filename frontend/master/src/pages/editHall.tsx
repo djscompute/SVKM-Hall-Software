@@ -1,7 +1,6 @@
 import HallLocation from "../components/editHall/HallLocation";
 import AboutHall from "../components/editHall/AboutHall";
 import HallCapacity from "../components/editHall/HallCapacity";
-import HallPricing from "../components/editHall/HallPricing";
 import HallAdditionalFeatures from "../components/editHall/HallAdditionalFeatures";
 import ImageCarousel from "../components/editHall/ImageCarousel";
 import { useState } from "react";
@@ -117,12 +116,6 @@ export default function EditHall() {
           />
           <HallCapacity
             capacity={hallData.capacity}
-            setHallData={
-              setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
-            }
-          />
-          <HallPricing
-            pricing={hallData.pricing}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }

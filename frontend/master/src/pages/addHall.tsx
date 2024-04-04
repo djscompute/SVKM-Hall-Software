@@ -5,7 +5,6 @@ import axiosInstance from "../config/axiosInstance";
 import HallLocation from "../components/addHall/HallLocation";
 import AboutHall from "../components/addHall/AboutHall";
 import HallCapacity from "../components/addHall/HallCapacity";
-import HallPricing from "../components/addHall/HallPricing";
 import HallSessions from "../components/addHall/HallSessions";
 import HallAdditionalFeatures from "../components/addHall/HallAdditionalFeatures";
 import ImageCarousel from "../components/addHall/ImageCarousel";
@@ -28,7 +27,6 @@ function AddHall() {
       "BJ Hall Vile Parle has an inviting ambiance which makes everyone feel welcomed. The elegant décor of the venue makes it an ideal option for a grand wedding. Host your events at BJ Hall Mumbai to make them outstanding. Ticking all the right boxes, this one must certainly be on your cards.",
     ],
     capacity: "500 people",
-    pricing: "200 per day",
     additionalFeatures: [
       {
         heading: "Dining Area",
@@ -133,7 +131,6 @@ function AddHall() {
         capacity={hallData.capacity}
         setHallData={setHallData}
       />
-      <HallPricing pricing={hallData.pricing} setHallData={setHallData} />
       <HallSessions sessions={hallData.sessions} setHallData={setHallData} />
       {hallData.additionalFeatures && (
         <HallAdditionalFeatures

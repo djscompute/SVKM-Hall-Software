@@ -7,7 +7,7 @@ import { EachHallType } from "../../types/Hall.types";
 export default function Card(
   props: Pick<
     EachHallType,
-    "name" | "_id" | "capacity" | "images" | "location" | "pricing" 
+    "name" | "_id" | "capacity" | "images" | "location"
   >
 ) {
   console.log(props);
@@ -46,9 +46,6 @@ export default function Card(
           </span>
         </div>
         <div className="flex flex-row items-center justify-between mt-3">
-          <span className="block text-gray-800">
-            pricing: <span className="font-medium text-black">₹{props.pricing}/hr</span>
-          </span>
           <button className="text-pink-600 border-2 text-sm sm:text-base border-pink-600 hover:bg-pink-600 hover:text-white px-4 py-1 rounded-full">
             Check Availability
           </button>
