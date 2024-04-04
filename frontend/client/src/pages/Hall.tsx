@@ -212,9 +212,6 @@ function Hall() {
                   </div>
                 ))}
               </div>
-              <button className="border border-sapblue-800 hover:border-sapblue-900 rounded py-4 px-8 bg-transparent font-bold text-sapblue-800 hover:text-sapblue-900 transition duration-500">
-                Place Request
-              </button>
             </div>
           ) : (
             <div>
