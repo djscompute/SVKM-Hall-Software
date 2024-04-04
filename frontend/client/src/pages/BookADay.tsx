@@ -22,7 +22,11 @@ function BookADay() {
   //const [aadharNumber, setAadharNumber] = useState("");
   //const [panCard, setPanCard] = useState("");
   //const [address, setAddress] = useState("");
-  const [errors, setErrors] = useState({ name: "",email:"", mobileNumber: "" });
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    mobileNumber: "",
+  });
   const [selectedFeatures, setSelectedFeatures] = useState<{
     [key: string]: EachHallAdditonalFeaturesType;
   }>({});
@@ -91,7 +95,7 @@ function BookADay() {
   const handleSubmit = () => {
     console.log("running");
     let hasErrors = false;
-    let newErrors = { name: "",email:"", mobileNumber: "" };
+    let newErrors = { name: "", email: "", mobileNumber: "" };
 
     if (!name) {
       newErrors.name = "Name is required";
@@ -104,7 +108,7 @@ function BookADay() {
       hasErrors = true;
       setErrors(newErrors);
       return;
-    }else if (!isValidEmail(email)) {
+    } else if (!isValidEmail(email)) {
       newErrors.email = "Please enter a valid email address";
       hasErrors = true;
     }
@@ -114,7 +118,7 @@ function BookADay() {
       setErrors(newErrors);
       return;
     }
-    setErrors({ name: "",email:"", mobileNumber: "" });
+    setErrors({ name: "", email: "", mobileNumber: "" });
 
     if (!hasErrors) {
       const yes = {
@@ -184,8 +188,10 @@ function BookADay() {
       </h1>
       <span>Estimated Price : ₹{price}</span>
       <div className="flex flex-col gap-4">
+        <label htmlFor="session">Session Type</label>
         <select
           className="p-2 rounded-md"
+          id="session"
           value={selectedSessionId}
           onChange={(e) => {
             setSelectedSessionId(e.target.value);
@@ -207,9 +213,11 @@ function BookADay() {
             </option>
           ))}
         </select>
+        <label htmlFor="booking">Booking Type</label>
         {selectedSessionId && (
           <select
             className="p-2 rounded-md"
+            id="booking"
             value={selectedCategory}
             onChange={(e) => {
               setSelectedCategory(e.target.value);
@@ -228,28 +236,32 @@ function BookADay() {
               ))}
           </select>
         )}
+        <label htmlFor="name">Name</label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          id="name"
           type="text"
-          placeholder="Name"
+          placeholder="John Doe"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
         {errors.name && <p className="text-red-500">{errors.name}</p>}
+        <label htmlFor="email">Email</label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          id="email"
           type="email"
-          placeholder="Email Id"
+          placeholder="john.doe@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        {errors.email && (
-          <p className="text-red-500">{errors.email}</p>
-        )}
+        {errors.email && <p className="text-red-500">{errors.email}</p>}
+        <label htmlFor="mobile">Mobile</label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          id="mobile"
           type="tel"
-          placeholder="Mobile Number"
+          placeholder="999999999"
           value={mobileNumber}
           onChange={(e) => setMobileNumber(e.target.value)}
         />
