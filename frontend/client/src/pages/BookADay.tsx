@@ -19,9 +19,9 @@ function BookADay() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
-  const [aadharNumber, setAadharNumber] = useState("");
-  const [panCard, setPanCard] = useState("");
-  const [address, setAddress] = useState("");
+  //const [aadharNumber, setAadharNumber] = useState("");
+  //const [panCard, setPanCard] = useState("");
+  //const [address, setAddress] = useState("");
   const [errors, setErrors] = useState({ name: "",email:"", mobileNumber: "" });
   const [selectedFeatures, setSelectedFeatures] = useState<{
     [key: string]: EachHallAdditonalFeaturesType;
@@ -55,9 +55,9 @@ function BookADay() {
           user: {
             username: name,
             email: email,
-            aadharNo: aadharNumber,
-            panNo: panCard,
-            address: address,
+            //aadharNo: aadharNumber,
+            //panNo: panCard,
+            //address: address,
             mobile: mobileNumber,
           },
           features: Object.values(selectedFeatures),
@@ -121,9 +121,9 @@ function BookADay() {
         user: {
           username: name,
           email: email,
-          aadharNo: aadharNumber,
-          panNo: panCard,
-          address: address,
+          //aadharNo: aadharNumber,
+          //panNo: panCard,
+          //address: address,
           mobile: mobileNumber,
         },
         features: Object.values(selectedFeatures),
@@ -256,6 +256,7 @@ function BookADay() {
         {errors.mobileNumber && (
           <p className="text-red-500">{errors.mobileNumber}</p>
         )}
+        {/*
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           type="number"
@@ -277,6 +278,7 @@ function BookADay() {
           value={address}
           onChange={(e) => setAddress(e.target.value)}
         />
+        */}
         <h6>Additional Features</h6>
         {HallData?.additionalFeatures?.map((eachFeature) => (
           <span className="flex items-center gap-2" key={eachFeature.heading}>

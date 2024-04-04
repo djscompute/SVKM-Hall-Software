@@ -87,6 +87,7 @@ function Booking() {
         <span className="w-full text-left">Mobile Number : </span>
         <span className="w-full text-right">{data?.user.mobile}</span>
       </div>
+      {/*
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Aadhar No : </span>
         <span className="w-full text-right">{data?.user.aadharNo || "-"}</span>
@@ -95,14 +96,17 @@ function Booking() {
         <span className="w-full text-left">Address : </span>
         <span className="w-full text-right">{data?.user.address || "-"}</span>
       </div>
+      */}
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Email Id : </span>
         <span className="w-full text-right">{data?.user.email || "-"}</span>
       </div>
+      {/*
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Pan No. : </span>
         <span className="w-full text-right">{data?.user.panNo || "-"}</span>
       </div>
+      */}
       <span className=" text-lg font-medium">Slot</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">From : </span>

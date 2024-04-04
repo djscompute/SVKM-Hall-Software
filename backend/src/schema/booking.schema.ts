@@ -9,10 +9,10 @@ export const AddBookingZodSchema = z.object({
   body: z.object({
     user: z.object({
       username: z.string(stringErrorHandler("name")),
-      email: z.string(stringErrorHandler("email")).email().optional(),
-      aadharNo: z.string(stringErrorHandler("aadharNo")).optional(),
-      panNo: z.string(stringErrorHandler("panNo")).optional(),
-      address: z.string(stringErrorHandler("address")).optional(),
+      email: z.string(stringErrorHandler("email")).email(),
+      //aadharNo: z.string(stringErrorHandler("aadharNo")).optional(),
+      //panNo: z.string(stringErrorHandler("panNo")).optional(),
+      //address: z.string(stringErrorHandler("address")).optional(),
       mobile: z.string(stringErrorHandler("mobile")),
     }),
     features: z.array(

@@ -91,9 +91,9 @@ export type CustomerType = {
   readonly _id: string; // unique customer id
   username: string; // name
   email?: string; // email ( maybe UNIQUE KEY )
-  aadharNo?: string; // adhar no. ( dont know if this is required )
-  panNo?: string; // pan no. ( dont know if this is required )
-  address?: string; // address
+  //aadharNo?: string; // adhar no. ( dont know if this is required )
+  //panNo?: string; // pan no. ( dont know if this is required )
+  //address?: string; // address
   mobile: string; // mobile number ( maybe UNIQUE )
 };
 
