@@ -101,19 +101,6 @@ function EachDay({
                     )?.name
                   }
                 </span>
-                <span className="overflow-x-auto text-xs pb-2 px-1 text-center bg-gray-300">
-                  {convert_IST_TimeString_To12HourFormat(
-                    HallSessionsArray.find(
-                      (obj) => obj._id === eachSessionGroup.sessionId
-                    )?.from as string
-                  )}
-                  -
-                  {convert_IST_TimeString_To12HourFormat(
-                    HallSessionsArray.find(
-                      (obj) => obj._id === eachSessionGroup.sessionId
-                    )?.to as string
-                  )}
-                </span>
                 {eachSessionGroup.subarray.map((eachBookingInfo) => (
                   <a
                     href={`/booking/${eachBookingInfo._id}`}
