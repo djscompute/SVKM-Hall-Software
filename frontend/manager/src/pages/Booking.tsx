@@ -84,6 +84,10 @@ function Booking() {
         <span className="w-full text-right">{data?.user.username}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Contact Person : </span>
+        <span className="w-full text-right">{data?.user.contact}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Mobile Number : </span>
         <span className="w-full text-right">{data?.user.mobile}</span>
       </div>

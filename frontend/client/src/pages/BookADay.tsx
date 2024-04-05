@@ -17,6 +17,7 @@ function BookADay() {
   const [selectedSessionId, setSelectedSessionId] = useState<string>();
   const [selectedCategory, setSelectedCategory] = useState<string>();
   const [name, setName] = useState("");
+  const [person, setPerson] = useState("");
   const [email, setEmail] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   //const [aadharNumber, setAadharNumber] = useState("");
@@ -31,6 +32,7 @@ function BookADay() {
     [key: string]: EachHallAdditonalFeaturesType;
   }>({});
   const [price, setPrice] = useState<number>();
+  const [isSame, setIsSame] = useState<boolean>(false);
 
   const dayjsObject = dayjs(day);
   const humanReadableDate = dayjsObject.format("MMMM D, YYYY");
@@ -58,6 +60,7 @@ function BookADay() {
         .post(`/addBooking`, {
           user: {
             username: name,
+            contact: person,
             email: email,
             //aadharNo: aadharNumber,
             //panNo: panCard,
@@ -95,10 +98,16 @@ function BookADay() {
   const handleSubmit = () => {
     console.log("running");
     let hasErrors = false;
-    let newErrors = { name: "", email: "", mobileNumber: "" };
+    let newErrors = { name: "", person: "", email: "", mobileNumber: "" };
 
     if (!name) {
       newErrors.name = "Name is required";
+      hasErrors = true;
+      setErrors(newErrors);
+      return;
+    }
+    if (!person) {
+      newErrors.name = "Contact Person is required";
       hasErrors = true;
       setErrors(newErrors);
       return;
@@ -124,6 +133,7 @@ function BookADay() {
       const yes = {
         user: {
           username: name,
+          contact: person,
           email: email,
           //aadharNo: aadharNumber,
           //panNo: panCard,
@@ -160,6 +170,13 @@ function BookADay() {
         return { ...prevSelectedFeatures, [feature._id!]: feature };
       }
     });
+  };
+
+  const handleSameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsSame(event.target.checked);
+    if (event.target.checked) {
+      setPerson(name);
+    }
   };
 
   useEffect(() => {
@@ -236,7 +253,7 @@ function BookADay() {
               ))}
           </select>
         )}
-        <label htmlFor="name">Name</label>
+        <label htmlFor="name">Customer Name</label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="name"
@@ -245,6 +262,24 @@ function BookADay() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
+        <label htmlFor="person">Contact Person</label>
+        <input
+          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          id="person"
+          type="text"
+          placeholder="Jane Smith"
+          value={person}
+          onChange={(e) => setPerson(e.target.value)}
+        />
+        <span>
+          <input
+            type="checkbox"
+            id="same"
+            checked={isSame}
+            onChange={handleSameChange}
+          />
+          <label htmlFor="same"> Same as Customer Name</label>
+        </span>
         {errors.name && <p className="text-red-500">{errors.name}</p>}
         <label htmlFor="email">Email</label>
         <input

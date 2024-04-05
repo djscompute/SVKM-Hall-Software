@@ -34,6 +34,7 @@ export type EachHallSessionType = {
 export interface EachHallType {
   readonly _id?: string; // UNIQUE KEY. This will be used to query Booking table in a certain time frame.
   name: string; // damn i forgot this
+  person: string;
   location: EachHallLocationType; // location of the hall
   about: string[]; // description of the hall. can be buletins
   capacity: string; // obvio
@@ -77,6 +78,7 @@ export interface adminType {
   readonly _id: string;
   role: string;
   username: string;
+  contact: String;
   email: string;
   password: string;
   managedHalls?: string[];  // id of the halls which he has the access to
@@ -90,6 +92,7 @@ export interface adminType {
 export type CustomerType = {
   readonly _id: string; // unique customer id
   username: string; // name
+  contact: string;
   email?: string; // email ( maybe UNIQUE KEY )
   //aadharNo?: string; // adhar no. ( dont know if this is required )
   //panNo?: string; // pan no. ( dont know if this is required )

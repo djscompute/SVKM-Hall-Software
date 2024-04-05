@@ -7,6 +7,7 @@ export type { CustomerType }
 export const CustomerSchema = new mongoose.Schema<CustomerType>(
   {
     username: { type: String, required: true },
+    contact: {type: String, required: true },
     email: { type: String,required: true },
     //aadharNo: { type: String },
     //panNo: { type: String },
