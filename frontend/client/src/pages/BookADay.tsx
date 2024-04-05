@@ -11,6 +11,7 @@ import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_Time
 import { useState, useEffect } from "react";
 import { queryClient } from "../App";
 import { isValidEmail } from "../utils/validateEmail";
+import { isValidMobile } from "../utils/validateMobile"; 
 
 function BookADay() {
   const { id, day } = useParams();
@@ -107,7 +108,7 @@ function BookADay() {
       return;
     }
     if (!person) {
-      newErrors.name = "Contact Person is required";
+      newErrors.person = "Contact Person is required";
       hasErrors = true;
       setErrors(newErrors);
       return;
@@ -123,6 +124,11 @@ function BookADay() {
     }
     if (!mobileNumber) {
       newErrors.mobileNumber = "Mobile number is required";
+      hasErrors = true;
+      setErrors(newErrors);
+      return;
+    } else if (!isValidMobile(mobileNumber)) {
+      newErrors.mobileNumber = "Please enter a valid Mobile Number address";
       hasErrors = true;
       setErrors(newErrors);
       return;
