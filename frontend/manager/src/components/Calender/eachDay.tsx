@@ -121,11 +121,8 @@ function EachDay({
                       eachBookingInfo.status
                     )} px-2 overflow-x-auto cursor-pointer`}
                   >
-                    <span className="text-center w-full border-b border-gray-500">
-                      {eachBookingInfo.user.username}
-                    </span>
-                    <span className="text-center">
-                      {eachBookingInfo.user.mobile}
+                    <span className="text-center w-full border-b border-gray-500 truncate">
+                      {eachBookingInfo.user.username} - {eachBookingInfo.user.mobile}
                     </span>
                   </a>
                 ))}
