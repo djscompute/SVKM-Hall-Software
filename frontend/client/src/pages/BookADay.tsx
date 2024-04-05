@@ -209,7 +209,7 @@ function BookADay() {
       <h1 className="text-3xl font-semibold">
         Book {HallData?.name} for {humanReadableDate}
       </h1>
-      <span>Estimated Price : ₹{price}</span>
+      <span>Estimated Price : ₹{price} + GST (if applicable)</span>
       <div className="flex flex-col gap-4">
         <label htmlFor="session">Session Type</label>
         <select
