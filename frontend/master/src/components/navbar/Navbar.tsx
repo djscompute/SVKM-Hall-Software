@@ -1,10 +1,27 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
 import axiosInstance from "../../config/axiosInstance";
 import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
 
 const NavBar = () => {
+  const navigate= useNavigate()
+  useQuery({
+    queryKey: ["loggedIn"],
+    queryFn: async () => {
+
+        const response = await axiosInstance.get("isLoggedIn");
+        if(!(response.data.isLoggedIn)){
+          navigate('/login')
+          return response.data;
+        }
+        else{
+          return null
+        }
+    },
+  });
+
   const [open, setOpen] = useState(false);
 
   const [isAuthenticated, user, logout] = useAuthStore((store) => [
@@ -21,6 +38,7 @@ const NavBar = () => {
         logout();
         toast.success("logged Out");
         console.log(data);
+        navigate('/login')
       } else {
         toast.error("error while logging you out.");
       }
