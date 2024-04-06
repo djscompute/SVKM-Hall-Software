@@ -3,6 +3,7 @@ import { HallBookingType } from "../../../../../types/global";
 import { bookingStatusType } from "../../types/Hall.types";
 import isBetween from "dayjs/plugin/isBetween"; // Import the timezone plugin
 import { convert_IST_DateTimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat";
+import { getSlotAbbreviation } from "../../utils/getSlotAbb";
 
 dayjs.extend(isBetween);
 
@@ -101,20 +102,24 @@ function EachMobileDay({
       {finalArr && (
         <>
           <div className="flex flex-col items-center justify-start gap-1 w-full  ">
-            {finalArr.map((eachSlotInfo) => (
+            {finalArr.map((eachSlotInfo, index) => (
               <div
+                key={index}
                 className={`flex justify-between w-full 
               ${getSlotColour(eachSlotInfo.status)}
               ${eachSlotInfo.status == "EMPTY" && " border-2 border-black"}
               px-2 overflow-x-auto
               `}
               >
-                <span>
-                  {convert_IST_DateTimeString_To12HourFormat(eachSlotInfo.from)}
-                  -{convert_IST_DateTimeString_To12HourFormat(eachSlotInfo.to)}
-                </span>
+                {eachSlotInfo.session_id
+                  ? // if booking is found then find the session using session_id and display its name
+                    HallSessionsArray?.find(
+                      (a) => a._id == eachSlotInfo.session_id
+                    )?.name
+                  : // no booking is found for this sesison means that this is the session itself. display its name
+                    eachSlotInfo.name}
                 {eachSlotInfo.initial !== "O" && (
-                  <span>{eachSlotInfo.initial}</span>
+                  <span>{getSlotAbbreviation(eachSlotInfo.status)}</span>
                 )}
               </div>
             ))}
