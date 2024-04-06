@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { useParams } from "react-router-dom";
+import { useParams , useNavigate} from "react-router-dom";
 import axiosInstance from "../config/axiosInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -12,8 +12,10 @@ import { useState, useEffect } from "react";
 import { queryClient } from "../App";
 import { isValidEmail } from "../utils/validateEmail";
 import { isValidMobile } from "../utils/validateMobile"; 
+import { AxiosError } from "axios";
 
 function BookADay() {
+  const navigate = useNavigate();
   const { id, day } = useParams();
   const [selectedSessionId, setSelectedSessionId] = useState<string>();
   const [selectedCategory, setSelectedCategory] = useState<string>();
@@ -34,6 +36,7 @@ function BookADay() {
   }>({});
   const [price, setPrice] = useState<number>();
   const [isSame, setIsSame] = useState<boolean>(false);
+  const [isDetailsConfirmed, setIsDetailsConfirmed] = useState<boolean>(false);
 
   const dayjsObject = dayjs(day);
   const humanReadableDate = dayjsObject.format("MMMM D, YYYY");
@@ -75,25 +78,62 @@ function BookADay() {
           session_id: selectedSessionId,
           from: `${day}T${
             HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-              ?.from
+              ?.from as string
           }`,
           to: `${day}T${
             HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-              ?.to
+              ?.to as string
           }`,
         })
         .then((response) => {
           console.log(response.data);
+          return response.data; 
         })
         .catch((error) => {
           console.log(error);
+          throw error; 
         }),
     mutationKey: ["addhall"],
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      if (data.error) {
+        console.error(data.error);
+      } else {
+        navigate("/bookingsuccessful", {
+          state: {
+            bookingDetails: {
+              username: name,
+              contact: person,
+              email: email,
+              mobile: mobileNumber,
+              hallName: HallData?.name,
+              sessionType:selectedSessionId,
+              sessionName:HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.name,
+              estimatedPrice:price,
+              additionalFeatures:selectedFeatures,
+              date:humanReadableDate,
+              startTime: `${day}T${
+                HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.from
+              }`,
+              endTime: `${day}T${
+                HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
+              }`,
+              status: "ENQUIRY",
+            },
+          },
+        });
+      }
       await queryClient.refetchQueries({
         queryKey: [`bookings`],
       });
     },
+    onError: (error: AxiosError) => {
+      if (error.response && error.response.status === 400) {
+        toast.error("Oops!!Session booked already. Cannot enquire for a session which is already booked. Please try to enquire for the sessions not booked.");
+      } else {
+        console.error("An error occurred:", error);
+      }
+    },
+  
   });
 
   const handleSubmit = () => {
@@ -128,14 +168,14 @@ function BookADay() {
       setErrors(newErrors);
       return;
     } else if (!isValidMobile(mobileNumber)) {
-      newErrors.mobileNumber = "Please enter a valid Mobile Number address";
+      newErrors.mobileNumber = "Please enter a valid Mobile Number";
       hasErrors = true;
       setErrors(newErrors);
       return;
     }
     setErrors({ name: "", email: "", mobileNumber: "" });
 
-    if (!hasErrors) {
+    if (!hasErrors && isDetailsConfirmed) {
       const yes = {
         user: {
           username: name,
@@ -346,10 +386,27 @@ function BookADay() {
             </label>
           </span>
         ))}
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="confirmDetails"
+            checked={isDetailsConfirmed}
+            onChange={(e) => setIsDetailsConfirmed(e.target.checked)}
+          />
+          <label htmlFor="confirmDetails">
+              Re-check all the entered details (important that the email and
+              mobile details entered are correct)
+          </label>
+        </div>
         <button
-          onClick={handleSubmit}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
-          value="Submit"
+            onClick={handleSubmit}
+            className={`font-bold py-2 px-4 rounded cursor-pointer ${
+            isDetailsConfirmed
+                ? "bg-green-500 hover:bg-green-700 text-white"
+                : "bg-gray-500 text-white"
+            }`}
+            value="Submit"
+            disabled={!isDetailsConfirmed}
         >
           Enquire
         </button>
