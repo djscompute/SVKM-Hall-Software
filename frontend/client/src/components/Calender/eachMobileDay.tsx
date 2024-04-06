@@ -52,29 +52,37 @@ function EachMobileDay({
     };
   });
 
-  function areTimeIntervalsOverlapping(interval1: any, interval2: any) {
-    const from1 = dayjs(interval1.from);
-    const to1 = dayjs(interval1.to);
-    const from2 = dayjs(interval2.from);
-    const to2 = dayjs(interval2.to);
+  // PRIORITY to show the booked sesison in frontend. if more that one booking with different status exists.
+  const priority = { CONFIRMED: 1, TENTATIVE: 2, ENQUIRY: 3 };
 
-    return from1.isBefore(to2) && to1.isAfter(from2);
-  }
+  // sort sessions in priority of status
+  allBookingData.sort(
+    (a: HallBookingType, b: HallBookingType) =>
+      // @ts-ignore
+      priority[a.status] - priority[b.status]
+  );
 
+  // only keep one booking of a hall session
+  const uniqueSessions = [];
+  const sessionIds = new Set();
+  allBookingData.forEach((session) => {
+    if (!sessionIds.has(session.session_id)) {
+      uniqueSessions.push(session);
+      sessionIds.add(session.session_id);
+    }
+  });
+
+  // merge bookings and sessions.
+  // give priority to booking over session to show in frontend
   const finalArr: any[] = [];
-  completeDateSessions.forEach((eachSession) => {
-    let clashing: boolean = false;
-    allBookingData?.forEach((eachBooking) => {
-      if (
-        areTimeIntervalsOverlapping(eachSession, eachBooking) &&
-        !finalArr.includes(eachBooking)
-      ) {
-        finalArr.push(eachBooking);
-        clashing = true;
-      }
-    });
-    if (!clashing && !finalArr.includes(eachSession)) {
-      finalArr.push(eachSession);
+  completeDateSessions.forEach((eachHallSession) => {
+    const A_Booking_for_This_Session = allBookingData.find(
+      (a) => eachHallSession._id == a.session_id
+    );
+    if (A_Booking_for_This_Session) {
+      finalArr.push(A_Booking_for_This_Session);
+    } else {
+      finalArr.push(eachHallSession);
     }
   });
 
