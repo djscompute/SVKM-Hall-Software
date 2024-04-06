@@ -78,11 +78,11 @@ function BookADay() {
           session_id: selectedSessionId,
           from: `${day}T${
             HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-              ?.from
+              ?.from as string
           }`,
           to: `${day}T${
             HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-              ?.to
+              ?.to as string
           }`,
         })
         .then((response) => {
@@ -107,8 +107,17 @@ function BookADay() {
               mobile: mobileNumber,
               hallName: HallData?.name,
               sessionType:selectedSessionId,
+              sessionName:HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.name,
               estimatedPrice:price,
-              additionalFeatures:selectedFeatures
+              additionalFeatures:selectedFeatures,
+              date:humanReadableDate,
+              startTime: `${day}T${
+                HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.from
+              }`,
+              endTime: `${day}T${
+                HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
+              }`,
+              status: "ENQUIRY",
             },
           },
         });
