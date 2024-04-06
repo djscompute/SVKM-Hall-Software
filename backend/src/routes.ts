@@ -132,6 +132,7 @@ export default function routes(app: Express) {
     requireManagerRole,
     validateRequest(RemoveBookingZodSchema),
     validateRequest(AddBookingZodSchema),
+    // validateRequest(EditBookingZodSchema),
     editBookingHandler,
   ]);
 

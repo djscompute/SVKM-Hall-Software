@@ -11,10 +11,11 @@ export const AddBookingZodSchema = z.object({
       username: z.string(stringErrorHandler("name")),
       contact: z.string(stringErrorHandler('person')),
       email: z.string(stringErrorHandler("email")).email(),
-      //aadharNo: z.string(stringErrorHandler("aadharNo")).optional(),
-      //panNo: z.string(stringErrorHandler("panNo")).optional(),
-      //address: z.string(stringErrorHandler("address")).optional(),
+      aadharNo: z.string(stringErrorHandler("aadharNo")).optional(),
+      panNo: z.string(stringErrorHandler("panNo")).optional(),
+      address: z.string(stringErrorHandler("address")).optional(),
       mobile: z.string(stringErrorHandler("mobile")),
+      
     }),
     features: z.array(
       z.object({
@@ -29,7 +30,7 @@ export const AddBookingZodSchema = z.object({
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
     from: z.string(stringErrorHandler("from")),
-    to: z.string(stringErrorHandler("to"))
+    to: z.string(stringErrorHandler("to")),
   }),
 });
 
@@ -55,6 +56,15 @@ export const getBookingZodSchema = z.object({
     }),
   }),
 });
+
+// export const EditBookingZodSchema = z.object({
+//   body: z.object({
+//     user: z.object({
+//       aadharNo: z.string().optional(), // Make Aadhar number optional for editing
+//       panNo: z.string().optional(), // Make PAN number optional for editing
+//     }).optional(),
+//   }),
+// });
 
 //Zod schema for getting a session by ID
 export const getBookingByIdZodSchema = z.object({

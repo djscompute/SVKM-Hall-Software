@@ -14,7 +14,9 @@ export async function addBookingHandler(req: Request, res: Response) {
       from,
       to,
       time,
-    } = req.body as HallBookingType;
+      aadharNo, // Add Aadhar field
+      panNo, // Add PAN field
+    } = req.body as HallBookingType  & { aadharNo: string; panNo: string };
 
     // Check for existing bookings within the specified time range
     const existingBookings = await BookingModel.find({
@@ -47,6 +49,8 @@ export async function addBookingHandler(req: Request, res: Response) {
       from,
       to,
       time,
+      aadharNo, // Include Aadhar in the new booking
+      panNo, // Include PAN in the new booking
     });
     await newBooking.save();
     console.log("added new booking");
@@ -69,13 +73,15 @@ export async function editBookingHandler(req: Request, res: Response) {
       from,
       to,
       time,
-    } = req.body as HallBookingType;
+      aadharNo, // Edit Aadhar field
+      panNo, // Edit PAN field
+    } = req.body as HallBookingType & { aadharNo: string; panNo: string };
     const bookingId: string = req.params.id;
 
     const updatedBooking = await BookingModel.findByIdAndUpdate(
       bookingId,
       {
-        user,
+        user: { ...user, aadharNo: aadharNo || user.aadharNo, panNo: panNo || user.panNo },
         features,
         status,
         price,
