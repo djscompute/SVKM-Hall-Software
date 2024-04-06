@@ -1,5 +1,8 @@
 import dayjs from "dayjs";
-import { HallBookingType } from "../../../../../types/global";
+import {
+  EachHallSessionType,
+  HallBookingType,
+} from "../../../../../types/global";
 import { convert_IST_DateTimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat";
 
 import isBetween from "dayjs/plugin/isBetween"; // Import the timezone plugin
@@ -44,42 +47,55 @@ function EachDay({
     dayjs(obj.from).isSame(myDayJSObject, "day")
   );
 
-  // convert "08:00:00" to "${aaj-ka-din}T"08:00:00""
-  const completeDateSessions = HallSessionsArray.map((element) => {
-    return {
-      ...element,
-      from: `${myDayJSObject.format("YYYY-MM-DD")}T${element.from}`,
-      to: `${myDayJSObject.format("YYYY-MM-DD")}T${element.to}`,
-    };
-  });
+  // filter out the CANCELLED as we dont show them on frontend. we dont remove them from backend.
+  allBookingData = allBookingData.filter(
+    (session) => session.status !== "CANCELLED"
+  );
 
-  function areTimeIntervalsOverlapping(interval1: any, interval2: any) {
-    const from1 = dayjs(interval1.from);
-    const to1 = dayjs(interval1.to);
-    const from2 = dayjs(interval2.from);
-    const to2 = dayjs(interval2.to);
+  // convert "08:00:00" to "${aaj-ka-din}T08:00:00"
+  const completeDateSessions: EachHallSessionType[] = HallSessionsArray.map(
+    (element) => {
+      return {
+        ...element,
+        from: `${myDayJSObject.format("YYYY-MM-DD")}T${element.from}`,
+        to: `${myDayJSObject.format("YYYY-MM-DD")}T${element.to}`,
+      };
+    }
+  );
 
-    return from1.isBefore(to2) && to1.isAfter(from2);
-  }
+  // PRIORITY to show the booked sesison in frontend. if more that one booking with different status exists.
+  const priority = { CONFIRMED: 1, TENTATIVE: 2, ENQUIRY: 3 };
 
-  const finalArr: any[] = [];
-  completeDateSessions.forEach((eachSession) => {
-    let clashing: boolean = false;
-    allBookingData?.forEach((eachBooking) => {
-      if (
-        areTimeIntervalsOverlapping(eachSession, eachBooking) &&
-        !finalArr.includes(eachBooking)
-      ) {
-        finalArr.push(eachBooking);
-        clashing = true;
-      }
-    });
-    if (!clashing && !finalArr.includes(eachSession)) {
-      finalArr.push(eachSession);
+  // sort sessions in priority of status
+  allBookingData.sort(
+    (a: HallBookingType, b: HallBookingType) =>
+      // @ts-ignore
+      priority[a.status] - priority[b.status]
+  );
+
+  // only keep one booking of a hall session
+  const uniqueSessions = [];
+  const sessionIds = new Set();
+  allBookingData.forEach((session) => {
+    if (!sessionIds.has(session.session_id)) {
+      uniqueSessions.push(session);
+      sessionIds.add(session.session_id);
     }
   });
 
-  console.log(i, finalArr, HallSessionsArray);
+  // merge bookings and sessions.
+  // give priority to booking over session to show in frontend
+  const finalArr: any[] = [];
+  completeDateSessions.forEach((eachHallSession) => {
+    const A_Booking_for_This_Session = allBookingData.find(
+      (a) => eachHallSession._id == a.session_id
+    );
+    if (A_Booking_for_This_Session) {
+      finalArr.push(A_Booking_for_This_Session);
+    } else {
+      finalArr.push(eachHallSession);
+    }
+  });
 
   return (
     <div
