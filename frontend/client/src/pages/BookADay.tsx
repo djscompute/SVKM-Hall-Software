@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import { queryClient } from "../App";
 import { isValidEmail } from "../utils/validateEmail";
 import { isValidMobile } from "../utils/validateMobile"; 
+import { AxiosError } from "axios";
 
 function BookADay() {
   const navigate = useNavigate();
@@ -116,6 +117,14 @@ function BookADay() {
         queryKey: [`bookings`],
       });
     },
+    onError: (error: AxiosError) => {
+      if (error.response && error.response.status === 400) {
+        toast.error("Oops!!Session booked already. Cannot enquire for a session which is already booked. Please try to enquire for the sessions not booked.");
+      } else {
+        console.error("An error occurred:", error);
+      }
+    },
+  
   });
 
   const handleSubmit = () => {
