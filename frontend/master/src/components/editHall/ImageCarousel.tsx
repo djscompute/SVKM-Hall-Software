@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { EachHallType } from "../../types/Hall.types";
 import axiosInstance from "../../config/axiosInstance";
+import { toast } from "react-toastify";
 
 type props = {
   images: string[];
@@ -34,8 +35,14 @@ export default function ImageCarousel({ images, setHallData }: props) {
           },
         }
       );
+      toast.promise(Promise.resolve(response.status === 200), {
+        pending: "Uploading your image...",
+        success: "Image uploaded succesfully",
+        error: "Failed to upload image",
+      });
       const { imageUrl } = response.data;
       setHallData((prev) => ({ ...prev, images: [...prev.images, imageUrl] }));
+      setNewImage(null)
     } catch (error) {
       console.error("Error uploading image:", error);
     }

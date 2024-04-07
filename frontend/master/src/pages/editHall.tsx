@@ -83,7 +83,7 @@ export default function EditHall() {
             />
           </div>
           {JSON.stringify(databaseHallData) !== JSON.stringify(hallData) && (
-            <div className="flex flex-col items-center gap-3 fixed top-5 bg-white px-3 py-2 border-gray-400 rounded-md shadow-md">
+            <div className="w-full flex flex-col items-center gap-3 fixed z-20 top-0 bg-white px-3 py-2 border-gray-400 rounded-md shadow-md">
               <p>Confirm the changes you just made</p>
               <div className="flex gap-5">
                 <button
