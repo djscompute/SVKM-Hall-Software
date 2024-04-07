@@ -121,8 +121,9 @@ export async function removeBookingHandler(req: Request, res: Response) {
 //Handler to get Session details during a range including user info
 export async function getBookingHandler(req: Request, res: Response) {
   try {
-    const { from, to } = req.query;
+    const { from, to, hallId } = req.query;
     const bookings = await BookingModel.find({
+      hallId: hallId,
       from: { $gte: from },
       to: { $lte: to },
     });

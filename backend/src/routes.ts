@@ -15,7 +15,7 @@ import {
   loginAdminHandler,
   logoutAdminHandler,
 } from "./controller/admin.controller";
-import { validateRequest, validateCookie } from "./middleware/validator";
+import { validateRequest, validateCookie, validateLogin } from "./middleware/validator";
 import { AddHallZodSchema, RemoveHallZodSchema } from "./schema/hall.schema";
 import {
   CreateAdminZodSchema,
@@ -54,6 +54,11 @@ export default function routes(app: Express) {
       return res.status(200).send("Hello World");
     },
   ]);
+
+  //Chek if user is logged in
+  app.get("/isLoggedIn", [validateLogin, (req: Request, res: Response) => {
+    return res.status(200).json({ isLoggedIn: true });
+  }]);
 
   //Login a admin
   app.post("/loginAdmin", [
