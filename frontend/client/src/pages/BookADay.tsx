@@ -78,13 +78,15 @@ function BookADay() {
           price: price,
           hallId: id,
           session_id: selectedSessionId,
-          from: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-            ?.from as string
-            }`,
-          to: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-            ?.to as string
-            }`,
-          purpose:purpose,
+          from: `${day}T${
+            HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
+              ?.from as string
+          }`,
+          to: `${day}T${
+            HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
+              ?.to as string
+          }`,
+          purpose: purpose,
         })
         .then((response) => {
           console.log(response.data);
@@ -108,16 +110,24 @@ function BookADay() {
               mobile: mobileNumber,
               hallName: HallData?.name,
               sessionType: selectedSessionId,
-              sessionName: HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.name,
+              sessionName: HallData?.sessions.find(
+                (ecssn) => ecssn._id == selectedSessionId
+              )?.name,
               estimatedPrice: price,
               additionalFeatures: selectedFeatures,
               date: humanReadableDate,
-              startTime: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.from
-                }`,
-              endTime: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
-                }`,
+              startTime: `${day}T${
+                HallData?.sessions.find(
+                  (ecssn) => ecssn._id == selectedSessionId
+                )?.from
+              }`,
+              endTime: `${day}T${
+                HallData?.sessions.find(
+                  (ecssn) => ecssn._id == selectedSessionId
+                )?.to
+              }`,
               status: "ENQUIRY",
-              eventPurpose:purpose
+              eventPurpose: purpose,
             },
           },
         });
@@ -128,12 +138,13 @@ function BookADay() {
     },
     onError: (error: AxiosError) => {
       if (error.response && error.response.status === 400) {
-        toast.error("Oops!!Session booked already. Cannot enquire for a session which is already booked. Please try to enquire for the sessions not booked.");
+        toast.error(
+          "Oops!!Session booked already. Cannot enquire for a session which is already booked. Please try to enquire for the sessions not booked."
+        );
       } else {
         console.error("An error occurred:", error);
       }
     },
-
   });
 
   const handleSubmit = () => {
@@ -191,11 +202,13 @@ function BookADay() {
         price: price,
         hallId: id,
         session_id: selectedSessionId,
-        from: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-          ?.from
-          }`,
-        to: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
-          }`,
+        from: `${day}T${
+          HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
+            ?.from
+        }`,
+        to: `${day}T${
+          HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
+        }`,
       };
       console.log(yes);
       addBookingMutation.mutate();
@@ -247,9 +260,13 @@ function BookADay() {
       <h1 className="text-3xl font-semibold">
         Book {HallData?.name} for {humanReadableDate}
       </h1>
-      <span><b>Estimated Price :</b> ₹{price} + GST (if applicable)</span>
+      <span>
+        <b>Estimated Price :</b> ₹{price} + GST (if applicable)
+      </span>
       <div className="flex flex-col gap-4">
-        <label htmlFor="session"><b>Session Type</b></label>
+        <label htmlFor="session">
+          <b>Session Type</b>
+        </label>
         <select
           className="p-2 rounded-md"
           id="session"
@@ -263,8 +280,9 @@ function BookADay() {
             <option
               key={eachSession._id}
               value={eachSession._id}
-              className={`flex flex-col text-center ${!eachSession.active && "hidden"
-                }`}
+              className={`flex flex-col text-center ${
+                !eachSession.active && "hidden"
+              }`}
             >
               {eachSession.name} |{" "}
               {convert_IST_TimeString_To12HourFormat(
@@ -274,7 +292,9 @@ function BookADay() {
             </option>
           ))}
         </select>
-        <label htmlFor="booking"><b>Booking Type</b></label>
+        <label htmlFor="booking">
+          <b>Booking Type</b>
+        </label>
         {selectedSessionId && (
           <select
             className="p-2 rounded-md"
@@ -298,7 +318,9 @@ function BookADay() {
               ))}
           </select>
         )}
-        <label htmlFor="name"><b>Customer Name</b></label>
+        <label htmlFor="name">
+          <b>Customer Name</b>
+        </label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="name"
@@ -307,7 +329,9 @@ function BookADay() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <label htmlFor="person"><b>Contact Person</b></label>
+        <label htmlFor="person">
+          <b>Contact Person</b>
+        </label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="person"
@@ -326,7 +350,9 @@ function BookADay() {
           <label htmlFor="same"> Same as Customer Name</label>
         </span>
         {errors.name && <p className="text-red-500">{errors.name}</p>}
-        <label htmlFor="email"><b>Email</b></label>
+        <label htmlFor="email">
+          <b>Email</b>
+        </label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="email"
@@ -336,7 +362,9 @@ function BookADay() {
           onChange={(e) => setEmail(e.target.value)}
         />
         {errors.email && <p className="text-red-500">{errors.email}</p>}
-        <label htmlFor="mobile"><b>Mobile</b></label>
+        <label htmlFor="mobile">
+          <b>Mobile</b>
+        </label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="mobile"
@@ -373,20 +401,27 @@ function BookADay() {
         */}
         {/* Purpose of Booking */}
         <div>
-          <label htmlFor="person"><b>Purpose (Event Type)</b></label>
+          <label htmlFor="person">
+            <b>Purpose (Event Type)</b>
+          </label>
           <div>
-            <p>The following types of events are not allowed to be booked at this hall:</p>
-            {HallData && HallData.eventRestrictions && HallData.eventRestrictions.length > 0 ? (
-              <p>
-                {HallData?.eventRestrictions}
+            <p className=" text-xs text-red-500 font-semibold">
+              The following types of events are not allowed to be booked at this
+              hall:
+            </p>
+            {HallData &&
+            HallData.eventRestrictions &&
+            HallData.eventRestrictions.length > 0 ? (
+              <p className=" text-xs text-red-500 font-semibold">
+                - {HallData?.eventRestrictions}
               </p>
             ) : (
-              <p>No restrictions</p>
+              <p>- No restrictions</p>
             )}
           </div>
-          <br/>
+          <br />
           <input
-            className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+            className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1 w-full"
             type="text"
             placeholder="Purpose of booking"
             value={purpose}
@@ -394,7 +429,9 @@ function BookADay() {
           />
         </div>
 
-        <h6><b>Additional Features</b></h6>
+        <h6>
+          <b>Additional Features</b>
+        </h6>
         {HallData?.additionalFeatures?.map((eachFeature) => (
           <span className="flex items-center gap-2" key={eachFeature.heading}>
             <input
@@ -422,10 +459,11 @@ function BookADay() {
         </div>
         <button
           onClick={handleSubmit}
-          className={`font-bold py-2 px-4 rounded cursor-pointer ${isDetailsConfirmed
-            ? "bg-green-500 hover:bg-green-700 text-white"
-            : "bg-gray-500 text-white"
-            }`}
+          className={`font-bold py-2 px-4 rounded cursor-pointer ${
+            isDetailsConfirmed
+              ? "bg-green-500 hover:bg-green-700 text-white"
+              : "bg-gray-500 text-white"
+          }`}
           value="Submit"
           disabled={!isDetailsConfirmed}
         >
