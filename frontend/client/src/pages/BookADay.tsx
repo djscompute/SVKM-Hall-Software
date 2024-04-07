@@ -268,7 +268,7 @@ function BookADay() {
           <b>Session Type</b>
         </label>
         <select
-          className="p-2 rounded-md"
+          className="p-2 rounded-md border border-black"
           id="session"
           value={selectedSessionId}
           onChange={(e) => {
