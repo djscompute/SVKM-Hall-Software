@@ -47,7 +47,7 @@ export interface EachHallType {
 
 export type bookingStatusType =
   | "CONFIRMED"
-  | "TENTATIVE"
+  //| "TENTATIVE"
   | "CANCELLED"
   | "ENQUIRY";
 

@@ -8,7 +8,7 @@ import {
 ////////////////////////////////////////////
 // Define ur custom type below here
 
-
+export type bookingStatusType = "ENQUIRY" | "CONFIRMED" | "EMPTY";
 
 
 // Define ur custom type above here

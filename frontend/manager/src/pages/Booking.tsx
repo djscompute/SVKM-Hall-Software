@@ -14,7 +14,7 @@ import { queryClient } from "../App";
 
 const possibleBookingTypes: bookingStatusType[] = [
   "CONFIRMED",
-  "TENTATIVE",
+  //"TENTATIVE",
   "CANCELLED",
   "ENQUIRY",
 ];

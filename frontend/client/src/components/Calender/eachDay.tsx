@@ -64,7 +64,8 @@ function EachDay({
   );
 
   // PRIORITY to show the booked sesison in frontend. if more that one booking with different status exists.
-  const priority = { CONFIRMED: 1, TENTATIVE: 2, ENQUIRY: 3 };
+  //const priority = { CONFIRMED: 1, TENTATIVE: 2, ENQUIRY: 3 };
+  const priority = { CONFIRMED: 1, ENQUIRY: 2};
 
   // sort sessions in priority of status
   allBookingData.sort(
