@@ -3,7 +3,7 @@ import { getSlotColour } from "../../utils/getSlotColour";
 
 const possibleBookingStatus: bookingStatusType[] = [
   "CONFIRMED",
-  "TENTATIVE",
+  //"TENTATIVE",
   "ENQUIRY",
 ];
 
@@ -19,6 +19,7 @@ function Legends() {
           </span>
         </span>
       </div>
+      {/*
       <div className="flex gap-1">
         <div className={`${getSlotColour("TENTATIVE")} h-5 w-5 rounded-sm`} />
         <span className="text-sm">
@@ -29,6 +30,7 @@ function Legends() {
           </span>
         </span>
       </div>
+      */}
       <div className="flex gap-1">
         <div className={`${getSlotColour("ENQUIRY")} h-5 w-5 rounded-sm`} />
         <span className="text-sm">
