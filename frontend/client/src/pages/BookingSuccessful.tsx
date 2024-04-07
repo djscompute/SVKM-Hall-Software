@@ -35,6 +35,7 @@ const BookingSuccessful = () => {
             <p><span className="font-semibold">Contact Person:</span> {bookingDetails.contact}</p>
             <p><span className="font-semibold">Email:</span> {bookingDetails.email}</p>
             <p><span className="font-semibold">Mobile Number:</span> {bookingDetails.mobile}</p>
+            <p><span className="font-semibold">Event Type (Purpose):</span> {bookingDetails.eventPurpose}</p>
             <p><span className="font-semibold">Current Status:</span> {bookingDetails.status}</p>
           </div>
         </>

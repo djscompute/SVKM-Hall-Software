@@ -43,6 +43,7 @@ const BookingSchema = new mongoose.Schema<HallBookingType>(
     session_id: { type: String, required: true },
     from: { type: String, required: true },
     to: { type: String, required: true },
+    purpose: { type: String, required: true },
   },
   { timestamps: true }
 );

@@ -48,6 +48,7 @@ const HallSchema = new mongoose.Schema<EachHallType>(
     },
     images: { type: [String], required: true },
     sessions: { type: [HallSessionSchema], required: true },
+    eventRestrictions : {type: String, required: true},
   },
   {
     timestamps: true,

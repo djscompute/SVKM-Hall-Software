@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { useParams , useNavigate} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "../config/axiosInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -11,8 +11,9 @@ import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_Time
 import { useState, useEffect } from "react";
 import { queryClient } from "../App";
 import { isValidEmail } from "../utils/validateEmail";
-import { isValidMobile } from "../utils/validateMobile"; 
+import { isValidMobile } from "../utils/validateMobile";
 import { AxiosError } from "axios";
+import Hall from "./Hall";
 
 function BookADay() {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ function BookADay() {
   //const [aadharNumber, setAadharNumber] = useState("");
   //const [panCard, setPanCard] = useState("");
   //const [address, setAddress] = useState("");
+  const [purpose, setPurpose] = useState("");
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -84,14 +86,15 @@ function BookADay() {
             HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
               ?.to as string
           }`,
+          purpose: purpose,
         })
         .then((response) => {
           console.log(response.data);
-          return response.data; 
+          return response.data;
         })
         .catch((error) => {
           console.log(error);
-          throw error; 
+          throw error;
         }),
     mutationKey: ["addhall"],
     onSuccess: async (data) => {
@@ -106,18 +109,25 @@ function BookADay() {
               email: email,
               mobile: mobileNumber,
               hallName: HallData?.name,
-              sessionType:selectedSessionId,
-              sessionName:HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.name,
-              estimatedPrice:price,
-              additionalFeatures:selectedFeatures,
-              date:humanReadableDate,
+              sessionType: selectedSessionId,
+              sessionName: HallData?.sessions.find(
+                (ecssn) => ecssn._id == selectedSessionId
+              )?.name,
+              estimatedPrice: price,
+              additionalFeatures: selectedFeatures,
+              date: humanReadableDate,
               startTime: `${day}T${
-                HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.from
+                HallData?.sessions.find(
+                  (ecssn) => ecssn._id == selectedSessionId
+                )?.from
               }`,
               endTime: `${day}T${
-                HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
+                HallData?.sessions.find(
+                  (ecssn) => ecssn._id == selectedSessionId
+                )?.to
               }`,
               status: "ENQUIRY",
+              eventPurpose: purpose,
             },
           },
         });
@@ -128,12 +138,13 @@ function BookADay() {
     },
     onError: (error: AxiosError) => {
       if (error.response && error.response.status === 400) {
-        toast.error("Oops!!Session booked already. Cannot enquire for a session which is already booked. Please try to enquire for the sessions not booked.");
+        toast.error(
+          "Oops!!Session booked already. Cannot enquire for a session which is already booked. Please try to enquire for the sessions not booked."
+        );
       } else {
         console.error("An error occurred:", error);
       }
     },
-  
   });
 
   const handleSubmit = () => {
@@ -249,9 +260,13 @@ function BookADay() {
       <h1 className="text-3xl font-semibold">
         Book {HallData?.name} for {humanReadableDate}
       </h1>
-      <span><b>Estimated Price :</b> ₹{price} + GST (if applicable)</span>
+      <span>
+        <b>Estimated Price :</b> ₹{price} + GST (if applicable)
+      </span>
       <div className="flex flex-col gap-4">
-        <label htmlFor="session"><b>Session Type</b></label>
+        <label htmlFor="session">
+          <b>Session Type</b>
+        </label>
         <select
           className="p-2 rounded-md"
           id="session"
@@ -277,7 +292,9 @@ function BookADay() {
             </option>
           ))}
         </select>
-        <label htmlFor="booking"><b>Booking Type</b></label>
+        <label htmlFor="booking">
+          <b>Booking Type</b>
+        </label>
         {selectedSessionId && (
           <select
             className="p-2 rounded-md"
@@ -301,7 +318,9 @@ function BookADay() {
               ))}
           </select>
         )}
-        <label htmlFor="name"><b>Customer Name</b></label>
+        <label htmlFor="name">
+          <b>Customer Name</b>
+        </label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="name"
@@ -310,7 +329,9 @@ function BookADay() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <label htmlFor="person"><b>Contact Person</b></label>
+        <label htmlFor="person">
+          <b>Contact Person</b>
+        </label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="person"
@@ -329,7 +350,9 @@ function BookADay() {
           <label htmlFor="same"> Same as Customer Name</label>
         </span>
         {errors.name && <p className="text-red-500">{errors.name}</p>}
-        <label htmlFor="email"><b>Email</b></label>
+        <label htmlFor="email">
+          <b>Email</b>
+        </label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="email"
@@ -339,7 +362,9 @@ function BookADay() {
           onChange={(e) => setEmail(e.target.value)}
         />
         {errors.email && <p className="text-red-500">{errors.email}</p>}
-        <label htmlFor="mobile"><b>Mobile</b></label>
+        <label htmlFor="mobile">
+          <b>Mobile</b>
+        </label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="mobile"
@@ -374,7 +399,39 @@ function BookADay() {
           onChange={(e) => setAddress(e.target.value)}
         />
         */}
-        <h6>Additional Features</h6>
+        {/* Purpose of Booking */}
+        <div>
+          <label htmlFor="person">
+            <b>Purpose (Event Type)</b>
+          </label>
+          <div>
+            <p className=" text-xs text-red-500 font-semibold">
+              The following types of events are not allowed to be booked at this
+              hall:
+            </p>
+            {HallData &&
+            HallData.eventRestrictions &&
+            HallData.eventRestrictions.length > 0 ? (
+              <p className=" text-xs text-red-500 font-semibold">
+                - {HallData?.eventRestrictions}
+              </p>
+            ) : (
+              <p>- No restrictions</p>
+            )}
+          </div>
+          <br />
+          <input
+            className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1 w-full"
+            type="text"
+            placeholder="Purpose of booking"
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value)}
+          />
+        </div>
+
+        <h6>
+          <b>Additional Features</b>
+        </h6>
         {HallData?.additionalFeatures?.map((eachFeature) => (
           <span className="flex items-center gap-2" key={eachFeature.heading}>
             <input
@@ -396,19 +453,19 @@ function BookADay() {
             onChange={(e) => setIsDetailsConfirmed(e.target.checked)}
           />
           <label htmlFor="confirmDetails">
-              Re-check all the entered details (important that the email and
-              mobile details entered are correct)
+            Re-check all the entered details (important that the email and
+            mobile details entered are correct)
           </label>
         </div>
         <button
-            onClick={handleSubmit}
-            className={`font-bold py-2 px-4 rounded cursor-pointer ${
+          onClick={handleSubmit}
+          className={`font-bold py-2 px-4 rounded cursor-pointer ${
             isDetailsConfirmed
-                ? "bg-green-500 hover:bg-green-700 text-white"
-                : "bg-gray-500 text-white"
-            }`}
-            value="Submit"
-            disabled={!isDetailsConfirmed}
+              ? "bg-green-500 hover:bg-green-700 text-white"
+              : "bg-gray-500 text-white"
+          }`}
+          value="Submit"
+          disabled={!isDetailsConfirmed}
         >
           Enquire
         </button>

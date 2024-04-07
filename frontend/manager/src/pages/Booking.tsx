@@ -105,6 +105,12 @@ function Booking() {
         <span className="w-full text-left">Email Id : </span>
         <span className="w-full text-right">{data?.user.email || "-"}</span>
       </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Purpose (Event Type) : </span>
+        <span className="w-full text-right">
+          {data?.purpose ? data.purpose : "N/A"}
+        </span>
+      </div>
       {/*
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Pan No. : </span>

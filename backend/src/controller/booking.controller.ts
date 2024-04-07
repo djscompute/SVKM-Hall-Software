@@ -14,6 +14,7 @@ export async function addBookingHandler(req: Request, res: Response) {
       from,
       to,
       time,
+      purpose,
     } = req.body as HallBookingType;
 
     // Check for existing bookings within the specified time range
@@ -47,6 +48,7 @@ export async function addBookingHandler(req: Request, res: Response) {
       from,
       to,
       time,
+      purpose,
     });
     await newBooking.save();
     console.log("added new booking");
@@ -69,6 +71,7 @@ export async function editBookingHandler(req: Request, res: Response) {
       from,
       to,
       time,
+      purpose,
     } = req.body as HallBookingType;
     const bookingId: string = req.params.id;
 
@@ -84,6 +87,7 @@ export async function editBookingHandler(req: Request, res: Response) {
         from,
         to,
         time,
+        purpose,
       },
       { new: true }
     );
