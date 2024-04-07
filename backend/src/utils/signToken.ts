@@ -6,7 +6,7 @@ import { jwtPayload, jwtPayloadToken } from "../types/jwtPayload";
 //signAccessToken fnc
 export function signAccessToken(res: Response, payload: jwtPayload) {
   const PRIVATE_KEY = config.get<string>("PRIVATE_KEY");
-  const token = jwt.sign({ ...payload }, PRIVATE_KEY, { expiresIn: "300s" });
+  const token = jwt.sign({ ...payload }, PRIVATE_KEY, { expiresIn: "2d" });
   res.cookie("accessToken", token, {
     httpOnly: true,
     // maxAge: 20000, //20 sec
@@ -23,7 +23,7 @@ export function signRefreshToken(res: Response, payload: jwtPayload): string {
   });
   res.cookie("refreshToken", token, {
     httpOnly: true,
-    maxAge: 172800000, // 2days
+    maxAge: 31557600000, // 1 year
     // secure: true,
   });
   return token;

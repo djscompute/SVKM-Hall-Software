@@ -6,22 +6,6 @@ import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
 
 const NavBar = () => {
-  const navigate= useNavigate()
-  useQuery({
-    queryKey: ["loggedIn"],
-    queryFn: async () => {
-
-        const response = await axiosInstance.get("isLoggedIn");
-        if(!(response.data.isLoggedIn)){
-          navigate('/login')
-          return response.data;
-        }
-        else{
-          return null
-        }
-    },
-  });
-
   const [open, setOpen] = useState(false);
 
   const [isAuthenticated, user, logout] = useAuthStore((store) => [
@@ -29,6 +13,21 @@ const NavBar = () => {
     store.user,
     store.logout,
   ]);
+  const navigate = useNavigate();
+  
+  useQuery({
+    queryKey: ["loggedIn"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("isLoggedIn");
+      if (!response.data.isLoggedIn) {
+        logout();
+        navigate("/login");
+        return response.data;
+      } else {
+        return null;
+      }
+    },
+  });
 
   const handleLogout = async () => {
     try {
@@ -38,7 +37,7 @@ const NavBar = () => {
         logout();
         toast.success("logged Out");
         console.log(data);
-        navigate('/login')
+        navigate("/login");
       } else {
         toast.error("error while logging you out.");
       }
@@ -95,8 +94,7 @@ const NavBar = () => {
               {isAuthenticated ? (
                 <div className="flex items-center gap-2">
                   <span>
-                    <span className=" text-gray-500">master</span>{" "}
-                    {user?.email}
+                    <span className=" text-gray-500">master</span> {user?.email}
                   </span>
                   <span
                     onClick={handleLogout}
