@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { useParams , useNavigate} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "../config/axiosInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -11,8 +11,9 @@ import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_Time
 import { useState, useEffect } from "react";
 import { queryClient } from "../App";
 import { isValidEmail } from "../utils/validateEmail";
-import { isValidMobile } from "../utils/validateMobile"; 
+import { isValidMobile } from "../utils/validateMobile";
 import { AxiosError } from "axios";
+import Hall from "./Hall";
 
 function BookADay() {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ function BookADay() {
   //const [aadharNumber, setAadharNumber] = useState("");
   //const [panCard, setPanCard] = useState("");
   //const [address, setAddress] = useState("");
+  const [purpose, setPurpose] = useState("");
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -76,22 +78,21 @@ function BookADay() {
           price: price,
           hallId: id,
           session_id: selectedSessionId,
-          from: `${day}T${
-            HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-              ?.from as string
-          }`,
-          to: `${day}T${
-            HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-              ?.to as string
-          }`,
+          from: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
+            ?.from as string
+            }`,
+          to: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
+            ?.to as string
+            }`,
+          purpose:purpose,
         })
         .then((response) => {
           console.log(response.data);
-          return response.data; 
+          return response.data;
         })
         .catch((error) => {
           console.log(error);
-          throw error; 
+          throw error;
         }),
     mutationKey: ["addhall"],
     onSuccess: async (data) => {
@@ -106,18 +107,17 @@ function BookADay() {
               email: email,
               mobile: mobileNumber,
               hallName: HallData?.name,
-              sessionType:selectedSessionId,
-              sessionName:HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.name,
-              estimatedPrice:price,
-              additionalFeatures:selectedFeatures,
-              date:humanReadableDate,
-              startTime: `${day}T${
-                HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.from
-              }`,
-              endTime: `${day}T${
-                HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
-              }`,
+              sessionType: selectedSessionId,
+              sessionName: HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.name,
+              estimatedPrice: price,
+              additionalFeatures: selectedFeatures,
+              date: humanReadableDate,
+              startTime: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.from
+                }`,
+              endTime: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
+                }`,
               status: "ENQUIRY",
+              eventPurpose:purpose
             },
           },
         });
@@ -133,7 +133,7 @@ function BookADay() {
         console.error("An error occurred:", error);
       }
     },
-  
+
   });
 
   const handleSubmit = () => {
@@ -191,13 +191,11 @@ function BookADay() {
         price: price,
         hallId: id,
         session_id: selectedSessionId,
-        from: `${day}T${
-          HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-            ?.from
-        }`,
-        to: `${day}T${
-          HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
-        }`,
+        from: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
+          ?.from
+          }`,
+        to: `${day}T${HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
+          }`,
       };
       console.log(yes);
       addBookingMutation.mutate();
@@ -265,9 +263,8 @@ function BookADay() {
             <option
               key={eachSession._id}
               value={eachSession._id}
-              className={`flex flex-col text-center ${
-                !eachSession.active && "hidden"
-              }`}
+              className={`flex flex-col text-center ${!eachSession.active && "hidden"
+                }`}
             >
               {eachSession.name} |{" "}
               {convert_IST_TimeString_To12HourFormat(
@@ -374,7 +371,30 @@ function BookADay() {
           onChange={(e) => setAddress(e.target.value)}
         />
         */}
-        <h6>Additional Features</h6>
+        {/* Purpose of Booking */}
+        <div>
+          <label htmlFor="person"><b>Purpose (Event Type)</b></label>
+          <div>
+            <p>The following types of events are not allowed to be booked at this hall:</p>
+            {HallData && HallData.eventRestrictions && HallData.eventRestrictions.length > 0 ? (
+              <p>
+                {HallData?.eventRestrictions}
+              </p>
+            ) : (
+              <p>No restrictions</p>
+            )}
+          </div>
+          <br/>
+          <input
+            className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+            type="text"
+            placeholder="Purpose of booking"
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value)}
+          />
+        </div>
+
+        <h6><b>Additional Features</b></h6>
         {HallData?.additionalFeatures?.map((eachFeature) => (
           <span className="flex items-center gap-2" key={eachFeature.heading}>
             <input
@@ -396,19 +416,18 @@ function BookADay() {
             onChange={(e) => setIsDetailsConfirmed(e.target.checked)}
           />
           <label htmlFor="confirmDetails">
-              Re-check all the entered details (important that the email and
-              mobile details entered are correct)
+            Re-check all the entered details (important that the email and
+            mobile details entered are correct)
           </label>
         </div>
         <button
-            onClick={handleSubmit}
-            className={`font-bold py-2 px-4 rounded cursor-pointer ${
-            isDetailsConfirmed
-                ? "bg-green-500 hover:bg-green-700 text-white"
-                : "bg-gray-500 text-white"
+          onClick={handleSubmit}
+          className={`font-bold py-2 px-4 rounded cursor-pointer ${isDetailsConfirmed
+            ? "bg-green-500 hover:bg-green-700 text-white"
+            : "bg-gray-500 text-white"
             }`}
-            value="Submit"
-            disabled={!isDetailsConfirmed}
+          value="Submit"
+          disabled={!isDetailsConfirmed}
         >
           Enquire
         </button>

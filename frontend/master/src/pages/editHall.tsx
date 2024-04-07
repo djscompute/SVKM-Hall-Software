@@ -13,6 +13,7 @@ import { useParams } from "react-router-dom";
 import { queryClient } from "../App";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import HallRestrictions from "../components/editHall/HallRestrictions";
 
 export default function EditHall() {
   let { id: HallID } = useParams();
@@ -116,6 +117,12 @@ export default function EditHall() {
           />
           <HallCapacity
             capacity={hallData.capacity}
+            setHallData={
+              setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
+            }
+          />
+          <HallRestrictions
+            eventRestrictions={hallData.eventRestrictions}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }

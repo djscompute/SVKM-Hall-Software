@@ -29,7 +29,9 @@ export const AddBookingZodSchema = z.object({
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
     from: z.string(stringErrorHandler("from")),
-    to: z.string(stringErrorHandler("to"))
+    to: z.string(stringErrorHandler("to")),
+    purpose: z.string(stringErrorHandler("purpose")),
+
   }),
 });
 
