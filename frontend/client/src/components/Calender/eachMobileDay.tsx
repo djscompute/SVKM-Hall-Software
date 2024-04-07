@@ -53,7 +53,8 @@ function EachMobileDay({
   });
 
   // PRIORITY to show the booked sesison in frontend. if more that one booking with different status exists.
-  const priority = { CONFIRMED: 1, TENTATIVE: 2, ENQUIRY: 3 };
+  //const priority = { CONFIRMED: 1, TENTATIVE: 2, ENQUIRY: 3 };
+  const priority = { CONFIRMED: 1,ENQUIRY: 2 };
 
   // sort sessions in priority of status
   allBookingData.sort(
@@ -92,8 +93,10 @@ function EachMobileDay({
         return "bg-blue-200";
       case "CONFIRMED":
         return "bg-red-200";
+      /*
       case "TENTATIVE":
         return "bg-orange-200";
+      */
       default:
         return "bg-white";
     }
