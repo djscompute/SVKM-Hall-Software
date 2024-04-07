@@ -7,8 +7,12 @@ const BookingSuccessful = () => {
   const extractTime = (dateTimeString:string) => {
     return dateTimeString.split("T")[1].split(".")[0]; 
   };
+  const extractDate = (dateTimeString:string) => {
+    return dateTimeString.split("T")[0]; 
+  };
   const from = convert_IST_TimeString_To12HourFormat(extractTime(bookingDetails.startTime));
   const to = convert_IST_TimeString_To12HourFormat(extractTime(bookingDetails.endTime));
+  const date = extractDate(bookingDetails.startTime);
 
   return (
     <div className="flex flex-col items-center py-10 gap-6 md:w-2/3 lg:w-1/2 mx-auto">
@@ -20,6 +24,7 @@ const BookingSuccessful = () => {
             <h2 className="text-lg font-semibold mb-2">Hall Details:</h2>
             <p><span className="font-semibold">Name:</span> {bookingDetails.hallName}</p>
             <p><span className="font-semibold">Session Name:</span> {bookingDetails.sessionName}</p>
+            <p><span className="font-semibold">Date:</span> {date}</p>
             <p><span className="font-semibold">Time:</span> {from} - {to}</p>
             <p><span className="font-semibold">Estimated Cost:</span> ₹{bookingDetails.estimatedPrice}</p>
             <p><span className="font-semibold">Additional Features:</span> {bookingDetails.selectedFeatures ?? "None"}</p>

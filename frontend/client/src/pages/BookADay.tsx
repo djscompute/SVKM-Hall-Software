@@ -34,7 +34,7 @@ function BookADay() {
   const [selectedFeatures, setSelectedFeatures] = useState<{
     [key: string]: EachHallAdditonalFeaturesType;
   }>({});
-  const [price, setPrice] = useState<number>();
+  const [price, setPrice] = useState<number>(0);
   const [isSame, setIsSame] = useState<boolean>(false);
   const [isDetailsConfirmed, setIsDetailsConfirmed] = useState<boolean>(false);
 
@@ -240,8 +240,8 @@ function BookADay() {
   }, [selectedFeatures, selectedSessionId, selectedCategory]);
 
   useEffect(() => {
-    setSelectedSessionId(HallData?.sessions[0]._id);
-    setSelectedCategory(HallData?.sessions[0].price[0].categoryName);
+    //setSelectedSessionId(HallData?.sessions[0]._id);
+    //setSelectedCategory(HallData?.sessions[0].price[0].categoryName);
   }, [HallData]);
 
   return (
@@ -249,9 +249,9 @@ function BookADay() {
       <h1 className="text-3xl font-semibold">
         Book {HallData?.name} for {humanReadableDate}
       </h1>
-      <span>Estimated Price : ₹{price} + GST (if applicable)</span>
+      <span><b>Estimated Price :</b> ₹{price} + GST (if applicable)</span>
       <div className="flex flex-col gap-4">
-        <label htmlFor="session">Session Type</label>
+        <label htmlFor="session"><b>Session Type</b></label>
         <select
           className="p-2 rounded-md"
           id="session"
@@ -260,6 +260,7 @@ function BookADay() {
             setSelectedSessionId(e.target.value);
           }}
         >
+          <option value="">Select your session type</option>
           {HallData?.sessions?.map((eachSession) => (
             <option
               key={eachSession._id}
@@ -276,7 +277,7 @@ function BookADay() {
             </option>
           ))}
         </select>
-        <label htmlFor="booking">Booking Type</label>
+        <label htmlFor="booking"><b>Booking Type</b></label>
         {selectedSessionId && (
           <select
             className="p-2 rounded-md"
@@ -286,6 +287,7 @@ function BookADay() {
               setSelectedCategory(e.target.value);
             }}
           >
+            <option value="">Select your booking type</option>
             {HallData?.sessions
               .find((ss) => ss._id == selectedSessionId)
               ?.price?.map((eachSessionCategory) => (
@@ -299,7 +301,7 @@ function BookADay() {
               ))}
           </select>
         )}
-        <label htmlFor="name">Customer Name</label>
+        <label htmlFor="name"><b>Customer Name</b></label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="name"
@@ -308,7 +310,7 @@ function BookADay() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <label htmlFor="person">Contact Person</label>
+        <label htmlFor="person"><b>Contact Person</b></label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="person"
@@ -327,7 +329,7 @@ function BookADay() {
           <label htmlFor="same"> Same as Customer Name</label>
         </span>
         {errors.name && <p className="text-red-500">{errors.name}</p>}
-        <label htmlFor="email">Email</label>
+        <label htmlFor="email"><b>Email</b></label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="email"
@@ -337,7 +339,7 @@ function BookADay() {
           onChange={(e) => setEmail(e.target.value)}
         />
         {errors.email && <p className="text-red-500">{errors.email}</p>}
-        <label htmlFor="mobile">Mobile</label>
+        <label htmlFor="mobile"><b>Mobile</b></label>
         <input
           className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
           id="mobile"
