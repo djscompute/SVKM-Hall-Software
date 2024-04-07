@@ -57,15 +57,6 @@ export const getBookingZodSchema = z.object({
   }),
 });
 
-// export const EditBookingZodSchema = z.object({
-//   body: z.object({
-//     user: z.object({
-//       aadharNo: z.string().optional(), // Make Aadhar number optional for editing
-//       panNo: z.string().optional(), // Make PAN number optional for editing
-//     }).optional(),
-//   }),
-// });
-
 //Zod schema for getting a session by ID
 export const getBookingByIdZodSchema = z.object({
   query: z.object({

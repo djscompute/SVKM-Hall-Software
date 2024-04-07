@@ -11,7 +11,7 @@ import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_Time
 import { useState, useEffect } from "react";
 import { queryClient } from "../App";
 import { isValidEmail } from "../utils/validateEmail";
-import { isValidMobile } from "../utils/validateMobile"; 
+import { isValidMobile } from "../utils/validateMobile";
 
 function BookADay() {
   const { id, day } = useParams();
@@ -63,9 +63,6 @@ function BookADay() {
             username: name,
             contact: person,
             email: email,
-            //aadharNo: aadharNumber,
-            //panNo: panCard,
-            //address: address,
             mobile: mobileNumber,
           },
           features: Object.values(selectedFeatures),
@@ -136,30 +133,6 @@ function BookADay() {
     setErrors({ name: "", email: "", mobileNumber: "" });
 
     if (!hasErrors) {
-      const yes = {
-        user: {
-          username: name,
-          contact: person,
-          email: email,
-          //aadharNo: aadharNumber,
-          //panNo: panCard,
-          //address: address,
-          mobile: mobileNumber,
-        },
-        features: Object.values(selectedFeatures),
-        status: "ENQUIRY",
-        price: price,
-        hallId: id,
-        session_id: selectedSessionId,
-        from: `${day}T${
-          HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-            ?.from
-        }`,
-        to: `${day}T${
-          HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
-        }`,
-      };
-      console.log(yes);
       addBookingMutation.mutate();
     }
   };

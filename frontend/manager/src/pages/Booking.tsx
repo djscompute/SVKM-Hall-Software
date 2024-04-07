@@ -23,7 +23,7 @@ function Booking() {
   const { bookingId } = useParams<{ bookingId: string }>();
   const [hallData, setHallData] = useState<EachHallType>();
   const [editingMode, setEditingMode] = useState(false);
-  const [editedData, setEditedData] = useState<Partial<HallBookingType>>({});
+  const [editedData, setEditedData] = useState<HallBookingType>();
 
   const { data, error, isFetching } = useQuery({
     queryKey: [`booking/${bookingId}`],
@@ -76,25 +76,18 @@ function Booking() {
     },
   });
 
-
   const handleEdit = () => {
     setEditingMode(true);
-    setEditedData({
-      ...editedData,
-      aadharNo: data?.user.aadharNo || "",
-      panNo: data?.user.panNo || "",
-    });
+    if (!editedData) {
+      setEditedData(data);
+    }
   };
 
   const handleSave = async () => {
-    const updatedData = {
-      ...data,
-      user: {
-        ...data?.user,
-        ...editedData,
-      },
-    };
-    const response = await axiosInstance.post(`/editBooking/${bookingId}`, updatedData);
+    const response = await axiosInstance.post(
+      `/editBooking/${bookingId}`,
+      editedData
+    );
     setEditingMode(false);
     await queryClient.refetchQueries({
       queryKey: [`booking/${bookingId}`],
@@ -111,7 +104,7 @@ function Booking() {
         <span className="w-full text-left">Name : </span>
         <span className="w-full text-right">{data?.user.username}</span>
       </div>
-     
+
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Mobile Number : </span>
         <span className="w-full text-right">{data?.user.mobile}</span>
@@ -121,14 +114,24 @@ function Booking() {
         <span className="w-full text-right">{data?.user?.contact}</span>
       </div>
 
-
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">Aadhar No : </span>
           <input
             type="text"
-            value={editedData.aadharNo}
-            onChange={(e) => setEditedData({ ...editedData, aadharNo: e.target.value })}
+            value={editedData?.user?.aadharNo}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    aadharNo: e.target.value,
+                  },
+                };
+              })
+            }
             placeholder="Enter Aadhar Number"
             className=" px-2"
           />
@@ -147,8 +150,20 @@ function Booking() {
           <span className="w-full text-left">Pan No. : </span>
           <input
             type="text"
-            value={editedData.panNo}
-            onChange={(e) => setEditedData({ ...editedData, panNo: e.target.value })}
+            value={editedData?.user?.panNo}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined; // Return undefined if prev is undefined
+
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    panNo: e.target.value,
+                  },
+                };
+              })
+            }
             placeholder="Enter PAN Number"
             className="px-2"
           />
@@ -167,7 +182,7 @@ function Booking() {
         <span className="w-full text-left">Email Id : </span>
         <span className="w-full text-right">{data?.user.email || "-"}</span>
       </div>
-      
+
       <span className=" text-lg font-medium">Slot</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">From : </span>
@@ -218,15 +233,23 @@ function Booking() {
       ))}
       <span className=" mb-3">STATUS: {data?.status}</span>
 
-
       {editingMode ? (
-        <button onClick={handleSave} className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg">Save Details</button>
+        <button
+          onClick={handleSave}
+          className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+        >
+          Save Details
+        </button>
       ) : (
-        <button onClick={handleEdit} className=" mb-2 bg-red-600 px-4 text-white py-1 rounded-lg">Edit Details</button>
+        <button
+          onClick={handleEdit}
+          className=" mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
+        >
+          Edit Details
+        </button>
       )}
 
-
-       <select
+      <select
         value={data?.status}
         onChange={(e) => {
           console.log(e.target.value);
