@@ -270,11 +270,6 @@ function BookADay() {
     setPrice(totalPrice);
   }, [selectedFeatures, selectedSessionId, selectedCategory]);
 
-  useEffect(() => {
-    //setSelectedSessionId(HallData?.sessions[0]._id);
-    //setSelectedCategory(HallData?.sessions[0].price[0].categoryName);
-  }, [HallData]);
-
   return (
     <div className="flex flex-col items-center py-10 gap-3">
       <h1 className="text-3xl font-semibold">
@@ -404,29 +399,6 @@ function BookADay() {
         {errors.mobileNumber && (
           <p className="text-red-500">{errors.mobileNumber}</p>
         )}
-        {/*
-        <input
-          className="p-2 border-gray-300 border rounded-md px-2 "
-          type="number"
-          placeholder="Aadhar Number"
-          value={aadharNumber}
-          onChange={(e) => setAadharNumber(e.target.value)}
-        />
-        <input
-          className="p-2 border-gray-300 border rounded-md px-2 "
-          type="text"
-          placeholder="Pan Card"
-          value={panCard}
-          onChange={(e) => setPanCard(e.target.value)}
-        />
-        <input
-          className="p-2 border-gray-300 border rounded-md px-2 "
-          type="text"
-          placeholder="Address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
-        */}
         {/* Purpose of Booking */}
         <div>
           <label htmlFor="person">
