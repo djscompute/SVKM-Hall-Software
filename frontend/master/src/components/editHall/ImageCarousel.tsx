@@ -35,7 +35,6 @@ export default function ImageCarousel({ images, setHallData }: props) {
           },
         }
       );
-      console.log("response toh aa gaya")
       // toast.promise(Promise.resolve(response.status === 200), {
       //   pending: "Uploading your image...",
       //   success: "Image uploaded succesfully",
