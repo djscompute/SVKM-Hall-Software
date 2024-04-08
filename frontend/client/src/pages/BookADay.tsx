@@ -79,6 +79,7 @@ function BookADay() {
           price: price,
           hallId: id,
           session_id: selectedSessionId,
+          booking_type: selectedCategory,
           from: `${day}T${
             HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
               ?.from as string
@@ -222,6 +223,7 @@ function BookADay() {
         price: price,
         hallId: id,
         session_id: selectedSessionId,
+        booking_type: selectedCategory,
         from: `${day}T${HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.from}`,
         to: `${day}T${HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to}`,
         purpose: purpose,

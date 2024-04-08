@@ -63,6 +63,7 @@ export type HallBookingType = {
   price: number; // obvio bro
   hallId: string;
   session_id: string; // the sesison id
+  booking_type: string;
   from: string; // starting time of session
   to: string; // ending time of session
   time: {

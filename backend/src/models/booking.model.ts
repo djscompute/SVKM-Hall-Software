@@ -43,6 +43,7 @@ const BookingSchema = new mongoose.Schema<HallBookingType>(
     price: { type: Number, required: true },
     hallId: { type: String, required: true },
     session_id: { type: String, required: true },
+    booking_type: { type: String, required: true },
     from: { type: String, required: true },
     to: { type: String, required: true },
     purpose: { type: String, required: true },

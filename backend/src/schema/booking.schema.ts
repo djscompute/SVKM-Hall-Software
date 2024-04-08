@@ -29,6 +29,7 @@ export const AddBookingZodSchema = z.object({
     price: z.number(stringErrorHandler("price")),
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
+    booking_type: z.string(stringErrorHandler("booking_type")),
     from: z.string(stringErrorHandler("from")),
     to: z.string(stringErrorHandler("to")),
     purpose: z.string(stringErrorHandler("purpose")),
