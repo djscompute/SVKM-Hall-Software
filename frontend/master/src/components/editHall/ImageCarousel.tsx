@@ -35,14 +35,15 @@ export default function ImageCarousel({ images, setHallData }: props) {
           },
         }
       );
-      toast.promise(Promise.resolve(response.status === 200), {
-        pending: "Uploading your image...",
-        success: "Image uploaded succesfully",
-        error: "Failed to upload image",
-      });
+      console.log("response toh aa gaya")
+      // toast.promise(Promise.resolve(response.status === 200), {
+      //   pending: "Uploading your image...",
+      //   success: "Image uploaded succesfully",
+      //   error: "Failed to upload image",
+      // });
       const { imageUrl } = response.data;
       setHallData((prev) => ({ ...prev, images: [...prev.images, imageUrl] }));
-      setNewImage(null)
+      // setNewImage(null);
     } catch (error) {
       console.error("Error uploading image:", error);
     }

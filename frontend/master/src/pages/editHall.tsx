@@ -23,7 +23,7 @@ export default function EditHall() {
   const { data: databaseHallData } = useQuery({
     queryKey: [`getHall/${HallID}`],
     queryFn: async () => {
-      try {
+      // try {
         console.log("FETCHING");
         const responsePromise = axiosInstance.get(`getHall/${HallID}`);
         toast.promise(responsePromise, {
@@ -34,11 +34,12 @@ export default function EditHall() {
         const response = await responsePromise;
         setHallData(response.data);
         return response.data as EachHallType;
-      } catch (error) {
-        throw error;
-      }
+      // } catch (error) {
+        // throw error;
+      // }
     },
   });
+  // console.log("upload hua",hallData)
 
   const editHallMutation = useMutation({
     mutationFn: async () => {
@@ -49,7 +50,7 @@ export default function EditHall() {
       );
       toast.promise(responsePromise, {
         pending: "Updating...",
-        success: "Hall Edited!",
+        success: "Hall Details Edited!",
         error: "Failed to Edit Hall. Please try again.",
       });
       const response = await responsePromise;
