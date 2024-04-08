@@ -30,6 +30,7 @@ function BookADay() {
   const [purpose, setPurpose] = useState("");
   const [errors, setErrors] = useState({
     name: "",
+    person: "",
     email: "",
     mobileNumber: "",
     purpose: "",
@@ -354,6 +355,7 @@ function BookADay() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
+        {errors.name && <p className="text-red-500">{errors.name}</p>}
         <label htmlFor="person">
           <b>Contact Person</b>
         </label>
@@ -375,7 +377,7 @@ function BookADay() {
           />
           <label htmlFor="same"> Same as Customer Name</label>
         </span>
-        {errors.name && <p className="text-red-500">{errors.name}</p>}
+        {errors.person && <p className="text-red-500">{errors.person}</p>}
         <label htmlFor="email">
           <b>Email</b>
         </label>
