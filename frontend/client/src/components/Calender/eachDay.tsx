@@ -8,6 +8,7 @@ import { convert_IST_DateTimeString_To12HourFormat } from "../../utils/convert_I
 import isBetween from "dayjs/plugin/isBetween"; // Import the timezone plugin
 import { getSlotColour } from "../../utils/getSlotColour";
 import { getSlotAbbreviation } from "../../utils/getSlotAbb";
+import { toast } from "react-toastify";
 
 dayjs.extend(isBetween);
 
@@ -21,6 +22,14 @@ type Props = {
   setSelectedMobileDate: React.Dispatch<React.SetStateAction<number>>;
 };
 
+interface OpenEnquireTabEvent extends React.MouseEvent<HTMLDivElement> {
+  currentTarget: HTMLDivElement & {
+    dataset: {
+      hallId: string;
+      date: string;
+    };
+  };
+}
 // @ts-ignore
 function EachDay({
   i,
@@ -65,7 +74,7 @@ function EachDay({
 
   // PRIORITY to show the booked sesison in frontend. if more that one booking with different status exists.
   //const priority = { CONFIRMED: 1, TENTATIVE: 2, ENQUIRY: 3 };
-  const priority = { CONFIRMED: 1, ENQUIRY: 2};
+  const priority = { CONFIRMED: 1, ENQUIRY: 2 };
 
   // sort sessions in priority of status
   allBookingData.sort(
@@ -97,7 +106,22 @@ function EachDay({
       finalArr.push(eachHallSession);
     }
   });
-
+  function openEnquireTab(event: OpenEnquireTabEvent) {
+    const hallId = event.currentTarget.dataset.hallId;
+    const dateAttribute = event.currentTarget.dataset.date;
+    const date = new Date(dateAttribute!); 
+    const today = new Date(); // Get today's date
+  
+    // Compare dates
+    if (date > today) {
+      console.log("date is:", dateAttribute);
+      const url = `${hallId}/${dateAttribute}`;
+      window.open(url, "_blank");
+    } else {
+      toast.error("Date is not in the future.");
+      console.log("Date is not in the future.");
+    }
+  }
   return (
     <div
       key={`day-${i}`}
@@ -137,7 +161,7 @@ function EachDay({
               </div>
             ))}
           </div>
-          <a
+          {/* <a
             className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 mt-1 rounded-md"
             href={`${hallId}/${dayjs(currentDate)
               .add(i - 1, "day")
@@ -145,7 +169,17 @@ function EachDay({
             target="_blank"
           >
             ENQUIRE
-          </a>
+          </a> */}
+          <div
+            className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 mt-1 rounded-md cursor-pointer"
+            onClick={openEnquireTab}
+            data-hall-id={hallId}
+            data-date={dayjs(currentDate)
+              .add(i - 1, "day")
+              .format("YYYY-MM-DD")}
+          >
+            ENQUIRE
+          </div>
         </>
       )}
     </div>
