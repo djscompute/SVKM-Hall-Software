@@ -26,7 +26,7 @@ export default function ImageCarousel({ images, setHallData }: props) {
     try {
       const formData = new FormData();
       formData.append("image", newImage);
-      const response = await axiosInstance.post(
+      const responsePromise = axiosInstance.post(
         "http://localhost:3000/uploadImage",
         formData,
         {
@@ -35,14 +35,15 @@ export default function ImageCarousel({ images, setHallData }: props) {
           },
         }
       );
-      // toast.promise(Promise.resolve(response.status === 200), {
-      //   pending: "Uploading your image...",
-      //   success: "Image uploaded succesfully",
-      //   error: "Failed to upload image",
-      // });
+      toast.promise(responsePromise, {
+        pending: "Uploading your image...",
+        success: "Image uploaded succesfully",
+        error: "Failed to upload image",
+      });
+      const response = await responsePromise;
       const { imageUrl } = response.data;
       setHallData((prev) => ({ ...prev, images: [...prev.images, imageUrl] }));
-      // setNewImage(null);
+      setNewImage(null);
     } catch (error) {
       console.error("Error uploading image:", error);
     }
