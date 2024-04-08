@@ -15,6 +15,7 @@ export const AddBookingZodSchema = z.object({
       panNo: z.string(stringErrorHandler("panNo")).optional(),
       address: z.string(stringErrorHandler("address")).optional(),
       mobile: z.string(stringErrorHandler("mobile")),
+      remark: z.string(stringErrorHandler("remark")).optional(),
       
     }),
     features: z.array(

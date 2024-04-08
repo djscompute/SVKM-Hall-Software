@@ -98,6 +98,7 @@ export type CustomerType = {
   panNo?: string; // pan no. ( dont know if this is required )
   address?: string; // address
   mobile: string; // mobile number ( maybe UNIQUE )
+  remark?: string; // any remark
 };
 
 // ================================================

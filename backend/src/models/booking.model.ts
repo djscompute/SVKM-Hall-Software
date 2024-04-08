@@ -17,6 +17,7 @@ export const CustomerSchema = new mongoose.Schema<CustomerType>({
   panNo: { type: String },
   address: { type: String },
   mobile: { type: String, required: true },
+  remark:{type:String},
 });
 
 const HallAdditonalFeaturesSchema =

@@ -84,7 +84,7 @@ function Booking() {
   };
 
   const handleSave = async () => {
-    const response = await axiosInstance.post(
+    const response =  axiosInstance.post(
       `/editBooking/${bookingId}`,
       editedData
     );
@@ -92,8 +92,13 @@ function Booking() {
     await queryClient.refetchQueries({
       queryKey: [`booking/${bookingId}`],
     });
-    toast.success("Booking Updated Successfully");
+    toast.promise(response, {
+      pending: "Updating...",
+      success: "Booking Status Edited!",
+      error: "Failed to Booking Hall. Please Reload and try again.",
+    });
   };
+
 
   if (isFetching) return <h1>Loading</h1>;
 
@@ -113,71 +118,125 @@ function Booking() {
         <span className="w-full text-left">Contact Person : </span>
         <span className="w-full text-right">{data?.user?.contact}</span>
       </div>
-
       {editingMode ? (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Aadhar No : </span>
-          <input
-            type="text"
-            value={editedData?.user?.aadharNo}
-            onChange={(e) =>
-              setEditedData((prev) => {
-                if (!prev) return undefined;
-                return {
-                  ...prev,
-                  user: {
-                    ...prev.user,
-                    aadharNo: e.target.value,
-                  },
-                };
-              })
-            }
-            placeholder="Enter Aadhar Number"
-            className=" px-2"
-          />
-        </div>
-      ) : (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Aadhar No : </span>
-          <span className="w-full text-right">
-            {data?.user.aadharNo || "-"}
-          </span>
-        </div>
-      )}
+  <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+    <span className="w-full text-left">Aadhar No : </span>
+    <input
+      type="text"
+      value={editedData?.user?.aadharNo}
+      onChange={(e) =>
+        setEditedData((prev) => {
+          if (!prev) return undefined;
+          return {
+            ...prev,
+            user: {
+              ...prev.user,
+              aadharNo: e.target.value,
+            },
+          };
+        })
+      }
+      placeholder="Enter Aadhar Number"
+      className="px-2"
+    />
+  </div>
+) : (
+  <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+    <span className="w-full text-left">Aadhar No : </span>
+    <span className="w-full text-right">
+      {data?.user.aadharNo || "-"}
+    </span>
+  </div>
+)}
 
-      {editingMode ? (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Pan No. : </span>
-          <input
-            type="text"
-            value={editedData?.user?.panNo}
-            onChange={(e) =>
-              setEditedData((prev) => {
-                if (!prev) return undefined; // Return undefined if prev is undefined
+{editingMode ? (
+  <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+    <span className="w-full text-left">Pan No. : </span>
+    <input
+      type="text"
+      value={editedData?.user?.panNo}
+      onChange={(e) =>
+        setEditedData((prev) => {
+          if (!prev) return undefined;
+          return {
+            ...prev,
+            user: {
+              ...prev.user,
+              panNo: e.target.value,
+            },
+          };
+        })
+      }
+      placeholder="Enter PAN Number"
+      className="px-2"
+    />
+  </div>
+) : (
+  <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+    <span className="w-full text-left">Pan No. : </span>
+    <span className="w-full text-right">{data?.user.panNo || "-"}</span>
+  </div>
+)}
 
-                return {
-                  ...prev,
-                  user: {
-                    ...prev.user,
-                    panNo: e.target.value,
-                  },
-                };
-              })
-            }
-            placeholder="Enter PAN Number"
-            className="px-2"
-          />
-        </div>
-      ) : (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Pan No. : </span>
-          <span className="w-full text-right">{data?.user.panNo || "-"}</span>
-        </div>
-      )}
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Address : </span>
-        <span className="w-full text-right">{data?.user.address || "-"}</span>
-      </div>
+{editingMode ? (
+  <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+    <span className="w-full text-left">Address : </span>
+    <input
+      type="text"
+      value={editedData?.user?.address}
+      onChange={(e) =>
+        setEditedData((prev) => {
+          if (!prev) return undefined;
+          return {
+            ...prev,
+            user: {
+              ...prev.user,
+              address: e.target.value,
+            },
+          };
+        })
+      }
+      placeholder="Enter Address"
+      className="px-2"
+    />
+  </div>
+) : (
+  <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+    <span className="w-full text-left">Address : </span>
+    <span className="w-full text-right">{data?.user.address || "-"}</span>
+  </div>
+)}
+
+{editingMode ? (
+  <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+    <span className="w-full text-left">Remark : </span>
+    <input
+      type="text"
+      value={editedData?.user?.remark}
+      onChange={(e) =>
+        setEditedData((prev) => {
+          if (!prev) return undefined;
+          return {
+            ...prev,
+            user: {
+              ...prev.user,
+              remark: e.target.value,
+            },
+          };
+        })
+      }
+      placeholder="Enter Remark"
+      className="px-2"
+    />
+  </div>
+) : (
+  <div className="flex items-center gap-3 w-full bg-red-600 rounded-sm px-2 py-1 border border-blue-600"> 
+  {/* just to highlight it's laal hai */}
+    <span className="w-full text-left">Remark : </span>
+    <span className="w-full text-right">{data?.user.remark || "-"}</span>
+  </div>
+)}
+
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Email Id : </span>
         <span className="w-full text-right">{data?.user.email || "-"}</span>
