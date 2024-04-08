@@ -16,7 +16,6 @@ export const AddBookingZodSchema = z.object({
       address: z.string(stringErrorHandler("address")).optional(),
       mobile: z.string(stringErrorHandler("mobile")),
       remark: z.string(stringErrorHandler("remark")).optional(),
-      
     }),
     features: z.array(
       z.object({
@@ -32,6 +31,7 @@ export const AddBookingZodSchema = z.object({
     session_id: z.string(stringErrorHandler("session_id")),
     from: z.string(stringErrorHandler("from")),
     to: z.string(stringErrorHandler("to")),
+    purpose: z.string(stringErrorHandler("purpose")),
   }),
 });
 
