@@ -16,6 +16,12 @@ export const CreateAdminZodSchema = z.object({
           required_error: "New Admin username cannot be empty.",
         })
         .min(5),
+      contact: z
+        .string({
+          invalid_type_error: "Contact number can only be a string.",
+          required_error: "Contact number cannot be empty.",
+        })
+        .regex(/^\d{10}$/, "Contact number must be 10 digits long."),
       email: z
         .string({
           invalid_type_error: "New Admin email can only be string.",
@@ -56,6 +62,7 @@ export const EmailAdminZodSchema = z.object({
     }),
   }),
 });
+
 
 //type
 export type CreateAdminReqType = {
