@@ -9,10 +9,12 @@ import HallSessions from "../components/addHall/HallSessions";
 import HallAdditionalFeatures from "../components/addHall/HallAdditionalFeatures";
 import ImageCarousel from "../components/addHall/ImageCarousel";
 import { queryClient } from "../App";
+import HallRestrictions from "../components/addHall/HallRestrictions";
 
 function AddHall() {
   const [hallData, setHallData] = useState<EachHallType>({
     name: "HALL NAME",
+    person:"Someone",
     location: {
       desc1: "Juhu, Mumbai",
       desc2:
@@ -87,6 +89,7 @@ function AddHall() {
     images: [
       "https://img.weddingbazaar.com/shaadisaga_production/photos/pictures/006/353/648/new_large/ss20230327-3861-13nkp45.jpg",
     ],
+    eventRestrictions: "Sleeping",
   });
 
   const addHallMutation = useMutation({
@@ -129,6 +132,10 @@ function AddHall() {
       <AboutHall about={hallData.about} setHallData={setHallData} />
       <HallCapacity
         capacity={hallData.capacity}
+        setHallData={setHallData}
+      />
+      <HallRestrictions
+        eventRestrictions={hallData.eventRestrictions}
         setHallData={setHallData}
       />
       <HallSessions sessions={hallData.sessions} setHallData={setHallData} />

@@ -57,6 +57,7 @@ export const AddHallZodSchema = z.object({
         ),
       })
     ),
+    eventRestrictions: z.string(stringErrorHandler("eventRestrictions")).optional()
   }),
 });
 

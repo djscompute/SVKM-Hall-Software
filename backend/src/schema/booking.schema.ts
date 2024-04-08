@@ -9,7 +9,7 @@ export const AddBookingZodSchema = z.object({
   body: z.object({
     user: z.object({
       username: z.string(stringErrorHandler("name")),
-      contact: z.string(stringErrorHandler('person')),
+      contact: z.string(stringErrorHandler("person")),
       email: z.string(stringErrorHandler("email")).email(),
       aadharNo: z.string(stringErrorHandler("aadharNo")).optional(),
       panNo: z.string(stringErrorHandler("panNo")).optional(),
@@ -54,6 +54,10 @@ export const getBookingZodSchema = z.object({
     to: z.string().refine((to) => to.trim() !== "", {
       message: "to cannot be empty",
       path: ["to"],
+    }),
+    hallId: z.string({
+      required_error: " hallIdcannot be empty",
+      invalid_type_error: "hallId should be a string value.",
     }),
   }),
 });

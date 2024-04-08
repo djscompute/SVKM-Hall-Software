@@ -40,6 +40,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
         params: {
           from: startDate,
           to: endDate,
+          hallId:hallId
         },
       });
       console.log(response.data);

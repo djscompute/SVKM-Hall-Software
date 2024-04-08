@@ -13,6 +13,7 @@ import { useParams } from "react-router-dom";
 import { queryClient } from "../App";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import HallRestrictions from "../components/editHall/HallRestrictions";
 
 export default function EditHall() {
   let { id: HallID } = useParams();
@@ -22,7 +23,7 @@ export default function EditHall() {
   const { data: databaseHallData } = useQuery({
     queryKey: [`getHall/${HallID}`],
     queryFn: async () => {
-      try {
+      // try {
         console.log("FETCHING");
         const responsePromise = axiosInstance.get(`getHall/${HallID}`);
         toast.promise(responsePromise, {
@@ -33,11 +34,12 @@ export default function EditHall() {
         const response = await responsePromise;
         setHallData(response.data);
         return response.data as EachHallType;
-      } catch (error) {
-        throw error;
-      }
+      // } catch (error) {
+        // throw error;
+      // }
     },
   });
+  // console.log("upload hua",hallData)
 
   const editHallMutation = useMutation({
     mutationFn: async () => {
@@ -48,7 +50,7 @@ export default function EditHall() {
       );
       toast.promise(responsePromise, {
         pending: "Updating...",
-        success: "Hall Edited!",
+        success: "Hall Details Edited!",
         error: "Failed to Edit Hall. Please try again.",
       });
       const response = await responsePromise;
@@ -82,7 +84,7 @@ export default function EditHall() {
             />
           </div>
           {JSON.stringify(databaseHallData) !== JSON.stringify(hallData) && (
-            <div className="flex flex-col items-center gap-3 fixed top-5 bg-white px-3 py-2 border-gray-400 rounded-md shadow-md">
+            <div className="w-full flex flex-col items-center gap-3 fixed z-20 top-0 bg-white px-3 py-2 border-gray-400 rounded-md shadow-md">
               <p>Confirm the changes you just made</p>
               <div className="flex gap-5">
                 <button
@@ -116,6 +118,12 @@ export default function EditHall() {
           />
           <HallCapacity
             capacity={hallData.capacity}
+            setHallData={
+              setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
+            }
+          />
+          <HallRestrictions
+            eventRestrictions={hallData.eventRestrictions}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }

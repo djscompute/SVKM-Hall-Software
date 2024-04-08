@@ -161,6 +161,18 @@ function Hall() {
               </div>
 
               <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
+                <h2 className="font-bold text-xl mb-3">Event Restrictions</h2>
+                <p>The following types of events are not allowed to be booked at this hall.</p>
+                <div className="flex ">
+                  {data.eventRestrictions ? (
+                    data.eventRestrictions
+                  ) : (
+                    <p>No restrictions</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
                 <h2 className="font-bold text-xl mb-3">Additional Features</h2>
                 <div className="about-hall text-lg">
                   {data.additionalFeatures?.map((feature, index) => (
