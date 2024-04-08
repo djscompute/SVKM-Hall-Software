@@ -32,6 +32,9 @@ function BookADay() {
     name: "",
     email: "",
     mobileNumber: "",
+    purpose: "",
+    sessionType: "", 
+    bookingType: ""
   });
   const [selectedFeatures, setSelectedFeatures] = useState<{
     [key: string]: EachHallAdditonalFeaturesType;
@@ -148,53 +151,72 @@ function BookADay() {
   });
 
   const handleSubmit = () => {
-    console.log("running");
+    let newErrors = { name: "", person: "", email: "", mobileNumber: "", purpose: "", sessionType: "", bookingType: "" };
     let hasErrors = false;
-    let newErrors = { name: "", person: "", email: "", mobileNumber: "" };
-
+  
+    // Validate name field
     if (!name) {
       newErrors.name = "Name is required";
       hasErrors = true;
-      setErrors(newErrors);
-      return;
     }
+  
+    // Validate contact person field
     if (!person) {
       newErrors.person = "Contact Person is required";
       hasErrors = true;
-      setErrors(newErrors);
-      return;
     }
+  
+    // Validate email field
     if (!email) {
       newErrors.email = "Email Address is required";
       hasErrors = true;
-      setErrors(newErrors);
-      return;
     } else if (!isValidEmail(email)) {
       newErrors.email = "Please enter a valid email address";
       hasErrors = true;
     }
+  
+    // Validate mobile number field
     if (!mobileNumber) {
       newErrors.mobileNumber = "Mobile number is required";
       hasErrors = true;
-      setErrors(newErrors);
-      return;
     } else if (!isValidMobile(mobileNumber)) {
       newErrors.mobileNumber = "Please enter a valid Mobile Number";
       hasErrors = true;
-      setErrors(newErrors);
-      return;
     }
-    setErrors({ name: "", email: "", mobileNumber: "" });
-
-    if (!hasErrors && isDetailsConfirmed) {
-      const yes = {
+  
+    // Validate session type selection
+    if (!selectedSessionId) {
+      newErrors.sessionType = "Session Type is required";
+      hasErrors = true;
+    }
+  
+    // Validate booking type selection
+    if (!selectedCategory) {
+      newErrors.bookingType = "Booking Type is required";
+      hasErrors = true;
+    }
+  
+    // Validate purpose field
+    if (!purpose) {
+      newErrors.purpose = "Purpose is required";
+      hasErrors = true;
+    }
+  
+    // Set errors if any
+    setErrors(newErrors);
+  
+    // If there are errors, return early
+    if (hasErrors) {
+      return;
+    }  
+  
+    // Proceed with mutation
+    if (isDetailsConfirmed) {
+      const bookingData = {
         user: {
           username: name,
           contact: person,
           email: email,
-          //aadharNo: aadharNumber,
-          //panNo: panCard,
-          //address: address,
           mobile: mobileNumber,
         },
         features: Object.values(selectedFeatures),
@@ -202,19 +224,16 @@ function BookADay() {
         price: price,
         hallId: id,
         session_id: selectedSessionId,
-        from: `${day}T${
-          HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
-            ?.from
-        }`,
-        to: `${day}T${
-          HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)?.to
-        }`,
+        from: `${day}T${HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.from}`,
+        to: `${day}T${HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to}`,
+        purpose: purpose,
       };
-      console.log(yes);
+      console.log(bookingData)
+      // Perform mutation
       addBookingMutation.mutate();
     }
   };
-
+  
   const handleCheckboxChange = (feature: EachHallAdditonalFeaturesType) => {
     setSelectedFeatures((prevSelectedFeatures) => {
       if (prevSelectedFeatures[feature._id!]) {
@@ -292,12 +311,16 @@ function BookADay() {
             </option>
           ))}
         </select>
+        {errors.sessionType && (
+          <p className="text-red-500">{errors.sessionType}</p>
+        )}
+        {selectedSessionId && (<>
         <label htmlFor="booking">
           <b>Booking Type</b>
         </label>
-        {selectedSessionId && (
+        
           <select
-            className="p-2 rounded-md"
+            className="p-2 rounded-md border border-black"
             id="booking"
             value={selectedCategory}
             onChange={(e) => {
@@ -317,12 +340,14 @@ function BookADay() {
                 </option>
               ))}
           </select>
+          </>
         )}
+         {selectedSessionId && errors.bookingType && (<p className="text-red-500">{errors.bookingType}</p>)}
         <label htmlFor="name">
           <b>Customer Name</b>
         </label>
         <input
-          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          className="p-2 border-gray-300 border rounded-md px-2 "
           id="name"
           type="text"
           placeholder="John Doe"
@@ -333,12 +358,13 @@ function BookADay() {
           <b>Contact Person</b>
         </label>
         <input
-          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          className="p-2 border-gray-300 border rounded-md px-2 "
           id="person"
           type="text"
           placeholder="Jane Smith"
           value={person}
           onChange={(e) => setPerson(e.target.value)}
+          disabled={isSame}
         />
         <span>
           <input
@@ -354,7 +380,7 @@ function BookADay() {
           <b>Email</b>
         </label>
         <input
-          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          className="p-2 border-gray-300 border rounded-md px-2 "
           id="email"
           type="email"
           placeholder="john.doe@example.com"
@@ -366,7 +392,7 @@ function BookADay() {
           <b>Mobile</b>
         </label>
         <input
-          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          className="p-2 border-gray-300 border rounded-md px-2 "
           id="mobile"
           type="tel"
           placeholder="999999999"
@@ -378,21 +404,21 @@ function BookADay() {
         )}
         {/*
         <input
-          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          className="p-2 border-gray-300 border rounded-md px-2 "
           type="number"
           placeholder="Aadhar Number"
           value={aadharNumber}
           onChange={(e) => setAadharNumber(e.target.value)}
         />
         <input
-          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          className="p-2 border-gray-300 border rounded-md px-2 "
           type="text"
           placeholder="Pan Card"
           value={panCard}
           onChange={(e) => setPanCard(e.target.value)}
         />
         <input
-          className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1"
+          className="p-2 border-gray-300 border rounded-md px-2 "
           type="text"
           placeholder="Address"
           value={address}
@@ -421,12 +447,15 @@ function BookADay() {
           </div>
           <br />
           <input
-            className="bg-gray-200 border-gray-300 border rounded-md px-2 p-1 w-full"
+            className="p-2 border-gray-300 border rounded-md px-2  w-full"
             type="text"
             placeholder="Purpose of booking"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           />
+          {errors.purpose && (
+          <p className="text-red-500">{errors.purpose}</p>
+        )}
         </div>
 
         <h6>
