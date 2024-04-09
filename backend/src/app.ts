@@ -30,7 +30,8 @@ const corsOptions = {
     "http://127.0.0.1:5175",
     "http://localhost:5173",
     "http://localhost:5174",
-    "http://localhost:5175"
+    "http://localhost:5175",
+    "http://localhost:5173"
   ],
   credentials: true,
 };
