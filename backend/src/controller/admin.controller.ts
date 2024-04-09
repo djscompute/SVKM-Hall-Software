@@ -3,7 +3,7 @@ import logger from "../utils/logger";
 import createUser from "../service/createAdmin";
 import authenticateUser from "../service/authAdmin";
 import { signAccessToken, signRefreshToken } from "../utils/signToken";
-import {getUserDatabyEmail, getUserDatabyUsername} from "../service/getAdminData";
+import {getUserDatabyEmail, getUserDatabyUsername, getUsers} from "../service/getAdminData";
 import { createSession } from "../service/createSession";
 import { deleteSession } from "../service/deleteSession";
 import { AuthenticatedRequest } from "../types/requests";
@@ -97,6 +97,24 @@ export async function logoutAdminHandler(req: Request, res: Response) {
   } catch (error: any) {
     logger.error(error);
     res.status(400).json({ name: error.name, message: error.message });
+  }
+}
+
+//Get all admins
+export async function getAdmins(req: Request, res: Response) {
+  try {
+    const userEmail = req.params.email;
+
+    const user = await getUsers();
+
+    if (!user) {
+      return res.status(404).json({ message: "Users not found" });
+    }
+
+    return res.status(200).json(user);
+  } catch (error: any) {
+    console.error("Error fetching users:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 }
 
