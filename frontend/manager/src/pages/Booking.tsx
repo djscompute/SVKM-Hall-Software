@@ -24,6 +24,8 @@ function Booking() {
   const [hallData, setHallData] = useState<EachHallType>();
   const [editingMode, setEditingMode] = useState(false);
   const [editedData, setEditedData] = useState<HallBookingType>();
+  const [isDepositApplicable, setIsDepositApplicable] =
+    useState<boolean>(false);
 
   const { data, error, isFetching } = useQuery({
     queryKey: [`booking/${bookingId}`],
@@ -313,7 +315,7 @@ function Booking() {
                 if (!prev) return undefined;
                 return {
                   ...prev,
-                  discount: Number(e.target.value)
+                  discount: Number(e.target.value),
                 };
               })
             }
@@ -324,39 +326,56 @@ function Booking() {
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">Discount % : </span>
-          <span className="w-full text-right">
-            {data?.discount || "-"}
-          </span>
+          <span className="w-full text-right">{data?.discount || "-"}</span>
         </div>
       )}
 
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Discounted Price : </span>
         <span className="w-full text-right">
-          {data?.price ? data?.price - 0.01 * data?.discount * data?.price : "-"}
+          {data?.price
+            ? data?.price - 0.01 * data?.discount * data?.price
+            : "-"}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">CGST : </span>
         <span className="w-full text-right">
-          {data?.price ? 0.09 * ( data?.price - 0.01 * data?.discount * data?.price ) : "-"}
+          {data?.price
+            ? 0.09 * (data?.price - 0.01 * data?.discount * data?.price)
+            : "-"}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">SGST : </span>
         <span className="w-full text-right">
-          {data?.price ? 0.09 * ( data?.price - 0.01 * data?.discount * data?.price ) : "-"}
+          {data?.price
+            ? 0.09 * (data?.price - 0.01 * data?.discount * data?.price)
+            : "-"}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Security Deposit : </span>
-        <span className="w-full text-right">{100000}</span>
+        <span className="w-full text-right">{hallData?.securityDeposit}</span>
       </div>
+      <span>
+        <label htmlFor="paidornot">Is Security Deposit Applicable : </label>
+        <input
+          type="checkbox"
+          id="paidornot"
+          checked={isDepositApplicable}
+          onChange={() => setIsDepositApplicable((prev) => !prev)}
+        />
+      </span>
+
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Final Price : </span>
         <span className="w-full text-right">
           {data?.price
-            ? data?.price - 0.01 * data?.discount * data?.price + 0.18 * ( data?.price - 0.01 * data?.discount * data?.price ) + 100000
+            ? data?.price -
+              0.01 * data?.discount * data?.price +
+              0.18 * (data?.price - 0.01 * data?.discount * data?.price) +
+              (isDepositApplicable ? hallData?.securityDeposit || 0 : 0)
             : "-"}
         </span>
       </div>

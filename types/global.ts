@@ -42,6 +42,7 @@ export interface EachHallType {
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
   sessions: EachHallSessionType[];
   eventRestrictions: string;
+  securityDeposit: number;
   readonly createdAt?: Date;
   readonly updatedAt?: Date;
 }

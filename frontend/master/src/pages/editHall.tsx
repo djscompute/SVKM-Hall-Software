@@ -14,6 +14,7 @@ import { queryClient } from "../App";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import HallRestrictions from "../components/editHall/HallRestrictions";
+import HallDeposit from "../components/editHall/HallDeposit";
 
 export default function EditHall() {
   let { id: HallID } = useParams();
@@ -24,18 +25,18 @@ export default function EditHall() {
     queryKey: [`getHall/${HallID}`],
     queryFn: async () => {
       // try {
-        console.log("FETCHING");
-        const responsePromise = axiosInstance.get(`getHall/${HallID}`);
-        toast.promise(responsePromise, {
-          pending: "Updating with latest data...",
-          success: "Fetched Hall Data",
-          error: "Failed to fetch hall Data",
-        });
-        const response = await responsePromise;
-        setHallData(response.data);
-        return response.data as EachHallType;
+      console.log("FETCHING");
+      const responsePromise = axiosInstance.get(`getHall/${HallID}`);
+      toast.promise(responsePromise, {
+        pending: "Updating with latest data...",
+        success: "Fetched Hall Data",
+        error: "Failed to fetch hall Data",
+      });
+      const response = await responsePromise;
+      setHallData(response.data);
+      return response.data as EachHallType;
       // } catch (error) {
-        // throw error;
+      // throw error;
       // }
     },
   });
@@ -118,6 +119,12 @@ export default function EditHall() {
           />
           <HallCapacity
             capacity={hallData.capacity}
+            setHallData={
+              setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
+            }
+          />
+          <HallDeposit
+            securityDeposit={hallData.securityDeposit}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }
