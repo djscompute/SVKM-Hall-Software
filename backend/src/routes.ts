@@ -11,6 +11,7 @@ import {
   createAdminHandler,
   getAdminByEmailHandler,
   getAdminHandler,
+  getAdmins,
   getHallsforAdminHandler,
   loginAdminHandler,
   logoutAdminHandler,
@@ -72,6 +73,13 @@ export default function routes(app: Express) {
     validateRequest(CreateAdminZodSchema),
     requireMasterRole,
     createAdminHandler,
+  ]);
+
+  //Get all admins
+  app.get("/getAllAdmins", [
+    validateCookie,
+    requireMasterRole,
+    getAdmins,
   ]);
 
   //Get data of the admin who is sending the requests
