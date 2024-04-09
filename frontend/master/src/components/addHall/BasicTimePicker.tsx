@@ -2,6 +2,7 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import dayjs from "dayjs";
 // import { useState } from "react";
 
 type Props = {
@@ -15,11 +16,8 @@ export default function BasicTimePicker({
 }: Props) {
   // Function to handle time selection
   const handleTimeChange = (newTime: any) => {
-    // Convert the selected time to UTC
-    const stringArray = new Date(newTime).toISOString().split("T");
-    const utcTime: any = stringArray[1];
-    timeModifier(utcTime);
-    console.log("utcTime", utcTime);
+    const timeString = dayjs(newTime.$d).format("HH:mm:ss");
+    timeModifier(timeString);
   };
 
   return (

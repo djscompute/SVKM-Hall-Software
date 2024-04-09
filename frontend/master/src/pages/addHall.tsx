@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../config/axiosInstance";
@@ -10,11 +10,13 @@ import HallAdditionalFeatures from "../components/addHall/HallAdditionalFeatures
 import ImageCarousel from "../components/addHall/ImageCarousel";
 import { queryClient } from "../App";
 import HallRestrictions from "../components/addHall/HallRestrictions";
+import HallPricing from "../components/addHall/HallPricing";
+import { toast } from "react-toastify";
 
 function AddHall() {
   const [hallData, setHallData] = useState<EachHallType>({
     name: "HALL NAME",
-    person:"Someone",
+    person: "Someone",
     location: {
       desc1: "Juhu, Mumbai",
       desc2:
@@ -104,6 +106,7 @@ function AddHall() {
         }),
     mutationKey: ["addhall"],
     onSuccess: async () => {
+      toast.success("Hall added successfully");
       await queryClient.refetchQueries({
         queryKey: [`allhalls`],
       });
@@ -130,15 +133,13 @@ function AddHall() {
       </div>
       <HallLocation location={hallData.location} setHallData={setHallData} />
       <AboutHall about={hallData.about} setHallData={setHallData} />
-      <HallCapacity
-        capacity={hallData.capacity}
-        setHallData={setHallData}
-      />
+      <HallCapacity capacity={hallData.capacity} setHallData={setHallData} />
       <HallRestrictions
         eventRestrictions={hallData.eventRestrictions}
         setHallData={setHallData}
       />
       <HallSessions sessions={hallData.sessions} setHallData={setHallData} />
+      <HallPricing sessions={hallData.sessions} setHallData={setHallData} />
       {hallData.additionalFeatures && (
         <HallAdditionalFeatures
           additionalFeatures={hallData.additionalFeatures}

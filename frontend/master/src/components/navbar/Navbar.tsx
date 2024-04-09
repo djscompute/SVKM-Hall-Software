@@ -98,6 +98,14 @@ const NavBar = () => {
                 Create Admin
               </Link>
             </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/addnewhall"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Add Hall
+              </Link>
+            </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
               {isAuthenticated ? (
                 <div className="flex items-center gap-2">
