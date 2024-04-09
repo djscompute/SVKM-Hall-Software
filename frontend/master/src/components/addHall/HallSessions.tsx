@@ -12,7 +12,7 @@ type Props = {
 const HallSessions = ({ sessions, setHallData }: Props) => {
   const [newItem, setNewItem] = useState<EachHallSessionType>({
     name: "",
-    active: false,
+    active: true,
     to: "",
     from: "",
     price: [],
@@ -32,7 +32,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
       }
       setNewItem({
         name: "",
-        _id: "random id here",
         active: false,
         to: "",
         from: "",
