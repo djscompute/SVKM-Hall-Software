@@ -105,7 +105,7 @@ function CreateAdmin() {
 
     return (
         <>
-            <div className="max-w-lg mx-auto mt-8 p-4 bg-white rounded shadow-md">
+            <div className="max-w-lg mx-auto mt-8 p-4 bg-white rounded shadow-md mb-20">
                 <h1 className="text-2xl font-bold mb-4">Create Admin Account</h1>
                 <form onSubmit={handleFormSubmit}>
                     <div className="space-y-4">

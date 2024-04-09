@@ -14,7 +14,7 @@ const NavBar = () => {
     store.logout,
   ]);
   const navigate = useNavigate();
-  
+
   useQuery({
     queryKey: ["loggedIn"],
     queryFn: async () => {
@@ -88,6 +88,14 @@ const NavBar = () => {
                 className="text-base font-medium text-gray-500 hover:text-gray-900"
               >
                 Home
+              </Link>
+            </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/createadmin"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Create Admin
               </Link>
             </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
@@ -177,6 +185,14 @@ const NavBar = () => {
                   className="text-base font-medium text-gray-900 hover:text-gray-700"
                 >
                   Home
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                <Link
+                  to="/createadmin"
+                  className="text-base font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Create Admin
                 </Link>
               </div>
               <div className="">
