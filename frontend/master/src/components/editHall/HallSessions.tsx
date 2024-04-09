@@ -82,7 +82,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
         <h2 className="font-bold text-xl mb-3">Hall Sessions</h2>
         <div className="about-hall text-lg">
           {sessions.map((eachSession, index) => (
-            <div key={index} className="flex flex-col mb-3">
+            <div key={index} className={`flex flex-col mb-3 ${!eachSession.active && "opacity-30"}`}>
               <p className="font-medium text-lg">{eachSession.name}</p>
               <div className="flex justify-between">
                 <div className="flex gap-2 bg-white px-2 rounded-md">
@@ -108,7 +108,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
         <div className="show-on-hover cursor-pointer opacity-100 hover:opacity-100">
           <FontAwesomeIcon
             icon={faPenToSquare}
-            className="show-on-hover h-6 cursor-pointer opacity-50 hover:opacity-100"
+            className="show-on-hover h-6 cursor-pointer opacity-30 hover:opacity-100"
             onClick={toggleModal}
           />
         </div>
@@ -125,7 +125,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                     <div
                       key={index}
                       className={`flex flex-col items-center w-full mb-3 ${
-                        eachSession.active ? " " : "opacity-100"
+                        eachSession.active ? "" : "opacity-30"
                       } border-y border-gray-300 px-2 gap-5`}
                     >
                       <div className="flex flex-col items-center sm:flex-row w-full gap-5">
