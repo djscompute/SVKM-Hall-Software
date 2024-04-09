@@ -3,6 +3,7 @@ import axiosInstance from "../config/axiosInstance";
 import { adminType } from "../../../../types/global";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AddHalltoManager from "../components/createAdmin.tsx/addHalltoManager";
 
 function CreateAdmin() {
     const [adminData, setAdminData] = useState<Partial<adminType>>({
@@ -14,6 +15,7 @@ function CreateAdmin() {
         managedHalls: []
     });
 
+    const [selectedHallIds, setSelectedHallIds] = useState<string[]>([]);
     const [contactValid, setContactValid] = useState<boolean>(true);
     const [emailValid, setEmailValid] = useState<boolean>(true);
     const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -27,53 +29,62 @@ function CreateAdmin() {
                 console.error(`Field ${key} is empty`);
                 toast.error(`Field ${key} is empty`)
                 return;
-            }
+            }            
         }
+        if (adminData.role === "MANAGER") 
+            {
+                if(selectedHallIds.length===0){
+                console.error("Manager must have atleast 1 hall");
+                toast.error("Atleast one hall must be selected")
+                return;
+                }
+                adminData.managedHalls= selectedHallIds    
+            }
+            
+        else if(adminData.role==="MASTER")
+            {
+                adminData.managedHalls=[];
+            }
 
         if (!emailValid) {
             console.error("Email is not valid");
             toast.error("Email is not valid")
             return;
         }
-        if(!contactValid){
+        if (!contactValid) {
             console.error("Contact is not valid");
             toast.error("Contact is not valid")
             return;
         }
-        if(adminData.username?.length)
-            {
-                if(adminData.username.length<5)
-                    {
-                        toast.error("Username must be of minimum 5 characters")
-                        return
-                    }
+        if (adminData.username?.length) {
+            if (adminData.username.length < 5) {
+                toast.error("Username must be of minimum 5 characters")
+                return
             }
+        }
 
         if (adminData.password !== confirmPassword) {
             console.error("password confirmation does not match");
             toast.error("Password Confirmation Doesn't Match")
             return;
         }
-
         try {
             const responsePromise = axiosInstance.post("/createAdmin", JSON.stringify(adminData));
             toast.promise(responsePromise, {
                 pending: "Creating a new Admin...",
-              });
+            });
             const response = await responsePromise;
             console.log(response)
             toast.success("Admin Added Successfully!", {
                 autoClose: 3000,
-                onClose: ()=>window.location.reload()
+                onClose: () => window.location.reload()
             });
         } catch (error: any) {
-            if(error.response.status === 409)
-                {
-                    console.log(error.response.data.error)
-                    toast.error(error.response.data.error);
-                }
-            else
-            {
+            if (error.response.status === 409) {
+                console.log(error.response.data.error)
+                toast.error(error.response.data.error);
+            }
+            else {
                 console.error("Error adding admin:", error);
                 toast.error("Failed to create new Admin")
             }
@@ -82,10 +93,9 @@ function CreateAdmin() {
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        if(name == "role")
-            {
-                adminData.role=value;
-            }
+        if (name == "role") {
+            adminData.role = value;
+        }
         if (name === "contact") {
             const contactRegex = /^\d{10}$/;
             setContactValid(contactRegex.test(value));
@@ -103,9 +113,22 @@ function CreateAdmin() {
         }
     };
 
+
+    const handleHallSelect = (id: string) => {
+        setSelectedHallIds([...selectedHallIds, id]);
+    };
+
+    const clearSelectedHallIds = () => {
+        setSelectedHallIds([]);
+    };
+
+    const handleAddedHallsChange = (addedItems: string[]) => {
+        setSelectedHallIds(addedItems);
+    };
+
     return (
         <>
-            <div className="max-w-lg mx-auto mt-8 p-4 bg-white rounded shadow-md mb-20">
+            <div className="md:max-w-xl mx-auto mt-8 p-4 bg-white rounded shadow-md mb-20">
                 <h1 className="text-2xl font-bold mb-4">Create Admin Account</h1>
                 <form onSubmit={handleFormSubmit}>
                     <div className="space-y-4">
@@ -193,6 +216,19 @@ function CreateAdmin() {
                                 className="border border-gray-300 rounded px-3 py-2 mt-1 focus:outline-none focus:border-indigo-500"
                             />
                             {confirmPasswordTouched && confirmPassword && adminData.password !== confirmPassword && <p className="text-red-600 text-sm">Passwords do not match</p>}
+                        </div>
+                        <div className="">
+                        {adminData.role === "MANAGER" && (
+                            <div className="flex flex-col">
+                                <h1 className="text-lg ">Add Halls to Manager</h1>
+                                <AddHalltoManager
+                                    selectedHallIds={selectedHallIds}
+                                    onHallSelect={handleHallSelect}
+                                    onClearSelectedHalls={clearSelectedHallIds}
+                                    onAddedHallsChange={handleAddedHallsChange}
+                                />
+                            </div>
+                        )}
                         </div>
                         <div className="flex justify-center">
                             <button type="submit" className="bg-indigo-500 text-white font-semibold px-4 py-2 rounded mt-4">Submit</button>
