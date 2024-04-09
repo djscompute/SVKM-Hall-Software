@@ -9,12 +9,13 @@ export const AddBookingZodSchema = z.object({
   body: z.object({
     user: z.object({
       username: z.string(stringErrorHandler("name")),
-      contact: z.string(stringErrorHandler('person')),
+      contact: z.string(stringErrorHandler("person")),
       email: z.string(stringErrorHandler("email")).email(),
-      //aadharNo: z.string(stringErrorHandler("aadharNo")).optional(),
-      //panNo: z.string(stringErrorHandler("panNo")).optional(),
-      //address: z.string(stringErrorHandler("address")).optional(),
+      aadharNo: z.string(stringErrorHandler("aadharNo")).optional(),
+      panNo: z.string(stringErrorHandler("panNo")).optional(),
+      address: z.string(stringErrorHandler("address")).optional(),
       mobile: z.string(stringErrorHandler("mobile")),
+      remark: z.string(stringErrorHandler("remark")).optional(),
     }),
     features: z.array(
       z.object({
@@ -29,7 +30,8 @@ export const AddBookingZodSchema = z.object({
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
     from: z.string(stringErrorHandler("from")),
-    to: z.string(stringErrorHandler("to"))
+    to: z.string(stringErrorHandler("to")),
+    purpose: z.string(stringErrorHandler("purpose")),
   }),
 });
 
@@ -52,6 +54,10 @@ export const getBookingZodSchema = z.object({
     to: z.string().refine((to) => to.trim() !== "", {
       message: "to cannot be empty",
       path: ["to"],
+    }),
+    hallId: z.string({
+      required_error: " hallIdcannot be empty",
+      invalid_type_error: "hallId should be a string value.",
     }),
   }),
 });

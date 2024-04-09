@@ -6,8 +6,10 @@ export const getSlotAbbreviation = (status: bookingStatusType) => {
       return "(E)";
     case "CONFIRMED":
       return "(C)";
+    /*
     case "TENTATIVE":
       return "(T)";
+    */
     default:
       return "";
   }

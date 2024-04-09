@@ -3,10 +3,14 @@ import { useState } from "react";
 import { EachHallType, bookingStatusType } from "../../types/Hall.types";
 import EachDay from "./eachDay";
 import EachMobileDay from "./eachMobileDay";
-import dayjs from "dayjs";
 import axiosInstance from "../../config/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import Legends from "./legends";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers";
 
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -17,6 +21,7 @@ type Props = {
 
 //calendar
 const Calendar = ({ hallId, HallData }: Props) => {
+  dayjs.extend(utc);
   const [currentDate, setCurrentDate] = useState(
     dayjs().startOf("month").toDate()
   );
@@ -40,6 +45,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
         params: {
           from: startDate,
           to: endDate,
+          hallId:hallId
         },
       });
       console.log(response.data);
@@ -50,8 +56,6 @@ const Calendar = ({ hallId, HallData }: Props) => {
       return response.data;
     },
   });
-
-  console.log(allBookingData);
 
   const daysInMonth = dayjs(currentDate).daysInMonth();
 
@@ -82,8 +86,19 @@ const Calendar = ({ hallId, HallData }: Props) => {
   return (
     <div className=" flex justify-center items-center">
       <div className="flex flex-col justify-center w-full md:mx-10 h-full border-[3px] border-border-color rounded-lg shadow-custom p-4">
+        {/* Date  */}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            value={dayjs(currentDate)}
+            onChange={(newState): any => {
+              console.log(newState);
+              setCurrentDate(dayjs(newState).startOf("month").toDate());
+            }}
+            views={["year", "month"]}
+          />
+        </LocalizationProvider>
         {/* Top heading */}
-        <div className="flex justify-between items-center mb-4 w-3/4 mx-auto">
+        <div className="flex justify-between items-center my-4 w-3/4 mx-auto">
           <svg
             className=" cursor-pointer"
             onClick={onPreviousMonth}

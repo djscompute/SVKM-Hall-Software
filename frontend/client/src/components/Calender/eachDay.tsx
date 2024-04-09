@@ -1,10 +1,14 @@
 import dayjs from "dayjs";
-import { HallBookingType } from "../../../../../types/global";
+import {
+  EachHallSessionType,
+  HallBookingType,
+} from "../../../../../types/global";
 import { convert_IST_DateTimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat";
 
 import isBetween from "dayjs/plugin/isBetween"; // Import the timezone plugin
 import { getSlotColour } from "../../utils/getSlotColour";
 import { getSlotAbbreviation } from "../../utils/getSlotAbb";
+import { toast } from "react-toastify";
 
 dayjs.extend(isBetween);
 
@@ -18,6 +22,14 @@ type Props = {
   setSelectedMobileDate: React.Dispatch<React.SetStateAction<number>>;
 };
 
+interface OpenEnquireTabEvent extends React.MouseEvent<HTMLDivElement> {
+  currentTarget: HTMLDivElement & {
+    dataset: {
+      hallId: string;
+      date: string;
+    };
+  };
+}
 // @ts-ignore
 function EachDay({
   i,
@@ -44,41 +56,72 @@ function EachDay({
     dayjs(obj.from).isSame(myDayJSObject, "day")
   );
 
-  // convert "08:00:00" to "${aaj-ka-din}T"08:00:00""
-  const completeDateSessions = HallSessionsArray.map((element) => {
-    return {
-      ...element,
-      from: `${myDayJSObject.format("YYYY-MM-DD")}T${element.from}`,
-      to: `${myDayJSObject.format("YYYY-MM-DD")}T${element.to}`,
-    };
-  });
+  // filter out the CANCELLED as we dont show them on frontend. we dont remove them from backend.
+  allBookingData = allBookingData.filter(
+    (session) => session.status !== "CANCELLED"
+  );
 
-  function areTimeIntervalsOverlapping(interval1: any, interval2: any) {
-    const from1 = dayjs(interval1.from);
-    const to1 = dayjs(interval1.to);
-    const from2 = dayjs(interval2.from);
-    const to2 = dayjs(interval2.to);
+  // convert "08:00:00" to "${aaj-ka-din}T08:00:00"
+  const completeDateSessions: EachHallSessionType[] = HallSessionsArray.map(
+    (element) => {
+      return {
+        ...element,
+        from: `${myDayJSObject.format("YYYY-MM-DD")}T${element.from}`,
+        to: `${myDayJSObject.format("YYYY-MM-DD")}T${element.to}`,
+      };
+    }
+  );
 
-    return from1.isBefore(to2) && to1.isAfter(from2);
-  }
+  // PRIORITY to show the booked sesison in frontend. if more that one booking with different status exists.
+  //const priority = { CONFIRMED: 1, TENTATIVE: 2, ENQUIRY: 3 };
+  const priority = { CONFIRMED: 1, ENQUIRY: 2 };
 
-  const finalArr: any[] = [];
-  completeDateSessions.forEach((eachSession) => {
-    let clashing: boolean = false;
-    allBookingData?.forEach((eachBooking) => {
-      if (
-        areTimeIntervalsOverlapping(eachSession, eachBooking) &&
-        !finalArr.includes(eachBooking)
-      ) {
-        finalArr.push(eachBooking);
-        clashing = true;
-      }
-    });
-    if (!clashing && !finalArr.includes(eachSession)) {
-      finalArr.push(eachSession);
+  // sort sessions in priority of status
+  allBookingData.sort(
+    (a: HallBookingType, b: HallBookingType) =>
+      // @ts-ignore
+      priority[a.status] - priority[b.status]
+  );
+
+  // only keep one booking of a hall session
+  const uniqueSessions = [];
+  const sessionIds = new Set();
+  allBookingData.forEach((session) => {
+    if (!sessionIds.has(session.session_id)) {
+      uniqueSessions.push(session);
+      sessionIds.add(session.session_id);
     }
   });
 
+  // merge bookings and sessions.
+  // give priority to booking over session to show in frontend
+  const finalArr: any[] = [];
+  completeDateSessions.forEach((eachHallSession) => {
+    const A_Booking_for_This_Session = allBookingData.find(
+      (a) => eachHallSession._id == a.session_id
+    );
+    if (A_Booking_for_This_Session) {
+      finalArr.push(A_Booking_for_This_Session);
+    } else {
+      finalArr.push(eachHallSession);
+    }
+  });
+  function openEnquireTab(event: OpenEnquireTabEvent) {
+    const hallId = event.currentTarget.dataset.hallId;
+    const dateAttribute = event.currentTarget.dataset.date;
+    const date = new Date(dateAttribute!); 
+    const today = new Date(); // Get today's date
+  
+    // Compare dates
+    if (date > today) {
+      console.log("date is:", dateAttribute);
+      const url = `${hallId}/${dateAttribute}`;
+      window.open(url, "_blank");
+    } else {
+      toast.error("Date is not in the future.");
+      console.log("Date is not in the future.");
+    }
+  }
   return (
     <div
       key={`day-${i}`}
@@ -98,24 +141,27 @@ function EachDay({
       {finalArr && (
         <>
           <div className="hidden lg:flex flex-col items-center justify-start gap-1 w-full  ">
-            {finalArr.map((eachSlotInfo) => (
+            {finalArr.map((eachSlotInfo, index) => (
               <div
+                key={`eachday-${index}`}
                 className={`flex justify-between w-full 
-              ${getSlotColour(eachSlotInfo.status)}
-              ${eachSlotInfo.status == "EMPTY" && " border-2 border-black"}
-              px-2 overflow-x-auto
-              `}
+                ${getSlotColour(eachSlotInfo.status)}
+                ${eachSlotInfo.status == "EMPTY" && " border-2 border-black"}
+                px-2 overflow-x-auto
+                `}
               >
-                <span>
-                  {convert_IST_DateTimeString_To12HourFormat(eachSlotInfo.from)}
-                  -{convert_IST_DateTimeString_To12HourFormat(eachSlotInfo.to)}
-                </span>
-
+                {eachSlotInfo.session_id
+                  ? // if booking is found then find the session using session_id and display its name
+                    HallSessionsArray?.find(
+                      (a) => a._id == eachSlotInfo.session_id
+                    )?.name
+                  : // no booking is found for this sesison means that this is the session itself. display its name
+                    eachSlotInfo.name}
                 <span>{getSlotAbbreviation(eachSlotInfo.status)}</span>
               </div>
             ))}
           </div>
-          <a
+          {/* <a
             className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 mt-1 rounded-md"
             href={`${hallId}/${dayjs(currentDate)
               .add(i - 1, "day")
@@ -123,7 +169,17 @@ function EachDay({
             target="_blank"
           >
             ENQUIRE
-          </a>
+          </a> */}
+          <div
+            className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 mt-1 rounded-md cursor-pointer"
+            onClick={openEnquireTab}
+            data-hall-id={hallId}
+            data-date={dayjs(currentDate)
+              .add(i - 1, "day")
+              .format("YYYY-MM-DD")}
+          >
+            ENQUIRE
+          </div>
         </>
       )}
     </div>

@@ -38,8 +38,10 @@ function EachDay({
         return "bg-blue-200 hover:bg-blue-300";
       case "CONFIRMED":
         return "bg-red-200 hover:bg-red-300";
+      /*
       case "TENTATIVE":
         return "bg-orange-200 hover:bg-orange-300";
+      */
       default:
         return "bg-white";
     }

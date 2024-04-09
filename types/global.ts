@@ -41,13 +41,14 @@ export interface EachHallType {
   additionalFeatures?: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
   sessions: EachHallSessionType[];
+  eventRestrictions: string;
   readonly createdAt?: Date;
   readonly updatedAt?: Date;
 }
 
 export type bookingStatusType =
   | "CONFIRMED"
-  | "TENTATIVE"
+  //| "TENTATIVE"
   | "CANCELLED"
   | "ENQUIRY";
 
@@ -68,6 +69,7 @@ export type HallBookingType = {
     from: string; // start time
     to: string; // end time
   };
+  purpose: string //purpose for which the hall is being booked by the user (event type)
 };
 
 // ================================================
@@ -94,10 +96,11 @@ export type CustomerType = {
   username: string; // name
   contact: string;
   email?: string; // email ( maybe UNIQUE KEY )
-  //aadharNo?: string; // adhar no. ( dont know if this is required )
-  //panNo?: string; // pan no. ( dont know if this is required )
-  //address?: string; // address
+  aadharNo?: string; // adhar no. ( dont know if this is required )
+  panNo?: string; // pan no. ( dont know if this is required )
+  address?: string; // address
   mobile: string; // mobile number ( maybe UNIQUE )
+  remark?: string; // any remark
 };
 
 // ================================================

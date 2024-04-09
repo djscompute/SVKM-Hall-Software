@@ -7,16 +7,18 @@ import {
   bookingStatusType,
 } from "../../../types/global";
 export type { CustomerType, HallBookingType, bookingStatusType };
-import { CustomerSchema } from "./customer.model";
+// import {CustomerSchema}  from "./customer.model";
 
-// export const CustomerSchema = new mongoose.Schema<CustomerType>({
-//   username: { type: String, required: true },
-//   email: { type: String },
-//   aadharNo: { type: String },
-//   panNo: { type: String },
-//   address: { type: String },
-//   mobile: { type: String, required: true },
-// });
+export const CustomerSchema = new mongoose.Schema<CustomerType>({
+  username: { type: String, required: true },
+  contact: { type: String},
+  email: { type: String },
+  aadharNo: { type: String },
+  panNo: { type: String },
+  address: { type: String },
+  mobile: { type: String, required: true },
+  remark:{type:String},
+});
 
 const HallAdditonalFeaturesSchema =
   new mongoose.Schema<EachHallAdditonalFeaturesType>({
@@ -43,6 +45,7 @@ const BookingSchema = new mongoose.Schema<HallBookingType>(
     session_id: { type: String, required: true },
     from: { type: String, required: true },
     to: { type: String, required: true },
+    purpose: { type: String, required: true },
   },
   { timestamps: true }
 );

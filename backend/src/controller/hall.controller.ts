@@ -11,6 +11,7 @@ export async function addHallHandler(req: Request, res: Response) {
       additionalFeatures,
       images,
       sessions,
+      eventRestrictions,
     } = req.body as EachHallType;
 
     const newHall = new HallModel({
@@ -21,6 +22,7 @@ export async function addHallHandler(req: Request, res: Response) {
       additionalFeatures,
       images,
       sessions,
+      eventRestrictions,
     });
     await newHall.save();
 
@@ -57,6 +59,7 @@ export async function editHallHandler(req: Request, res: Response) {
       additionalFeatures,
       images,
       sessions,
+      eventRestrictions,
     } = req.body as EachHallType;
     const hallId: string = req.params.id;
 
@@ -70,6 +73,7 @@ export async function editHallHandler(req: Request, res: Response) {
         additionalFeatures,
         images,
         sessions,
+        eventRestrictions,
       },
       { new: true }
     );
