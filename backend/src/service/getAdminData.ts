@@ -2,7 +2,7 @@ import User, { adminType } from "../models/admin.model";
 import _ from "lodash";
 
 export async function getUsers() {
-  const temp = await User.find({ role: "MANAGER" });
+  const temp = await User.find();
   const users = _.map(temp, (user) => _.omit(user.toJSON(), "password"));
   return users as Omit<adminType, "password">[];
 }

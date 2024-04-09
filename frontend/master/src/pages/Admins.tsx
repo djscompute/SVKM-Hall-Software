@@ -31,13 +31,7 @@ function Admins() {
       <h1 className=" text-3xl font-semibold my-5">All Admins</h1>
       <div className="flex flex-wrap justify-around w-full">
         {data?.map((adminProp) => (
-          <Card
-            key={adminProp._id}
-            _id={adminProp._id}  
-            username={adminProp.username}
-            email={adminProp.email}
-            managedHalls={adminProp.managedHalls}     
-          />
+          <Card key={adminProp._id} adminData={adminProp} />
         ))}
       </div>
     </div>
