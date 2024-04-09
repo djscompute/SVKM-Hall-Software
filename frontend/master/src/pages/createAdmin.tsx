@@ -115,6 +115,7 @@ function CreateAdmin() {
 
 
     const handleHallSelect = (id: string) => {
+        console.log(selectedHallIds)
         setSelectedHallIds([...selectedHallIds, id]);
     };
 
@@ -123,6 +124,7 @@ function CreateAdmin() {
     };
 
     const handleAddedHallsChange = (addedItems: string[]) => {
+
         setSelectedHallIds(addedItems);
     };
 
