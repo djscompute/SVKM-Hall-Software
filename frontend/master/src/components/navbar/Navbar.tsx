@@ -14,7 +14,7 @@ const NavBar = () => {
     store.logout,
   ]);
   const navigate = useNavigate();
-  
+
   useQuery({
     queryKey: ["loggedIn"],
     queryFn: async () => {
@@ -88,6 +88,14 @@ const NavBar = () => {
                 className="text-base font-medium text-gray-500 hover:text-gray-900"
               >
                 Home
+              </Link>
+            </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/addnewhall"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                New Hall
               </Link>
             </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">

@@ -67,11 +67,9 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   return (
     <div className="about-hall flex justify-between bg-blue-100 w-[60%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
       <div className="flex flex-col gap-3 mb-5 w-full">
-        <h2 className="font-bold text-xl mb-3 text-center">
-          Edit Hall Sessions
-        </h2>
+        <h2 className="font-bold text-xl mb-3 text-center">Hall Sessions</h2>
         <ul className="max-h-80 overflow-scroll">
-          {sessions.map((eachSession, index) => (
+          {sessions?.map((eachSession, index) => (
             <div
               key={index}
               className={`flex flex-col items-center w-full mb-3 ${
@@ -80,17 +78,15 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
             >
               <div className={`flex items-center w-full gap-5`}>
                 <div className="flex flex-col w-full">
-                  {/* <div className="flex">
-                            <span className=" text-xs">session id:</span>
-                            <span className=" text-xs">{eachSession._id}</span>
-                        </div> */}
                   <p className="font-medium text-lg">{eachSession.name}</p>
                   <div className="flex justify-between">
                     <div className="flex gap-2 bg-white rounded-md">
                       <span>From:</span>
                       <span className="">
                         {eachSession.from
-                          ? convert_IST_TimeString_To12HourFormat(eachSession.from)
+                          ? convert_IST_TimeString_To12HourFormat(
+                              eachSession.from
+                            )
                           : "NAN"}
                       </span>
                     </div>
@@ -98,12 +94,11 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                       <span>To:</span>
                       <span className="">
                         {convert_IST_TimeString_To12HourFormat(eachSession.to)}
-                        {/* {eachSession.to} asdasd */}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col items-center sm:flex-row w-full gap-5">
+                <div className="flex flex-col items-center sm:flex-row gap-5">
                   <button
                     className="bg-blue-700 p-2 rounded text-white hover:bg-blue-500 transform active:scale-95 transition duration-300"
                     onClick={() => handleEditItem(index)}
@@ -117,26 +112,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                     Delete
                   </button>
                 </div>
-              </div>
-              <div className="flex flex-col items-center justify-center w-full">
-                <div className="flex justify-evenly w-full text-sm font-semibold">
-                  <span className="border border-gray-600 border-r-0 w-full text-center">
-                    Category
-                  </span>
-                  <span className="border border-gray-600 w-full text-center">
-                    Price
-                  </span>
-                </div>
-                {eachSession.price.map((eachSessionPrice) => (
-                  <div className="flex justify-evenly w-full text-sm">
-                    <span className="border border-gray-600 border-r-0  w-full text-center">
-                      {eachSessionPrice.categoryName}
-                    </span>
-                    <span className="border border-gray-600 w-full text-center">
-                      {eachSessionPrice.price}
-                    </span>
-                  </div>
-                ))}
               </div>
             </div>
           ))}

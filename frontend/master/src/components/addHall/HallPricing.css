@@ -1,0 +1,23 @@
+#session-pricing-table {
+  overflow-x: scroll;
+  margin: 10px 0px;
+  table-layout: fixed;
+  /* width: 100%; */
+
+  th {
+    border: 2px solid black;
+    padding: 3px 0px;
+    background-color: rgb(190, 190, 190);
+  }
+  td {
+    border: 2px solid black;
+    padding: 3px 0px;
+    text-align: center;
+    width: 100px;
+    
+    input{
+        width: 100%;
+        padding:2px 5px;
+    }
+  }
+}
