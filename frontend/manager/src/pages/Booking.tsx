@@ -100,6 +100,14 @@ function Booking() {
     });
   };
 
+  const session = hallData?.sessions.find(
+    (session) => session._id === data?.session_id
+  );
+
+  const priceEntry = session?.price.find(
+    (price) => price.categoryName === data?.booking_type
+  );
+
   if (isFetching) return <h1>Loading</h1>;
 
   return (
@@ -230,7 +238,7 @@ function Booking() {
           />
         </div>
       ) : (
-        <div className="flex items-center gap-3 w-full bg-red-600 rounded-sm px-2 py-1 border border-blue-600">
+        <div className="flex items-center gap-3 w-full bg-orange-600 rounded-sm px-2 py-1 border border-blue-600">
           {/* just to highlight it's laal hai */}
           <span className="w-full text-left">Remark : </span>
           <span className="w-full text-right">{data?.user.remark || "-"}</span>
@@ -256,40 +264,102 @@ function Booking() {
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Predicted Price : </span>
-        <span className="w-full text-right">{data?.price || "-"}</span>
+        <span className="w-full text-left">Base Price : </span>
+        <span className="w-full text-right">{priceEntry?.price || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Status : </span>
         <span className="w-full text-right">{data?.status || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">HallId : </span>
-        <span className="w-full text-right">{data?.hallId || "-"}</span>
+        <span className="w-full text-left">Purpose : </span>
+        <span className="w-full text-right">{data?.purpose || "-"}</span>
       </div>
-      {hallData?.name && (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Hall Name : </span>
-          <span className="w-full text-right">{hallData?.name || "-"}</span>
-        </div>
-      )}
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Hall Name : </span>
+        <span className="w-full text-right">{hallData?.name || "-"}</span>
+      </div>
       <span className=" text-lg font-medium">Additional Features</span>
       {data?.features.map((eachFeature, index) => (
         <div key={index} className="flex flex-col w-full mb-2">
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>name : </span>
+            <span>Name : </span>
             <span>{eachFeature.heading || "-"}</span>
           </div>
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>desc : </span>
+            <span>Description : </span>
             <span>{eachFeature.desc || "-"}</span>
           </div>
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>price : </span>
+            <span>Price : </span>
             <span>{eachFeature.price || "-"}</span>
           </div>
         </div>
       ))}
+      <span className=" text-lg font-medium">Billing</span>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Total Price : </span>
+        <span className="w-full text-right">{data?.price || "-"}</span>
+      </div>
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Discount % : </span>
+          <input
+            type="text"
+            value={editedData?.discount}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  discount: Number(e.target.value)
+                };
+              })
+            }
+            placeholder="Enter Discount %"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Discount % : </span>
+          <span className="w-full text-right">
+            {data?.discount || "-"}
+          </span>
+        </div>
+      )}
+
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Discounted Price : </span>
+        <span className="w-full text-right">
+          {data?.price ? data?.price - 0.01 * data?.discount * data?.price : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">CGST : </span>
+        <span className="w-full text-right">
+          {data?.price ? 0.09 * ( data?.price - 0.01 * data?.discount * data?.price ) : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">SGST : </span>
+        <span className="w-full text-right">
+          {data?.price ? 0.09 * ( data?.price - 0.01 * data?.discount * data?.price ) : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Security Deposit : </span>
+        <span className="w-full text-right">{100000}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Final Price : </span>
+        <span className="w-full text-right">
+          {data?.price
+            ? data?.price - 0.01 * data?.discount * data?.price + 0.18 * ( data?.price - 0.01 * data?.discount * data?.price ) + 100000
+            : "-"}
+        </span>
+      </div>
       <span className=" mb-3">STATUS: {data?.status}</span>
 
       {editingMode ? (

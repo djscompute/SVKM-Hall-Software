@@ -61,6 +61,8 @@ export type HallBookingType = {
   features: EachHallAdditonalFeaturesType[]; // the Ammenities which the user has booked for himself
   status: bookingStatusType; // payment and booking status is reflected here
   price: number; // obvio bro
+  discount: number;
+  final_price: number;
   hallId: string;
   session_id: string; // the sesison id
   booking_type: string;

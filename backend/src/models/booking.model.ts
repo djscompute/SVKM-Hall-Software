@@ -41,6 +41,8 @@ const BookingSchema = new mongoose.Schema<HallBookingType>(
       required: true,
     },
     price: { type: Number, required: true },
+    discount: { type: Number },
+    final_price: { type: Number },
     hallId: { type: String, required: true },
     session_id: { type: String, required: true },
     booking_type: { type: String, required: true },
