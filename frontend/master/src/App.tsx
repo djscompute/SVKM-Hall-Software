@@ -9,6 +9,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import AddHall from "./pages/addHall";
 import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CreateAdmin from "./pages/createAdmin";
 export const queryClient = new QueryClient();
 
 export default function App() {
@@ -38,6 +39,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <EditHall />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/createadmin"
+          element={
+            <ProtectedRoute>
+              <CreateAdmin />
             </ProtectedRoute>
           }
         />
