@@ -107,7 +107,7 @@ function Booking() {
 
   const handleCancellation = async () => {
     editBookingStatus.mutate("CANCELLED");
-    setShowCancellationReason(true);
+    setShowCancellationReason(false);
   };
 
   const handleSaveCancellationReason = async () => {
@@ -334,12 +334,13 @@ function Booking() {
             className="px-2"
           />
           <button
-            onClick={() => {
-              handleSaveCancellationReason(), handleCancellation();
+            onClick={async () => {
+              await handleSaveCancellationReason();
+              handleCancellation();
             }}
             className="bg-green-500 px-4 text-white py-1 rounded-lg"
           >
-            Save Reason
+            Confirm Cancellation
           </button>
         </div>
       ) : (
@@ -347,7 +348,7 @@ function Booking() {
       )}
 
       {data?.cancellationReason && (
-        <div className="w-full flex justify-between my-2 bg-red-700 rounded-sm px-2 py-1 border text-white">
+        <div className="w-full flex justify-between my-2 bg-red-400 rounded-sm px-2 py-1 border text-white">
           <span className="text-lg font-medium">Cancellation Reason</span>
           <span>{data?.cancellationReason}</span>
         </div>
@@ -365,13 +366,13 @@ function Booking() {
       ) : (
         <button
           onClick={handleEdit}
-          className=" mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
+          className=" mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
         >
           Edit Details
         </button>
       )}
 
-      {!showCancellationReason && (
+      {/* {!showCancellationReason && (
         <button
           onClick={() => {
             setShowCancellationReason(true);
@@ -380,13 +381,17 @@ function Booking() {
         >
           Handle Cancellation
         </button>
-      )}
+      )} */}
 
       <select
         value={data?.status}
         onChange={(e) => {
           console.log(e.target.value);
-          editBookingStatus.mutate(e.target.value as bookingStatusType);
+          if (e.target.value == "CANCELLED") {
+            setShowCancellationReason(true);
+          } else {
+            editBookingStatus.mutate(e.target.value as bookingStatusType);
+          }
         }}
         className="px-2 py-1 rounded-md border border-gray-400"
       >
