@@ -110,6 +110,32 @@ function Booking() {
     },
   });
 
+  const editDepositAmount = useMutation({
+    mutationFn: async (newDeposit: number) => {
+      console.log(hallData);
+      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
+        ...data,
+        deposit: newDeposit,
+      });
+      toast.promise(responsePromise, {
+        pending: "Updating...",
+        success: "Booking Status Edited!",
+        error: "Failed to Booking Hall. Please Reload and try again.",
+      });
+      const response = await responsePromise;
+      console.log(response.data);
+    },
+    onSuccess: async () => {
+      console.log("REVALIDATING");
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${bookingId}`],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   const handleEdit = () => {
     setEditingMode(true);
     if (!editedData) {
@@ -133,6 +159,14 @@ function Booking() {
       queryKey: [`booking/${bookingId}`],
     });
   };
+
+  const session = hallData?.sessions.find(
+    (session) => session._id === data?.session_id
+  );
+
+  const priceEntry = session?.price.find(
+    (price) => price.categoryName === data?.booking_type
+  );
 
   const handleCancellation = async () => {
     editBookingStatus.mutate("CANCELLED");
@@ -291,7 +325,7 @@ function Booking() {
           />
         </div>
       ) : (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <div className="flex items-center gap-3 w-full bg-orange-600 rounded-sm px-2 py-1 border border-blue-600">
           {/* just to highlight it's laal hai */}
           <span className="w-full text-left">Remark : </span>
           <span className="w-full text-right">{data?.user.remark || "-"}</span>
@@ -317,36 +351,38 @@ function Booking() {
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Predicted Price : </span>
-        <span className="w-full text-right">{data?.price || "-"}</span>
+        <span className="w-full text-left">Base Price : </span>
+        <span className="w-full text-right">{priceEntry?.price || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Status : </span>
         <span className="w-full text-right">{data?.status || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">HallId : </span>
-        <span className="w-full text-right">{data?.hallId || "-"}</span>
+        <span className="w-full text-left">Booking Type : </span>
+        <span className="w-full text-right">{data?.booking_type || "-"}</span>
       </div>
-      {hallData?.name && (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Hall Name : </span>
-          <span className="w-full text-right">{hallData?.name || "-"}</span>
-        </div>
-      )}
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Purpose : </span>
+        <span className="w-full text-right">{data?.purpose || "-"}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Hall Name : </span>
+        <span className="w-full text-right">{hallData?.name || "-"}</span>
+      </div>
       <span className=" text-lg font-medium">Additional Features</span>
       {data?.features.map((eachFeature, index) => (
         <div key={index} className="flex flex-col w-full mb-2">
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>name : </span>
+            <span>Name : </span>
             <span>{eachFeature.heading || "-"}</span>
           </div>
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>desc : </span>
+            <span>Description : </span>
             <span>{eachFeature.desc || "-"}</span>
           </div>
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>price : </span>
+            <span>Price : </span>
             <span>{eachFeature.price || "-"}</span>
           </div>
         </div>
@@ -558,6 +594,103 @@ function Booking() {
             </span>
           </div>
         ))}
+      <span className=" text-lg font-medium">Billing</span>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Total Price : </span>
+        <span className="w-full text-right">{data?.price || "-"}</span>
+      </div>
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Discount % : </span>
+          <input
+            type="text"
+            value={editedData?.discount}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  discount: Number(e.target.value),
+                };
+              })
+            }
+            placeholder="Enter Discount %"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Discount % : </span>
+          <span className="w-full text-right">{data?.discount || 0}</span>
+        </div>
+      )}
+
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Discounted Price : </span>
+        <span className="w-full text-right">
+          {data?.price
+            ? data?.price - 0.01 * data?.discount * data?.price
+            : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">CGST : </span>
+        <span className="w-full text-right">
+          {data?.price
+            ? 0.09 * (data?.price - 0.01 * data?.discount * data?.price)
+            : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">SGST : </span>
+        <span className="w-full text-right">
+          {data?.price
+            ? 0.09 * (data?.price - 0.01 * data?.discount * data?.price)
+            : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Existing Security Deposit : </span>
+        <span className="w-full text-right">{data?.deposit}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">New Security Deposit : </span>
+        <span className="w-full text-right">{hallData?.securityDeposit}</span>
+      </div>
+      <span>
+        <label htmlFor="paidornot">Security Deposit Type : </label>
+        <select
+          id="paidornot"
+          className="px-2 py-1 rounded-md border border-gray-400 my-1"
+          onChange={(e) => {
+            if (e.target.value === "existing") {
+              editDepositAmount.mutate(data?.deposit || 0);
+            }
+            if (e.target.value === "none") {
+              editDepositAmount.mutate(0);
+            }
+            if (e.target.value === "new") {
+              editDepositAmount.mutate(hallData?.securityDeposit || 0);
+            }
+          }}
+        >
+          <option value="existing">Existing</option>
+          <option value="none">None</option>
+          <option value="new">New</option>
+        </select>
+      </span>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Final Price : </span>
+        <span className="w-full text-right">
+          {data
+            ? data?.price -
+              0.01 * data?.discount * data?.price +
+              0.18 * (data?.price - 0.01 * data?.discount * data?.price) +
+              data?.deposit
+            : 0}
+        </span>
+      </div>
 
       {showCancellationReason ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600 my-5">

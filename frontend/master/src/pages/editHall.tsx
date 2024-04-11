@@ -14,6 +14,7 @@ import { queryClient } from "../App";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import HallRestrictions from "../components/editHall/HallRestrictions";
+import HallDeposit from "../components/editHall/HallDeposit";
 import HallPricing from "../components/editHall/HallPricing";
 
 export default function EditHall() {
@@ -119,6 +120,12 @@ export default function EditHall() {
           />
           <HallCapacity
             capacity={hallData.capacity}
+            setHallData={
+              setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
+            }
+          />
+          <HallDeposit
+            securityDeposit={hallData.securityDeposit}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }

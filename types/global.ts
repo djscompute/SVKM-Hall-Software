@@ -42,6 +42,7 @@ export interface EachHallType {
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
   sessions: EachHallSessionType[];
   eventRestrictions: string;
+  securityDeposit: number;
   readonly createdAt?: Date;
   readonly updatedAt?: Date;
 }
@@ -74,8 +75,11 @@ export type HallBookingType = {
   status: bookingStatusType; // payment and booking status is reflected here
   price: number; // obvio bro
   transaction: bookingTransactionType;
+  discount: number;
+  deposit: number;
   hallId: string;
   session_id: string; // the sesison id
+  booking_type: string;
   from: string; // starting time of session
   to: string; // ending time of session
   time: {

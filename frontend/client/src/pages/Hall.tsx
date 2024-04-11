@@ -98,17 +98,17 @@ function Hall() {
                     <div>{data.location.desc2}</div>
                   </div>
                 </h1>
-                  <a
-                    href={data.location.gmapurl}
-                    className="flex items-center justify-center bg-blue-300 w-auto md:w-32 lg:w-40 my-2 p-1 rounded-md border-2 border-blue-400"
-                    target="_blank"
-                  >
-                    <FontAwesomeIcon
-                      className="text-red-600"
-                      icon={faLocationDot}
-                    />
-                    <span className="ml-1 ">View on map</span>
-                  </a>
+                <a
+                  href={data.location.gmapurl}
+                  className="flex items-center justify-center bg-blue-300 w-auto md:w-32 lg:w-40 my-2 p-1 rounded-md border-2 border-blue-400"
+                  target="_blank"
+                >
+                  <FontAwesomeIcon
+                    className="text-red-600"
+                    icon={faLocationDot}
+                  />
+                  <span className="ml-1 ">View on map</span>
+                </a>
                 {finalIframeUrl && (
                   <iframe
                     src={finalIframeUrl}
@@ -161,8 +161,21 @@ function Hall() {
               </div>
 
               <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
+                <h2 className="font-bold text-xl mb-3">
+                  Security Deposit ( if applicable )
+                </h2>
+                <div className="flex ">
+                  <p>Security Deposit Amount : </p>
+                  <p> Rs. {data.securityDeposit}</p>
+                </div>
+              </div>
+
+              <div className="w-[95%] mx-auto my-5 border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
                 <h2 className="font-bold text-xl mb-3">Event Restrictions</h2>
-                <p>The following types of events are not allowed to be booked at this hall.</p>
+                <p>
+                  The following types of events are not allowed to be booked at
+                  this hall.
+                </p>
                 <div className="flex ">
                   {data.eventRestrictions ? (
                     data.eventRestrictions
