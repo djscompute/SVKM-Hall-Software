@@ -3,12 +3,52 @@ import logger from "../utils/logger";
 import createUser from "../service/createAdmin";
 import authenticateUser from "../service/authAdmin";
 import { signAccessToken, signRefreshToken } from "../utils/signToken";
-import {getUserDatabyEmail, getUserDatabyUsername} from "../service/getAdminData";
+import {getUserDatabyEmail, getUserDatabyUsername, getUserDatabyId} from "../service/getAdminData";
+import { updateUserById } from "../service/updateAdminData";
 import { createSession } from "../service/createSession";
 import { deleteSession } from "../service/deleteSession";
 import { AuthenticatedRequest } from "../types/requests";
 import { HallModel } from "../models/hall.model";
 import { adminType } from "../models/admin.model";
+
+
+export async function updateAdminByIdHandler(req: Request, res: Response) {
+  try {
+    const { _id, ...updateData } = req.body;
+
+    const existingUser = await getUserDatabyId(_id);
+    if (!existingUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (updateData.email) {
+      const existingUserByEmail = await getUserDatabyEmail(updateData.email);
+      if (existingUserByEmail && existingUserByEmail._id !== _id) {
+        return res.status(409).json({ error: 'Admin with this email already exists' });
+      }
+    }
+
+    if (updateData.username) {
+      const existingUserByUsername = await getUserDatabyUsername(updateData.username);
+      if (existingUserByUsername && existingUserByUsername._id !== _id) {
+        return res.status(409).json({ error: 'Admin with this username already exists' });
+      }
+    }
+
+    const updatedUser = await updateUserById(_id, updateData);
+
+    if (!updatedUser) {
+      return res.status(500).json({ error: 'Failed to update user' });
+    }
+
+    return res.status(200).json(updatedUser);
+  } catch (error: any) {
+    console.error('Error updating user by id:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+
 
 export async function createAdminHandler(req: Request, res: Response) {
   try {
@@ -100,6 +140,22 @@ export async function logoutAdminHandler(req: Request, res: Response) {
   }
 }
 
+export async function getAdminByIdHandler(req: Request, res: Response) {
+  try {
+    const userId = req.params.id; 
+    
+    const user = await getUserDatabyId(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json(user);
+  } catch (error: any) {
+    console.error("Error fetching user by id:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
 export async function getAdminByEmailHandler(req: Request, res: Response) {
   try {
     const userEmail = req.params.email;
