@@ -29,7 +29,7 @@ export default function Card(
           </span>
         </div>
         <img
-          className=" rounded-md z-0"
+          className="w-full h-96 rounded-md z-0"
           src={props.images ? props.images[0] : "null"}
         />
       </div>
@@ -40,8 +40,8 @@ export default function Card(
         </span>
         <span className="font-medium w-full">{props.location.desc1}</span>
         <div className="flex flex-wrap justify-between">
-          <span className="text-gray-800">
-            capacity:
+          <span className="text-gray-800 mt-1">
+            Capacity:
             <span className="text-black">{props.capacity}</span>
           </span>
         </div>

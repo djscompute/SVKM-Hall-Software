@@ -80,6 +80,7 @@ function BookADay() {
           price: price,
           hallId: id,
           session_id: selectedSessionId,
+          booking_type: selectedCategory,
           from: `${day}T${
             HallData?.sessions.find((ecssn) => ecssn._id == selectedSessionId)
               ?.from as string
@@ -231,6 +232,7 @@ function BookADay() {
         price: price,
         hallId: id,
         session_id: selectedSessionId,
+        booking_type: selectedCategory,
         from: `${day}T${
           HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.from
         }`,
@@ -418,14 +420,14 @@ function BookADay() {
             <b>Purpose (Event Type)</b>
           </label>
           <div>
-            <p className=" text-xs text-red-500 font-semibold">
+            <p className=" text-xs text-orange-500 font-semibold">
               The following types of events are not allowed to be booked at this
               hall:
             </p>
             {HallData &&
             HallData.eventRestrictions &&
             HallData.eventRestrictions.length > 0 ? (
-              <p className=" text-xs text-red-500 font-semibold">
+              <p className=" text-xs text-orange-500 font-semibold">
                 - {HallData?.eventRestrictions}
               </p>
             ) : (
