@@ -23,14 +23,14 @@ export async function updateAdminByIdHandler(req: Request, res: Response) {
 
     if (updateData.email) {
       const existingUserByEmail = await getUserDatabyEmail(updateData.email);
-      if (existingUserByEmail && existingUserByEmail._id !== _id) {
+      if (existingUserByEmail._id && existingUserByEmail._id.toString() !== _id) {
         return res.status(409).json({ error: 'Admin with this email already exists' });
       }
     }
 
     if (updateData.username) {
       const existingUserByUsername = await getUserDatabyUsername(updateData.username);
-      if (existingUserByUsername && existingUserByUsername._id !== _id) {
+      if (existingUserByUsername._id && existingUserByUsername._id.toString() !== _id) {
         return res.status(409).json({ error: 'Admin with this username already exists' });
       }
     }
@@ -143,7 +143,7 @@ export async function logoutAdminHandler(req: Request, res: Response) {
 export async function getAdminByIdHandler(req: Request, res: Response) {
   try {
     const userId = req.params.id; 
-    
+
     const user = await getUserDatabyId(userId);
 
     if (!user) {
