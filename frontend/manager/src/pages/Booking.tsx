@@ -107,32 +107,6 @@ function Booking() {
     },
   });
 
-  const editDepositAmount = useMutation({
-    mutationFn: async (newDeposit: number) => {
-      console.log(hallData);
-      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
-        ...data,
-        deposit: newDeposit,
-      });
-      toast.promise(responsePromise, {
-        pending: "Updating...",
-        success: "Booking Status Edited!",
-        error: "Failed to Booking Hall. Please Reload and try again.",
-      });
-      const response = await responsePromise;
-      console.log(response.data);
-    },
-    onSuccess: async () => {
-      console.log("REVALIDATING");
-      await queryClient.refetchQueries({
-        queryKey: [`booking/${bookingId}`],
-      });
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-
   const handleEdit = () => {
     setEditingMode(true);
     if (!editedData) {
