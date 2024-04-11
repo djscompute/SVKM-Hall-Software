@@ -11,13 +11,13 @@ export type { CustomerType, HallBookingType, bookingStatusType };
 
 export const CustomerSchema = new mongoose.Schema<CustomerType>({
   username: { type: String, required: true },
-  contact: { type: String},
+  contact: { type: String },
   email: { type: String },
   aadharNo: { type: String },
   panNo: { type: String },
   address: { type: String },
   mobile: { type: String, required: true },
-  remark:{type:String},
+  remark: { type: String },
 });
 
 const HallAdditonalFeaturesSchema =
@@ -41,6 +41,15 @@ const BookingSchema = new mongoose.Schema<HallBookingType>(
       required: true,
     },
     price: { type: Number, required: true },
+    transaction: {
+      type: { type: String },
+      date: { type: String },
+      transactionID: { type: String },
+      transactionNo: { type: String },
+      utrNo: { type: String },
+      chequeNo: { type: String },
+      bank: { type: String },
+    },
     discount: { type: Number },
     deposit : { type: Number },
     hallId: { type: String, required: true },

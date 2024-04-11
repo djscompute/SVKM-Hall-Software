@@ -6,6 +6,7 @@ import {
   EachHallType,
   HallBookingType,
   bookingStatusType,
+  transactionType,
 } from "../../../../types/global";
 import { useParams } from "react-router-dom";
 // import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
@@ -61,6 +62,34 @@ function Booking() {
         cancellationReason: showCancellationReason
           ? cancellationReason
           : undefined,
+      });
+      toast.promise(responsePromise, {
+        pending: "Updating...",
+        success: "Booking Status Edited!",
+        error: "Failed to Booking Hall. Please Reload and try again.",
+      });
+      const response = await responsePromise;
+      console.log(response.data);
+    },
+    onSuccess: async () => {
+      console.log("REVALIDATING");
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${bookingId}`],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const editTransactionType = useMutation({
+    mutationFn: async (newTransaction: transactionType) => {
+      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
+        ...data,
+        transaction: {
+          ...data?.transaction,
+          type: newTransaction,
+        },
       });
       toast.promise(responsePromise, {
         pending: "Updating...",
@@ -358,6 +387,7 @@ function Booking() {
           </div>
         </div>
       ))}
+
       <span className=" text-lg font-medium">Billing</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Total Price : </span>
@@ -456,8 +486,215 @@ function Booking() {
         </span>
       </div>
 
+      <span className=" text-lg font-medium">Transaction Details</span>
+      <span>
+        <label htmlFor="transaction">Choose a Transaction Type: </label>
+        <select
+          id="transaction"
+          value={data?.transaction?.type || ""}
+          className="px-2 py-1 rounded-md border border-gray-400 my-2"
+          onChange={(e) =>
+            editTransactionType.mutate(e.target.value as transactionType)
+          }
+        >
+          <option value="" disabled>
+            Select an option
+          </option>
+          <option value="cheque">Cheque</option>
+          <option value="upi">UPI</option>
+          <option value="neft">NEFT</option>
+          <option value="rtgs">RTGS</option>
+        </select>
+      </span>
+      {["cheque", "neft", "rtgs"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Date : </span>
+            <input
+              type="text"
+              value={editedData?.transaction?.date}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      date: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Date of Transaction"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Date : </span>
+            <span className="w-full text-right">
+              {data?.transaction?.date || "-"}
+            </span>
+          </div>
+        ))}
+      {["upi"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Transaction ID : </span>
+            <input
+              type="text"
+              value={editedData?.transaction?.transactionID}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      transactionID: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Transaction ID"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Transaction ID : </span>
+            <span className="w-full text-right">
+              {data?.transaction?.transactionID || "-"}
+            </span>
+          </div>
+        ))}
+      {["neft"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Transaction No. : </span>
+            <input
+              type="text"
+              value={editedData?.transaction?.transactionNo}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      transactionNo: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Transaction Number"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Transaction No. : </span>
+            <span className="w-full text-right">
+              {data?.transaction?.transactionNo || "-"}
+            </span>
+          </div>
+        ))}
+      {["rtgs"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">UTR No. : </span>
+            <input
+              type="text"
+              value={editedData?.transaction?.utrNo}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      utrNo: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter UTR Number"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">UTR No. : </span>
+            <span className="w-full text-right">
+              {data?.transaction?.utrNo || "-"}
+            </span>
+          </div>
+        ))}
+      {["cheque"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Cheque No. : </span>
+            <input
+              type="text"
+              value={editedData?.transaction?.chequeNo}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      chequeNo: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Cheque Number"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Cheque No. : </span>
+            <span className="w-full text-right">
+              {data?.transaction?.chequeNo || "-"}
+            </span>
+          </div>
+        ))}
+      {["cheque"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Bank : </span>
+            <input
+              type="text"
+              value={editedData?.transaction?.bank}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      bank: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Bank Name"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Bank : </span>
+            <span className="w-full text-right">
+              {data?.transaction?.bank || "-"}
+            </span>
+          </div>
+        ))}
+
       {showCancellationReason ? (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600 my-5">
           <span className="w-full text-left">Cancellation Reason : </span>
           <input
             type="text"
