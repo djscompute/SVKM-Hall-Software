@@ -24,6 +24,8 @@ function Booking() {
   const [hallData, setHallData] = useState<EachHallType>();
   const [editingMode, setEditingMode] = useState(false);
   const [editedData, setEditedData] = useState<HallBookingType>();
+  const [showCancellationReason, setShowCancellationReason] = useState(false);
+  const [cancellationReason, setCancellationReason] = useState("");
 
   const { data, error, isFetching } = useQuery({
     queryKey: [`booking/${bookingId}`],
@@ -56,6 +58,35 @@ function Booking() {
       const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
         ...data,
         status: newStatus,
+        cancellationReason: showCancellationReason
+          ? cancellationReason
+          : undefined,
+      });
+      toast.promise(responsePromise, {
+        pending: "Updating...",
+        success: "Booking Status Edited!",
+        error: "Failed to Booking Hall. Please Reload and try again.",
+      });
+      const response = await responsePromise;
+      console.log(response.data);
+    },
+    onSuccess: async () => {
+      console.log("REVALIDATING");
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${bookingId}`],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const editDepositAmount = useMutation({
+    mutationFn: async (newDeposit: number) => {
+      console.log(hallData);
+      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
+        ...data,
+        deposit: newDeposit,
       });
       toast.promise(responsePromise, {
         pending: "Updating...",
@@ -133,6 +164,33 @@ function Booking() {
   const priceEntry = session?.price.find(
     (price) => price.categoryName === data?.booking_type
   );
+
+  const handleCancellation = async () => {
+    editBookingStatus.mutate("CANCELLED");
+    setShowCancellationReason(false);
+  };
+
+  const handleSaveCancellationReason = async () => {
+    const updatedData = {
+      ...data,
+      cancellationReason: cancellationReason,
+    };
+
+    const responsePromise = axiosInstance.post(
+      `/editBooking/${bookingId}`,
+      updatedData
+    );
+    toast.promise(responsePromise, {
+      pending: "Saving Cancellation Reason...",
+      success: "Cancellation Reason Saved!",
+      error: "Failed to save Cancellation Reason. Please try again.",
+    });
+    await responsePromise;
+    setShowCancellationReason(false);
+    await queryClient.refetchQueries({
+      queryKey: [`booking/${bookingId}`],
+    });
+  };
 
   if (isFetching) return <h1>Loading</h1>;
 
@@ -423,6 +481,38 @@ function Booking() {
             : 0}
         </span>
       </div>
+
+      {showCancellationReason ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Cancellation Reason : </span>
+          <input
+            type="text"
+            value={cancellationReason}
+            onChange={(e) => setCancellationReason(e.target.value)}
+            placeholder="Enter Cancellation Reason"
+            className="px-2"
+          />
+          <button
+            onClick={async () => {
+              await handleSaveCancellationReason();
+              handleCancellation();
+            }}
+            className="bg-green-500 px-4 text-white py-1 rounded-lg"
+          >
+            Confirm Cancellation
+          </button>
+        </div>
+      ) : (
+        <></>
+      )}
+
+      {data?.cancellationReason && (
+        <div className="w-full flex justify-between my-2 bg-red-400 rounded-sm px-2 py-1 border text-white">
+          <span className="text-lg font-medium">Cancellation Reason</span>
+          <span>{data?.cancellationReason}</span>
+        </div>
+      )}
+
       <span className=" mb-3">STATUS: {data?.status}</span>
 
       {editingMode ? (
@@ -435,17 +525,32 @@ function Booking() {
       ) : (
         <button
           onClick={handleEdit}
-          className=" mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
+          className=" mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
         >
           Edit Details
         </button>
       )}
 
+      {/* {!showCancellationReason && (
+        <button
+          onClick={() => {
+            setShowCancellationReason(true);
+          }}
+          className="bg-blue-600 px-4 mb-2 text-white py-1 rounded-lg"
+        >
+          Handle Cancellation
+        </button>
+      )} */}
+
       <select
         value={data?.status}
         onChange={(e) => {
           console.log(e.target.value);
-          editBookingStatus.mutate(e.target.value as bookingStatusType);
+          if (e.target.value == "CANCELLED") {
+            setShowCancellationReason(true);
+          } else {
+            editBookingStatus.mutate(e.target.value as bookingStatusType);
+          }
         }}
         className="px-2 py-1 rounded-md border border-gray-400"
       >

@@ -34,8 +34,8 @@ function BookADay() {
     email: "",
     mobileNumber: "",
     purpose: "",
-    sessionType: "", 
-    bookingType: ""
+    sessionType: "",
+    bookingType: "",
   });
   const [selectedFeatures, setSelectedFeatures] = useState<{
     [key: string]: EachHallAdditonalFeaturesType;
@@ -57,6 +57,7 @@ function BookADay() {
           error: "Failed to fetch Hall. Please try again.",
         });
         const response = await responsePromise;
+        console.log(response.data);
         return response.data as EachHallType;
       } catch (error) {
         throw error;
@@ -150,21 +151,29 @@ function BookADay() {
   });
 
   const handleSubmit = () => {
-    let newErrors = { name: "", person: "", email: "", mobileNumber: "", purpose: "", sessionType: "", bookingType: "" };
+    let newErrors = {
+      name: "",
+      person: "",
+      email: "",
+      mobileNumber: "",
+      purpose: "",
+      sessionType: "",
+      bookingType: "",
+    };
     let hasErrors = false;
-  
+
     // Validate name field
     if (!name) {
       newErrors.name = "Name is required";
       hasErrors = true;
     }
-  
+
     // Validate contact person field
     if (!person) {
       newErrors.person = "Contact Person is required";
       hasErrors = true;
     }
-  
+
     // Validate email field
     if (!email) {
       newErrors.email = "Email Address is required";
@@ -173,7 +182,7 @@ function BookADay() {
       newErrors.email = "Please enter a valid email address";
       hasErrors = true;
     }
-  
+
     // Validate mobile number field
     if (!mobileNumber) {
       newErrors.mobileNumber = "Mobile number is required";
@@ -182,33 +191,33 @@ function BookADay() {
       newErrors.mobileNumber = "Please enter a valid Mobile Number";
       hasErrors = true;
     }
-  
+
     // Validate session type selection
     if (!selectedSessionId) {
       newErrors.sessionType = "Session Type is required";
       hasErrors = true;
     }
-  
+
     // Validate booking type selection
     if (!selectedCategory) {
       newErrors.bookingType = "Booking Type is required";
       hasErrors = true;
     }
-  
+
     // Validate purpose field
     if (!purpose) {
       newErrors.purpose = "Purpose is required";
       hasErrors = true;
     }
-  
+
     // Set errors if any
     setErrors(newErrors);
-  
+
     // If there are errors, return early
     if (hasErrors) {
       return;
-    }  
-  
+    }
+
     // Proceed with mutation
     if (isDetailsConfirmed) {
       const bookingData = {
@@ -224,16 +233,20 @@ function BookADay() {
         hallId: id,
         session_id: selectedSessionId,
         booking_type: selectedCategory,
-        from: `${day}T${HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.from}`,
-        to: `${day}T${HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to}`,
+        from: `${day}T${
+          HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.from
+        }`,
+        to: `${day}T${
+          HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to
+        }`,
         purpose: purpose,
       };
-      console.log(bookingData)
+      console.log(bookingData);
       // Perform mutation
       addBookingMutation.mutate();
     }
   };
-  
+
   const handleCheckboxChange = (feature: EachHallAdditonalFeaturesType) => {
     setSelectedFeatures((prevSelectedFeatures) => {
       if (prevSelectedFeatures[feature._id!]) {
@@ -270,11 +283,11 @@ function BookADay() {
   }, [selectedFeatures, selectedSessionId, selectedCategory]);
 
   return (
-    <div className="flex flex-col items-center py-10 gap-3">
-      <h1 className="text-3xl font-semibold">
+    <div className="flex flex-col mx-10 items-center py-10 gap-3">
+      <h1 className="text-3xl text-center font-semibold">
         Book {HallData?.name} for {humanReadableDate}
       </h1>
-      <span>
+      <span className="text-center">
         <b>Estimated Price :</b> ₹{price} + GST (if applicable)
       </span>
       <div className="flex flex-col gap-4">
@@ -309,35 +322,38 @@ function BookADay() {
         {errors.sessionType && (
           <p className="text-red-500">{errors.sessionType}</p>
         )}
-        {selectedSessionId && (<>
-        <label htmlFor="booking">
-          <b>Booking Type</b>
-        </label>
-        
-          <select
-            className="p-2 rounded-md border border-black"
-            id="booking"
-            value={selectedCategory}
-            onChange={(e) => {
-              setSelectedCategory(e.target.value);
-            }}
-          >
-            <option value="">Select your booking type</option>
-            {HallData?.sessions
-              .find((ss) => ss._id == selectedSessionId)
-              ?.price?.map((eachSessionCategory) => (
-                <option
-                  key={eachSessionCategory.categoryName}
-                  value={eachSessionCategory.categoryName}
-                  className={`flex flex-col text-center`}
-                >
-                  {eachSessionCategory.categoryName}
-                </option>
-              ))}
-          </select>
+        {selectedSessionId && (
+          <>
+            <label htmlFor="booking">
+              <b>Booking Type</b>
+            </label>
+
+            <select
+              className="p-2 rounded-md border border-black"
+              id="booking"
+              value={selectedCategory}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value);
+              }}
+            >
+              <option value="">Select your booking type</option>
+              {HallData?.sessions
+                .find((ss) => ss._id == selectedSessionId)
+                ?.price?.map((eachSessionCategory) => (
+                  <option
+                    key={eachSessionCategory.categoryName}
+                    value={eachSessionCategory.categoryName}
+                    className={`flex flex-col text-center`}
+                  >
+                    {eachSessionCategory.categoryName}
+                  </option>
+                ))}
+            </select>
           </>
         )}
-         {selectedSessionId && errors.bookingType && (<p className="text-red-500">{errors.bookingType}</p>)}
+        {selectedSessionId && errors.bookingType && (
+          <p className="text-red-500">{errors.bookingType}</p>
+        )}
         <label htmlFor="name">
           <b>Customer Name</b>
         </label>
@@ -426,9 +442,7 @@ function BookADay() {
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           />
-          {errors.purpose && (
-          <p className="text-red-500">{errors.purpose}</p>
-        )}
+          {errors.purpose && <p className="text-red-500">{errors.purpose}</p>}
         </div>
 
         <h6>

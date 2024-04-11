@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import HallRestrictions from "../components/editHall/HallRestrictions";
 import HallDeposit from "../components/editHall/HallDeposit";
+import HallPricing from "../components/editHall/HallPricing";
 
 export default function EditHall() {
   let { id: HallID } = useParams();
@@ -136,6 +137,12 @@ export default function EditHall() {
             }
           />
           <HallSessions
+            sessions={hallData.sessions}
+            setHallData={
+              setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
+            }
+          />
+          <HallPricing
             sessions={hallData.sessions}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>

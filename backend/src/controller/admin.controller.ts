@@ -3,21 +3,39 @@ import logger from "../utils/logger";
 import createUser from "../service/createAdmin";
 import authenticateUser from "../service/authAdmin";
 import { signAccessToken, signRefreshToken } from "../utils/signToken";
-import getUserData from "../service/getAdminData";
+import {getUserDatabyEmail, getUserDatabyUsername, getUsers} from "../service/getAdminData";
 import { createSession } from "../service/createSession";
 import { deleteSession } from "../service/deleteSession";
 import { AuthenticatedRequest } from "../types/requests";
 import { HallModel } from "../models/hall.model";
+import { adminType } from "../models/admin.model";
 
 export async function createAdminHandler(req: Request, res: Response) {
   try {
-    const userInstance = await createUser(req.body);
+    const { email, username } = req.body;
 
+    const existingUserByEmail: Omit<adminType, "password"> = await getUserDatabyEmail(email);
+    if (!isOmittedAdminTypeEmpty(existingUserByEmail)) {
+      return res.status(409).json({ error: "Admin with this email already exists" });
+    }
+
+    const existingUserByUsername: Omit<adminType, "password"> = await getUserDatabyUsername(username);
+    if (!isOmittedAdminTypeEmpty(existingUserByUsername)) {
+      return res.status(409).json({ error: "Admin with this username already exists" });
+    }
+
+    const userInstance = await createUser(req.body);
     res.status(200).json(userInstance);
+
   } catch (error: any) {
     logger.error(error);
     res.status(400).json({ name: error.name, message: error.message });
   }
+}
+
+// Function to check if Omit<adminType, "password"> object is empty
+function isOmittedAdminTypeEmpty(obj: Omit<adminType, "password">): boolean {
+  return Object.keys(obj).length === 0;
 }
 
 export async function loginAdminHandler(req: Request, res: Response) {
@@ -54,7 +72,7 @@ export async function getAdminHandler(req: Request, res: Response) {
   try {
     const authenticatedReq = req as AuthenticatedRequest;
     const email: string = authenticatedReq.userEmail;
-    const userInstance = await getUserData(email);
+    const userInstance = await getUserDatabyEmail(email);
 
     // if (!userInstance) res.status(404).json({ error: "User not found" });
 
@@ -82,11 +100,29 @@ export async function logoutAdminHandler(req: Request, res: Response) {
   }
 }
 
+//Get all admins
+export async function getAdmins(req: Request, res: Response) {
+  try {
+    const userEmail = req.params.email;
+
+    const user = await getUsers();
+
+    if (!user) {
+      return res.status(404).json({ message: "Users not found" });
+    }
+
+    return res.status(200).json(user);
+  } catch (error: any) {
+    console.error("Error fetching users:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 export async function getAdminByEmailHandler(req: Request, res: Response) {
   try {
     const userEmail = req.params.email;
 
-    const user = await getUserData(userEmail);
+    const user = await getUserDatabyEmail(userEmail);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -98,12 +134,28 @@ export async function getAdminByEmailHandler(req: Request, res: Response) {
     return res.status(500).json({ message: "Internal server error" });
   }
 }
+export async function getAdminByUsernameHandler(req: Request, res: Response) {
+  try {
+    const userUsername = req.params.username;
+
+    const user = await getUserDatabyUsername(userUsername);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json(user);
+  } catch (error: any) {
+    console.error("Error fetching user by username:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
 
 export async function getHallsforAdminHandler(req: Request, res: Response) {
   try {
     const userEmail = req.params.email;
 
-    const user = await getUserData(userEmail);
+    const user = await getUserDatabyEmail(userEmail);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

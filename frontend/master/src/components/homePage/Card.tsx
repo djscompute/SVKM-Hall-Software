@@ -14,7 +14,7 @@ export default function Card(
   return (
     <Link
       to={`/halls/${props._id}`}
-      className="flex flex-col rounded-lg bg-white w-full lg:w-1/3 m-3 md:m-10 lg:m-0 drop-shadow-2xl pb-4 border-2 border-gray-300 "
+      className="flex flex-col rounded-lg bg-white w-full lg:w-1/3 m-3 md:m-10 lg:m-2 drop-shadow-2xl pb-4 border-2 border-gray-300 "
     >
       {/* IMAGE PART */}
       <div className="flex justify-center w-full relative">

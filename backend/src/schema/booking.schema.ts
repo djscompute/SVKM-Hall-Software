@@ -35,6 +35,8 @@ export const AddBookingZodSchema = z.object({
     from: z.string(stringErrorHandler("from")),
     to: z.string(stringErrorHandler("to")),
     purpose: z.string(stringErrorHandler("purpose")),
+    cancellationReason: z.string(stringErrorHandler("cancellationReason")).optional(),
+    
   }),
 });
 
@@ -45,6 +47,7 @@ export const RemoveBookingZodSchema = z.object({
       invalid_type_error: "Id should be a string value.",
     }),
   }),
+  // cancellationReason: z.string(),
 });
 
 //Zod Schema for getting a session by {from, to}

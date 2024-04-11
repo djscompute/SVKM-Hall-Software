@@ -14,7 +14,7 @@ const NavBar = () => {
     store.logout,
   ]);
   const navigate = useNavigate();
-  
+
   useQuery({
     queryKey: ["loggedIn"],
     queryFn: async () => {
@@ -90,6 +90,30 @@ const NavBar = () => {
                 Home
               </Link>
             </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/createadmin"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Create Admin
+              </Link>
+            </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/addnewhall"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Add Hall
+              </Link>
+            </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/admins"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                View Admins
+              </Link>
+            </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
               {isAuthenticated ? (
                 <div className="flex items-center gap-2">
@@ -129,7 +153,7 @@ const NavBar = () => {
           className={
             open
               ? "opacity-100 scale-100 ease-out duration-200 absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden z-40"
-              : "opacity-0 scale-95 absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden z-40"
+              : "hidden scale-95 absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden z-40"
           }
         >
           <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50">
@@ -177,6 +201,14 @@ const NavBar = () => {
                   className="text-base font-medium text-gray-900 hover:text-gray-700"
                 >
                   Home
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                <Link
+                  to="/createadmin"
+                  className="text-base font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Create Admin
                 </Link>
               </div>
               <div className="">

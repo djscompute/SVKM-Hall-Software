@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../config/axiosInstance";
@@ -11,6 +11,8 @@ import ImageCarousel from "../components/addHall/ImageCarousel";
 import { queryClient } from "../App";
 import HallRestrictions from "../components/addHall/HallRestrictions";
 import HallDeposit from "../components/addHall/HallDeposit";
+import HallPricing from "../components/addHall/HallPricing";
+import { toast } from "react-toastify";
 
 function AddHall() {
   const [hallData, setHallData] = useState<EachHallType>({
@@ -106,6 +108,7 @@ function AddHall() {
         }),
     mutationKey: ["addhall"],
     onSuccess: async () => {
+      toast.success("Hall added successfully");
       await queryClient.refetchQueries({
         queryKey: [`allhalls`],
       });
@@ -142,6 +145,7 @@ function AddHall() {
         setHallData={setHallData}
       />
       <HallSessions sessions={hallData.sessions} setHallData={setHallData} />
+      <HallPricing sessions={hallData.sessions} setHallData={setHallData} />
       {hallData.additionalFeatures && (
         <HallAdditionalFeatures
           additionalFeatures={hallData.additionalFeatures}

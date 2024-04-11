@@ -74,6 +74,7 @@ export type HallBookingType = {
     to: string; // end time
   };
   purpose: string //purpose for which the hall is being booked by the user (event type)
+  cancellationReason?: string; // reason for cancellation
 };
 
 // ================================================
@@ -84,7 +85,7 @@ export interface adminType {
   readonly _id: string;
   role: string;
   username: string;
-  contact: String;
+  contact: string;
   email: string;
   password: string;
   managedHalls?: string[];  // id of the halls which he has the access to

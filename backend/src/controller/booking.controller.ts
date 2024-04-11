@@ -81,6 +81,7 @@ export async function editBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
+      cancellationReason
     } = req.body as HallBookingType;
     const bookingId: string = req.params.id;
 
@@ -100,6 +101,7 @@ export async function editBookingHandler(req: Request, res: Response) {
         to,
         time,
         purpose,
+        cancellationReason
       },
       { new: true }
     );
