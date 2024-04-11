@@ -52,6 +52,18 @@ export type bookingStatusType =
   | "CANCELLED"
   | "ENQUIRY";
 
+export type transactionType = "cheque" | "upi" | "neft" | "rtgs";
+
+export type bookingTransactionType = {
+  type: transactionType;
+  date: string;
+  transactionID: string;
+  transactionNo: string;
+  utrNo: string;
+  chequeNo: string;
+  bank: string;
+};
+
 // ================================================
 // This will be in Bookings Table
 // ================================================
@@ -61,6 +73,7 @@ export type HallBookingType = {
   features: EachHallAdditonalFeaturesType[]; // the Ammenities which the user has booked for himself
   status: bookingStatusType; // payment and booking status is reflected here
   price: number; // obvio bro
+  transaction: bookingTransactionType;
   hallId: string;
   session_id: string; // the sesison id
   from: string; // starting time of session
@@ -69,7 +82,7 @@ export type HallBookingType = {
     from: string; // start time
     to: string; // end time
   };
-  purpose: string //purpose for which the hall is being booked by the user (event type)
+  purpose: string; //purpose for which the hall is being booked by the user (event type)
   cancellationReason?: string; // reason for cancellation
 };
 
@@ -84,7 +97,7 @@ export interface adminType {
   contact: string;
   email: string;
   password: string;
-  managedHalls?: string[];  // id of the halls which he has the access to
+  managedHalls?: string[]; // id of the halls which he has the access to
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
