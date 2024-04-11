@@ -28,7 +28,7 @@ export const AddBookingZodSchema = z.object({
     status: z.enum(["CONFIRMED", "TENTATIVE", "CANCELLED", "ENQUIRY"]),
     price: z.number(stringErrorHandler("price")),
     discount: z.number(stringErrorHandler("discount")).optional(),
-    final_price: z.number(stringErrorHandler("final_price")).optional(),
+    deposit: z.number(stringErrorHandler("deposit")).optional(),
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
     booking_type: z.string(stringErrorHandler("booking_type")),

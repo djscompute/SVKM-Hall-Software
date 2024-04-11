@@ -24,8 +24,6 @@ function Booking() {
   const [hallData, setHallData] = useState<EachHallType>();
   const [editingMode, setEditingMode] = useState(false);
   const [editedData, setEditedData] = useState<HallBookingType>();
-  const [isDepositApplicable, setIsDepositApplicable] =
-    useState<boolean>(false);
 
   const { data, error, isFetching } = useQuery({
     queryKey: [`booking/${bookingId}`],
@@ -58,6 +56,32 @@ function Booking() {
       const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
         ...data,
         status: newStatus,
+      });
+      toast.promise(responsePromise, {
+        pending: "Updating...",
+        success: "Booking Status Edited!",
+        error: "Failed to Booking Hall. Please Reload and try again.",
+      });
+      const response = await responsePromise;
+      console.log(response.data);
+    },
+    onSuccess: async () => {
+      console.log("REVALIDATING");
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${bookingId}`],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const editDepositAmount = useMutation({
+    mutationFn: async (newDeposit: number) => {
+      console.log(hallData);
+      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
+        ...data,
+        deposit: newDeposit,
       });
       toast.promise(responsePromise, {
         pending: "Updating...",
@@ -274,6 +298,10 @@ function Booking() {
         <span className="w-full text-right">{data?.status || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Booking Type : </span>
+        <span className="w-full text-right">{data?.booking_type || "-"}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Purpose : </span>
         <span className="w-full text-right">{data?.purpose || "-"}</span>
       </div>
@@ -326,7 +354,7 @@ function Booking() {
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">Discount % : </span>
-          <span className="w-full text-right">{data?.discount || "-"}</span>
+          <span className="w-full text-right">{data?.discount || 0}</span>
         </div>
       )}
 
@@ -355,28 +383,44 @@ function Booking() {
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Security Deposit : </span>
+        <span className="w-full text-left">Existing Security Deposit : </span>
+        <span className="w-full text-right">{data?.deposit}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">New Security Deposit : </span>
         <span className="w-full text-right">{hallData?.securityDeposit}</span>
       </div>
       <span>
-        <label htmlFor="paidornot">Is Security Deposit Applicable : </label>
-        <input
-          type="checkbox"
+        <label htmlFor="paidornot">Security Deposit Type : </label>
+        <select
           id="paidornot"
-          checked={isDepositApplicable}
-          onChange={() => setIsDepositApplicable((prev) => !prev)}
-        />
+          className="px-2 py-1 rounded-md border border-gray-400 my-1"
+          onChange={(e) => {
+            if (e.target.value === "existing") {
+              editDepositAmount.mutate(data?.deposit || 0);
+            }
+            if (e.target.value === "none") {
+              editDepositAmount.mutate(0);
+            }
+            if (e.target.value === "new") {
+              editDepositAmount.mutate(hallData?.securityDeposit || 0);
+            }
+          }}
+        >
+          <option value="existing">Existing</option>
+          <option value="none">None</option>
+          <option value="new">New</option>
+        </select>
       </span>
-
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Final Price : </span>
         <span className="w-full text-right">
-          {data?.price
+          {data
             ? data?.price -
               0.01 * data?.discount * data?.price +
               0.18 * (data?.price - 0.01 * data?.discount * data?.price) +
-              (isDepositApplicable ? hallData?.securityDeposit || 0 : 0)
-            : "-"}
+              data?.deposit
+            : 0}
         </span>
       </div>
       <span className=" mb-3">STATUS: {data?.status}</span>
