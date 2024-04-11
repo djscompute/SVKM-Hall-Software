@@ -281,11 +281,11 @@ function BookADay() {
   }, [selectedFeatures, selectedSessionId, selectedCategory]);
 
   return (
-    <div className="flex flex-col items-center py-10 gap-3">
-      <h1 className="text-3xl font-semibold">
+    <div className="flex flex-col mx-10 items-center py-10 gap-3">
+      <h1 className="text-3xl text-center font-semibold">
         Book {HallData?.name} for {humanReadableDate}
       </h1>
-      <span>
+      <span className="text-center">
         <b>Estimated Price :</b> ₹{price} + GST (if applicable)
       </span>
       <div className="flex flex-col gap-4">
