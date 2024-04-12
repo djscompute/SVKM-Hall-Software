@@ -27,15 +27,17 @@ export const AddBookingZodSchema = z.object({
     ),
     status: z.enum(["CONFIRMED", "TENTATIVE", "CANCELLED", "ENQUIRY"]),
     price: z.number(stringErrorHandler("price")),
-    transaction: z.object({
-      type: z.string(stringErrorHandler("type")).optional(),
-      date: z.string(stringErrorHandler("date")).optional(),
-      transactionID: z.string(stringErrorHandler("transactionID")).optional(),
-      transactionNo: z.string(stringErrorHandler("transactionNo")).optional(),
-      utrNo: z.string(stringErrorHandler("utrNo")).optional(),
-      chequeNo: z.string(stringErrorHandler("chequeNo")).optional(),
-      bank: z.string(stringErrorHandler("bank")).optional(),
-    }),
+    transaction: z
+      .object({
+        type: z.string(stringErrorHandler("type")).optional(),
+        date: z.string(stringErrorHandler("date")).optional(),
+        transactionID: z.string(stringErrorHandler("transactionID")).optional(),
+        transactionNo: z.string(stringErrorHandler("transactionNo")).optional(),
+        utrNo: z.string(stringErrorHandler("utrNo")).optional(),
+        chequeNo: z.string(stringErrorHandler("chequeNo")).optional(),
+        bank: z.string(stringErrorHandler("bank")).optional(),
+      })
+      .optional(),
     discount: z.number(stringErrorHandler("discount")).optional(),
     deposit: z.number(stringErrorHandler("deposit")).optional(),
     hallId: z.string(stringErrorHandler("hallId")),
@@ -44,8 +46,9 @@ export const AddBookingZodSchema = z.object({
     from: z.string(stringErrorHandler("from")),
     to: z.string(stringErrorHandler("to")),
     purpose: z.string(stringErrorHandler("purpose")),
-    cancellationReason: z.string(stringErrorHandler("cancellationReason")).optional(),
-    
+    cancellationReason: z
+      .string(stringErrorHandler("cancellationReason"))
+      .optional(),
   }),
 });
 
