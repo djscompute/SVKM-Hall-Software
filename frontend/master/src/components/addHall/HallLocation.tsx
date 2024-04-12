@@ -11,6 +11,7 @@ type props = {
 export default function HallLocation({ location, setHallData }: props) {
   const handleChange = (event: React.ChangeEvent<any>) => {
     const { name, value } = event.target;
+    console.log(name, value);
     setHallData((prev) => ({
       ...prev,
       [name]: value,
@@ -25,7 +26,12 @@ export default function HallLocation({ location, setHallData }: props) {
         <textarea
           name="desc1"
           value={location.desc1}
-          onChange={handleChange}
+          onChange={(e) =>
+            setHallData((prev) => ({
+              ...prev,
+              location: { ...prev.location, desc1: e.target.value },
+            }))
+          }
           className="bg-black text-white px-3 py-1 rounded w-full h-auto"
         />
       </div>
@@ -34,7 +40,12 @@ export default function HallLocation({ location, setHallData }: props) {
         <textarea
           name="desc2"
           value={location.desc2}
-          onChange={handleChange}
+          onChange={(e) =>
+            setHallData((prev) => ({
+              ...prev,
+              location: { ...prev.location, desc2: e.target.value },
+            }))
+          }
           className="bg-black text-white px-3 py-1 rounded w-full h-auto"
         />
       </div>
@@ -44,7 +55,12 @@ export default function HallLocation({ location, setHallData }: props) {
           <textarea
             name="gmapurl"
             value={location.gmapurl}
-            onChange={handleChange}
+            onChange={(e) =>
+              setHallData((prev) => ({
+                ...prev,
+                location: { ...prev.location, gmapurl: e.target.value },
+              }))
+            }
             className="bg-black text-white px-3 py-1 rounded w-full h-auto"
           />
         </div>
@@ -75,7 +91,12 @@ export default function HallLocation({ location, setHallData }: props) {
           <textarea
             name="iframe"
             value={location.iframe}
-            onChange={handleChange}
+            onChange={(e) =>
+              setHallData((prev) => ({
+                ...prev,
+                location: { ...prev.location, iframe: e.target.value },
+              }))
+            }
             className="bg-black text-white px-3 py-1 rounded w-full h-auto"
           />
         </div>
