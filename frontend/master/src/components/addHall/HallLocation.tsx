@@ -9,14 +9,6 @@ type props = {
 };
 
 export default function HallLocation({ location, setHallData }: props) {
-  const handleChange = (event: React.ChangeEvent<any>) => {
-    const { name, value } = event.target;
-    console.log(name, value);
-    setHallData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
   let finalIframeUrl = location.iframe?.replace(/&#39;/g, "'");
   return (
     <div className="hall-location flex flex-col gap-3 justify-between bg-blue-100 w-[60%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">

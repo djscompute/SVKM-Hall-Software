@@ -98,17 +98,13 @@ function AddHall() {
 
   const addHallMutation = useMutation({
     mutationFn: () =>
-      axiosInstance
-        .post(`/addHall`, hallData)
-        .then((response) => {
-          console.log(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        }),
+      toast.promise(axiosInstance.post(`/addHall`, hallData), {
+        success: "Hall added successfully!",
+        error: "Error adding hall.",
+        pending: "Adding hall...",
+      }),
     mutationKey: ["addhall"],
     onSuccess: async () => {
-      toast.success("Hall added successfully");
       await queryClient.refetchQueries({
         queryKey: [`allhalls`],
       });

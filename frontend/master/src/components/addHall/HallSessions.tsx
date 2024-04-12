@@ -32,7 +32,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
       }
       setNewItem({
         name: "",
-        active: false,
+        active: true,
         to: "",
         from: "",
         price: [],
@@ -48,7 +48,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   const handleDontEditItem = () => {
     setNewItem({
       name: "",
-      active: false,
+      active: true,
       to: "",
       from: "",
       price: [],

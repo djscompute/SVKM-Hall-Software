@@ -109,9 +109,9 @@ function EachDay({
   function openEnquireTab(event: OpenEnquireTabEvent) {
     const hallId = event.currentTarget.dataset.hallId;
     const dateAttribute = event.currentTarget.dataset.date;
-    const date = new Date(dateAttribute!); 
+    const date = new Date(dateAttribute!);
     const today = new Date(); // Get today's date
-  
+
     // Compare dates
     if (date > today) {
       console.log("date is:", dateAttribute);
@@ -147,6 +147,7 @@ function EachDay({
                 className={`flex justify-between w-full 
                 ${getSlotColour(eachSlotInfo.status)}
                 ${eachSlotInfo.status == "EMPTY" && " border-2 border-black"}
+                ${eachSlotInfo?.active == false && "hidden"}
                 px-2 overflow-x-auto
                 `}
               >
