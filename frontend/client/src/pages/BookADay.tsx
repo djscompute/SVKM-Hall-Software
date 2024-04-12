@@ -13,7 +13,6 @@ import { queryClient } from "../App";
 import { isValidEmail } from "../utils/validateEmail";
 import { isValidMobile } from "../utils/validateMobile";
 import { AxiosError } from "axios";
-import Hall from "./Hall";
 
 function BookADay() {
   const navigate = useNavigate();
@@ -47,7 +46,7 @@ function BookADay() {
   const dayjsObject = dayjs(day);
   const humanReadableDate = dayjsObject.format("MMMM D, YYYY");
 
-  const { data: HallData, isFetching } = useQuery({
+  const { data: HallData } = useQuery({
     queryKey: ["bookings"],
     queryFn: async () => {
       try {

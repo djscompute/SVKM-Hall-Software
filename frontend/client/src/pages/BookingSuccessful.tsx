@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
+import { EachHallAdditonalFeaturesType } from "../types/Hall.types";
 
 const BookingSuccessful = () => {
   const location = useLocation();
@@ -18,9 +19,11 @@ const BookingSuccessful = () => {
   );
   const date = extractDate(bookingDetails.startTime);
 
+  console.log("HEREEE", bookingDetails.additionalFeatures);
+
   return (
     <div className="flex flex-col py-4 gap-6 md:w-2/3 lg:w-1/2 mx-auto">
-      <h1 className="text-3xl font-semibold text-center">
+      <h1 className="text-lg sm:text-3xl font-semibold text-center">
         Enquiry Successful for {bookingDetails.hallName}
       </h1>
       <p className="text-center">
@@ -30,11 +33,11 @@ const BookingSuccessful = () => {
       {bookingDetails && (
         <>
           <div className="self-center w-full max-w-[650px] px-4">
-            <span className="text-3xl font-light text-gray-600">
+            <span className=" text-lg sm:text-3xl font-light text-gray-600">
               Hall Details
             </span>
             <div className="border-2 w-full mt-5"></div>
-            <table className="mt-4 w-full text-xl">
+            <table className="mt-4 w-full text-sm sm:text-md md:text-xl">
               <tbody>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">Hall Name</td>
@@ -63,7 +66,17 @@ const BookingSuccessful = () => {
                     Additional Features
                   </td>
                   <td className="w-1/2">
-                    {bookingDetails.selectedFeatures ?? "None"}
+                    {bookingDetails.additionalFeatures
+                      ? Object.values(bookingDetails.additionalFeatures)?.map(
+                          (each: any) => (
+                            <div className="flex flex-col items-start gap-2">
+                              <span>{each.heading}</span>
+                              <span>{each.desc}</span>
+                              <span>{each.price}</span>
+                            </div>
+                          )
+                        )
+                      : "None"}
                   </td>
                 </tr>
               </tbody>
@@ -71,11 +84,11 @@ const BookingSuccessful = () => {
           </div>
 
           <div className="self-center w-full max-w-[650px] px-4">
-            <span className="text-3xl font-light text-gray-600">
+            <span className="text-lg sm:text-3xl font-light text-gray-600">
               User Details
             </span>
             <div className="border-2 w-full mt-5"></div>
-            <table className="mt-4 w-full text-xl">
+            <table className="mt-4 w-full text-sm sm:text-md md:text-xl">
               <tbody>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">Name</td>
@@ -106,7 +119,6 @@ const BookingSuccessful = () => {
               </tbody>
             </table>
           </div>
-
         </>
       )}
     </div>
