@@ -71,6 +71,7 @@ function Hall() {
           {data ? (
             <div className="flex w-full flex-col">
               <h1 className="text-center text-5xl mt-10">{data.name}</h1>
+              <Calendar hallId={id as string} HallData={data} />
               <div className="w-3/4 mx-auto items-center">
                 {/* Carousel */}
                 {/* @ts-ignore */}
@@ -86,7 +87,6 @@ function Hall() {
                   ))}
                 </Carousel>
               </div>
-              <Calendar hallId={id as string} HallData={data} />
               {/* Hall Location */}
               <div className="w-[95%] mx-auto my-5  border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
                 <h1 className="text-3xl">Details:</h1>
