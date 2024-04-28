@@ -200,19 +200,94 @@ function Booking() {
   return (
     <div className="flex flex-col items-center my-10 w-11/12 sm:w-3/4 lg:w-1/2 mx-auto">
       <span className=" text-lg font-medium">User</span>
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Name : </span>
-        <span className="w-full text-right">{data?.user.username}</span>
-      </div>
 
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Mobile Number : </span>
-        <span className="w-full text-right">{data?.user.mobile}</span>
-      </div>
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Contact Person : </span>
-        <span className="w-full text-right">{data?.user?.contact}</span>
-      </div>
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Name : </span>
+          <input
+            type="text"
+            value={editedData?.user?.username}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    username: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Name"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Name : </span>
+          <span className="w-full text-right">{data?.user.username}</span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Mobile Number : </span>
+          <input
+            type="text"
+            value={editedData?.user?.mobile}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    mobile: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Mobile Number"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Mobile Number : </span>
+          <span className="w-full text-right">{data?.user.mobile}</span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Contact Person : </span>
+          <input
+            type="text"
+            value={editedData?.user?.contact}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    contact: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Contact Person"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Contact Person : </span>
+          <span className="w-full text-right">{data?.user?.contact}</span>
+        </div>
+      )}
+
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">Aadhar No : </span>
@@ -332,10 +407,34 @@ function Booking() {
         </div>
       )}
 
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Email Id : </span>
-        <span className="w-full text-right">{data?.user.email || "-"}</span>
-      </div>
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Email Id : </span>
+          <input
+            type="text"
+            value={editedData?.user?.email}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    email: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Aadhar Number"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Email Id : </span>
+          <span className="w-full text-right">{data?.user.email || "-"}</span>
+        </div>
+      )}
 
       <span className=" text-lg font-medium">Slot</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
