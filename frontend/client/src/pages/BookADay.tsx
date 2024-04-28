@@ -268,10 +268,13 @@ function BookADay() {
   };
 
   useEffect(() => {
-    let totalPrice = Object.values(selectedFeatures).reduce(
-      (acc, feature) => acc + feature.price,
-      0
-    );
+    let totalPrice = 0;
+    if (selectedCategory !== "Inter Institute") {
+      totalPrice = Object.values(selectedFeatures).reduce(
+        (acc, feature) => acc + feature.price,
+        0
+      );
+    }
     const slctdsession = HallData?.sessions.find(
       (ss) => ss._id == selectedSessionId
     );
@@ -456,7 +459,7 @@ function BookADay() {
               onChange={() => handleCheckboxChange(eachFeature)}
             />
             <label htmlFor={eachFeature._id}>
-              {eachFeature.heading} - ₹{eachFeature.price}
+              {eachFeature.heading} - ₹{selectedCategory === "Inter Institute" ? 0 : eachFeature.price}
             </label>
           </span>
         ))}
