@@ -3,13 +3,12 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../config/axiosInstance.ts";
 import { EachHallType } from "../types/Hall.types.ts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat.tsx";
-import { Carousel } from "@material-tailwind/react";
 import { toast } from "react-toastify";
 import Calendar from "../components/Calender/calendar.tsx";
 import "react-toastify/dist/ReactToastify.css";
+import ImageCarousel from "../components/hall/ImageCarousel.tsx";
+import HallLocation from "../components/hall/HallLocation.tsx";
 
 function Hall() {
   const { id } = useParams<{ id: string }>();
@@ -62,67 +61,18 @@ function Hall() {
       </>
     );
   }
-  let finalIframeUrl = data?.location.iframe?.replace(/&#39;/g, "'");
 
   return (
     <>
       {data && (
         <div>
           {data ? (
-            <div className="flex w-full flex-col">
+            <div className="flex w-full flex-col items-center gap-5 sm:gap-10 px-3 sm:px-10 md:px-16 lg:px-28">
               <h1 className="text-center text-5xl mt-10">{data.name}</h1>
-              <Calendar hallId={id as string} HallData={data} />
-              <div className="w-3/4 mx-auto items-center">
-                {/* Carousel */}
-                {/* @ts-ignore */}
-                <Carousel
-                  transition={{ duration: 1 }}
-                  className="rounded-xl my-6"
-                >
-                  {data.images.map((eachImgSrc) => (
-                    <img
-                      src={eachImgSrc}
-                      className="h-[80vh] w-full object-cover"
-                    />
-                  ))}
-                </Carousel>
-              </div>
-              {/* Hall Location */}
-              <div className="w-[95%] mx-auto my-5  border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
-                <h1 className="text-3xl">Details:</h1>
-                <hr className="my-4" />
-                <h1 className="text-2xl ">
-                  <h2 className="font-bold text-xl mb-3">Location</h2>
-                  <div className=" text-lg">
-                    <div className=" my-2">{data.location.desc1}</div>
-                    <div>{data.location.desc2}</div>
-                  </div>
-                </h1>
-                <a
-                  href={data.location.gmapurl}
-                  className="flex items-center justify-center bg-blue-300 w-auto md:w-32 lg:w-40 my-2 p-1 rounded-md border-2 border-blue-400"
-                  target="_blank"
-                >
-                  <FontAwesomeIcon
-                    className="text-red-600"
-                    icon={faLocationDot}
-                  />
-                  <span className="ml-1 ">View on map</span>
-                </a>
-                {finalIframeUrl && (
-                  <iframe
-                    src={finalIframeUrl}
-                    className="w-full h-72 md:w-96 md:h-80 lg:w-[40%] "
-                    //width="600"
-                    //height="450"
-                    loading="lazy"
-                    // @ts-ignore
-                    allowFullScreen=""
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                )}
-                <hr className="my-4" />
-              </div>
+              {/* <Calendar hallId={id as string} HallData={data} /> */}
+              <ImageCarousel data={data} />
+              <hr className=" bg-gray-300 h-[1.5px] w-full" />
+              <HallLocation data={data} />
 
               {/* About Hall */}
               <div className="w-[95%] mx-auto my-5  border-[4px] bg-blue-100 rounded-xl border-sapblue-300 shadow-2xl py-7 px-10 ">
