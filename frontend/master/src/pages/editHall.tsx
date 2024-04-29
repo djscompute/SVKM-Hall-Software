@@ -70,7 +70,7 @@ export default function EditHall() {
   });
 
   return (
-    <div className="hall-info-container justify-center grid place-items-center gap-y-12 mx-auto w-auto lg:w-11/12 pt-10 overflow-y-hidden">
+    <div className="flex flex-col items-center gap-5 sm:gap-10 px-3 sm:px-10 md:px-16 lg:px-28 pt-10">
       {databaseHallData && hallData && (
         <>
           <div className="flex flex-col items-center">
@@ -112,6 +112,7 @@ export default function EditHall() {
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }
           />
+          <hr className=" bg-gray-300 h-[1.5px] w-full" />
           <AboutHall
             about={hallData.about}
             setHallData={
