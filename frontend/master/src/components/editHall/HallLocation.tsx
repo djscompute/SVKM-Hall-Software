@@ -70,9 +70,9 @@ export default function HallLocation({ location, setHallData }: props) {
           onClick={toggleModal}
         />
         {modal && (
-          <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50 h-screen overflow-y-auto">
-            <div className="flex flex-col message bg-white p-6 rounded w-3/5 gap-2">
-              <p className="w-full text-center text-xl font-semibold mb-2">
+          <div className="fixed top-0 left-0 flex justify-center items-center w-full z-10 backdrop-blur-md h-screen overflow-scroll">
+            <div className="flex flex-col rounded w-4/5 h-max gap-2 p-3 my-3 bg-white border-gray-300z border-2 overflow-scroll">
+              <p className="w-full text-center text-xl font-semibold">
                 Location
               </p>
               <div className="flex gap-3 items-center">
@@ -81,7 +81,7 @@ export default function HallLocation({ location, setHallData }: props) {
                   name="desc1"
                   value={modalData.desc1}
                   onChange={handleChange}
-                  className="bg-black text-white px-3 py-1 rounded w-full h-auto"
+                  className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
                 />
               </div>
               <div className="flex gap-3 items-center">
@@ -90,10 +90,10 @@ export default function HallLocation({ location, setHallData }: props) {
                   name="desc2"
                   value={modalData.desc2}
                   onChange={handleChange}
-                  className="bg-black text-white px-3 py-1 rounded w-full h-auto"
+                  className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
                 />
               </div>
-              <div className=" flex flex-col">
+              <div className=" flex flex-col gap-3">
                 <div className="flex gap-3 items-center  ">
                   <h1 className="w-1/3 md:w-1/5 lg:w-1/5 ">
                     Google Map Places Link
@@ -102,10 +102,10 @@ export default function HallLocation({ location, setHallData }: props) {
                     name="gmapurl"
                     value={modalData.gmapurl}
                     onChange={handleChange}
-                    className="bg-black text-white px-3 py-1 rounded w-full h-auto"
+                    className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
                   />
                 </div>
-                <p className=" w-full text-center mt-1">
+                <p className=" w-full text-center">
                   Example Google map places url :
                   <a
                     className=" text-blue-600 underline "
@@ -114,7 +114,7 @@ export default function HallLocation({ location, setHallData }: props) {
                     https://maps.app.goo.gl/8fenAeRK5RJ2LZLc8
                   </a>
                 </p>
-                <div className="flex flex-col gap-2 items-center sm:flex-row sm:items-center mt-1">
+                <div className="flex flex-col gap-2 items-center sm:flex-row sm:items-center">
                   <p>Test the google map link here 👉🏻</p>
                   <a
                     href={modalData.gmapurl}
@@ -129,7 +129,7 @@ export default function HallLocation({ location, setHallData }: props) {
                   </a>
                 </div>
               </div>
-              <div className=" flex flex-col">
+              <div className=" flex flex-col gap-3">
                 <div className="flex gap-3 items-center  ">
                   <h1 className="w-1/3 md:w-1/5 lg:w-1/5  ">
                     Google Map Embed
@@ -138,38 +138,30 @@ export default function HallLocation({ location, setHallData }: props) {
                     name="iframe"
                     value={modalData.iframe}
                     onChange={handleChange}
-                    className="bg-black text-white px-3 py-1 rounded w-full h-auto"
+                    className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
                   />
                 </div>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center mt-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <p>Preview of the embed here 👉🏻</p>
-                  {/* <div
-                    dangerouslySetInnerHTML={{
-                      __html: modalData.iframe as string,
-                    }}
-                  ></div> */}
                   <iframe
                     src={modalIframeUrl}
-                    className="w-[200px] h-[200px] lg:w-[400px] md:w-[400px] lg:h-[200px] md:h-[200px]"
-                    //width="400"
-                    //height="200"
+                    className="w-full"
                     // @ts-ignore
                     allowFullScreen=""
-                    // @ts-ignore
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                   />
                 </div>
               </div>
-              <div className="buttons flex justify-end gap-3 mt-20">
+              <div className="buttons flex justify-end gap-3">
                 <button
-                  className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300"
+                  className="bg-red-700 p-2 rounded  hover:bg-red-500 transform active:scale-95 transition duration-300"
                   onClick={toggleModal}
                 >
                   Cancel
                 </button>
                 <button
-                  className="bg-sapblue-700 p-2 rounded text-white hover:bg-sapblue-900 transform active:scale-95 transition duration-300"
+                  className="bg-sapblue-700 p-2 rounded  hover:bg-sapblue-900 transform active:scale-95 transition duration-300"
                   onClick={updateLocation}
                 >
                   Submit
