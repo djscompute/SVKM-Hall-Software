@@ -118,7 +118,7 @@ function AddHall() {
   };
 
   return (
-    <div className="hall-info-container justify-center grid place-items-center gap-y-12 mx-auto w-auto lg:w-11/12 pt-10 overflow-y-hidden">
+    <div className="flex w-full flex-col items-center gap-5 sm:gap-10 px-3 sm:px-10 md:px-16 lg:px-28">
       <div className="flex flex-col items-center">
         <p className="text-blue-700 font-semibold">Add New Hall</p>
         <input
@@ -130,7 +130,12 @@ function AddHall() {
         />
       </div>
       <HallLocation location={hallData.location} setHallData={setHallData} />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <AboutHall about={hallData.about} setHallData={setHallData} />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
+      <h2 className="font-semibold text-xl mb-3 text-center">
+        Capacity, Deposit, Restrictions
+      </h2>
       <HallCapacity capacity={hallData.capacity} setHallData={setHallData} />
       <HallDeposit
         securityDeposit={hallData.securityDeposit}
@@ -140,14 +145,18 @@ function AddHall() {
         eventRestrictions={hallData.eventRestrictions}
         setHallData={setHallData}
       />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <HallSessions sessions={hallData.sessions} setHallData={setHallData} />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <HallPricing sessions={hallData.sessions} setHallData={setHallData} />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       {hallData.additionalFeatures && (
         <HallAdditionalFeatures
           additionalFeatures={hallData.additionalFeatures}
           setHallData={setHallData}
         />
       )}
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <ImageCarousel images={hallData.images} setHallData={setHallData} />
       <div className="flex mb-20">
         <button
