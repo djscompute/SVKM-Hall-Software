@@ -9,7 +9,6 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "predev": "node -v | grep -q 'v20.12.2' || (echo 'This project requires Node.js version 20.12.2' && exit 1)",
     "dev": "nodemon ./src/app.ts",
     "build": "nodemon ./build/app.js"
   },
