@@ -25,7 +25,7 @@ export default function BasicTimePicker({
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DemoContainer components={["TimePicker"]}>
           <TimePicker
-            className="w-full bg-gray-100"
+            className="w-full bg-gray-300"
             label={timePickerName}
             onChange={handleTimeChange}
           />

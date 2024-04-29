@@ -30,7 +30,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
           additionalFeatures: [...additionalFeatures, newItem],
         }));
       }
-      setNewItem({ _id: "", heading: "", desc: "", price: 0});
+      setNewItem({ _id: "", heading: "", desc: "", price: 0 });
     }
   };
 
@@ -40,7 +40,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   };
 
   const handleDontEditItem = () => {
-    setNewItem({ _id: "", heading: "", desc: "", price: 0});
+    setNewItem({ _id: "", heading: "", desc: "", price: 0 });
     setEditIndex(-1);
   };
 
@@ -52,9 +52,9 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-[60%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
+    <div className="about-hall flex justify-between bg-gray-100 w-[60%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
       <div className="flex flex-col gap-3 mb-5 w-full">
-        <h2 className="font-bold text-xl mb-3 text-center">
+        <h2 className="font-semibold text-xl mb-3 text-center">
           Additional Features
         </h2>
         <ul className="max-h-80 overflow-scroll">
