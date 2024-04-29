@@ -4,11 +4,12 @@ import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { EachHallType } from "../../types/Hall.types";
 
 type Props = {
+  data: EachHallType;
   about: string[];
   setHallData: React.Dispatch<React.SetStateAction<EachHallType>>;
 };
 
-export default function AboutHall({ about, setHallData }: Props) {
+export default function AboutHall({ data, about, setHallData }: Props) {
   const [modalData, setModalData] = useState<string[]>(about);
   const [isOpen, setIsOpen] = useState(false);
   const [modal, setModal] = useState(false);
@@ -65,44 +66,31 @@ export default function AboutHall({ about, setHallData }: Props) {
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-[80%] md:w-[90%] lg:w-full py-5 px-7 rounded-md">
-      <div className="about-hall-info w-11/12">
-        <h2 className=" font-bold text-xl mb-3">About this venue</h2>
-        <div
-          className={`flex flex-col text-lg ${
-            isOpen ? "" : " h-24 overflow-hidden"
-          }`}
-        >
-          {about.map((eachPara, index) => (
-            <span key={index} className="my-2">
-              {eachPara}
-            </span>
-          ))}
-        </div>
-        {!isOpen ? (
-          <button
-            onClick={toggleReadMore}
-            className="read-more-btn text-gray-700 font-semibold text-lg"
-          >
-            Read More
-          </button>
-        ) : (
-          <button
-            onClick={toggleReadMore}
-            className="read-less-btn text-gray-700 font-semibold text-lg"
-          >
-            Read Less
-          </button>
-        )}
-      </div>
-      <div className="hall-info-edit h-fit relative">
-        <div className="show-on-hover cursor-pointer opacity-100 hover:opacity-100">
+    <div className="about-hall w-[80%] md:w-[90%] lg:w-full py-5 px-7 rounded-md">
+      <div className="flex justify-between">
+        <h1 className="text-base sm:text-lg md:text-2xl font-medium">
+        About Venue
+      </h1>
+      <div className="show-on-hover cursor-pointer opacity-100 hover:opacity-100">
           <FontAwesomeIcon
             icon={faPenToSquare}
             className="show-on-hover h-6 cursor-pointer opacity-50 hover:opacity-100"
             onClick={toggleModal}
           />
         </div>
+      </div>
+      <div className="ml-8 mt-1">
+        <ul className="list-disc text-gray-600">
+        {data.about.map((about, index) => (
+            <li key={index}>
+                {about}
+            </li>
+        ))}
+        </ul>
+      </div>
+      
+      <div className="hall-info-edit h-fit relative">
+        
         {modal && (
           <div className="modal-message fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50">
             <div className="message bg-white p-6 rounded w-3/5">
