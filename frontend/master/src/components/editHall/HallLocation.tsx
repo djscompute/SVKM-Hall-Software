@@ -33,28 +33,27 @@ export default function HallLocation({ location, setHallData }: props) {
   let finalIframeUrl = location.iframe?.replace(/&#39;/g, "'");
   let modalIframeUrl = modalData.iframe?.replace(/&#39;/g, "'");
   return (
-    <div className="hall-location flex justify-between bg-blue-100 w-[80%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
-      <div className="hall-location-main-info w-11/12">
-        <h2 className="font-bold text-xl mb-3">Location</h2>
-        <div className="hall-location-map flex flex-col items-start gap-5">
-          <h2 className="hall-location-small text-lg">{location.desc1}</h2>
-          <h2 className="hall-location-big text-lg">{location.desc2}</h2>
-          {location.gmapurl && (
-            <a
-              href={location.gmapurl}
-              className="flex items-center bg-blue-300 p-1 rounded-md border-2 border-blue-400"
-              target="_blank"
-            >
-              <FontAwesomeIcon className="text-red-600" icon={faLocationDot} />
-              <span className="ml-1 ">View on map</span>
-            </a>
-          )}
-          {location.iframe && (
+    <div className="hall-location flex justify-between w-full rounded-lg">
+      <div className="flex flex-col md:flex-row gap-3 w-full">
+        <div className="flex flex-col gap-3 h-full w-full md:w-1/3">
+          <h1 className="text-base sm:text-lg md:text-2xl font-medium">
+            Address
+          </h1>
+          <span className=" text-gray-600">{location.desc2}</span>
+          <a
+            href={location.gmapurl}
+            className="flex items-center justify-center p-1 px-3 rounded-md border-[2px] border-[#5AA7A0]"
+            target="_blank"
+          >
+            <FontAwesomeIcon className="text-[#5AA7A0]" icon={faLocationDot} />
+            <span className="ml-2 text-[#5AA7A0]">View on map</span>
+          </a>
+        </div>
+        <div className="flex w-full md:w-2/3">
+          {finalIframeUrl && (
             <iframe
               src={finalIframeUrl}
-              className="w-[250px] h-[250px] lg:w-[450px] lg:h-[300px]"
-              //width="400"
-              //height="200"
+              className="w-full md:h-56"
               loading="lazy"
               // @ts-ignore
               allowFullScreen=""
@@ -64,14 +63,14 @@ export default function HallLocation({ location, setHallData }: props) {
         </div>
       </div>
       {/* <EditComponent /> */}
-      <div className="hall-info-edit h-fit relative">
+      <div className="h-fit relative">
         <FontAwesomeIcon
           icon={faPenToSquare}
-          className="show-on-hover h-6 cursor-pointer opacity-50 hover:opacity-100"
+          className="show-on-hover h-6 ml-3 cursor-pointer opacity-50 hover:opacity-100"
           onClick={toggleModal}
         />
         {modal && (
-          <div className="modal-message fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50 h-screen overflow-y-auto">
             <div className="flex flex-col message bg-white p-6 rounded w-3/5 gap-2">
               <p className="w-full text-center text-xl font-semibold mb-2">
                 Location
@@ -96,7 +95,9 @@ export default function HallLocation({ location, setHallData }: props) {
               </div>
               <div className=" flex flex-col">
                 <div className="flex gap-3 items-center  ">
-                  <h1 className="w-1/3 md:w-1/5 lg:w-1/5 ">Google Map Places Link</h1>{" "}
+                  <h1 className="w-1/3 md:w-1/5 lg:w-1/5 ">
+                    Google Map Places Link
+                  </h1>{" "}
                   <textarea
                     name="gmapurl"
                     value={modalData.gmapurl}
@@ -130,7 +131,9 @@ export default function HallLocation({ location, setHallData }: props) {
               </div>
               <div className=" flex flex-col">
                 <div className="flex gap-3 items-center  ">
-                  <h1 className="w-1/3 md:w-1/5 lg:w-1/5  ">Google Map Embed</h1>{" "}
+                  <h1 className="w-1/3 md:w-1/5 lg:w-1/5  ">
+                    Google Map Embed
+                  </h1>{" "}
                   <textarea
                     name="iframe"
                     value={modalData.iframe}

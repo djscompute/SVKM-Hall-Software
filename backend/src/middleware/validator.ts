@@ -38,6 +38,7 @@ export function validateCookie(
   next: NextFunction
 ) {
   try {
+    // @ts-ignore
     const { accessToken, refreshToken }: CookieType = req.cookies;
     //Verify Access Token
     jwt.verify(
@@ -81,12 +82,9 @@ export function validateCookie(
     res.status(400).json({ name: error.name, message: error.message });
   }
 }
-export function validateLogin(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export function validateLogin(req: Request, res: Response, next: NextFunction) {
   try {
+    // @ts-ignore
     const { accessToken, refreshToken }: CookieType = req.cookies;
     //Verify Access Token
     jwt.verify(
@@ -95,12 +93,12 @@ export function validateLogin(
       (error: jwt.VerifyErrors | null, decoded) => {
         if (!error) {
           return next();
-        }  else {
+        } else {
           throw error;
         }
       }
     );
   } catch (error: any) {
-    res.json({ isLoggedIn:false });
+    res.json({ isLoggedIn: false });
   }
 }
