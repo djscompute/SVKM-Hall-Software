@@ -69,7 +69,7 @@ function Hall() {
           {data ? (
             <div className="flex w-full flex-col items-center gap-5 sm:gap-10 px-3 sm:px-10 md:px-16 lg:px-28">
               <h1 className="text-center text-5xl mt-10">{data.name}</h1>
-              {/* <Calendar hallId={id as string} HallData={data} /> */}
+              <Calendar hallId={id as string} HallData={data} />
               <ImageCarousel data={data} />
               <hr className=" bg-gray-300 h-[1.5px] w-full" />
               <HallLocation data={data} />
