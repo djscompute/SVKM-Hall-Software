@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../config/axiosInstance";
@@ -10,11 +10,14 @@ import HallAdditionalFeatures from "../components/addHall/HallAdditionalFeatures
 import ImageCarousel from "../components/addHall/ImageCarousel";
 import { queryClient } from "../App";
 import HallRestrictions from "../components/addHall/HallRestrictions";
+import HallDeposit from "../components/addHall/HallDeposit";
+import HallPricing from "../components/addHall/HallPricing";
+import { toast } from "react-toastify";
 
 function AddHall() {
   const [hallData, setHallData] = useState<EachHallType>({
     name: "HALL NAME",
-    person:"Someone",
+    person: "Someone",
     location: {
       desc1: "Juhu, Mumbai",
       desc2:
@@ -90,18 +93,16 @@ function AddHall() {
       "https://img.weddingbazaar.com/shaadisaga_production/photos/pictures/006/353/648/new_large/ss20230327-3861-13nkp45.jpg",
     ],
     eventRestrictions: "Sleeping",
+    securityDeposit: 100000,
   });
 
   const addHallMutation = useMutation({
     mutationFn: () =>
-      axiosInstance
-        .post(`/addHall`, hallData)
-        .then((response) => {
-          console.log(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        }),
+      toast.promise(axiosInstance.post(`/addHall`, hallData), {
+        success: "Hall added successfully!",
+        error: "Error adding hall.",
+        pending: "Adding hall...",
+      }),
     mutationKey: ["addhall"],
     onSuccess: async () => {
       await queryClient.refetchQueries({
@@ -117,7 +118,7 @@ function AddHall() {
   };
 
   return (
-    <div className="hall-info-container justify-center grid place-items-center gap-y-12 mx-auto w-auto lg:w-11/12 pt-10 overflow-y-hidden">
+    <div className="flex w-full flex-col items-center gap-5 sm:gap-10 px-3 sm:px-10 md:px-16 lg:px-28">
       <div className="flex flex-col items-center">
         <p className="text-blue-700 font-semibold">Add New Hall</p>
         <input
@@ -129,22 +130,33 @@ function AddHall() {
         />
       </div>
       <HallLocation location={hallData.location} setHallData={setHallData} />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <AboutHall about={hallData.about} setHallData={setHallData} />
-      <HallCapacity
-        capacity={hallData.capacity}
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
+      <h2 className="font-semibold text-xl mb-3 text-center">
+        Capacity, Deposit, Restrictions
+      </h2>
+      <HallCapacity capacity={hallData.capacity} setHallData={setHallData} />
+      <HallDeposit
+        securityDeposit={hallData.securityDeposit}
         setHallData={setHallData}
       />
       <HallRestrictions
         eventRestrictions={hallData.eventRestrictions}
         setHallData={setHallData}
       />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <HallSessions sessions={hallData.sessions} setHallData={setHallData} />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
+      <HallPricing sessions={hallData.sessions} setHallData={setHallData} />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       {hallData.additionalFeatures && (
         <HallAdditionalFeatures
           additionalFeatures={hallData.additionalFeatures}
           setHallData={setHallData}
         />
       )}
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <ImageCarousel images={hallData.images} setHallData={setHallData} />
       <div className="flex mb-20">
         <button

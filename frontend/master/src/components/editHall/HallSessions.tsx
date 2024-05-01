@@ -18,7 +18,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
     useState<EachHallSessionType[]>(modalData);
   const [newItem, setNewItem] = useState<EachHallSessionType>({
     name: "",
-    active: false,
+    active: true,
     to: "",
     from: "",
     price: [],
@@ -52,7 +52,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
       }
       setNewItem({
         name: "",
-        active: false,
+        active: true,
         to: "",
         from: "",
         price: [],
@@ -68,7 +68,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   const handleDontEditItem = () => {
     setNewItem({
       name: "",
-      active: false,
+      active: true,
       to: "",
       from: "",
       price: [],
@@ -76,69 +76,13 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
     setEditIndex(-1);
   };
 
-  const handleDeleteItem = (index: number) => {
-    const updatedList = [...editedSessions];
-    updatedList.splice(index, 1);
-    setEditedSessions(updatedList);
-    setEditIndex(-1);
-  };
-
-  const handleAddPrice = () => {
-    if (newItem.price.length < 5) {
-      // Limit the number of prices to add
-      setNewItem((prev) => ({
-        ...prev,
-        price: [...prev.price, { categoryName: "", price: 0 }],
-      }));
-    }
-  };
-
-  const handleEditPrice = (index: number) => {
-    // Implement the logic to edit the price at the specified index
-    // You can set the edited price to newItem or use a separate state for editing
-  };
-
-  const handleDeletePrice = (index: number) => {
-    setNewItem((prev) => ({
-      ...prev,
-      price: prev.price.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handlePriceChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
-    const { name, value } = e.target;
-
-    setNewItem((prev) => {
-      const updatedPrices = [...prev.price];
-      if (name == "price") {
-        updatedPrices[index] = {
-          ...updatedPrices[index],
-          [name]: parseInt(value),
-        };
-      } else {
-        updatedPrices[index] = {
-          ...updatedPrices[index],
-          [name]: value,
-        };
-      }
-
-      return {
-        ...prev,
-        price: updatedPrices,
-      };
-    });
-  };
-
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-[80%] md:w-[90%] lg:w-full  py-5 px-7 rounded-lg">
+    <div className="about-hall flex justify-between bg-gray-200 w-[80%] md:w-[90%] lg:w-full  py-5 px-7 rounded-lg">
       <div className="hall-additional-features-info w-11/12">
         <h2 className="font-bold text-xl mb-3">Hall Sessions</h2>
         <div className="about-hall text-lg">
           {sessions.map((eachSession, index) => (
-            <div key={index} className="flex flex-col mb-3">
+            <div key={index} className={`flex flex-col mb-3 ${!eachSession.active && "opacity-30"}`}>
               <p className="font-medium text-lg">{eachSession.name}</p>
               <div className="flex justify-between">
                 <div className="flex gap-2 bg-white px-2 rounded-md">
@@ -156,21 +100,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                   </span>
                 </div>
               </div>
-              <div className=" mt-2 mb-3">
-                {eachSession.price.map((eachSessionPrice, index) => (
-                  <div
-                    className="flex justify-evenly w-full"
-                    key={index}
-                  >
-                    <span className="border border-gray-600 border-r-0  w-full text-center">
-                      {eachSessionPrice.categoryName}
-                    </span>
-                    <span className="border border-gray-600 w-full text-center">
-                      {eachSessionPrice.price}
-                    </span>
-                  </div>
-                ))}
-              </div>
             </div>
           ))}
         </div>
@@ -179,7 +108,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
         <div className="show-on-hover cursor-pointer opacity-100 hover:opacity-100">
           <FontAwesomeIcon
             icon={faPenToSquare}
-            className="show-on-hover h-6 cursor-pointer opacity-50 hover:opacity-100"
+            className="show-on-hover h-6 cursor-pointer opacity-30 hover:opacity-100"
             onClick={toggleModal}
           />
         </div>
@@ -196,7 +125,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                     <div
                       key={index}
                       className={`flex flex-col items-center w-full mb-3 ${
-                        eachSession.active ? " " : "opacity-100"
+                        eachSession.active ? "" : "opacity-30"
                       } border-y border-gray-300 px-2 gap-5`}
                     >
                       <div className="flex flex-col items-center sm:flex-row w-full gap-5">
@@ -218,7 +147,9 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                             <div className="flex gap-2 bg-white px-2 rounded-md">
                               <span>To:</span>
                               <span className="">
-                                {convert_IST_TimeString_To12HourFormat(eachSession.to)}
+                                {convert_IST_TimeString_To12HourFormat(
+                                  eachSession.to
+                                )}
                               </span>
                             </div>
                           </div>
@@ -230,36 +161,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                           >
                             Edit
                           </button>
-                          <button
-                            className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300"
-                            onClick={() => handleDeleteItem(index)}
-                          >
-                            Delete
-                          </button>
                         </div>
-                      </div>
-                      <div className="flex flex-col items-center justify-center w-full">
-                        <div className="flex justify-evenly w-full text-sm font-semibold">
-                          <span className="border border-gray-600 border-r-0 w-full text-center">
-                            Category
-                          </span>
-                          <span className="border border-gray-600 w-full text-center">
-                            Price
-                          </span>
-                        </div>
-                        {eachSession.price.map((eachSessionPrice, index) => (
-                          <div
-                            className="flex justify-evenly w-full text-sm"
-                            key={index}
-                          >
-                            <span className="border border-gray-600 border-r-0  w-full text-center">
-                              {eachSessionPrice.categoryName}
-                            </span>
-                            <span className="border border-gray-600 w-full text-center">
-                              {eachSessionPrice.price}
-                            </span>
-                          </div>
-                        ))}
                       </div>
                     </div>
                   ))}
@@ -275,7 +177,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                       className="bg-gray-100 text-black px-5 py-3 rounded resize-none flex-grow border border-stone-300"
                       placeholder="Name"
                     />
-                   <div className="flex flex-col gap-2 justify-between sm:flex-row sm:gap-2">
+                    <div className="flex flex-col gap-2 justify-between sm:flex-row sm:gap-2">
                       <BasicTimePicker
                         timePickerName="From"
                         timeModifier={(newTimeString) =>
@@ -294,41 +196,6 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
                           }))
                         }
                       />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      {newItem.price.map((priceItem, index) => (
-                        <div key={index} className="flex flex-col gap-2">
-                          <input
-                            type="text"
-                            name="categoryName"
-                            value={priceItem.categoryName}
-                            onChange={(e) => handlePriceChange(e, index)}
-                            className="bg-gray-100 text-black px-5 py-3 rounded resize-none flex-grow border border-stone-300"
-                            placeholder="Category"
-                          />
-
-                          <input
-                            type="number"
-                            name="price"
-                            value={priceItem.price}
-                            onChange={(e) => handlePriceChange(e, index)}
-                            className="bg-gray-100 text-black px-5 py-3 rounded resize-none flex-grow border border-stone-300"
-                            placeholder="Price"
-                          />
-                          <button
-                            className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 focus:outline-none"
-                            onClick={() => handleDeletePrice(index)}
-                          >
-                            -
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        className="bg-green-300 text-white p-2 rounded-md hover:bg-green-400 focus:outline-none"
-                        onClick={handleAddPrice}
-                      >
-                        +
-                      </button>
                     </div>
                     <div className="flex gap-2">
                       <span>is Active</span>

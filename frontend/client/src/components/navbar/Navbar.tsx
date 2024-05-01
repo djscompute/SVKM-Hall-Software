@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import svkmLogo from "../../assets/svkm-logo.png"
 
 const NavBar = () => {
   const [open, setOpen] = useState(false);
@@ -12,7 +13,8 @@ const NavBar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center  py-6 md:justify-start md:space-x-10">
             <div className="flex justify-start lg:w-0 lg:flex-1">
-              <Link to="/">
+              <Link className="flex flex-row items-center gap-2" to="/">
+                <img className="h-10 w-auto" src={svkmLogo}/>
                 <h1 className="text-xl font-semibold">SVKM Halls</h1>
               </Link>
             </div>
@@ -47,6 +49,14 @@ const NavBar = () => {
                 className="text-base font-medium text-gray-500 hover:text-gray-900"
               >
                 Home
+              </Link>
+            </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Contact Us
               </Link>
             </nav>
           </div>
@@ -114,6 +124,16 @@ const NavBar = () => {
                   className="text-base font-medium text-gray-900 hover:text-gray-700"
                 >
                   Home
+                </Link>
+              </div>
+            </div>
+            <div className="py-6 px-5 space-y-6">
+              <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                <Link
+                  to="/"
+                  className="text-base font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Contact Us
                 </Link>
               </div>
             </div>

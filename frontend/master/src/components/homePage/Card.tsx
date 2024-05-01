@@ -1,55 +1,61 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
-import { faImages } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { EachHallType } from "../../types/Hall.types";
+import markerImage from "../../assets/location-marker-red.svg";
+import sparkle from "../../assets/sparkle.svg";
+import eye from "../../assets/eye.svg";
+import heart from "../../assets/heart.svg";
 
-export default function Card(
-  props: Pick<
-    EachHallType,
-    "name" | "_id" | "capacity" | "images" | "location"
-  >
-) {
-  console.log(props);
+type Props = {
+  hallData: EachHallType;
+};
+
+export default function Card({ hallData }: Props) {
+  console.log(hallData);
   return (
     <Link
-      to={`/halls/${props._id}`}
-      className="flex flex-col rounded-lg bg-white w-full lg:w-1/3 m-3 md:m-10 lg:m-0 drop-shadow-2xl pb-4 border-2 border-gray-300 "
+      to={`/halls/${hallData._id}`}
+      className="flex flex-col justify-between rounded-lg overflow-hidden h-auto w-full lg:w-1/4 m-3 md:m-10 lg:m-2"
     >
-      {/* IMAGE PART */}
-      <div className="flex justify-center w-full relative">
-        <FontAwesomeIcon
-          icon={faCircleInfo}
-          className="absolute drop-shadow-xl text-white top-5 left-5 z-10 h-6 w-6 shadow-md"
-        />
-        <div className=" absolute bottom-5 right-5 flex flex-row items-center justify-center rounded-md p-1 px-2 text-white bg-white z-10 ">
-          <FontAwesomeIcon icon={faImages} className="text-pink-600" />
-          <span className="font-medium text-black">
-            &nbsp;{props.images?.length} photos
-          </span>
-        </div>
-        <img
-          className=" rounded-md z-0"
-          src={props.images ? props.images[0] : "null"}
-        />
-      </div>
+      <img
+        className="z-0 w-full h-60 min-h-60 rounded-lg"
+        src={hallData.images ? hallData.images[0] : "null"}
+      />
       {/* TEXT PART */}
-      <div className="flex flex-col px-5 py-2">
-        <span className="font-bold text-center text-base sm:text-xl text-black">
-          {props.name}
-        </span>
-        <span className="font-medium w-full">{props.location.desc1}</span>
-        <div className="flex flex-wrap justify-between">
-          <span className="text-gray-800">
-            capacity:
-            <span className="text-black">{props.capacity}</span>
-          </span>
+      <div className="flex flex-col justify-between h-full pt-2 gap-1 ">
+        <div className="flex items-center gap-1">
+          <img className="h-4 w-4" src={markerImage} />
+          <a
+            href={hallData.location.gmapurl}
+            className=" text-[#950D0D] underline"
+          >
+            {hallData.location.desc1}
+          </a>
+          <span className="text-[#9CA3AF]"> | {hallData.capacity}</span>
         </div>
-        <div className="flex flex-row items-center justify-between mt-3">
-          <button className="text-pink-600 border-2 text-sm sm:text-base border-pink-600 hover:bg-pink-600 hover:text-white px-4 py-1 rounded-full">
+        <div className="flex flex-row flex-wrap items-center gap-x-3 gap-y-0">
+          {hallData.additionalFeatures?.map((a) => (
+            <div className="flex flex-row items-center gap-1">
+              <img src={sparkle} />
+              <span className=" text-[#F8A151] font-medium">{a.heading}</span>
+            </div>
+          ))}
+        </div>
+        <span className="font-semibold text-base sm:text-xl text-[#5AA7A0]">
+          {hallData.name}
+        </span>
+        <span className=" text-[#9CA3AF] text-sm" >{hallData.about[0]}</span>
+        <div className="flex flex-row items-center justify-between w-full">
+          <button className="p-2 text-[#5AA7A0] text-sm sm:text-base font-medium rounded-lg border border-[#5AA7A0] hover:bg-[#5AA7A0] hover:text-white">
             Edit Hall
           </button>
+          <div className="flex flex-row items-center gap-1">
+            <img className=" h-5 w-5" src={eye} />
+            <span className="text-[#9CA3AF] font-medium">17</span>
+            <img className=" h-5 w-5" src={heart} />
+            <span className="text-[#9CA3AF] font-medium">22</span>
+          </div>
         </div>
+        <div className="mt-3 h-1 w-full bg-[#5AA7A0]"/>
       </div>
     </Link>
   );

@@ -31,15 +31,10 @@ function HomePage() {
   }
 
   return (
-    <div className="flex flex-wrap justify-around w-full mt-10">
+    <div className="flex flex-wrap justify-around w-full my-10">
       {data?.map((hallProp) => (
         <Card
-          _id={hallProp._id}
-          key={hallProp._id}
-          images={hallProp.images}
-          name={hallProp.name}
-          location={hallProp.location}
-          capacity={hallProp.capacity}
+          hallData={hallProp}
         />
       ))}
     </div>

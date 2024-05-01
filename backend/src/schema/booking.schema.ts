@@ -27,11 +27,28 @@ export const AddBookingZodSchema = z.object({
     ),
     status: z.enum(["CONFIRMED", "TENTATIVE", "CANCELLED", "ENQUIRY"]),
     price: z.number(stringErrorHandler("price")),
+    transaction: z
+      .object({
+        type: z.string(stringErrorHandler("type")).optional(),
+        date: z.string(stringErrorHandler("date")).optional(),
+        transactionID: z.string(stringErrorHandler("transactionID")).optional(),
+        transactionNo: z.string(stringErrorHandler("transactionNo")).optional(),
+        utrNo: z.string(stringErrorHandler("utrNo")).optional(),
+        chequeNo: z.string(stringErrorHandler("chequeNo")).optional(),
+        bank: z.string(stringErrorHandler("bank")).optional(),
+      })
+      .optional(),
+    discount: z.number(stringErrorHandler("discount")).optional(),
+    deposit: z.number(stringErrorHandler("deposit")).optional(),
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
+    booking_type: z.string(stringErrorHandler("booking_type")),
     from: z.string(stringErrorHandler("from")),
     to: z.string(stringErrorHandler("to")),
     purpose: z.string(stringErrorHandler("purpose")),
+    cancellationReason: z
+      .string(stringErrorHandler("cancellationReason"))
+      .optional(),
   }),
 });
 
@@ -42,6 +59,7 @@ export const RemoveBookingZodSchema = z.object({
       invalid_type_error: "Id should be a string value.",
     }),
   }),
+  // cancellationReason: z.string(),
 });
 
 //Zod Schema for getting a session by {from, to}

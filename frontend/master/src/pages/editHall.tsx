@@ -14,6 +14,8 @@ import { queryClient } from "../App";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import HallRestrictions from "../components/editHall/HallRestrictions";
+import HallDeposit from "../components/editHall/HallDeposit";
+import HallPricing from "../components/editHall/HallPricing";
 
 export default function EditHall() {
   let { id: HallID } = useParams();
@@ -24,18 +26,18 @@ export default function EditHall() {
     queryKey: [`getHall/${HallID}`],
     queryFn: async () => {
       // try {
-        console.log("FETCHING");
-        const responsePromise = axiosInstance.get(`getHall/${HallID}`);
-        toast.promise(responsePromise, {
-          pending: "Updating with latest data...",
-          success: "Fetched Hall Data",
-          error: "Failed to fetch hall Data",
-        });
-        const response = await responsePromise;
-        setHallData(response.data);
-        return response.data as EachHallType;
+      console.log("FETCHING");
+      const responsePromise = axiosInstance.get(`getHall/${HallID}`);
+      toast.promise(responsePromise, {
+        pending: "Updating with latest data...",
+        success: "Fetched Hall Data",
+        error: "Failed to fetch hall Data",
+      });
+      const response = await responsePromise;
+      setHallData(response.data);
+      return response.data as EachHallType;
       // } catch (error) {
-        // throw error;
+      // throw error;
       // }
     },
   });
@@ -68,7 +70,7 @@ export default function EditHall() {
   });
 
   return (
-    <div className="hall-info-container justify-center grid place-items-center gap-y-12 mx-auto w-auto lg:w-11/12 pt-10 overflow-y-hidden">
+    <div className="flex flex-col items-center gap-5 sm:gap-10 px-3 sm:px-10 md:px-16 lg:px-28 pt-10">
       {databaseHallData && hallData && (
         <>
           <div className="flex flex-col items-center">
@@ -110,25 +112,30 @@ export default function EditHall() {
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }
           />
+          <hr className=" bg-gray-300 h-[1.5px] w-full" />
           <AboutHall
+            data={hallData}
             about={hallData.about}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }
           />
           <HallCapacity
+            data={hallData}
             capacity={hallData.capacity}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }
           />
-          <HallRestrictions
-            eventRestrictions={hallData.eventRestrictions}
+
+
+          <HallSessions
+            sessions={hallData.sessions}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }
           />
-          <HallSessions
+          <HallPricing
             sessions={hallData.sessions}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
@@ -136,6 +143,7 @@ export default function EditHall() {
           />
           {hallData.additionalFeatures && (
             <HallAdditionalFeatures
+              data={hallData}
               additionalFeatures={hallData.additionalFeatures}
               setHallData={
                 setHallData as React.Dispatch<

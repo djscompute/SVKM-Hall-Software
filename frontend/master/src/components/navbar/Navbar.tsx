@@ -4,6 +4,7 @@ import useAuthStore from "../../store/authStore";
 import axiosInstance from "../../config/axiosInstance";
 import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
+import svkmLogo from "../../assets/svkm-logo.png";
 
 const NavBar = () => {
   const [open, setOpen] = useState(false);
@@ -53,7 +54,8 @@ const NavBar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center  py-6 md:justify-start md:space-x-10">
             <div className="flex justify-start lg:w-0 lg:flex-1">
-              <Link to="/">
+              <Link className="flex flex-row items-center gap-2" to="/">
+                <img className="h-10 w-auto" src={svkmLogo} />
                 <h1 className="text-xl font-semibold">SVKM Halls</h1>
               </Link>
             </div>
@@ -96,6 +98,22 @@ const NavBar = () => {
                 className="text-base font-medium text-gray-500 hover:text-gray-900"
               >
                 Create Admin
+              </Link>
+            </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/addnewhall"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Add Hall
+              </Link>
+            </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/admins"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                View Admins
               </Link>
             </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">

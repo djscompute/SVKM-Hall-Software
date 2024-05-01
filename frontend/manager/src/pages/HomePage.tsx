@@ -35,14 +35,7 @@ function HomePage() {
       <h1 className=" text-3xl font-semibold my-5">All Halls</h1>
       <div className="flex flex-wrap justify-around w-full">
         {data?.map((hallProp) => (
-          <Card
-            _id={hallProp._id}
-            key={hallProp._id}
-            images={hallProp.images}
-            name={hallProp.name}
-            location={hallProp.location}
-            capacity={hallProp.capacity}
-          />
+          <Card hallData={hallProp} />
         ))}
       </div>
     </div>

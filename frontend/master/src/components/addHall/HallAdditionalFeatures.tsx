@@ -13,6 +13,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   const [newItem, setNewItem] = useState<EachHallAdditonalFeaturesType>({
     heading: "",
     desc: "",
+    price: 0,
   });
   const [editIndex, setEditIndex] = useState<number>(-1);
 
@@ -29,7 +30,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
           additionalFeatures: [...additionalFeatures, newItem],
         }));
       }
-      setNewItem({ _id: "", heading: "", desc: "" });
+      setNewItem({ _id: "", heading: "", desc: "", price: 0 });
     }
   };
 
@@ -39,7 +40,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   };
 
   const handleDontEditItem = () => {
-    setNewItem({ _id: "", heading: "", desc: "" });
+    setNewItem({ _id: "", heading: "", desc: "", price: 0 });
     setEditIndex(-1);
   };
 
@@ -51,9 +52,9 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-[60%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
+    <div className="about-hall flex justify-between bg-gray-100 w-[60%] md:w-[90%] lg:w-full py-5 px-7 rounded-lg">
       <div className="flex flex-col gap-3 mb-5 w-full">
-        <h2 className="font-bold text-xl mb-3 text-center">
+        <h2 className="font-semibold text-xl mb-3 text-center">
           Additional Features
         </h2>
         <ul className="max-h-80 overflow-scroll">
@@ -65,6 +66,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
               <div className="flex flex-col w-full gap-1">
                 <span className=" font-semibold">{item.heading}</span>
                 <span className="">{item.desc}</span>
+                <span className="">{item.price}</span>
               </div>
               <div className="flex gap-2">
                 <button
@@ -97,6 +99,14 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
             onChange={(e) => setNewItem({ ...newItem, desc: e.target.value })}
             className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
             placeholder="Description"
+          />
+          <textarea
+            value={newItem.price}
+            onChange={(e) =>
+              setNewItem({ ...newItem, price: Number(e.target.value) })
+            }
+            className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
+            placeholder="Heading"
           />
           {editIndex != -1 && (
             <button
