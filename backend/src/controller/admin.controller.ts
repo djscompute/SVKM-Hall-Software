@@ -139,7 +139,6 @@ export async function logoutAdminHandler(req: Request, res: Response) {
     res.status(400).json({ name: error.name, message: error.message });
   }
 }
-
 //Get all admins
 export async function getAdmins(req: Request, res: Response) {
   try {
@@ -175,6 +174,7 @@ export async function getAdminByIdHandler(req: Request, res: Response) {
     return res.status(500).json({ error: "Internal server error" });
   }
 }
+
 export async function getAdminByEmailHandler(req: Request, res: Response) {
   try {
     const userEmail = req.params.email;
