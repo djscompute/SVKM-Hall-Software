@@ -114,29 +114,21 @@ export default function EditHall() {
           />
           <hr className=" bg-gray-300 h-[1.5px] w-full" />
           <AboutHall
+            data={hallData}
             about={hallData.about}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }
           />
           <HallCapacity
+            data={hallData}
             capacity={hallData.capacity}
             setHallData={
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }
           />
-          <HallDeposit
-            securityDeposit={hallData.securityDeposit}
-            setHallData={
-              setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
-            }
-          />
-          <HallRestrictions
-            eventRestrictions={hallData.eventRestrictions}
-            setHallData={
-              setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
-            }
-          />
+
+
           <HallSessions
             sessions={hallData.sessions}
             setHallData={
@@ -151,6 +143,7 @@ export default function EditHall() {
           />
           {hallData.additionalFeatures && (
             <HallAdditionalFeatures
+              data={hallData}
               additionalFeatures={hallData.additionalFeatures}
               setHallData={
                 setHallData as React.Dispatch<

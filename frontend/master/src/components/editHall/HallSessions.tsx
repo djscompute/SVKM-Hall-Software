@@ -77,7 +77,7 @@ const HallSessions = ({ sessions, setHallData }: Props) => {
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-[80%] md:w-[90%] lg:w-full  py-5 px-7 rounded-lg">
+    <div className="about-hall flex justify-between bg-gray-200 w-[80%] md:w-[90%] lg:w-full  py-5 px-7 rounded-lg">
       <div className="hall-additional-features-info w-11/12">
         <h2 className="font-bold text-xl mb-3">Hall Sessions</h2>
         <div className="about-hall text-lg">
