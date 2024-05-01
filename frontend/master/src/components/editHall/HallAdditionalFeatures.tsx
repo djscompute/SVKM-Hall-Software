@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
+import { faPenToSquare, faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import arrowList from "../../assets/arrowList.svg";
 
 import {
@@ -37,15 +37,17 @@ const HallAdditionalFeatures = ({
   };
 
   const handleChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-    index: number
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    index: number,
+    field: string
   ) => {
-    const { name, value } = event.target;
+    const value =
+      field === "price" ? parseFloat(event.target.value) : event.target.value;
     const updatedFeatures = editedFeatures.map((feature, i) => {
       if (i === index) {
         return {
           ...feature,
-          [name]: value,
+          [field]: value,
         };
       }
       return feature;
@@ -64,31 +66,8 @@ const HallAdditionalFeatures = ({
   };
 
   const handleAddItem = () => {
-    if (
-      newItem.heading.trim() !== "" &&
-      newItem.desc.trim() !== "" &&
-      newItem.price >= 0
-    ) {
-      if (editIndex !== -1) {
-        const updatedList = [...editedFeatures];
-        updatedList[editIndex] = newItem;
-        setEditedFeatures(updatedList);
-        setEditIndex(-1);
-      } else {
-        setEditedFeatures([...editedFeatures, newItem]);
-      }
-      setNewItem({ heading: "", desc: "", price: 0 });
-    }
-  };
-
-  const handleEditItem = (index: number) => {
-    setNewItem(editedFeatures[index]);
-    setEditIndex(index);
-  };
-
-  const handleDontEditItem = () => {
-    setNewItem({ heading: "", desc: "", price: 0 });
-    setEditIndex(-1);
+    setEditedFeatures([...editedFeatures, newItem]);
+    console.log(editedFeatures);
   };
 
   const handleDeleteItem = (index: number) => {
@@ -126,6 +105,9 @@ const HallAdditionalFeatures = ({
                     className="self-baseline translate-y-[40%] mr-2"
                   />
                   <div className="">
+                    <span className="font-bold text-black">
+                      {feature.heading}:{" "}
+                    </span>
                     {feature.desc}
                     <br />
                     <span className="text-[#5AA7A0] font-semibold">
@@ -147,21 +129,32 @@ const HallAdditionalFeatures = ({
               <p className="w-full text-center text-xl font-semibold mb-2">
                 Additional Features
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 items-center">
-                {additionalFeatures.map((feature, index) => (
+              <div className="flex flex-col sm:flex-row gap-10 items-center flex-wrap">
+                {editedFeatures.map((feature, index) => (
                   <div className="flex flex-col gap-2 w-full" key={index}>
-                    <h1 className="w-full text-center">
-                      Additional Feature {index + 1}
-                    </h1>
+                    <div className="flex justify-center gap-5">
+                      <h1 className="">
+                        Additional Feature {index + 1}
+                      </h1>
+                      <button>
+                        <FontAwesomeIcon
+                          icon={faTrashCan}
+                          className="show-on-hover h-6 cursor-pointer opacity-50 hover:opacity-100"
+                          onClick={()=>{
+                            handleDeleteItem(index)
+                          }}
+                        />
+                      </button>
+                    </div>
                     <div className="flex gap-2">
                       <div className="w-[150px]">
                         <h1 className="self-baseline">Heading:</h1>{" "}
                       </div>
-                      <textarea
+                      <input
+                        type="text"
                         name="heading"
                         value={feature.heading}
-                        rows={1}
-                        onChange={(e) => handleChange(e, index)}
+                        onChange={(e) => handleChange(e, index, "heading")}
                         className="bg-black text-white px-3 py-1 w-[400px] rounded  h-auto  mx-auto sm:mx-0"
                       />
                     </div>
@@ -174,7 +167,7 @@ const HallAdditionalFeatures = ({
                         name="desc"
                         value={feature.desc}
                         rows={6}
-                        onChange={(e) => handleChange(e, index)}
+                        onChange={(e) => handleChange(e, index, "desc")}
                         className="bg-black text-white px-3 py-1 w-[400px] rounded  h-auto  mx-auto sm:mx-0"
                       />
                     </div>
@@ -183,11 +176,11 @@ const HallAdditionalFeatures = ({
                       <div className="w-[150px] ">
                         <h1 className="self-baseline">Price:</h1>{" "}
                       </div>
-                      <textarea
+                      <input
+                        type="number"
                         name="price"
                         value={feature.price}
-                        rows={1}
-                        onChange={(e) => handleChange(e, index)}
+                        onChange={(e) => handleChange(e, index, "price")}
                         className="bg-black text-white px-3 py-1 w-[400px] rounded  h-auto  mx-auto sm:mx-0"
                       />
                     </div>
@@ -195,6 +188,12 @@ const HallAdditionalFeatures = ({
                 ))}
               </div>
               <div className="buttons flex justify-end gap-3 mt-10">
+                <button
+                  className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300"
+                  onClick={handleAddItem}
+                >
+                  Add
+                </button>
                 <button
                   className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300"
                   onClick={toggleModal}
