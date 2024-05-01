@@ -10,18 +10,22 @@ import {
 import {
   createAdminHandler,
   getAdminByEmailHandler,
+  getAdminByIdHandler,
   getAdminHandler,
   getAdmins,
   getHallsforAdminHandler,
   loginAdminHandler,
   logoutAdminHandler,
+  updateAdminByIdHandler,
 } from "./controller/admin.controller";
 import { validateRequest, validateCookie, validateLogin } from "./middleware/validator";
 import { AddHallZodSchema, RemoveHallZodSchema } from "./schema/hall.schema";
 import {
   CreateAdminZodSchema,
   EmailAdminZodSchema,
+  IdAdminZodSchema,
   LoginAdminZodSchema,
+  UpdateAdminZodSchema,
 } from "./schema/admin.schema";
 import {
   requireManagerRole,
@@ -86,12 +90,29 @@ export default function routes(app: Express) {
   app.get("/getCurrentAdmin", [validateCookie, getAdminHandler]);
 
   // GET DATA OF A SPECIFIED USER USING UNIQUE EMAIL
-  app.get("/getAdmin/:email", [
+  app.get("/getAdmin/email/:email", [
     validateCookie,
     validateRequest(EmailAdminZodSchema),
     requireMasterRole,
     getAdminByEmailHandler,
   ]);
+
+  // GET DATA OF A SPECIFIED USER USING UNIQUE _ID
+  app.get("/getAdmin/id/:id", [
+    validateCookie,
+    validateRequest(IdAdminZodSchema),
+    requireMasterRole,
+    getAdminByIdHandler,
+  ]);
+
+  app.post("/updateAdmin", [
+    validateCookie,
+    validateRequest(UpdateAdminZodSchema),
+    requireMasterRole,
+    updateAdminByIdHandler,
+  ])
+
+
 
   //Add a new hall
   app.post("/addHall", [
