@@ -486,7 +486,7 @@ function Booking() {
           </div>
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span>Additional Feature Charges</span>
-            <span>{eachFeature.price || "-"}</span>
+            <span>{data?.booking_type === 'SVKM Institute' ? 0 : eachFeature.price || "-"}</span>
           </div>
         </div>
       ))}
