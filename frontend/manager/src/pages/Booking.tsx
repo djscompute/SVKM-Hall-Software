@@ -199,11 +199,11 @@ function Booking() {
 
   return (
     <div className="flex flex-col items-center my-10 w-11/12 sm:w-3/4 lg:w-1/2 mx-auto">
-      <span className=" text-lg font-medium">User</span>
+      <span className=" text-lg font-medium">Customer Details</span>
 
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Name : </span>
+          <span className="w-full text-left">Name</span>
           <input
             type="text"
             value={editedData?.user?.username}
@@ -225,14 +225,14 @@ function Booking() {
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Name : </span>
+          <span className="w-full text-left">Name</span>
           <span className="w-full text-right">{data?.user.username}</span>
         </div>
       )}
 
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Mobile Number : </span>
+          <span className="w-full text-left">Mobile Number</span>
           <input
             type="text"
             value={editedData?.user?.mobile}
@@ -254,14 +254,14 @@ function Booking() {
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Mobile Number : </span>
+          <span className="w-full text-left">Mobile Number</span>
           <span className="w-full text-right">{data?.user.mobile}</span>
         </div>
       )}
 
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Contact Person : </span>
+          <span className="w-full text-left">Contact Person</span>
           <input
             type="text"
             value={editedData?.user?.contact}
@@ -283,14 +283,43 @@ function Booking() {
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Contact Person : </span>
+          <span className="w-full text-left">Contact Person</span>
           <span className="w-full text-right">{data?.user?.contact}</span>
         </div>
       )}
 
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Aadhar No : </span>
+          <span className="w-full text-left">Email Id</span>
+          <input
+            type="text"
+            value={editedData?.user?.email}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    email: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Aadhar Number"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Email Id</span>
+          <span className="w-full text-right">{data?.user.email || "-"}</span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Aadhar No</span>
           <input
             type="text"
             value={editedData?.user?.aadharNo}
@@ -312,7 +341,7 @@ function Booking() {
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Aadhar No : </span>
+          <span className="w-full text-left">Aadhar No</span>
           <span className="w-full text-right">
             {data?.user.aadharNo || "-"}
           </span>
@@ -321,7 +350,7 @@ function Booking() {
 
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Pan No. : </span>
+          <span className="w-full text-left">Pan No.</span>
           <input
             type="text"
             value={editedData?.user?.panNo}
@@ -343,14 +372,14 @@ function Booking() {
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Pan No. : </span>
+          <span className="w-full text-left">Pan No.</span>
           <span className="w-full text-right">{data?.user.panNo || "-"}</span>
         </div>
       )}
 
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Address : </span>
+          <span className="w-full text-left">Address</span>
           <input
             type="text"
             value={editedData?.user?.address}
@@ -372,14 +401,14 @@ function Booking() {
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Address : </span>
+          <span className="w-full text-left">Address</span>
           <span className="w-full text-right">{data?.user.address || "-"}</span>
         </div>
       )}
 
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Remark : </span>
+          <span className="w-full text-left">Remark</span>
           <input
             type="text"
             value={editedData?.user?.remark}
@@ -402,100 +431,79 @@ function Booking() {
       ) : (
         <div className="flex items-center gap-3 w-full bg-orange-600 rounded-sm px-2 py-1 border border-blue-600">
           {/* just to highlight it's laal hai */}
-          <span className="w-full text-left">Remark : </span>
+          <span className="w-full text-left">Remark</span>
           <span className="w-full text-right">{data?.user.remark || "-"}</span>
-        </div>
-      )}
-
-      {editingMode ? (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Email Id : </span>
-          <input
-            type="text"
-            value={editedData?.user?.email}
-            onChange={(e) =>
-              setEditedData((prev) => {
-                if (!prev) return undefined;
-                return {
-                  ...prev,
-                  user: {
-                    ...prev.user,
-                    email: e.target.value,
-                  },
-                };
-              })
-            }
-            placeholder="Enter Aadhar Number"
-            className="px-2"
-          />
-        </div>
-      ) : (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Email Id : </span>
-          <span className="w-full text-right">{data?.user.email || "-"}</span>
         </div>
       )}
 
       <span className=" text-lg font-medium">Slot</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">From : </span>
+        <span className="w-full text-left">Hall Name</span>
+        <span className="w-full text-right">{hallData?.name || "-"}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Session Type</span>
+        <span className="w-full text-right">{session?.name || "-"}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">From</span>
         <span className="w-full text-right">
           {dayjs(data?.from).format("h:mm A, MMMM D, YYYY") || "-"}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">To : </span>
+        <span className="w-full text-left">To</span>
         <span className="w-full text-right">
           {dayjs(data?.to).format("h:mm A, MMMM D, YYYY") || "-"}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Base Price : </span>
+        <span className="w-full text-left">Hall Charges</span>
         <span className="w-full text-right">{priceEntry?.price || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Status : </span>
+        <span className="w-full text-left">Status</span>
         <span className="w-full text-right">{data?.status || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Booking Type : </span>
+        <span className="w-full text-left">Customer Type</span>
         <span className="w-full text-right">{data?.booking_type || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Purpose : </span>
+        <span className="w-full text-left">Purpose of the Event</span>
         <span className="w-full text-right">{data?.purpose || "-"}</span>
-      </div>
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Hall Name : </span>
-        <span className="w-full text-right">{hallData?.name || "-"}</span>
       </div>
       <span className=" text-lg font-medium">Additional Features</span>
       {data?.features.map((eachFeature, index) => (
         <div key={index} className="flex flex-col w-full mb-2">
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>Name : </span>
+            <span>Name</span>
             <span>{eachFeature.heading || "-"}</span>
           </div>
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>Description : </span>
+            <span>Description</span>
             <span>{eachFeature.desc || "-"}</span>
           </div>
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>Price : </span>
-            <span>{eachFeature.price || "-"}</span>
+            <span>Additional Feature Charges</span>
+            <span>
+              {data?.booking_type === "SVKM Institute"
+                ? 0
+                : eachFeature.price || "-"}
+            </span>
           </div>
         </div>
       ))}
 
       <span className=" text-lg font-medium">Billing</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Total Price : </span>
+        <span className="w-full text-left">Total Hall Charges</span>
         <span className="w-full text-right">{data?.price || "-"}</span>
       </div>
 
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Discount % : </span>
+          <span className="w-full text-left">Discount %</span>
           <input
             type="text"
             value={editedData?.discount}
@@ -514,13 +522,19 @@ function Booking() {
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Discount % : </span>
+          <span className="w-full text-left">Discount %</span>
           <span className="w-full text-right">{data?.discount || 0}</span>
         </div>
       )}
 
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Discounted Price : </span>
+        <span className="w-full text-left">Discount Amount</span>
+        <span className="w-full text-right">
+          {data?.price ? 0.01 * data?.discount * data?.price : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Discounted Price</span>
         <span className="w-full text-right">
           {data?.price
             ? data?.price - 0.01 * data?.discount * data?.price
@@ -528,7 +542,7 @@ function Booking() {
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">CGST : </span>
+        <span className="w-full text-left">CGST %</span>
         <span className="w-full text-right">
           {data?.price
             ? 0.09 * (data?.price - 0.01 * data?.discount * data?.price)
@@ -536,7 +550,7 @@ function Booking() {
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">SGST : </span>
+        <span className="w-full text-left">SGST %</span>
         <span className="w-full text-right">
           {data?.price
             ? 0.09 * (data?.price - 0.01 * data?.discount * data?.price)
@@ -544,15 +558,15 @@ function Booking() {
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Existing Security Deposit : </span>
+        <span className="w-full text-left">Existing Security Deposit</span>
         <span className="w-full text-right">{data?.deposit}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">New Security Deposit : </span>
+        <span className="w-full text-left">New Security Deposit</span>
         <span className="w-full text-right">{hallData?.securityDeposit}</span>
       </div>
       <span>
-        <label htmlFor="paidornot">Security Deposit Type : </label>
+        <label htmlFor="paidornot">Security Deposit Type </label>
         <select
           id="paidornot"
           className="px-2 py-1 rounded-md border border-gray-400 my-1"
@@ -574,7 +588,7 @@ function Booking() {
         </select>
       </span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Final Price : </span>
+        <span className="w-full text-left">Total Payable Amount</span>
         <span className="w-full text-right">
           {data
             ? data?.price -
@@ -587,7 +601,7 @@ function Booking() {
 
       <span className=" text-lg font-medium">Transaction Details</span>
       <span>
-        <label htmlFor="transaction">Choose a Transaction Type: </label>
+        <label htmlFor="transaction">Choose a Transaction Type </label>
         <select
           id="transaction"
           value={data?.transaction?.type || ""}
@@ -601,14 +615,13 @@ function Booking() {
           </option>
           <option value="cheque">Cheque</option>
           <option value="upi">UPI</option>
-          <option value="neft">NEFT</option>
-          <option value="rtgs">RTGS</option>
+          <option value="neft/rtgs">NEFT/RTGS</option>
         </select>
       </span>
-      {["cheque", "neft", "rtgs"].includes(data?.transaction?.type || "") &&
+      {["cheque", "upi", "neft/rtgs"].includes(data?.transaction?.type || "") &&
         (editingMode ? (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Date : </span>
+            <span className="w-full text-left">Date</span>
             <input
               type="text"
               value={editedData?.transaction?.date}
@@ -630,7 +643,7 @@ function Booking() {
           </div>
         ) : (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Date : </span>
+            <span className="w-full text-left">Date</span>
             <span className="w-full text-right">
               {data?.transaction?.date || "-"}
             </span>
@@ -639,7 +652,7 @@ function Booking() {
       {["upi"].includes(data?.transaction?.type || "") &&
         (editingMode ? (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Transaction ID : </span>
+            <span className="w-full text-left">Transaction ID</span>
             <input
               type="text"
               value={editedData?.transaction?.transactionID}
@@ -661,47 +674,16 @@ function Booking() {
           </div>
         ) : (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Transaction ID : </span>
+            <span className="w-full text-left">Transaction ID</span>
             <span className="w-full text-right">
               {data?.transaction?.transactionID || "-"}
             </span>
           </div>
         ))}
-      {["neft"].includes(data?.transaction?.type || "") &&
+      {["neft/rtgs"].includes(data?.transaction?.type || "") &&
         (editingMode ? (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Transaction No. : </span>
-            <input
-              type="text"
-              value={editedData?.transaction?.transactionNo}
-              onChange={(e) =>
-                setEditedData((prev) => {
-                  if (!prev) return undefined;
-                  return {
-                    ...prev,
-                    transaction: {
-                      ...prev.transaction,
-                      transactionNo: e.target.value,
-                    },
-                  };
-                })
-              }
-              placeholder="Enter Transaction Number"
-              className="px-2"
-            />
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Transaction No. : </span>
-            <span className="w-full text-right">
-              {data?.transaction?.transactionNo || "-"}
-            </span>
-          </div>
-        ))}
-      {["rtgs"].includes(data?.transaction?.type || "") &&
-        (editingMode ? (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">UTR No. : </span>
+            <span className="w-full text-left">UTR No.</span>
             <input
               type="text"
               value={editedData?.transaction?.utrNo}
@@ -723,7 +705,7 @@ function Booking() {
           </div>
         ) : (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">UTR No. : </span>
+            <span className="w-full text-left">UTR No.</span>
             <span className="w-full text-right">
               {data?.transaction?.utrNo || "-"}
             </span>
@@ -732,7 +714,7 @@ function Booking() {
       {["cheque"].includes(data?.transaction?.type || "") &&
         (editingMode ? (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Cheque No. : </span>
+            <span className="w-full text-left">Cheque No.</span>
             <input
               type="text"
               value={editedData?.transaction?.chequeNo}
@@ -754,7 +736,7 @@ function Booking() {
           </div>
         ) : (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Cheque No. : </span>
+            <span className="w-full text-left">Cheque No.</span>
             <span className="w-full text-right">
               {data?.transaction?.chequeNo || "-"}
             </span>
@@ -763,7 +745,7 @@ function Booking() {
       {["cheque"].includes(data?.transaction?.type || "") &&
         (editingMode ? (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Bank : </span>
+            <span className="w-full text-left">Bank</span>
             <input
               type="text"
               value={editedData?.transaction?.bank}
@@ -785,16 +767,48 @@ function Booking() {
           </div>
         ) : (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Bank : </span>
+            <span className="w-full text-left">Bank</span>
             <span className="w-full text-right">
               {data?.transaction?.bank || "-"}
             </span>
           </div>
         ))}
 
+      {["cheque"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Payee Name</span>
+            <input
+              type="text"
+              value={editedData?.transaction?.payeeName}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      payeeName: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Payee Name"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Payee Name</span>
+            <span className="w-full text-right">
+              {data?.transaction?.payeeName || "-"}
+            </span>
+          </div>
+        ))}
+
       {showCancellationReason ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600 my-5">
-          <span className="w-full text-left">Cancellation Reason : </span>
+          <span className="w-full text-left">Cancellation Reason</span>
           <input
             type="text"
             value={cancellationReason}

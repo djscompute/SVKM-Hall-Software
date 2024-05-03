@@ -53,13 +53,13 @@ export type bookingStatusType =
   | "CANCELLED"
   | "ENQUIRY";
 
-export type transactionType = "cheque" | "upi" | "neft" | "rtgs";
+export type transactionType = "cheque" | "upi" | "neft/rtgs" ;
 
 export type bookingTransactionType = {
   type: transactionType;
   date: string;
   transactionID: string;
-  transactionNo: string;
+  payeeName: string;
   utrNo: string;
   chequeNo: string;
   bank: string;
