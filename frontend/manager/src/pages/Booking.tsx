@@ -442,6 +442,10 @@ function Booking() {
         <span className="w-full text-right">{hallData?.name || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Session Type</span>
+        <span className="w-full text-right">{session?.name || "-"}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">From</span>
         <span className="w-full text-right">
           {dayjs(data?.from).format("h:mm A, MMMM D, YYYY") || "-"}
