@@ -486,7 +486,11 @@ function Booking() {
           </div>
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span>Additional Feature Charges</span>
-            <span>{data?.booking_type === 'SVKM Institute' ? 0 : eachFeature.price || "-"}</span>
+            <span>
+              {data?.booking_type === "SVKM Institute"
+                ? 0
+                : eachFeature.price || "-"}
+            </span>
           </div>
         </div>
       ))}
@@ -605,11 +609,10 @@ function Booking() {
           </option>
           <option value="cheque">Cheque</option>
           <option value="upi">UPI</option>
-          <option value="neft">NEFT</option>
-          <option value="rtgs">RTGS</option>
+          <option value="neft/rtgs">NEFT/RTGS</option>
         </select>
       </span>
-      {["cheque", "upi", "neft", "rtgs"].includes(data?.transaction?.type || "") &&
+      {["cheque", "upi", "neft/rtgs"].includes(data?.transaction?.type || "") &&
         (editingMode ? (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Date</span>
@@ -671,38 +674,7 @@ function Booking() {
             </span>
           </div>
         ))}
-      {["neft"].includes(data?.transaction?.type || "") &&
-        (editingMode ? (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Transaction No.</span>
-            <input
-              type="text"
-              value={editedData?.transaction?.transactionNo}
-              onChange={(e) =>
-                setEditedData((prev) => {
-                  if (!prev) return undefined;
-                  return {
-                    ...prev,
-                    transaction: {
-                      ...prev.transaction,
-                      transactionNo: e.target.value,
-                    },
-                  };
-                })
-              }
-              placeholder="Enter Transaction Number"
-              className="px-2"
-            />
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Transaction No.</span>
-            <span className="w-full text-right">
-              {data?.transaction?.transactionNo || "-"}
-            </span>
-          </div>
-        ))}
-      {["rtgs"].includes(data?.transaction?.type || "") &&
+      {["neft/rtgs"].includes(data?.transaction?.type || "") &&
         (editingMode ? (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">UTR No.</span>
