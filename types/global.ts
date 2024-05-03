@@ -59,7 +59,7 @@ export type bookingTransactionType = {
   type: transactionType;
   date: string;
   transactionID: string;
-  transactionNo: string;
+  payeeName: string;
   utrNo: string;
   chequeNo: string;
   bank: string;

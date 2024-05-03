@@ -45,7 +45,7 @@ const BookingSchema = new mongoose.Schema<HallBookingType>(
       type: { type: String },
       date: { type: String },
       transactionID: { type: String },
-      transactionNo: { type: String },
+      payeeName: { type: String },
       utrNo: { type: String },
       chequeNo: { type: String },
       bank: { type: String },

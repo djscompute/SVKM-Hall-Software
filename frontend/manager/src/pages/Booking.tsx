@@ -768,6 +768,38 @@ function Booking() {
           </div>
         ))}
 
+      {["cheque"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Payee Name</span>
+            <input
+              type="text"
+              value={editedData?.transaction?.payeeName}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      payeeName: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Payee Name"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Payee Name</span>
+            <span className="w-full text-right">
+              {data?.transaction?.payeeName || "-"}              
+            </span>
+          </div>
+        ))}
+
       {showCancellationReason ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600 my-5">
           <span className="w-full text-left">Cancellation Reason</span>
