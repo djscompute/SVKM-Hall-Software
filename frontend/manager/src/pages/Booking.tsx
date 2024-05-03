@@ -605,7 +605,7 @@ function Booking() {
           <option value="rtgs">RTGS</option>
         </select>
       </span>
-      {["cheque", "neft", "rtgs"].includes(data?.transaction?.type || "") &&
+      {["cheque", "upi", "neft", "rtgs"].includes(data?.transaction?.type || "") &&
         (editingMode ? (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Date</span>
