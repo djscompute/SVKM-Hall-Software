@@ -199,7 +199,7 @@ function Booking() {
 
   return (
     <div className="flex flex-col items-center my-10 w-11/12 sm:w-3/4 lg:w-1/2 mx-auto">
-      <span className=" text-lg font-medium">User</span>
+      <span className=" text-lg font-medium">Customer Details</span>
 
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
@@ -454,7 +454,7 @@ function Booking() {
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Base Price</span>
+        <span className="w-full text-left">Hall Charges</span>
         <span className="w-full text-right">{priceEntry?.price || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
@@ -462,11 +462,11 @@ function Booking() {
         <span className="w-full text-right">{data?.status || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Booking Type</span>
+        <span className="w-full text-left">Customer Type</span>
         <span className="w-full text-right">{data?.booking_type || "-"}</span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Purpose</span>
+        <span className="w-full text-left">Purpose of the Event</span>
         <span className="w-full text-right">{data?.purpose || "-"}</span>
       </div>
       <span className=" text-lg font-medium">Additional Features</span>
@@ -481,7 +481,7 @@ function Booking() {
             <span>{eachFeature.desc || "-"}</span>
           </div>
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>Price</span>
+            <span>Additional Feature Charges</span>
             <span>{eachFeature.price || "-"}</span>
           </div>
         </div>
@@ -489,7 +489,7 @@ function Booking() {
 
       <span className=" text-lg font-medium">Billing</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Total Price</span>
+        <span className="w-full text-left">Total Hall Charges</span>
         <span className="w-full text-right">{data?.price || "-"}</span>
       </div>
 
@@ -574,7 +574,7 @@ function Booking() {
         </select>
       </span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Final Price</span>
+        <span className="w-full text-left">Total Payable Amount</span>
         <span className="w-full text-right">
           {data
             ? data?.price -
