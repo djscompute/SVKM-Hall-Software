@@ -288,6 +288,35 @@ function Booking() {
         </div>
       )}
 
+{editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Email Id</span>
+          <input
+            type="text"
+            value={editedData?.user?.email}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    email: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Aadhar Number"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Email Id</span>
+          <span className="w-full text-right">{data?.user.email || "-"}</span>
+        </div>
+      )}
+
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">Aadhar No</span>
@@ -404,35 +433,6 @@ function Booking() {
           {/* just to highlight it's laal hai */}
           <span className="w-full text-left">Remark</span>
           <span className="w-full text-right">{data?.user.remark || "-"}</span>
-        </div>
-      )}
-
-      {editingMode ? (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Email Id</span>
-          <input
-            type="text"
-            value={editedData?.user?.email}
-            onChange={(e) =>
-              setEditedData((prev) => {
-                if (!prev) return undefined;
-                return {
-                  ...prev,
-                  user: {
-                    ...prev.user,
-                    email: e.target.value,
-                  },
-                };
-              })
-            }
-            placeholder="Enter Aadhar Number"
-            className="px-2"
-          />
-        </div>
-      ) : (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Email Id</span>
-          <span className="w-full text-right">{data?.user.email || "-"}</span>
         </div>
       )}
 
