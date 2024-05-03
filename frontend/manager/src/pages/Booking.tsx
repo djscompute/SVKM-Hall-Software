@@ -528,6 +528,12 @@ function Booking() {
       )}
 
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Discount Amount</span>
+        <span className="w-full text-right">
+          {data?.price ? 0.01 * data?.discount * data?.price : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Discounted Price</span>
         <span className="w-full text-right">
           {data?.price
@@ -795,7 +801,7 @@ function Booking() {
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Payee Name</span>
             <span className="w-full text-right">
-              {data?.transaction?.payeeName || "-"}              
+              {data?.transaction?.payeeName || "-"}
             </span>
           </div>
         ))}
