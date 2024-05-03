@@ -23,7 +23,7 @@ export default function HallCapacity({ data, capacity, setHallData }: props) {
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = event.target;
-    const newValue = name === "securityDeposit" ? parseFloat(value) : value;
+    const newValue = name === "securityDeposit" ? Number(value) : value;
     setModalData((prev) => ({
       ...prev,
       data: {
@@ -41,13 +41,6 @@ export default function HallCapacity({ data, capacity, setHallData }: props) {
     }));
     toggleModal();
   };
-
-  function formatNumber(number: number | string) {
-    if (typeof number === "string") {
-      number = parseFloat(number); // Convert string to number
-    }
-    return number.toLocaleString("en-IN");
-  }
 
   const handleInfoClick = () => {
     setShowDialog(true);
@@ -91,7 +84,7 @@ export default function HallCapacity({ data, capacity, setHallData }: props) {
               alt="capacity"
               className="inline-block mr-2 align-middle"
             />
-            ₹{formatNumber(data.securityDeposit)} Security Deposit
+            ₹{data.securityDeposit} Security Deposit
           </div>
         </div>
 
