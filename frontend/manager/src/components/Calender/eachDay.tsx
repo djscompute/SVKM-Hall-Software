@@ -19,6 +19,14 @@ type Props = {
   selectedMobileDate: number;
   setSelectedMobileDate: React.Dispatch<React.SetStateAction<number>>;
 };
+interface OpenEnquireTabEvent extends React.MouseEvent<HTMLDivElement> {
+  currentTarget: HTMLDivElement & {
+    dataset: {
+      hallId: string;
+      date: string;
+    };
+  };
+}
 
 // @ts-ignore
 function EachDay({
@@ -75,6 +83,13 @@ function EachDay({
     Object.values(groupedBySessionId) || [];
   console.log(i, finalArr);
 
+  function openEnquireTab(event: OpenEnquireTabEvent) {
+    const hallId = event.currentTarget.dataset.hallId;
+    const dateAttribute = event.currentTarget.dataset.date;
+    const url = `${hallId}/${dateAttribute}`;
+    window.open(url, "_blank");
+  }
+
   return (
     <div
       key={`day-${i}`}
@@ -93,9 +108,9 @@ function EachDay({
       {/* SLOT INFO */}
       {finalArr.length > 0 ? (
         <>
-          <div className="hidden lg:flex flex-col items-center justify-start gap-1 w-full  ">
+          <div className="hidden lg:flex flex-col items-center justify-start gap-1 w-full">
             {finalArr.map((eachSessionGroup) => (
-              <div className="flex flex-col w-full border border-black">
+              <div className="flex flex-col w-full gap-1">
                 <span className="overflow-x-auto font-medium pt-2 px-1 text-center bg-gray-300">
                   {
                     HallSessionsArray.find(
@@ -111,7 +126,8 @@ function EachDay({
                     )} px-2 overflow-x-auto cursor-pointer`}
                   >
                     <span className="text-center w-full border-b border-gray-500 truncate">
-                      {eachBookingInfo.user.username} - {eachBookingInfo.user.mobile}
+                      {eachBookingInfo.user.username} -{" "}
+                      {eachBookingInfo.user.mobile}
                     </span>
                   </a>
                 ))}
@@ -122,6 +138,16 @@ function EachDay({
       ) : (
         <span className="my-auto mx-auto">---</span>
       )}
+      <div
+        className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 my-2 mx-auto w-fit rounded-md cursor-pointer"
+        onClick={openEnquireTab}
+        data-hall-id={hallId}
+        data-date={dayjs(currentDate)
+          .add(i - 1, "day")
+          .format("YYYY-MM-DD")}
+      >
+        New Booking
+      </div>
     </div>
   );
 }
