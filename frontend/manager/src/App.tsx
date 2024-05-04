@@ -9,6 +9,8 @@ import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Hall from "./pages/Hall";
 import Booking from "./pages/Booking";
+import BookADay from "./pages/BookADay";
+import BookingSuccessful from "./pages/BookingSuccessful";
 export const queryClient = new QueryClient();
 
 export default function App() {
@@ -41,6 +43,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/halls/:id/:day" element={<BookADay />} />
+        <Route path="/bookingsuccessful" element={<BookingSuccessful />} />
         <Route
           path="/login"
           element={

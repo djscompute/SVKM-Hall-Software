@@ -4,7 +4,7 @@ import useAuthStore from "../../store/authStore";
 import axiosInstance from "../../config/axiosInstance";
 import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
-import svkmLogo from "../../assets/svkm-logo.png"
+import svkmLogo from "../../assets/svkm-logo.png";
 
 const NavBar = () => {
   const [open, setOpen] = useState(false);

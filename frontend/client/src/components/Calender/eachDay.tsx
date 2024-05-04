@@ -172,7 +172,7 @@ function EachDay({
             ENQUIRE
           </a> */}
           <div
-            className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 mt-1 rounded-md cursor-pointer"
+            className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 mt-2 mb-1 rounded-md cursor-pointer"
             onClick={openEnquireTab}
             data-hall-id={hallId}
             data-date={dayjs(currentDate)
