@@ -12,6 +12,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CreateAdmin from "./pages/createAdmin";
 import EditAdmin from "./pages/editAdmin";
 import Admins from "./pages/Admins";
+import Dashboard from "./pages/dashboard/dashboard";
+import Report1 from "./pages/dashboard/report1";
 export const queryClient = new QueryClient();
 
 export default function App() {
@@ -65,6 +67,22 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Admins />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/report1"
+          element={
+            <ProtectedRoute>
+              <Report1 />
             </ProtectedRoute>
           }
         />
