@@ -49,6 +49,16 @@ import {
 // ImageHandler
 import { uploadImageHandler } from "./controller/image.controller";
 import { UploadImageZodSchema } from "./schema/image.schema";
+import { 
+  getAdditionalFeatureReportHandler,
+  getBookingInformationReportHandler,
+  getBookingTypeCountsHandler, 
+  getCollectionDetailsHandler,
+  getHallBookingsCountHandler, 
+  getInteractionCountHandler,
+  getMonthwiseCollectionDetailsHandler,
+  getSessionWiseBookingHandler
+} from "./controller/dashboard.controller";
 
 // const upload = multer({ dest: "uploads/" });
 const upload = multer({ storage: multer.memoryStorage() });
@@ -207,4 +217,38 @@ export default function routes(app: Express) {
     upload.single("image"),
     uploadImageHandler
   );
+  {/********************* Dashboard Routes Begin *********************/}
+  app.post(
+    "/dashboard/getHallWiseBookingsCount",
+    getHallBookingsCountHandler
+  )
+  app.post(
+    "/dashboard/getSessionWiseBookings",
+    getSessionWiseBookingHandler
+  )
+  app.post(
+    "/dashboard/getBookingTypeCounts",
+    getBookingTypeCountsHandler
+  )
+  app.post(
+    "/dashboard/getCollectionDetails",
+    getCollectionDetailsHandler
+  )
+  app.post(
+    "/dashboard/getMonthwiseCollectionDetails",
+    getMonthwiseCollectionDetailsHandler
+  )
+  app.post(
+    "/dashboard/getTotalInteraction",
+    getInteractionCountHandler
+  )
+  app.post(
+    "/dashboard/generateBookingInformationReport",
+    getBookingInformationReportHandler
+  )
+  app.post(
+    "/dashboard/generateAdditionalFeatureReport",
+    getAdditionalFeatureReportHandler
+  )
+  {/********************* Dashboard Routes Begin *********************/}
 }
