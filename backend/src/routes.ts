@@ -51,14 +51,17 @@ import { uploadImageHandler } from "./controller/image.controller";
 import { UploadImageZodSchema } from "./schema/image.schema";
 import { 
   getAdditionalFeatureReportHandler,
+  getAllHallNamesAndIdsHandler,
   getBookingInformationReportHandler,
   getBookingTypeCountsHandler, 
   getCollectionDetailsHandler,
   getHallBookingsCountHandler, 
   getInteractionCountHandler,
   getMonthwiseCollectionDetailsHandler,
-  getSessionWiseBookingHandler
+  getSessionWiseBookingHandler,
+  getSessionsWithCategoriesByHallNameHandler
 } from "./controller/dashboard.controller";
+import { getAllHallNamesAndIds } from "./service/getHallConfig";
 
 // const upload = multer({ dest: "uploads/" });
 const upload = multer({ storage: multer.memoryStorage() });
@@ -266,5 +269,16 @@ export default function routes(app: Express) {
     requireMasterRole,
     getAdditionalFeatureReportHandler
   )
-  {/********************* Dashboard Routes Begin *********************/}
+  {/********************* Dashboard Routes End *********************/}
+
+  {/********************* Helper Routes Begin *********************/}
+  app.get(
+    '/getAllHallNameID',
+    getAllHallNamesAndIdsHandler
+  )
+  app.get(
+    '/getSessionAndCategoryByHall',
+    getSessionsWithCategoriesByHallNameHandler
+  )
+  {/********************* Helper Routes End*********************/}
 }

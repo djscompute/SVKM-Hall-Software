@@ -90,7 +90,7 @@ export async function getBookingInformationReport(params: BookingInformationRepo
                 const bookingsTomorrow = await BookingModel.find(findQueryTomorrow).exec();
                 bookings.push(...bookingsTomorrow);
                 break;
-            case "This week":
+            case "Week":
                 const istWeek = new Date(today.getTime() + offsetInMilliseconds);
 
                 // Start of today in IST
