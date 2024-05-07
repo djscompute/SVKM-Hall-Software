@@ -8,7 +8,7 @@ function Dashboard() {
           target="_blank"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
-          Report 1
+          Hall Wise Bookings
         </a>
         <a
           href="/dashboard/report2"
