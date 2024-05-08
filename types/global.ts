@@ -75,8 +75,10 @@ export type HallBookingType = {
   status: bookingStatusType; // payment and booking status is reflected here
   price: number; // obvio bro
   transaction: bookingTransactionType;
-  discount: number;
+  baseDiscount: number;
   deposit: number;
+  isDeposit: boolean;
+  depositDiscount: number;
   hallId: string;
   session_id: string; // the sesison id
   booking_type: string;

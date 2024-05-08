@@ -111,12 +111,11 @@ function Booking() {
     },
   });
 
-  const editDepositAmount = useMutation({
-    mutationFn: async (newDeposit: number) => {
-      console.log(hallData);
+  const editIsDepositApplicable = useMutation({
+    mutationFn: async (newDeposit: boolean) => {      
       const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
         ...data,
-        deposit: newDeposit,
+        isDeposit: newDeposit,
       });
       toast.promise(responsePromise, {
         pending: "Updating...",
@@ -507,13 +506,13 @@ function Booking() {
           <span className="w-full text-left">Discount %</span>
           <input
             type="text"
-            value={editedData?.discount}
+            value={editedData?.baseDiscount}
             onChange={(e) =>
               setEditedData((prev) => {
                 if (!prev) return undefined;
                 return {
                   ...prev,
-                  discount: Number(e.target.value),
+                  baseDiscount: Number(e.target.value),
                 };
               })
             }
@@ -524,21 +523,21 @@ function Booking() {
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">Discount %</span>
-          <span className="w-full text-right">{data?.discount || 0}</span>
+          <span className="w-full text-right">{data?.baseDiscount || 0}</span>
         </div>
       )}
 
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Discount Amount</span>
         <span className="w-full text-right">
-          {data?.price ? 0.01 * data?.discount * data?.price : "-"}
+          {data?.price ? 0.01 * data?.baseDiscount * data?.price : "-"}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Discounted Price</span>
         <span className="w-full text-right">
           {data?.price
-            ? data?.price - 0.01 * data?.discount * data?.price
+            ? data?.price - 0.01 * data?.baseDiscount * data?.price
             : "-"}
         </span>
       </div>
@@ -546,7 +545,7 @@ function Booking() {
         <span className="w-full text-left">CGST %</span>
         <span className="w-full text-right">
           {data?.price
-            ? 0.09 * (data?.price - 0.01 * data?.discount * data?.price)
+            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
             : "-"}
         </span>
       </div>
@@ -554,48 +553,90 @@ function Booking() {
         <span className="w-full text-left">SGST %</span>
         <span className="w-full text-right">
           {data?.price
-            ? 0.09 * (data?.price - 0.01 * data?.discount * data?.price)
+            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
             : "-"}
         </span>
       </div>
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Existing Security Deposit</span>
-        <span className="w-full text-right">{data?.deposit}</span>
-      </div>
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">New Security Deposit</span>
-        <span className="w-full text-right">{hallData?.securityDeposit}</span>
-      </div>
       <span>
-        <label htmlFor="paidornot">Security Deposit Type </label>
+        <label htmlFor="isDeposit">Security Deposit Applicable </label>
         <select
-          id="paidornot"
+          id="isDeposit"
+          value={data?.isDeposit === true ? "yes" : "no" || ""}
           className="px-2 py-1 rounded-md border border-gray-400 my-1"
           onChange={(e) => {
-            if (e.target.value === "existing") {
-              editDepositAmount.mutate(data?.deposit || 0);
+            if (e.target.value === "yes") {
+              editIsDepositApplicable.mutate(true);
             }
-            if (e.target.value === "none") {
-              editDepositAmount.mutate(0);
-            }
-            if (e.target.value === "new") {
-              editDepositAmount.mutate(hallData?.securityDeposit || 0);
+            if (e.target.value === "no") {
+              editIsDepositApplicable.mutate(false);
             }
           }}
         >
-          <option value="existing">Existing</option>
-          <option value="none">None</option>
-          <option value="new">New</option>
+          <option value="" disabled>
+            Select an option
+          </option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
         </select>
       </span>
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Enter Security Deposit</span>
+          <input
+            type="text"
+            value={editedData?.deposit}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  deposit: Number(e.target.value),
+                };
+              })
+            }
+            placeholder="Enter Security Deposit"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Security Deposit Amount</span>
+          <span className="w-full text-right">{data?.deposit}</span>
+        </div>
+      )}
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Security Deposit Discount %</span>
+          <input
+            type="text"
+            value={editedData?.depositDiscount}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  depositDiscount: Number(e.target.value),
+                };
+              })
+            }
+            placeholder="Enter Security Deposit Discount %"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Security Deposit Discount %</span>
+          <span className="w-full text-right">{data?.depositDiscount || 0}</span>
+        </div>
+      )}
+
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Total Payable Amount</span>
         <span className="w-full text-right">
           {data
-            ? data?.price -
-              0.01 * data?.discount * data?.price +
-              0.18 * (data?.price - 0.01 * data?.discount * data?.price) +
-              data?.deposit
+            ? (data?.price - 0.01 * data?.baseDiscount * data?.price) +
+              0.18 * (data?.price - 0.01 * data?.baseDiscount * data?.price) +
+              (data.isDeposit ? (data?.deposit - 0.01 * data?.depositDiscount * data?.deposit) : 0)
             : 0}
         </span>
       </div>
