@@ -24,6 +24,7 @@ function HomePage() {
         throw error;
       }
     },
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
 
   if (isFetching) {
@@ -33,9 +34,7 @@ function HomePage() {
   return (
     <div className="flex flex-wrap justify-around w-full my-10">
       {data?.map((hallProp) => (
-        <Card
-          hallData={hallProp}
-        />
+        <Card hallData={hallProp} />
       ))}
     </div>
   );

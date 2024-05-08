@@ -10,7 +10,7 @@ function Hall() {
   const { id } = useParams<{ id: string }>();
 
   const { data, isFetching } = useQuery({
-    queryKey: ["allhalls"],
+    queryKey: ["allhalls", `hall-${id}`],
     queryFn: async () => {
       try {
         const responsePromise = axiosInstance.get(`getHall/${id}`);
@@ -25,6 +25,7 @@ function Hall() {
         throw error;
       }
     },
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
 
   if (isFetching) {

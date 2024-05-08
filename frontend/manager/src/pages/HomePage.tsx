@@ -27,6 +27,7 @@ function HomePage() {
         throw error;
       }
     },
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
 
   if (isFetching) return <h1>LOADING</h1>;

@@ -18,7 +18,7 @@ function Hall() {
   const { id } = useParams<{ id: string }>();
 
   const { data, error, isFetching } = useQuery({
-    queryKey: ["allhalls"],
+    queryKey: ["allhalls", `hall-${id}`],
     queryFn: async () => {
       try {
         const responsePromise = axiosInstance.get(`getHall/${id}`);
@@ -33,6 +33,7 @@ function Hall() {
         throw error;
       }
     },
+    staleTime: 2 * 60 * 1000, // Data is considered fresh for 2 minutes
   });
 
   const [isOpen, setIsOpen] = useState(false);
@@ -80,17 +81,16 @@ function Hall() {
 
               <hr className=" bg-gray-300 h-[1.5px] w-full" />
               {/* About Hall */}
-              <AboutHall data={data}/>
+              <AboutHall data={data} />
 
               {/* Seating and capacity */}
-              <HallCapacity data={data}/>
+              <HallCapacity data={data} />
               <hr className=" bg-gray-300 h-[1.5px] w-full" />
 
-              <HallAdditionalFeatures data={data}/>
+              <HallAdditionalFeatures data={data} />
               <hr className=" bg-gray-300 h-[1.5px] w-full" />
 
-              <HallPricing data={data}/>
-              
+              <HallPricing data={data} />
             </div>
           ) : (
             <div>
