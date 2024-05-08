@@ -677,6 +677,7 @@ function Booking() {
           <option value="cheque">Cheque</option>
           <option value="upi">UPI</option>
           <option value="neft/rtgs">NEFT/RTGS</option>
+          <option value="svkminstitute">SVKM Institute</option>
         </select>
       </span>
       {["cheque", "upi", "neft/rtgs"].includes(data?.transaction?.type || "") &&
