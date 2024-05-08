@@ -28,7 +28,8 @@ const NavBar = () => {
       } else {
         return null;
       }
-    },
+    }
+    // dont put any stale time
   });
 
   const handleLogout = async () => {

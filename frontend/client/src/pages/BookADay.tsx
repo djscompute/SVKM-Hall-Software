@@ -47,7 +47,7 @@ function BookADay() {
   const humanReadableDate = dayjsObject.format("MMMM D, YYYY");
 
   const { data: HallData } = useQuery({
-    queryKey: ["bookings"],
+    queryKey: ["bookaday", `${humanReadableDate}`],
     queryFn: async () => {
       try {
         const responsePromise = axiosInstance.get(`getHall/${id}`);
@@ -62,6 +62,7 @@ function BookADay() {
         throw error;
       }
     },
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
 
   const addBookingMutation = useMutation({
@@ -135,7 +136,7 @@ function BookADay() {
         });
       }
       await queryClient.refetchQueries({
-        queryKey: [`bookings`],
+        queryKey: ["bookaday", `${humanReadableDate}`],
       });
     },
     onError: (error: AxiosError) => {
@@ -459,7 +460,8 @@ function BookADay() {
               onChange={() => handleCheckboxChange(eachFeature)}
             />
             <label htmlFor={eachFeature._id}>
-              {eachFeature.heading} - ₹{selectedCategory === "Inter Institute" ? 0 : eachFeature.price}
+              {eachFeature.heading} - ₹
+              {selectedCategory === "Inter Institute" ? 0 : eachFeature.price}
             </label>
           </span>
         ))}

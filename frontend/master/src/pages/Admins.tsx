@@ -23,11 +23,17 @@ function Admins() {
         throw error;
       }
     },
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
 
   if (isFetching) return <h1>LOADING</h1>;
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center mb-20">
+      <div className="flex flex-col items-end w-4/5 mt-5">
+        <a className="border-2 border-green-500 rounded-lg text-green-500 px-3 py-1" href="/createadmin">
+          Create New Admin
+        </a>
+      </div>
       <h1 className=" text-3xl font-semibold my-5">All Admins</h1>
       <div className="flex flex-wrap justify-around w-full">
         {data?.map((adminProp) => (

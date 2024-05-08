@@ -13,8 +13,6 @@ import { useParams } from "react-router-dom";
 import { queryClient } from "../App";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import HallRestrictions from "../components/editHall/HallRestrictions";
-import HallDeposit from "../components/editHall/HallDeposit";
 import HallPricing from "../components/editHall/HallPricing";
 
 export default function EditHall() {
@@ -23,7 +21,7 @@ export default function EditHall() {
   const [hallData, setHallData] = useState<EachHallType | undefined>(undefined);
 
   const { data: databaseHallData } = useQuery({
-    queryKey: [`getHall/${HallID}`],
+    queryKey: [`allhalls','hall-${HallID}`],
     queryFn: async () => {
       // try {
       console.log("FETCHING");
@@ -36,12 +34,9 @@ export default function EditHall() {
       const response = await responsePromise;
       setHallData(response.data);
       return response.data as EachHallType;
-      // } catch (error) {
-      // throw error;
-      // }
     },
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
-  // console.log("upload hua",hallData)
 
   const editHallMutation = useMutation({
     mutationFn: async () => {
@@ -61,7 +56,7 @@ export default function EditHall() {
     onSuccess: async () => {
       console.log("REVALIDATING");
       await queryClient.refetchQueries({
-        queryKey: [`getHall/${HallID}`],
+        queryKey: [`allhalls`],
       });
     },
     onError: (error) => {

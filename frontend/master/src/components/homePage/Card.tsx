@@ -2,8 +2,6 @@ import { Link } from "react-router-dom";
 import { EachHallType } from "../../types/Hall.types";
 import markerImage from "../../assets/location-marker-red.svg";
 import sparkle from "../../assets/sparkle.svg";
-import eye from "../../assets/eye.svg";
-import heart from "../../assets/heart.svg";
 
 type Props = {
   hallData: EachHallType;
@@ -48,12 +46,6 @@ export default function Card({ hallData }: Props) {
           <button className="p-2 text-[#5AA7A0] text-sm sm:text-base font-medium rounded-lg border border-[#5AA7A0] hover:bg-[#5AA7A0] hover:text-white">
             Edit Hall
           </button>
-          <div className="flex flex-row items-center gap-1">
-            <img className=" h-5 w-5" src={eye} />
-            <span className="text-[#9CA3AF] font-medium">17</span>
-            <img className=" h-5 w-5" src={heart} />
-            <span className="text-[#9CA3AF] font-medium">22</span>
-          </div>
         </div>
         <div className="mt-3 h-1 w-full bg-[#5AA7A0]"/>
       </div>

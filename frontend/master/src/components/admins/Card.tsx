@@ -28,6 +28,7 @@ export default function Card({ adminData }: { adminData: adminType }) {
         throw error;
       }
     },
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
 
   return (

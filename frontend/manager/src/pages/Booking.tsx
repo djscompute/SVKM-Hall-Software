@@ -51,6 +51,7 @@ function Booking() {
         throw error;
       }
     },
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
 
   const editBookingStatus = useMutation({

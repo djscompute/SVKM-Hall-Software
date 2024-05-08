@@ -45,7 +45,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
         params: {
           from: startDate,
           to: endDate,
-          hallId:hallId
+          hallId: hallId,
         },
       });
       console.log(response.data);
@@ -55,6 +55,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
       response.data.sort((a: any, b: any) => dayjs(a.from).diff(dayjs(b.from)));
       return response.data;
     },
+    staleTime: 1 * 60 * 1000, // Data is considered fresh for 1 minutes
   });
 
   const daysInMonth = dayjs(currentDate).daysInMonth();
