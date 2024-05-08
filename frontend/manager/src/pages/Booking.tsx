@@ -112,7 +112,7 @@ function Booking() {
   });
 
   const editIsDepositApplicable = useMutation({
-    mutationFn: async (newDeposit: boolean) => {      
+    mutationFn: async (newDeposit: boolean) => {
       const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
         ...data,
         isDeposit: newDeposit,
@@ -522,19 +522,19 @@ function Booking() {
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Discount %</span>
+          <span className="w-full text-left">Hall Discount %</span>
           <span className="w-full text-right">{data?.baseDiscount || 0}</span>
         </div>
       )}
 
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Discount Amount</span>
+        <span className="w-full text-left">Hall Discount Amount</span>
         <span className="w-full text-right">
           {data?.price ? 0.01 * data?.baseDiscount * data?.price : "-"}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Discounted Price</span>
+        <span className="w-full text-left">Hall Discounted Price</span>
         <span className="w-full text-right">
           {data?.price
             ? data?.price - 0.01 * data?.baseDiscount * data?.price
@@ -606,7 +606,7 @@ function Booking() {
       )}
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Security Deposit Discount %</span>
+          <span className="w-full text-left">Deposit Discount %</span>
           <input
             type="text"
             value={editedData?.depositDiscount}
@@ -625,18 +625,37 @@ function Booking() {
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Security Deposit Discount %</span>
-          <span className="w-full text-right">{data?.depositDiscount || 0}</span>
+          <span className="w-full text-left">Deposit Discount %</span>
+          <span className="w-full text-right">
+            {data?.depositDiscount || 0}
+          </span>
         </div>
       )}
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Deposit Discount Amount</span>
+        <span className="w-full text-right">
+          {data?.deposit ? 0.01 * data?.depositDiscount * data?.deposit : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Deposit Discounted Price</span>
+        <span className="w-full text-right">
+          {data?.deposit
+            ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
+            : "-"}
+        </span>
+      </div>
 
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Total Payable Amount</span>
         <span className="w-full text-right">
           {data
-            ? (data?.price - 0.01 * data?.baseDiscount * data?.price) +
+            ? data?.price -
+              0.01 * data?.baseDiscount * data?.price +
               0.18 * (data?.price - 0.01 * data?.baseDiscount * data?.price) +
-              (data.isDeposit ? (data?.deposit - 0.01 * data?.depositDiscount * data?.deposit) : 0)
+              (data.isDeposit
+                ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
+                : 0)
             : 0}
         </span>
       </div>
