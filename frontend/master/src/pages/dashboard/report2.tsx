@@ -8,7 +8,7 @@ import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
 
 const PieChartComponent = ({ data }: { data: any }) => {
   const chartData = {
-    labels: data.map((item: any) => item.sessionName),
+    labels: data.map((item: any) => `${item.hallName} - ${item.sessionName}`), 
     datasets: [
       {
         data: data.map((item: any) => item.bookingCount),
@@ -53,7 +53,7 @@ const PieChartComponent = ({ data }: { data: any }) => {
 
 const BarChartComponent = ({ data }: { data: any }) => {
   const chartData = {
-    labels: data.map((item: any) => item.hallName),
+    labels: data.map((item: any) => `${item.hallName} - ${item.sessionName}`), 
     datasets: [
       {
         label: "Booking Count",
