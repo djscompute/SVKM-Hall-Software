@@ -199,6 +199,17 @@ function Booking() {
 
   return (
     <div className="flex flex-col items-center my-10 w-11/12 sm:w-3/4 lg:w-1/2 mx-auto">
+      {editingMode ? (
+        <></>
+      ) : (
+        <button
+          onClick={handleEdit}
+          className=" mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+        >
+          Edit Details
+        </button>
+      )}
+
       <span className=" text-lg font-medium">Customer Details</span>
 
       {editingMode ? (
@@ -899,22 +910,38 @@ function Booking() {
         </div>
       )}
 
-      <span className=" mb-3">STATUS: {data?.status}</span>
-
       {editingMode ? (
-        <button
-          onClick={handleSave}
-          className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
-        >
-          Save Details
-        </button>
+        <span className="space-x-4 space-y-4">
+          <button
+            onClick={() => {
+              handleSave();
+              setShowCancellationReason(true);
+            }}
+            className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
+          >
+            Cancel & Save
+          </button>
+          <button
+            onClick={() => {
+              handleSave();
+              editBookingStatus.mutate("ENQUIRY" as bookingStatusType);
+            }}
+            className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+          >
+            Enquiry & Save
+          </button>
+          <button
+            onClick={() => {
+              handleSave();
+              editBookingStatus.mutate("CONFIRMED" as bookingStatusType);
+            }}
+            className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
+          >
+            Confirm & Save
+          </button>
+        </span>
       ) : (
-        <button
-          onClick={handleEdit}
-          className=" mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
-        >
-          Edit Details
-        </button>
+        <></>
       )}
 
       {/* {!showCancellationReason && (
@@ -927,23 +954,6 @@ function Booking() {
           Handle Cancellation
         </button>
       )} */}
-
-      <select
-        value={data?.status}
-        onChange={(e) => {
-          console.log(e.target.value);
-          if (e.target.value == "CANCELLED") {
-            setShowCancellationReason(true);
-          } else {
-            editBookingStatus.mutate(e.target.value as bookingStatusType);
-          }
-        }}
-        className="px-2 py-1 rounded-md border border-gray-400"
-      >
-        {possibleBookingTypes.map((eachBooktingType) => (
-          <option value={eachBooktingType}>{eachBooktingType}</option>
-        ))}
-      </select>
     </div>
   );
 }
