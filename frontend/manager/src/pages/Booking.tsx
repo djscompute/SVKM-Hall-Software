@@ -485,6 +485,7 @@ function Booking() {
         <span className="w-full text-right">{data?.purpose || "-"}</span>
       </div>
       <span className=" text-lg font-medium">Additional Features</span>
+      {!data?.features.length ? <p className="text-lg font-medium">No Additional Features Selected</p> : <></>}
       {data?.features.map((eachFeature, index) => (
         <div key={index} className="flex flex-col w-full mb-2">
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
