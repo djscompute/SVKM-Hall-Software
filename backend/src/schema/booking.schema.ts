@@ -4,6 +4,14 @@ const stringErrorHandler = (fieldName: string) => ({
   invalid_type_error: `${fieldName} can only be a string.`,
   required_error: `${fieldName} cannot be empty.`,
 });
+const numberErrorHandler = (fieldName: string) => ({
+  invalid_type_error: `${fieldName} can only be a number.`,
+  required_error: `${fieldName} cannot be empty.`,
+});
+const booleanErrorHandler = (fieldName: string) => ({
+  invalid_type_error: `${fieldName} can only be a boolean.`,
+  required_error: `${fieldName} cannot be empty.`,
+});
 
 export const AddBookingZodSchema = z.object({
   body: z.object({
@@ -22,11 +30,11 @@ export const AddBookingZodSchema = z.object({
         heading: z.string(stringErrorHandler("heading")),
         desc: z.string(stringErrorHandler("desc")).optional(),
         stats: z.array(z.string(stringErrorHandler("stats"))).optional(),
-        price: z.number(stringErrorHandler("price")),
+        price: z.number(numberErrorHandler("price")),
       })
     ),
     status: z.enum(["CONFIRMED", "TENTATIVE", "CANCELLED", "ENQUIRY"]),
-    price: z.number(stringErrorHandler("price")),
+    price: z.number(numberErrorHandler("price")),
     transaction: z
       .object({
         type: z.string(stringErrorHandler("type")).optional(),
@@ -38,8 +46,10 @@ export const AddBookingZodSchema = z.object({
         bank: z.string(stringErrorHandler("bank")).optional(),
       })
       .optional(),
-    discount: z.number(stringErrorHandler("discount")).optional(),
-    deposit: z.number(stringErrorHandler("deposit")).optional(),
+    baseDiscount: z.number(numberErrorHandler("baseDiscount")),
+    deposit: z.number(numberErrorHandler("deposit")),
+    isDeposit : z.boolean(booleanErrorHandler("isDeposit")),
+    depositDiscount : z.number(numberErrorHandler("depositDiscount")),
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
     booking_type: z.string(stringErrorHandler("booking_type")),

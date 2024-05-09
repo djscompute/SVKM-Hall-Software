@@ -111,12 +111,11 @@ function Booking() {
     },
   });
 
-  const editDepositAmount = useMutation({
-    mutationFn: async (newDeposit: number) => {
-      console.log(hallData);
+  const editIsDepositApplicable = useMutation({
+    mutationFn: async (newDeposit: boolean) => {
       const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
         ...data,
-        deposit: newDeposit,
+        isDeposit: newDeposit,
       });
       toast.promise(responsePromise, {
         pending: "Updating...",
@@ -200,6 +199,17 @@ function Booking() {
 
   return (
     <div className="flex flex-col items-center my-10 w-11/12 sm:w-3/4 lg:w-1/2 mx-auto">
+      {editingMode ? (
+        <></>
+      ) : (
+        <button
+          onClick={handleEdit}
+          className=" mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+        >
+          Edit Details
+        </button>
+      )}
+
       <span className=" text-lg font-medium">Customer Details</span>
 
       {editingMode ? (
@@ -475,6 +485,7 @@ function Booking() {
         <span className="w-full text-right">{data?.purpose || "-"}</span>
       </div>
       <span className=" text-lg font-medium">Additional Features</span>
+      {!data?.features.length ? <p className="text-lg font-medium">No Additional Features Selected</p> : <></>}
       {data?.features.map((eachFeature, index) => (
         <div key={index} className="flex flex-col w-full mb-2">
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
@@ -507,13 +518,13 @@ function Booking() {
           <span className="w-full text-left">Discount %</span>
           <input
             type="text"
-            value={editedData?.discount}
+            value={editedData?.baseDiscount}
             onChange={(e) =>
               setEditedData((prev) => {
                 if (!prev) return undefined;
                 return {
                   ...prev,
-                  discount: Number(e.target.value),
+                  baseDiscount: Number(e.target.value),
                 };
               })
             }
@@ -523,22 +534,22 @@ function Booking() {
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Discount %</span>
-          <span className="w-full text-right">{data?.discount || 0}</span>
+          <span className="w-full text-left">Hall Discount %</span>
+          <span className="w-full text-right">{data?.baseDiscount || 0}</span>
         </div>
       )}
 
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Discount Amount</span>
+        <span className="w-full text-left">Hall Discount Amount</span>
         <span className="w-full text-right">
-          {data?.price ? 0.01 * data?.discount * data?.price : "-"}
+          {data?.price ? 0.01 * data?.baseDiscount * data?.price : "-"}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Discounted Price</span>
+        <span className="w-full text-left">Hall Discounted Price</span>
         <span className="w-full text-right">
           {data?.price
-            ? data?.price - 0.01 * data?.discount * data?.price
+            ? data?.price - 0.01 * data?.baseDiscount * data?.price
             : "-"}
         </span>
       </div>
@@ -546,7 +557,7 @@ function Booking() {
         <span className="w-full text-left">CGST %</span>
         <span className="w-full text-right">
           {data?.price
-            ? 0.09 * (data?.price - 0.01 * data?.discount * data?.price)
+            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
             : "-"}
         </span>
       </div>
@@ -554,48 +565,109 @@ function Booking() {
         <span className="w-full text-left">SGST %</span>
         <span className="w-full text-right">
           {data?.price
-            ? 0.09 * (data?.price - 0.01 * data?.discount * data?.price)
+            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
             : "-"}
         </span>
       </div>
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Existing Security Deposit</span>
-        <span className="w-full text-right">{data?.deposit}</span>
-      </div>
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">New Security Deposit</span>
-        <span className="w-full text-right">{hallData?.securityDeposit}</span>
-      </div>
       <span>
-        <label htmlFor="paidornot">Security Deposit Type </label>
+        <label htmlFor="isDeposit">Security Deposit Applicable </label>
         <select
-          id="paidornot"
+          id="isDeposit"
+          value={data?.isDeposit === true ? "yes" : "no" || ""}
           className="px-2 py-1 rounded-md border border-gray-400 my-1"
           onChange={(e) => {
-            if (e.target.value === "existing") {
-              editDepositAmount.mutate(data?.deposit || 0);
+            if (e.target.value === "yes") {
+              editIsDepositApplicable.mutate(true);
             }
-            if (e.target.value === "none") {
-              editDepositAmount.mutate(0);
-            }
-            if (e.target.value === "new") {
-              editDepositAmount.mutate(hallData?.securityDeposit || 0);
+            if (e.target.value === "no") {
+              editIsDepositApplicable.mutate(false);
             }
           }}
         >
-          <option value="existing">Existing</option>
-          <option value="none">None</option>
-          <option value="new">New</option>
+          <option value="" disabled>
+            Select an option
+          </option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
         </select>
       </span>
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Enter Security Deposit</span>
+          <input
+            type="text"
+            value={editedData?.deposit}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  deposit: Number(e.target.value),
+                };
+              })
+            }
+            placeholder="Enter Security Deposit"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Security Deposit Amount</span>
+          <span className="w-full text-right">{data?.deposit}</span>
+        </div>
+      )}
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Deposit Discount %</span>
+          <input
+            type="text"
+            value={editedData?.depositDiscount}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  depositDiscount: Number(e.target.value),
+                };
+              })
+            }
+            placeholder="Enter Security Deposit Discount %"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Deposit Discount %</span>
+          <span className="w-full text-right">
+            {data?.depositDiscount || 0}
+          </span>
+        </div>
+      )}
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Deposit Discount Amount</span>
+        <span className="w-full text-right">
+          {data?.deposit ? 0.01 * data?.depositDiscount * data?.deposit : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Deposit Discounted Price</span>
+        <span className="w-full text-right">
+          {data?.deposit
+            ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
+            : "-"}
+        </span>
+      </div>
+
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Total Payable Amount</span>
         <span className="w-full text-right">
           {data
             ? data?.price -
-              0.01 * data?.discount * data?.price +
-              0.18 * (data?.price - 0.01 * data?.discount * data?.price) +
-              data?.deposit
+              0.01 * data?.baseDiscount * data?.price +
+              0.18 * (data?.price - 0.01 * data?.baseDiscount * data?.price) +
+              (data.isDeposit
+                ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
+                : 0)
             : 0}
         </span>
       </div>
@@ -617,6 +689,7 @@ function Booking() {
           <option value="cheque">Cheque</option>
           <option value="upi">UPI</option>
           <option value="neft/rtgs">NEFT/RTGS</option>
+          <option value="svkminstitute">SVKM Institute</option>
         </select>
       </span>
       {["cheque", "upi", "neft/rtgs"].includes(data?.transaction?.type || "") &&
@@ -838,22 +911,38 @@ function Booking() {
         </div>
       )}
 
-      <span className=" mb-3">STATUS: {data?.status}</span>
-
       {editingMode ? (
-        <button
-          onClick={handleSave}
-          className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
-        >
-          Save Details
-        </button>
+        <span className="space-x-4 space-y-4">
+          <button
+            onClick={() => {
+              handleSave();
+              setShowCancellationReason(true);
+            }}
+            className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
+          >
+            Cancel & Save
+          </button>
+          <button
+            onClick={() => {
+              handleSave();
+              editBookingStatus.mutate("ENQUIRY" as bookingStatusType);
+            }}
+            className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+          >
+            Enquiry & Save
+          </button>
+          <button
+            onClick={() => {
+              handleSave();
+              editBookingStatus.mutate("CONFIRMED" as bookingStatusType);
+            }}
+            className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
+          >
+            Confirm & Save
+          </button>
+        </span>
       ) : (
-        <button
-          onClick={handleEdit}
-          className=" mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
-        >
-          Edit Details
-        </button>
+        <></>
       )}
 
       {/* {!showCancellationReason && (
@@ -866,23 +955,6 @@ function Booking() {
           Handle Cancellation
         </button>
       )} */}
-
-      <select
-        value={data?.status}
-        onChange={(e) => {
-          console.log(e.target.value);
-          if (e.target.value == "CANCELLED") {
-            setShowCancellationReason(true);
-          } else {
-            editBookingStatus.mutate(e.target.value as bookingStatusType);
-          }
-        }}
-        className="px-2 py-1 rounded-md border border-gray-400"
-      >
-        {possibleBookingTypes.map((eachBooktingType) => (
-          <option value={eachBooktingType}>{eachBooktingType}</option>
-        ))}
-      </select>
     </div>
   );
 }

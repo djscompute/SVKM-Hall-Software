@@ -4,7 +4,7 @@ function Dashboard() {
       <h1 className=" text-3xl font-semibold my-5">DashBoard</h1>
       <div className="flex flex-wrap justify-around w-full gap-10">
         <a
-          href="/dashboard/report1"
+          href="/dashboard/hall-wise-bookings"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
           Hall Wise Bookings
@@ -40,10 +40,10 @@ function Dashboard() {
           Report 6
         </a>
         <a
-          href="/dashboard/report7"
+          href="/dashboard/hall-wise-additional-feature-report"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
-          Report 7
+          Hall Wise Additional Feature Report
         </a>
         <a
           href="/dashboard/report8"
