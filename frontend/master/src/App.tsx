@@ -16,6 +16,7 @@ import Dashboard from "./pages/dashboard/dashboard";
 import Report1 from "./pages/dashboard/report1";
 import Constants from "./pages/Constants";
 import Report7 from "./pages/dashboard/report7";
+import Report8 from "./pages/dashboard/report8";
 export const queryClient = new QueryClient();
 
 export default function App() {
@@ -93,6 +94,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Report7 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/booking-information-report"
+          element={
+            <ProtectedRoute>
+              <Report8 />
             </ProtectedRoute>
           }
         />
