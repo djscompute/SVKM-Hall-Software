@@ -165,7 +165,7 @@ function Report7() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "bookings.csv";
+    link.download = `${selectedHall} Additional Feature Reports ${humanReadable.fromHuman}-${humanReadable.toHuman} .csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
