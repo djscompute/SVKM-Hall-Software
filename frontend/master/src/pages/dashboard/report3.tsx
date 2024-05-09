@@ -139,7 +139,7 @@ function Report2() {
     if (!from || !to) return;
     console.log(selectedHall);
     const responsePromise = axiosInstance.post(
-      "dashboard/getSessionWiseBookings",
+      "dashboard/getBookingTypeCounts",
       {
         fromDate: from,
         toDate: to,
@@ -151,7 +151,7 @@ function Report2() {
       error: "Failed to fetch Report. Please contact maintainer.",
     });
     const response = await responsePromise;
-    console.log("itna response aa raha hai:",response.data);
+    console.log(response.data);
     setData(response.data);
   };
 
