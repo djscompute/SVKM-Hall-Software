@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosInstance";
 import { toast } from "react-toastify";
@@ -8,7 +9,7 @@ import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
 
 const PieChartComponent = ({ data }: { data: any }) => {
   const chartData = {
-    labels: data.map((item: any) => `${item.hallName} - ${item.sessionName}`), 
+    labels: data.map((item: any) => `${item.hallName} - ${item.sessionName}`),
     datasets: [
       {
         data: data.map((item: any) => item.bookingCount),
@@ -53,7 +54,7 @@ const PieChartComponent = ({ data }: { data: any }) => {
 
 const BarChartComponent = ({ data }: { data: any }) => {
   const chartData = {
-    labels: data.map((item: any) => `${item.hallName} - ${item.sessionName}`), 
+    labels: data.map((item: any) => `${item.hallName} - ${item.sessionName}`),
     datasets: [
       {
         label: "Booking Count",
@@ -95,19 +96,21 @@ const BarChartComponent = ({ data }: { data: any }) => {
 };
 
 function Report2() {
-    const [allHalls, setAllHalls] = useState<HallType[]>([{ id: -1, name: "All" }]);
-    const [selectedHall, setSelectedHall] = useState(null);
-    async function getHalls() {
-        console.log("hii");
-        try {
-          const response = await axiosInstance.get("getAllHalls");
-          if (response.data.length > 0) {
-            setAllHalls(prevHalls => [...prevHalls, ...response.data]);
-          }
-        } catch (error) {
-          console.log("Error while fetching hall data:", error);
-        }
+  const [allHalls, setAllHalls] = useState<HallType[]>([
+    { id: -1, name: "All" },
+  ]);
+  const [selectedHall, setSelectedHall] = useState(null);
+  async function getHalls() {
+    console.log("hii");
+    try {
+      const response = await axiosInstance.get("getAllHalls");
+      if (response.data.length > 0) {
+        setAllHalls((prevHalls) => [...prevHalls, ...response.data]);
       }
+    } catch (error) {
+      console.log("Error while fetching hall data:", error);
+    }
+  }
   const [queryFilter, setQueryFilter] = useState<{
     from: string;
     to: string;
@@ -123,6 +126,7 @@ function Report2() {
     toHuman: "",
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any>();
   const now = dayjs();
 
@@ -151,7 +155,7 @@ function Report2() {
       error: "Failed to fetch Report. Please contact maintainer.",
     });
     const response = await responsePromise;
-    console.log("itna response aa raha hai:",response.data);
+    console.log("response:", response.data);
     setData(response.data);
   };
 
@@ -191,9 +195,16 @@ function Report2() {
   useEffect(() => {
     getHalls();
   }, []);
+  const DownloadReport = () => {
+    // jspdf was generating more than 9 mb pdf,so this was optimal soln
+    window.print();
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
+    <div
+      id="report-container"
+      className=" flex flex-col items-center justify-center w-full gap-2 mb-20"
+    >
       <span className=" text-xl font-medium mt-5">Session Wise Bookings</span>
       <div className="flex gap-2">
         <BasicDateTimePicker
@@ -230,6 +241,12 @@ function Report2() {
       >
         Get for Time Period
       </button>
+      <button
+        className="bg-blue-500 text-white px-2 py-1 rounded-md"
+        onClick={() => DownloadReport()}
+      >
+        Download Report
+      </button>
       <span>or</span>
       <button
         className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-xs"
@@ -253,7 +270,7 @@ function Report2() {
       {data?.length > 0 && (
         <div className="flex flex-col items-center mt-5 gap-10">
           <span className="font-medium text-lg">
-            Showing analytics from {humanReadable.fromHuman} to
+            Showing analytics from {humanReadable.fromHuman} to 
             {humanReadable.toHuman}
           </span>
           <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">

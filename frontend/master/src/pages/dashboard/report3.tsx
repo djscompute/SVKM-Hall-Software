@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosInstance";
 import { toast } from "react-toastify";
@@ -95,19 +96,21 @@ const BarChartComponent = ({ data }: { data: any }) => {
 };
 
 function Report2() {
-    const [allHalls, setAllHalls] = useState<HallType[]>([{ id: -1, name: "All" }]);
-    const [selectedHall, setSelectedHall] = useState(null);
-    async function getHalls() {
-        console.log("hii");
-        try {
-          const response = await axiosInstance.get("getAllHalls");
-          if (response.data.length > 0) {
-            setAllHalls(prevHalls => [...prevHalls, ...response.data]);
-          }
-        } catch (error) {
-          console.log("Error while fetching hall data:", error);
-        }
+  const [allHalls, setAllHalls] = useState<HallType[]>([
+    { id: -1, name: "All" },
+  ]);
+  const [selectedHall, setSelectedHall] = useState(null);
+  async function getHalls() {
+    console.log("hii");
+    try {
+      const response = await axiosInstance.get("getAllHalls");
+      if (response.data.length > 0) {
+        setAllHalls((prevHalls) => [...prevHalls, ...response.data]);
       }
+    } catch (error) {
+      console.log("Error while fetching hall data:", error);
+    }
+  }
   const [queryFilter, setQueryFilter] = useState<{
     from: string;
     to: string;

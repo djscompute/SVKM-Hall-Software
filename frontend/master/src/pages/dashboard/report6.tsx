@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosInstance";
 import { toast } from "react-toastify";
@@ -137,7 +138,7 @@ function Report6() {
       error: "Failed to fetch Report. Please contact maintainer.",
     });
     const response = await responsePromise;
-    console.log("itna response aa raha hai:",response.data);
+    console.log("response:", response.data);
     setData(response.data);
   };
 
@@ -174,6 +175,10 @@ function Report6() {
     handleHumanReadable(queryFilter.from, queryFilter.to);
   }, [queryFilter]);
 
+  const DownloadReport = () => {
+    // jspdf was generating more than 9 mb pdf,so this was optimal soln
+    window.print();
+  };
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
       <span className=" text-xl font-medium mt-5">Total Interactions</span>
@@ -196,6 +201,12 @@ function Report6() {
         onClick={() => getData(queryFilter)}
       >
         Get for Time Period
+      </button>
+      <button
+        className="bg-blue-500 text-white px-2 py-1 rounded-md"
+        onClick={() => DownloadReport()}
+      >
+        Download Report
       </button>
       <span>or</span>
       <button
