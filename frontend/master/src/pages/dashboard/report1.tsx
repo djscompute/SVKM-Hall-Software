@@ -219,7 +219,7 @@ function Report1() {
       {data?.length > 0 && (
         <div className="flex flex-col items-center mt-5 gap-10">
           <span className="font-medium text-lg">
-            Showing analytics from {humanReadable.fromHuman} to{" "}
+            Showing analytics from {humanReadable.fromHuman} to
             {humanReadable.toHuman}
           </span>
           <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
