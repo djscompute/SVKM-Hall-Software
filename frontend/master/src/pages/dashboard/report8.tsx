@@ -307,26 +307,7 @@ function Report8() {
           >
             Get for Time Period
           </button>
-          <span>or</span>
 
-          <button
-            className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-xs"
-            onClick={() => getThisWeek()}
-          >
-            Get for this Week
-          </button>
-          <button
-            className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-xs"
-            onClick={() => getThisMonth()}
-          >
-            Get for this Month
-          </button>
-          <button
-            className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-xs"
-            onClick={() => getThisYear()}
-          >
-            Get for this Year
-          </button>
         </div>
       )}
       {/* Display Data */}
