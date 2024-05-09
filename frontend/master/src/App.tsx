@@ -14,6 +14,7 @@ import EditAdmin from "./pages/editAdmin";
 import Admins from "./pages/Admins";
 import Dashboard from "./pages/dashboard/dashboard";
 import Report1 from "./pages/dashboard/report1";
+import Constants from "./pages/Constants";
 import Report7 from "./pages/dashboard/report7";
 export const queryClient = new QueryClient();
 
@@ -100,6 +101,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Login />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/constants"
+          element={
+            <ProtectedRoute>
+              <Constants />
             </ProtectedRoute>
           }
         />
