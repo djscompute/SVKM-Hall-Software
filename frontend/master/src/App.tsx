@@ -14,6 +14,7 @@ import EditAdmin from "./pages/editAdmin";
 import Admins from "./pages/Admins";
 import Dashboard from "./pages/dashboard/dashboard";
 import Report1 from "./pages/dashboard/report1";
+import Report7 from "./pages/dashboard/report7";
 export const queryClient = new QueryClient();
 
 export default function App() {
@@ -79,10 +80,18 @@ export default function App() {
           }
         />
         <Route
-          path="/dashboard/report1"
+          path="/dashboard/hall-wise-bookings"
           element={
             <ProtectedRoute>
               <Report1 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/hall-wise-additional-feature-report"
+          element={
+            <ProtectedRoute>
+              <Report7 />
             </ProtectedRoute>
           }
         />
