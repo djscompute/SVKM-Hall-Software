@@ -80,7 +80,7 @@ export default function App() {
           }
         />
         <Route
-          path="/dashboard/report1"
+          path="/dashboard/hall-wise-bookings"
           element={
             <ProtectedRoute>
               <Report1 />
@@ -88,7 +88,7 @@ export default function App() {
           }
         />
         <Route
-          path="/dashboard/report7"
+          path="/dashboard/hall-wise-additional-feature-report"
           element={
             <ProtectedRoute>
               <Report7 />
