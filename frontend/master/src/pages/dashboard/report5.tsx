@@ -194,7 +194,7 @@ function Report5() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
-      <span className=" text-xl font-medium mt-5">Hall Wise Bookings</span>
+      <span className=" text-xl font-medium mt-5">Month Wise Collections</span>
       <div className="flex gap-2">
         <BasicDateTimePicker
           timeModifier={(time) => {
@@ -216,9 +216,7 @@ function Report5() {
             setSelectedHall(event.target.value);
           }}
         >
-          <option key="1" value="">
-            Select a hall
-          </option>
+          
           {allHalls.map((hall) => (
             <option value={hall.name}>{hall.name}</option>
           ))}

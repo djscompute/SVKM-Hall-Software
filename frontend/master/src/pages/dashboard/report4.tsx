@@ -194,7 +194,7 @@ function Report4() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
-      <span className=" text-xl font-medium mt-5">Hall Wise Bookings</span>
+      <span className=" text-xl font-medium mt-5">Collection Details</span>
       <div className="flex gap-2">
         <BasicDateTimePicker
           timeModifier={(time) => {

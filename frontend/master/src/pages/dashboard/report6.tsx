@@ -95,19 +95,6 @@ const BarChartComponent = ({ data }: { data: any }) => {
 };
 
 function Report6() {
-    const [allHalls, setAllHalls] = useState<HallType[]>([]);
-    const [selectedHall, setSelectedHall] = useState(null);
-    async function getHalls() {
-        console.log("hii");
-        try {
-          const response = await axiosInstance.get("getAllHalls");
-          if (response.data.length > 0) {
-            setAllHalls(prevHalls => [...prevHalls, ...response.data]);
-          }
-        } catch (error) {
-          console.log("Error while fetching hall data:", error);
-        }
-      }
   const [queryFilter, setQueryFilter] = useState<{
     from: string;
     to: string;
@@ -137,13 +124,12 @@ function Report6() {
 
   const getData = async ({ from, to }: { from: string; to: string }) => {
     if (!from || !to) return;
-    console.log(selectedHall);
     const responsePromise = axiosInstance.post(
       "dashboard/getTotalInteraction",
       {
         fromDate: from,
         toDate: to,
-        hallName: selectedHall,
+        hallName: "all",
       }
     );
     toast.promise(responsePromise, {
@@ -188,13 +174,9 @@ function Report6() {
     handleHumanReadable(queryFilter.from, queryFilter.to);
   }, [queryFilter]);
 
-  useEffect(() => {
-    getHalls();
-  }, []);
-
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
-      <span className=" text-xl font-medium mt-5">Hall Wise Bookings</span>
+      <span className=" text-xl font-medium mt-5">Total Interactions</span>
       <div className="flex gap-2">
         <BasicDateTimePicker
           timeModifier={(time) => {
@@ -208,21 +190,6 @@ function Report6() {
           }}
           timePickerName="to"
         />
-      </div>
-      <div>
-        <select
-          className="border-2   h-12 w-full"
-          onChange={(event) => {
-            setSelectedHall(event.target.value);
-          }}
-        >
-          <option key="1" value="">
-            Select a hall
-          </option>
-          {allHalls.map((hall) => (
-            <option value={hall.name}>{hall.name}</option>
-          ))}
-        </select>
       </div>
       <button
         className="bg-blue-500 text-white px-2 py-1 rounded-md"
