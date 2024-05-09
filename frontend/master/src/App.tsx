@@ -15,7 +15,9 @@ import Admins from "./pages/Admins";
 import Dashboard from "./pages/dashboard/dashboard";
 import Report1 from "./pages/dashboard/report1";
 import Report2 from "./pages/dashboard/report2";
-import Report3 from "./pages/dashboard/report3";
+import Report4 from "./pages/dashboard/report4";
+import Report5 from "./pages/dashboard/report5";
+import Report6 from "./pages/dashboard/report6";
 import Constants from "./pages/Constants";
 import Report7 from "./pages/dashboard/report7";
 export const queryClient = new QueryClient();
@@ -99,13 +101,30 @@ export default function App() {
           }
         />
         <Route
-          path="/dashboard/report3"
+          path="/dashboard/report4"
           element={
             <ProtectedRoute>
-              <Report3 />
+              <Report4 />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/dashboard/report5"
+          element={
+            <ProtectedRoute>
+              <Report5 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/report6"
+          element={
+            <ProtectedRoute>
+              <Report6 />
+            </ProtectedRoute>
+          }
+        />
+       
         <Route
           path="/dashboard/hall-wise-additional-feature-report"
           element={
