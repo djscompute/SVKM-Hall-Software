@@ -46,10 +46,10 @@ function Dashboard() {
           Hall Wise Additional Feature Report
         </a>
         <a
-          href="/dashboard/report8"
+          href="/dashboard/booking-information-report"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
-          Report 8
+          Booking Information Report
         </a>
       </div>
     </div>

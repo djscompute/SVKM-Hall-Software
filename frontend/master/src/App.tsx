@@ -15,12 +15,13 @@ import Admins from "./pages/Admins";
 import Dashboard from "./pages/dashboard/dashboard";
 import Report1 from "./pages/dashboard/report1";
 import Report2 from "./pages/dashboard/report2";
+import Report3 from "./pages/dashboard/report3";
 import Report4 from "./pages/dashboard/report4";
 import Report5 from "./pages/dashboard/report5";
 import Report6 from "./pages/dashboard/report6";
-import Constants from "./pages/Constants";
 import Report7 from "./pages/dashboard/report7";
-import Report3 from "./pages/dashboard/report3";
+import Report8 from "./pages/dashboard/report8";
+import Constants from "./pages/Constants";
 export const queryClient = new QueryClient();
 
 export default function App() {
@@ -139,6 +140,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Report7 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/booking-information-report"
+          element={
+            <ProtectedRoute>
+              <Report8 />
             </ProtectedRoute>
           }
         />
