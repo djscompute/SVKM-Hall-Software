@@ -9,9 +9,6 @@ import { useQuery } from "@tanstack/react-query";
 
 function Report8() {
   const [hallData, setHallData] = useState<EachHallType[]>([]);
-  const [selectedAdditionalFeatures, setSelectedAdditionalFeatures] = useState<
-    string[]
-  >([]);
 
   useQuery({
     queryKey: ["allhalls"],
@@ -36,10 +33,12 @@ function Report8() {
   const [data, setData] = useState<any>();
   const [selectedHall, setSelectedHall] = useState<string>();
   const [selectedHallId, setSelectedHallId] = useState<string>();
-  const [selectedSession, setSelectedSession] = useState<string>();
+  const [selectedSession, setSelectedSession] = useState<string>("All");
   const [selectedCategory, setSelectedCategory] = useState<string>();
-  const [hallCharges, setHallCharges] = useState<boolean>();
-  const [displayPeriod, setDisplayPeriod] = useState<string>("Select");
+  const [hallCharges, setHallCharges] = useState<boolean>(false);
+  const [responseHallCharges, setresponseHallCharges] = useState<boolean>()
+  const [selectedDisplayPeriod, setSelectedDisplayPeriod] =
+    useState<string>("Select");
 
   const [date, setDate] = useState<{
     from: string;
@@ -56,91 +55,98 @@ function Report8() {
     fromHuman: "",
     toHuman: "",
   });
+  const [humanReadableRequest, setHumanReadableRequest] = useState<{
+    fromHuman: string;
+    toHuman: string;
+  }>({
+    fromHuman: "",
+    toHuman: "",
+  });
 
   const now = dayjs();
-
-  const startOfWeek = now.startOf("week").format("YYYY-MM-DDT00:00:00");
-  const endOfWeek = now.endOf("week").format("YYYY-MM-DDT23:59:59");
-
-  const startOfMonth = now.startOf("month").format("YYYY-MM-DDT00:00:00");
-  const endOfMonth = now.endOf("month").format("YYYY-MM-DDT23:59:59");
-
-  const startOfYear = now.startOf("year").format("YYYY-MM-DDT00:00:00");
-  const endOfYear = now.endOf("year").format("YYYY-MM-DDT23:59:59");
-
-  const getThisWeek = () => {
-    if (!selectedHall) return;
-    getData({
-      from: startOfWeek,
-      to: endOfWeek,
-      hallName: selectedHall,
-      additionalFeatures: selectedAdditionalFeatures,
-    });
-    handleHumanReadable(startOfWeek, endOfWeek);
-  };
-  const getThisMonth = () => {
-    if (!selectedHall) return;
-    getData({
-      from: startOfMonth,
-      to: endOfMonth,
-      hallName: selectedHall,
-      additionalFeatures: selectedAdditionalFeatures,
-    });
-    handleHumanReadable(startOfMonth, endOfMonth);
-  };
-  const getThisYear = () => {
-    if (!selectedHall) return;
-    getData({
-      from: startOfYear,
-      to: endOfYear,
-      hallName: selectedHall,
-      additionalFeatures: selectedAdditionalFeatures,
-    });
-    handleHumanReadable(startOfYear, endOfYear);
-  };
 
   const handleHumanReadable = (from: string, to: string) => {
     let humanReadableFrom = "";
     let humanReadableTo = "";
-    if (from) {
-      humanReadableFrom = dayjs(from)?.format("MMMM D, YYYY");
+    if (selectedDisplayPeriod === "Today") {
+      humanReadableFrom = dayjs().format("MMMM D, YYYY");
+      humanReadableTo = dayjs().format("MMMM D, YYYY");
+    } else if (selectedDisplayPeriod === "Tomorrow") {
+      humanReadableFrom = dayjs().add(1, 'day').format("MMMM D, YYYY");
+      humanReadableTo = dayjs().add(1, 'day').format("MMMM D, YYYY");
+    } else if (selectedDisplayPeriod === "Week") {
+      humanReadableFrom = dayjs().startOf('week').format("MMMM D, YYYY");
+      humanReadableTo = dayjs().endOf('week').format("MMMM D, YYYY");
+    } else if (selectedDisplayPeriod === "Month") {
+      humanReadableFrom = dayjs().startOf('month').format("MMMM D, YYYY");
+      humanReadableTo = dayjs().endOf('month').format("MMMM D, YYYY");
+    } else if (selectedDisplayPeriod === "Year") {
+      humanReadableFrom = dayjs().startOf('year').format("MMMM D, YYYY");
+      humanReadableTo = dayjs().endOf('year').format("MMMM D, YYYY");
+    } else {
+      if (from) {
+        humanReadableFrom = dayjs(from).format("MMMM D, YYYY");
+      }
+      if (to) {
+        humanReadableTo = dayjs(to).format("MMMM D, YYYY");
+      }
     }
-    if (to) {
-      humanReadableTo = dayjs(to)?.format("MMMM D, YYYY");
-    }
-    console.log(humanReadableFrom, humanReadableTo);
     setHumanReadable({
       fromHuman: humanReadableFrom,
       toHuman: humanReadableTo,
     });
   };
 
+  useEffect(() => {
+    handleHumanReadable(date.from, date.to);
+  }, [selectedDisplayPeriod, date.from, date.to]);
+
   const getData = async ({
-    from,
-    to,
-    hallName,
-    additionalFeatures,
+    displayPeriod,
+    fromDate,
+    toDate,
+    displayHall,
+    displayCustomerCategory,
+    displaySession,
+    displayHallCharges,
   }: {
-    from: string;
-    to: string;
-    hallName: string;
-    additionalFeatures: string[];
+    displayPeriod: string;
+    fromDate: string;
+    toDate: string;
+    displayHall: string;
+    displayCustomerCategory: string;
+    displaySession: string;
+    displayHallCharges: boolean;
   }) => {
-    if (!from || !to) return;
-    console.log({
-      fromDate: from,
-      toDate: to,
-      hallName: hallName,
-      additionalFeatures: additionalFeatures,
-    });
+    if (!displayPeriod) return;
+    setresponseHallCharges(displayHallCharges)
+    setHumanReadableRequest(humanReadable)
+    let request;
+    if (displayPeriod === "Select") {
+      request = {
+        displayPeriod: displayPeriod,
+        fromDate: fromDate,
+        toDate: toDate,
+        displayHall: displayHall,
+        displayCustomerCategory: displayCustomerCategory,
+        displaySession: displaySession,
+        displayHallCharges: displayHallCharges,
+      };
+      console.log(request);
+    } else {
+      request = {
+        displayPeriod: displayPeriod,
+        displayHall: displayHall,
+        displayCustomerCategory: displayCustomerCategory,
+        displaySession: displaySession,
+        displayHallCharges: displayHallCharges,
+      };
+      console.log(request);
+    }
+
     const responsePromise = axiosInstance.post(
-      "dashboard/generateAdditionalFeatureReport",
-      {
-        fromDate: from,
-        toDate: to,
-        hallName: hallName,
-        additionalFeatures: additionalFeatures,
-      }
+      "dashboard/generateBookingInformationReport",
+      request
     );
     toast.promise(responsePromise, {
       pending: "Fetching Report...",
@@ -170,7 +176,7 @@ function Report8() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${selectedHall} Additional Feature Reports ${humanReadable.fromHuman}-${humanReadable.toHuman} .csv`;
+    link.download = `${selectedHall} Booking Information Reports ${humanReadable.fromHuman}-${humanReadable.toHuman} .csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -181,13 +187,11 @@ function Report8() {
       <span className="text-xl font-medium mt-5">
         Booking Information Report
       </span>
-
-      <span className="text-xl font-medium mt-5">Display Period</span>
       {/* SELECT DISPLAY PERIOD */}
-      <div>
+      <div className="mt-4">
         <select
           className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
-          onChange={(e) => setDisplayPeriod(e.target.value)}
+          onChange={(e) => setSelectedDisplayPeriod(e.target.value)}
         >
           <option value="Select">Select Display Period</option>
           <option value="Today">Today</option>
@@ -246,27 +250,46 @@ function Report8() {
         <select
           className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
           onChange={(e) => {
-            setSelectedCategory(e.target.value)
+            setSelectedCategory(e.target.value);
           }}
         >
           <option value="">Select Category</option>
-          {hallData
-            .find((hall) => hall.name === selectedHall)
-            ?.sessions.find((session) => session._id === selectedSession)
-            ?.price.map((category) => (
-              <option key={category.categoryName} value={category.categoryName}>
-                {category.categoryName}
-              </option>
-            ))}
+          <option value="All">All</option>
+          {selectedSession === "All"
+            ? hallData
+                .find((hall) => hall.name === selectedHall)
+                ?.sessions[0]?.price.map((category) => (
+                  <option
+                    key={category.categoryName}
+                    value={category.categoryName}
+                  >
+                    {category.categoryName}
+                  </option>
+                ))
+            : hallData
+                .find((hall) => hall.name === selectedHall)
+                ?.sessions.find((session) => session._id === selectedSession)
+                ?.price.map((category) => (
+                  <option
+                    key={category.categoryName}
+                    value={category.categoryName}
+                  >
+                    {category.categoryName}
+                  </option>
+                ))}
         </select>
       </div>
-      
+
       {/* SELECT HALL CHARGES */}
       <div className="">
         <select
           className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
           onChange={(e) => {
-            {e.target.value=='true'?setHallCharges(true):setHallCharges(false)}
+            {
+              e.target.value == "true"
+                ? setHallCharges(true)
+                : setHallCharges(false);
+            }
           }}
         >
           <option value="">Display Hall Charges</option>
@@ -277,7 +300,7 @@ function Report8() {
 
       <hr className=" bg-gray-300 h-[1.5px] w-[50%] my-2" />
       {/* SELECT TIME PERIOD */}
-      {displayPeriod == "Select" && (
+      {selectedDisplayPeriod == "Select" && (
         <div className={`flex flex-col items-center justify-center gap-2 `}>
           <div className="flex gap-2">
             <BasicDateTimePicker
@@ -293,29 +316,32 @@ function Report8() {
               timePickerName="to"
             />
           </div>
-          <button
-            className="bg-blue-500 text-white px-2 py-1 rounded-md"
-            onClick={() => {
-              if (selectedHall)
-                getData({
-                  from: date.from,
-                  to: date.to,
-                  hallName: selectedHall,
-                  additionalFeatures: selectedAdditionalFeatures,
-                });
-            }}
-          >
-            Get for Time Period
-          </button>
-
         </div>
       )}
+      <button
+        className="bg-blue-500 text-white px-2 py-1 rounded-md"
+        onClick={() => {
+          if (selectedHallId && selectedCategory) {
+            getData({
+              displayPeriod: selectedDisplayPeriod,
+              fromDate: date.from,
+              toDate: date.to,
+              displayHall: selectedHallId,
+              displayCustomerCategory: selectedCategory,
+              displaySession: selectedSession,
+              displayHallCharges: hallCharges,
+            });
+          }
+        }}
+      >
+        Get for Time Period
+      </button>
+
       {/* Display Data */}
       {data?.length && (
         <div className="flex flex-col items-center w-full overflow-x-auto mt-5">
           <span className="font-medium text-lg my-5">
-            Showing analytics from {humanReadable.fromHuman} to
-            {humanReadable.toHuman}
+            Showing analytics from {humanReadableRequest.fromHuman} to {humanReadableRequest.toHuman}
           </span>
           <div className=" flex flex-row items-center gap-3 mb-3">
             <span className="font-medium ">{data?.length} entries found </span>
@@ -343,35 +369,35 @@ function Report8() {
           <table className="min-w-full table-auto">
             <thead className="bg-gray-800 text-white">
               <tr>
-                <th className="px-4 py-2">Date</th>
-                <th className="px-4 py-2">Session</th>
-                <th className="px-4 py-2">From</th>
-                <th className="px-4 py-2">To</th>
-                <th className="px-4 py-2">Hall Name</th>
-                <th className="px-4 py-2">Facility</th>
-                <th className="px-4 py-2">Manager</th>
-                <th className="px-4 py-2">Category</th>
-                <th className="px-4 py-2">Customer Name</th>
-                <th className="px-4 py-2">Contact Person</th>
-                <th className="px-4 py-2">Contact Details</th>
+                <th className="px-4 py-2 text-center">Date</th>
+                <th className="px-4 py-2 text-center">Hall Name</th>
+                <th className="px-4 py-2 text-center">Session</th>
+                <th className="px-4 py-2 text-center">Additional Facility</th>
+                <th className="px-4 py-2 text-center">Manager Name</th>
+                <th className="px-4 py-2 text-center">Customer Category</th>
+                <th className="px-4 py-2 text-center">Customer Name</th>
+                <th className="px-4 py-2 text-center">Contact Person</th>
+                <th className="px-4 py-2 text-center">Contact No.</th>
+                {responseHallCharges && <th className="px-4 py-2 text-center">Booking Amount</th>}
+                {responseHallCharges && <th className="px-4 py-2 text-center">Amount Paid</th>}
               </tr>
             </thead>
             <tbody>
               {data.map((booking: any, index: number) => (
                 <tr key={index} className="bg-white border-b">
-                  <td className="px-4 py-2">{booking.Date}</td>
-                  <td className="px-4 py-2">{booking.Session}</td>
-                  <td className="px-4 py-2">{booking.From}</td>
-                  <td className="px-4 py-2">{booking.To}</td>
-                  <td className="px-4 py-2">{booking["Hall Name"]}</td>
-                  <td className="px-4 py-2">
-                    {booking["Additional Facility Name"]}
+                  <td className="px-4 py-2 text-center">{booking.Date}</td>
+                  <td className="px-4 py-2 text-center">{booking["Hall Name"]}</td>
+                  <td className="px-4 py-2 text-center">{booking["Session"]}</td>
+                  <td className="px-4 py-2 text-center">{booking["Additional Facility"]?booking["Additional Facility"]:'None'}</td>
+                  <td className="px-4 py-2 text-center">{booking["Manager Name"]}</td>
+                  <td className="px-4 py-2 text-center">
+                    {booking["Customer Category"]}
                   </td>
-                  <td className="px-4 py-2">{booking["Manager Name"]}</td>
-                  <td className="px-4 py-2">{booking["Customer Category"]}</td>
-                  <td className="px-4 py-2">{booking["Customer Name"]}</td>
-                  <td className="px-4 py-2">{booking["Contact Person"]}</td>
-                  <td className="px-4 py-2">{booking["Contact Details"]}</td>
+                  <td className="px-4 py-2 text-center">{booking["Customer Name"]}</td>
+                  <td className="px-4 py-2 text-center">{booking["Contact Person"]}</td>
+                  <td className="px-4 py-2 text-center">{booking["Contact No."]}</td>
+                  {responseHallCharges && <td className="px-4 py-2 text-center">{booking["Booking Amount"]}</td>}
+                  {responseHallCharges && <td className="px-4 py-2 text-center">{booking["Amount Paid"]}</td>}
                 </tr>
               ))}
             </tbody>
