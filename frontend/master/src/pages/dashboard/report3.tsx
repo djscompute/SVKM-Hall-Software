@@ -9,10 +9,10 @@ import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
 
 const PieChartComponent = ({ data }: { data: any }) => {
   const chartData = {
-    labels: data.map((item: any) => item.hallName),
+    labels: data.bookingTypes.map((booking: any) => booking.type),
     datasets: [
       {
-        data: data.map((item: any) => item.bookingCount),
+        data: data.bookingTypes.map((booking: any) => booking.count),
         backgroundColor: [
           "#FF6384",
           "#36A2EB",
@@ -54,13 +54,13 @@ const PieChartComponent = ({ data }: { data: any }) => {
 
 const BarChartComponent = ({ data }: { data: any }) => {
   const chartData = {
-    labels: data.map((item: any) => item.hallName),
+    labels: data.bookingTypes.map((booking: any) => booking.type),
     datasets: [
       {
         label: "Booking Count",
-        data: data.map((item: any) => item.bookingCount),
-        backgroundColor: ["rgba(11, 127, 225, 0.8)"],
-        borderColor: ["rgba(11, 127, 225, 0.8)"],
+        data: data.bookingTypes.map((booking: any) => booking.count),
+        backgroundColor: "rgba(11, 127, 225, 0.8)",
+        borderColor: "rgba(11, 127, 225, 1)",
         borderWidth: 1,
       },
     ],
@@ -95,17 +95,14 @@ const BarChartComponent = ({ data }: { data: any }) => {
   );
 };
 
-function Report2() {
-  const [allHalls, setAllHalls] = useState<HallType[]>([
-    { id: -1, name: "All" },
-  ]);
-  const [selectedHall, setSelectedHall] = useState(null);
+function Report3() {
+  const [allHalls, setAllHalls] = useState([{ id: -1, name: "All" }]);
+  const [selectedHall, setSelectedHall] = useState<string>("");
   async function getHalls() {
-    console.log("hii");
     try {
       const response = await axiosInstance.get("getAllHalls");
       if (response.data.length > 0) {
-        setAllHalls((prevHalls) => [...prevHalls, ...response.data]);
+        setAllHalls(response.data);
       }
     } catch (error) {
       console.log("Error while fetching hall data:", error);
@@ -214,7 +211,7 @@ function Report2() {
       </div>
       <div>
         <select
-          className="border-2   h-12 w-full"
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md"
           onChange={(event) => {
             setSelectedHall(event.target.value);
           }}
@@ -222,6 +219,7 @@ function Report2() {
           <option key="1" value="">
             Select a hall
           </option>
+          <option value={"all"}>All</option>
           {allHalls.map((hall) => (
             <option value={hall.name}>{hall.name}</option>
           ))}
@@ -253,20 +251,27 @@ function Report2() {
         Get for this Year
       </button>
 
-      {data?.length > 0 && (
-        <div className="flex flex-col items-center mt-5 gap-10">
-          <span className="font-medium text-lg">
-            Showing analytics from {humanReadable.fromHuman} to
-            {humanReadable.toHuman}
-          </span>
-          <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
-            <PieChartComponent data={data} />
-            <BarChartComponent data={data} />
-          </div>
-        </div>
+      {data && (
+        <>
+          {data.map(
+            (hall: any) =>
+              hall.bookingTypes.length && (
+                <>
+                  <span className="font-medium text-lg">
+                    Showing analytics from {humanReadable.fromHuman} to
+                    {humanReadable.toHuman} for {hall.hallName}
+                  </span>
+                  <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
+                    <PieChartComponent data={hall} />
+                    <BarChartComponent data={hall} />
+                  </div>
+                </>
+              )
+          )}
+        </>
       )}
     </div>
   );
 }
 
-export default Report2;
+export default Report3;

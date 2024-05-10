@@ -96,19 +96,19 @@ const BarChartComponent = ({ data }: { data: any }) => {
 };
 
 function Report5() {
-    const [allHalls, setAllHalls] = useState<HallType[]>([]);
-    const [selectedHall, setSelectedHall] = useState(null);
-    async function getHalls() {
-        console.log("hii");
-        try {
-          const response = await axiosInstance.get("getAllHalls");
-          if (response.data.length > 0) {
-            setAllHalls(prevHalls => [...prevHalls, ...response.data]);
-          }
-        } catch (error) {
-          console.log("Error while fetching hall data:", error);
-        }
+  const [allHalls, setAllHalls] = useState([]);
+  const [selectedHall, setSelectedHall] = useState<string>("");
+  async function getHalls() {
+    console.log("hii");
+    try {
+      const response = await axiosInstance.get("getAllHalls");
+      if (response.data.length > 0) {
+        setAllHalls(response.data);
       }
+    } catch (error) {
+      console.log("Error while fetching hall data:", error);
+    }
+  }
   const [queryFilter, setQueryFilter] = useState<{
     from: string;
     to: string;
@@ -152,7 +152,7 @@ function Report5() {
       error: "Failed to fetch Report. Please contact maintainer.",
     });
     const response = await responsePromise;
-    console.log("response:",response.data);
+    console.log("response:", response.data);
     setData(response.data);
   };
 
@@ -216,14 +216,16 @@ function Report5() {
       </div>
       <div>
         <select
-          className="border-2   h-12 w-full"
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md"
           onChange={(event) => {
             setSelectedHall(event.target.value);
           }}
         >
-          
-          {allHalls.map((hall) => (
-            <option value={hall.name}>{hall.name}</option>
+          <option key="1" value="">
+            Select a hall
+          </option>
+          {allHalls.map((hall: any) => (
+            <option value={hall.hall}>{hall.name}</option>
           ))}
         </select>
       </div>
@@ -266,7 +268,6 @@ function Report5() {
             {humanReadable.toHuman}
           </span>
           <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
-            <PieChartComponent data={data} />
             <BarChartComponent data={data} />
           </div>
         </div>

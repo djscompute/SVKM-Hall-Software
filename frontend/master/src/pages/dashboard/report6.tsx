@@ -234,10 +234,28 @@ function Report6() {
             Showing analytics from {humanReadable.fromHuman} to
             {humanReadable.toHuman}
           </span>
-          <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
-            <PieChartComponent data={data} />
-            <BarChartComponent data={data} />
-          </div>
+
+          <BarChartComponent data={data} />
+          <table className="min-w-full table-auto border-2">
+            <thead className="bg-gray-800 text-white">
+              <tr>
+                <th className="px-4 py-2">Hall Name</th>
+                <th className="px-4 py-2">Interaction</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((hallCollection: any, index: number) => (
+                <tr key={index} className="bg-white border-b">
+                  <td className="px-4 py-2 text-center">
+                    {hallCollection.hallName}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    {hallCollection.bookingCount}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

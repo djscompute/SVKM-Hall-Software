@@ -96,16 +96,13 @@ const BarChartComponent = ({ data }: { data: any }) => {
 };
 
 function Report4() {
-  const [allHalls, setAllHalls] = useState<HallType[]>([
-    { id: -1, name: "All" },
-  ]);
-  const [selectedHall, setSelectedHall] = useState(null);
+  const [allHalls, setAllHalls] = useState([{ id: -1, name: "All" }]);
+  const [selectedHall, setSelectedHall] = useState<string>("");
   async function getHalls() {
-    console.log("hii");
     try {
       const response = await axiosInstance.get("getAllHalls");
       if (response.data.length > 0) {
-        setAllHalls((prevHalls) => [...prevHalls, ...response.data]);
+        setAllHalls(response.data);
       }
     } catch (error) {
       console.log("Error while fetching hall data:", error);
@@ -217,7 +214,7 @@ function Report4() {
       </div>
       <div>
         <select
-          className="border-2   h-12 w-full"
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md"
           onChange={(event) => {
             setSelectedHall(event.target.value);
           }}
@@ -225,6 +222,7 @@ function Report4() {
           <option key="1" value="">
             Select a hall
           </option>
+          <option value={"all"}>All</option>
           {allHalls.map((hall) => (
             <option value={hall.name}>{hall.name}</option>
           ))}
@@ -268,9 +266,25 @@ function Report4() {
             Showing analytics from {humanReadable.fromHuman} to
             {humanReadable.toHuman}
           </span>
-          <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
-            {/* <PieChartComponent data={data} /> */}
+          <div className="flex flex-col justify-evenly items-center gap-5">
             <BarChartComponent data={data} />
+
+            <table className="min-w-full table-auto border-2">
+              <thead className="bg-gray-800 text-white">
+                <tr>
+                  <th className="px-4 py-2">Hall Name</th>
+                  <th className="px-4 py-2">Collection</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((hallCollection: any, index: number) => (
+                  <tr key={index} className="bg-white border-b">
+                    <td className="px-4 py-2 text-center">{hallCollection.hallName}</td>
+                    <td className="px-4 py-2 text-center">{hallCollection.collection}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

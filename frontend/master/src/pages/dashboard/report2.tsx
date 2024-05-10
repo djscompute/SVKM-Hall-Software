@@ -96,16 +96,13 @@ const BarChartComponent = ({ data }: { data: any }) => {
 };
 
 function Report2() {
-  const [allHalls, setAllHalls] = useState<HallType[]>([
-    { id: -1, name: "All" },
-  ]);
-  const [selectedHall, setSelectedHall] = useState(null);
+  const [allHalls, setAllHalls] = useState([{ id: -1, name: "All" }]);
+  const [selectedHall, setSelectedHall] = useState<string>("");
   async function getHalls() {
-    console.log("hii");
     try {
       const response = await axiosInstance.get("getAllHalls");
       if (response.data.length > 0) {
-        setAllHalls((prevHalls) => [...prevHalls, ...response.data]);
+        setAllHalls(response.data);
       }
     } catch (error) {
       console.log("Error while fetching hall data:", error);
@@ -156,7 +153,20 @@ function Report2() {
     });
     const response = await responsePromise;
     console.log("response:", response.data);
-    setData(response.data);
+    const groupedByHallName = response.data.reduce((acc: any, obj: any) => {
+      // Create a key for the hallName if it doesn't exist
+      if (!acc[obj.hallName]) {
+        acc[obj.hallName] = [];
+      }
+      // Push the current object to the respective hall's array
+      acc[obj.hallName].push(obj);
+      return acc;
+    }, {});
+
+    // To convert this object back to an array of arrays (if needed):
+    const subarrays = Object.values(groupedByHallName);
+
+    setData(subarrays);
   };
 
   const getThisWeek = () => {
@@ -222,7 +232,7 @@ function Report2() {
       </div>
       <div>
         <select
-          className="border-2   h-12 w-full"
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md"
           onChange={(event) => {
             setSelectedHall(event.target.value);
           }}
@@ -230,6 +240,7 @@ function Report2() {
           <option key="1" value="">
             Select a hall
           </option>
+          <option value={"all"}>All</option>
           {allHalls.map((hall) => (
             <option value={hall.name}>{hall.name}</option>
           ))}
@@ -267,17 +278,21 @@ function Report2() {
         Get for this Year
       </button>
 
-      {data?.length > 0 && (
-        <div className="flex flex-col items-center mt-5 gap-10">
-          <span className="font-medium text-lg">
-            Showing analytics from {humanReadable.fromHuman} to 
-            {humanReadable.toHuman}
-          </span>
-          <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
-            <PieChartComponent data={data} />
-            <BarChartComponent data={data} />
-          </div>
-        </div>
+      {data && (
+        <>
+          {data.map((a: any) => (
+            <div className="flex flex-col items-center mt-5 gap-10">
+              <span className="font-medium text-lg">
+                Showing analytics from {humanReadable.fromHuman} to
+                {humanReadable.toHuman} for {a[0].hallName}
+              </span>
+              <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
+                <PieChartComponent data={a} />
+                <BarChartComponent data={a} />
+              </div>
+            </div>
+          ))}
+        </>
       )}
     </div>
   );
