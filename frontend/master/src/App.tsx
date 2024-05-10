@@ -95,7 +95,7 @@ export default function App() {
           }
         />
         <Route
-          path="/dashboard/report2"
+          path="/dashboard/get-session-wise-bookings"
           element={
             <ProtectedRoute>
               <Report2 />
@@ -103,7 +103,7 @@ export default function App() {
           }
         />
         <Route
-          path="/dashboard/report3"
+          path="/dashboard/get-booking-type-counts"
           element={
             <ProtectedRoute>
               <Report3 />
@@ -111,7 +111,7 @@ export default function App() {
           }
         />
         <Route
-          path="/dashboard/report4"
+          path="/dashboard/get-collection-details"
           element={
             <ProtectedRoute>
               <Report4 />
@@ -119,7 +119,7 @@ export default function App() {
           }
         />
         <Route
-          path="/dashboard/report5"
+          path="/dashboard/get-monthwise-collection-details"
           element={
             <ProtectedRoute>
               <Report5 />
@@ -127,7 +127,7 @@ export default function App() {
           }
         />
         <Route
-          path="/dashboard/report6"
+          path="/dashboard/total-interaction"
           element={
             <ProtectedRoute>
               <Report6 />
