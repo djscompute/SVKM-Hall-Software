@@ -1,0 +1,962 @@
+import { useMutation, useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
+import axiosInstance from "../config/axiosInstance";
+import { toast } from "react-toastify";
+import {
+  EachHallType,
+  HallBookingType,
+  bookingStatusType,
+  transactionType,
+} from "../../../../types/global";
+import { useParams } from "react-router-dom";
+// import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
+import { useState } from "react";
+import { queryClient } from "../App";
+
+const possibleBookingTypes: bookingStatusType[] = [
+  "CONFIRMED",
+  //"TENTATIVE",
+  "CANCELLED",
+  "ENQUIRY",
+];
+
+function Booking() {
+  const { bookingId } = useParams<{ bookingId: string }>();
+  const [hallData, setHallData] = useState<EachHallType>();
+  const [editingMode, setEditingMode] = useState(false);
+  const [editedData, setEditedData] = useState<HallBookingType>();
+  const [showCancellationReason, setShowCancellationReason] = useState(false);
+  const [cancellationReason, setCancellationReason] = useState("");
+
+  const { data, error, isFetching } = useQuery({
+    queryKey: [`booking/${bookingId}`],
+    queryFn: async () => {
+      try {
+        const responsePromise = axiosInstance.get(
+          `getBookingByID?_id=${bookingId}`
+        );
+        toast.promise(responsePromise, {
+          pending: "Fetching Booking...",
+          error: "Failed to fetch Booking. Please try again.",
+        });
+        const response = await responsePromise;
+        if (response.data.hallId) {
+          const result = await axiosInstance.get(
+            `getHall/${response.data.hallId}`
+          );
+          setHallData(result.data);
+        }
+        return response.data as HallBookingType;
+      } catch (error) {
+        throw error;
+      }
+    },
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
+  });
+
+  const editBookingStatus = useMutation({
+    mutationFn: async (newStatus: bookingStatusType) => {
+      console.log(hallData);
+      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
+        ...data,
+        status: newStatus,
+        cancellationReason: showCancellationReason
+          ? cancellationReason
+          : undefined,
+      });
+      toast.promise(responsePromise, {
+        pending: "Updating...",
+        success: "Booking Status Edited!",
+        error: "Failed to Booking Hall. Please Reload and try again.",
+      });
+      const response = await responsePromise;
+      console.log(response.data);
+    },
+    onSuccess: async () => {
+      console.log("REVALIDATING");
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${bookingId}`],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const editTransactionType = useMutation({
+    mutationFn: async (newTransaction: transactionType) => {
+      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
+        ...data,
+        transaction: {
+          ...data?.transaction,
+          type: newTransaction,
+        },
+      });
+      toast.promise(responsePromise, {
+        pending: "Updating...",
+        success: "Booking Status Edited!",
+        error: "Failed to Booking Hall. Please Reload and try again.",
+      });
+      const response = await responsePromise;
+      console.log(response.data);
+    },
+    onSuccess: async () => {
+      console.log("REVALIDATING");
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${bookingId}`],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const editIsDepositApplicable = useMutation({
+    mutationFn: async (newDeposit: boolean) => {
+      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
+        ...data,
+        isDeposit: newDeposit,
+      });
+      toast.promise(responsePromise, {
+        pending: "Updating...",
+        success: "Booking Status Edited!",
+        error: "Failed to Booking Hall. Please Reload and try again.",
+      });
+      const response = await responsePromise;
+      console.log(response.data);
+    },
+    onSuccess: async () => {
+      console.log("REVALIDATING");
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${bookingId}`],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const handleEdit = () => {
+    setEditingMode(true);
+    if (!editedData) {
+      setEditedData(data);
+    }
+  };
+
+  const handleSave = async () => {
+    const responsePromise = axiosInstance.post(
+      `/editBooking/${bookingId}`,
+      editedData
+    );
+    toast.promise(responsePromise, {
+      pending: "Updating...",
+      success: "Booking Status Edited!",
+      error: "Failed to Booking Hall. Please Reload and try again.",
+    });
+    await responsePromise;
+    setEditingMode(false);
+    await queryClient.refetchQueries({
+      queryKey: [`booking/${bookingId}`],
+    });
+  };
+
+  const session = hallData?.sessions.find(
+    (session) => session._id === data?.session_id
+  );
+
+  const priceEntry = session?.price.find(
+    (price) => price.categoryName === data?.booking_type
+  );
+
+  const handleCancellation = async () => {
+    editBookingStatus.mutate("CANCELLED");
+    setShowCancellationReason(false);
+  };
+
+  const handleSaveCancellationReason = async () => {
+    const updatedData = {
+      ...data,
+      cancellationReason: cancellationReason,
+    };
+
+    const responsePromise = axiosInstance.post(
+      `/editBooking/${bookingId}`,
+      updatedData
+    );
+    toast.promise(responsePromise, {
+      pending: "Saving Cancellation Reason...",
+      success: "Cancellation Reason Saved!",
+      error: "Failed to save Cancellation Reason. Please try again.",
+    });
+    await responsePromise;
+    setShowCancellationReason(false);
+    await queryClient.refetchQueries({
+      queryKey: [`booking/${bookingId}`],
+    });
+  };
+
+  if (isFetching) return <h1>Loading</h1>;
+
+  return (
+    <div className="flex flex-col items-center my-10 w-11/12 sm:w-3/4 lg:w-1/2 mx-auto">
+      {editingMode ? (
+        <></>
+      ) : (
+        <button
+          onClick={handleEdit}
+          className=" mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+        >
+          Edit Details
+        </button>
+      )}
+
+      <span className=" text-lg font-medium">Customer Details</span>
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Name</span>
+          <input
+            type="text"
+            value={editedData?.user?.username}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    username: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Name"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Name</span>
+          <span className="w-full text-right">{data?.user.username}</span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Mobile Number</span>
+          <input
+            type="text"
+            value={editedData?.user?.mobile}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    mobile: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Mobile Number"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Mobile Number</span>
+          <span className="w-full text-right">{data?.user.mobile}</span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Contact Person</span>
+          <input
+            type="text"
+            value={editedData?.user?.contact}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    contact: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Contact Person"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Contact Person</span>
+          <span className="w-full text-right">{data?.user?.contact}</span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Email Id</span>
+          <input
+            type="text"
+            value={editedData?.user?.email}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    email: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Aadhar Number"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Email Id</span>
+          <span className="w-full text-right">{data?.user.email || "-"}</span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Aadhar No</span>
+          <input
+            type="text"
+            value={editedData?.user?.aadharNo}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    aadharNo: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Aadhar Number"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Aadhar No</span>
+          <span className="w-full text-right">
+            {data?.user.aadharNo || "-"}
+          </span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Pan No.</span>
+          <input
+            type="text"
+            value={editedData?.user?.panNo}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    panNo: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter PAN Number"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Pan No.</span>
+          <span className="w-full text-right">{data?.user.panNo || "-"}</span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Address</span>
+          <input
+            type="text"
+            value={editedData?.user?.address}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    address: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Address"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Address</span>
+          <span className="w-full text-right">{data?.user.address || "-"}</span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Remark</span>
+          <input
+            type="text"
+            value={editedData?.user?.remark}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    remark: e.target.value,
+                  },
+                };
+              })
+            }
+            placeholder="Enter Remark"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-orange-600 rounded-sm px-2 py-1 border border-blue-600">
+          {/* just to highlight it's laal hai */}
+          <span className="w-full text-left">Remark</span>
+          <span className="w-full text-right">{data?.user.remark || "-"}</span>
+        </div>
+      )}
+
+      <span className=" text-lg font-medium">Slot</span>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Hall Name</span>
+        <span className="w-full text-right">{hallData?.name || "-"}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Session Type</span>
+        <span className="w-full text-right">{session?.name || "-"}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">From</span>
+        <span className="w-full text-right">
+          {dayjs(data?.from).format("h:mm A, MMMM D, YYYY") || "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">To</span>
+        <span className="w-full text-right">
+          {dayjs(data?.to).format("h:mm A, MMMM D, YYYY") || "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Hall Charges</span>
+        <span className="w-full text-right">{priceEntry?.price || "-"}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Status</span>
+        <span className="w-full text-right">{data?.status || "-"}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Customer Type</span>
+        <span className="w-full text-right">{data?.booking_type || "-"}</span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Purpose of the Event</span>
+        <span className="w-full text-right">{data?.purpose || "-"}</span>
+      </div>
+      <span className=" text-lg font-medium">Additional Features</span>
+      {!data?.features.length ? <p className="text-lg font-medium">No Additional Features Selected</p> : <></>}
+      {data?.features.map((eachFeature, index) => (
+        <div key={index} className="flex flex-col w-full mb-2">
+          <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span>Name</span>
+            <span>{eachFeature.heading || "-"}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span>Description</span>
+            <span>{eachFeature.desc || "-"}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span>Additional Feature Charges</span>
+            <span>
+              {data?.booking_type === "SVKM Institute"
+                ? 0
+                : eachFeature.price || "-"}
+            </span>
+          </div>
+        </div>
+      ))}
+
+      <span className=" text-lg font-medium">Billing</span>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Total Hall Charges</span>
+        <span className="w-full text-right">{data?.price || "-"}</span>
+      </div>
+
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Discount %</span>
+          <input
+            type="text"
+            value={editedData?.baseDiscount}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  baseDiscount: Number(e.target.value),
+                };
+              })
+            }
+            placeholder="Enter Discount %"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Hall Discount %</span>
+          <span className="w-full text-right">{data?.baseDiscount || 0}</span>
+        </div>
+      )}
+
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Hall Discount Amount</span>
+        <span className="w-full text-right">
+          {data?.price ? 0.01 * data?.baseDiscount * data?.price : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Hall Discounted Price</span>
+        <span className="w-full text-right">
+          {data?.price
+            ? data?.price - 0.01 * data?.baseDiscount * data?.price
+            : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">CGST %</span>
+        <span className="w-full text-right">
+          {data?.price
+            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
+            : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">SGST %</span>
+        <span className="w-full text-right">
+          {data?.price
+            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
+            : "-"}
+        </span>
+      </div>
+      <span>
+        <label htmlFor="isDeposit">Security Deposit Applicable </label>
+        <select
+          id="isDeposit"
+          value={data?.isDeposit === true ? "yes" : "no" || ""}
+          className="px-2 py-1 rounded-md border border-gray-400 my-1"
+          onChange={(e) => {
+            if (e.target.value === "yes") {
+              editIsDepositApplicable.mutate(true);
+            }
+            if (e.target.value === "no") {
+              editIsDepositApplicable.mutate(false);
+            }
+          }}
+        >
+          <option value="" disabled>
+            Select an option
+          </option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </span>
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Enter Security Deposit</span>
+          <input
+            type="text"
+            value={editedData?.deposit}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  deposit: Number(e.target.value),
+                };
+              })
+            }
+            placeholder="Enter Security Deposit"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Security Deposit Amount</span>
+          <span className="w-full text-right">{data?.deposit}</span>
+        </div>
+      )}
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Deposit Discount %</span>
+          <input
+            type="text"
+            value={editedData?.depositDiscount}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  depositDiscount: Number(e.target.value),
+                };
+              })
+            }
+            placeholder="Enter Security Deposit Discount %"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Deposit Discount %</span>
+          <span className="w-full text-right">
+            {data?.depositDiscount || 0}
+          </span>
+        </div>
+      )}
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Deposit Discount Amount</span>
+        <span className="w-full text-right">
+          {data?.deposit ? 0.01 * data?.depositDiscount * data?.deposit : "-"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Deposit Discounted Price</span>
+        <span className="w-full text-right">
+          {data?.deposit
+            ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
+            : "-"}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Total Payable Amount</span>
+        <span className="w-full text-right">
+          {data
+            ? data?.price -
+              0.01 * data?.baseDiscount * data?.price +
+              0.18 * (data?.price - 0.01 * data?.baseDiscount * data?.price) +
+              (data.isDeposit
+                ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
+                : 0)
+            : 0}
+        </span>
+      </div>
+
+      <span className=" text-lg font-medium">Transaction Details</span>
+      <span>
+        <label htmlFor="transaction">Choose a Transaction Type </label>
+        <select
+          id="transaction"
+          value={data?.transaction?.type || ""}
+          className="px-2 py-1 rounded-md border border-gray-400 my-2"
+          onChange={(e) =>
+            editTransactionType.mutate(e.target.value as transactionType)
+          }
+        >
+          <option value="" disabled>
+            Select an option
+          </option>
+          <option value="cheque">Cheque</option>
+          <option value="upi">UPI</option>
+          <option value="neft/rtgs">NEFT/RTGS</option>
+          <option value="svkminstitute">SVKM Institute</option>
+        </select>
+      </span>
+      {["cheque", "upi", "neft/rtgs"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Date</span>
+            <input
+              type="text"
+              value={editedData?.transaction?.date}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      date: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Date of Transaction"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Date</span>
+            <span className="w-full text-right">
+              {data?.transaction?.date || "-"}
+            </span>
+          </div>
+        ))}
+      {["upi"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Transaction ID</span>
+            <input
+              type="text"
+              value={editedData?.transaction?.transactionID}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      transactionID: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Transaction ID"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Transaction ID</span>
+            <span className="w-full text-right">
+              {data?.transaction?.transactionID || "-"}
+            </span>
+          </div>
+        ))}
+      {["neft/rtgs"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">UTR No.</span>
+            <input
+              type="text"
+              value={editedData?.transaction?.utrNo}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      utrNo: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter UTR Number"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">UTR No.</span>
+            <span className="w-full text-right">
+              {data?.transaction?.utrNo || "-"}
+            </span>
+          </div>
+        ))}
+      {["cheque"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Cheque No.</span>
+            <input
+              type="text"
+              value={editedData?.transaction?.chequeNo}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      chequeNo: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Cheque Number"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Cheque No.</span>
+            <span className="w-full text-right">
+              {data?.transaction?.chequeNo || "-"}
+            </span>
+          </div>
+        ))}
+      {["cheque"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Bank</span>
+            <input
+              type="text"
+              value={editedData?.transaction?.bank}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      bank: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Bank Name"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Bank</span>
+            <span className="w-full text-right">
+              {data?.transaction?.bank || "-"}
+            </span>
+          </div>
+        ))}
+
+      {["cheque"].includes(data?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Payee Name</span>
+            <input
+              type="text"
+              value={editedData?.transaction?.payeeName}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    transaction: {
+                      ...prev.transaction,
+                      payeeName: e.target.value,
+                    },
+                  };
+                })
+              }
+              placeholder="Enter Payee Name"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Payee Name</span>
+            <span className="w-full text-right">
+              {data?.transaction?.payeeName || "-"}
+            </span>
+          </div>
+        ))}
+
+      {showCancellationReason ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600 my-5">
+          <span className="w-full text-left">Cancellation Reason</span>
+          <input
+            type="text"
+            value={cancellationReason}
+            onChange={(e) => setCancellationReason(e.target.value)}
+            placeholder="Enter Cancellation Reason"
+            className="px-2"
+          />
+          <button
+            onClick={async () => {
+              await handleSaveCancellationReason();
+              handleCancellation();
+            }}
+            className="bg-green-500 px-4 text-white py-1 rounded-lg"
+          >
+            Confirm Cancellation
+          </button>
+        </div>
+      ) : (
+        <></>
+      )}
+
+      {data?.cancellationReason && (
+        <div className="w-full flex justify-between my-2 bg-red-400 rounded-sm px-2 py-1 border text-white">
+          <span className="text-lg font-medium">Cancellation Reason</span>
+          <span>{data?.cancellationReason}</span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <span className="space-x-4 space-y-4">
+          <button
+            onClick={() => {
+              handleSave();
+              setShowCancellationReason(true);
+            }}
+            className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
+          >
+            Cancel & Save
+          </button>
+          <button
+            onClick={() => {
+              handleSave();
+              editBookingStatus.mutate("ENQUIRY" as bookingStatusType);
+            }}
+            className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+          >
+            Enquiry & Save
+          </button>
+          <button
+            onClick={() => {
+              handleSave();
+              editBookingStatus.mutate("CONFIRMED" as bookingStatusType);
+            }}
+            className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
+          >
+            Confirm & Save
+          </button>
+        </span>
+      ) : (
+        <></>
+      )}
+
+      {/* {!showCancellationReason && (
+        <button
+          onClick={() => {
+            setShowCancellationReason(true);
+          }}
+          className="bg-blue-600 px-4 mb-2 text-white py-1 rounded-lg"
+        >
+          Handle Cancellation
+        </button>
+      )} */}
+    </div>
+  );
+}
+
+export default Booking;
