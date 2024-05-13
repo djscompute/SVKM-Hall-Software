@@ -4,52 +4,52 @@ function Dashboard() {
       <h1 className=" text-3xl font-semibold my-5">DashBoard</h1>
       <div className="flex flex-wrap justify-around w-full gap-10">
         <a
-          href="/dashboard/report1"
+          href="/dashboard/hall-wise-bookings"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
           Hall Wise Bookings
         </a>
         <a
-          href="/dashboard/report2"
+          href="/dashboard/get-session-wise-bookings"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
-          Report 2
+          Session Wise Bookings
         </a>
         <a
-          href="/dashboard/report3"
+          href="/dashboard/get-booking-type-counts"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
-          Report 3
+          Booking Type Counts
         </a>
         <a
-          href="/dashboard/report4"
+          href="/dashboard/get-collection-details"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
-          Report 4
+          Collection Details
         </a>
         <a
-          href="/dashboard/report5"
+          href="/dashboard/get-monthwise-collection-details"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
-          Report 5
+          Monthwise Collection Details
         </a>
         <a
-          href="/dashboard/report6"
+          href="/dashboard/total-interaction"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
-          Report 6
+          Total Interaction
         </a>
         <a
-          href="/dashboard/report7"
+          href="/dashboard/hall-wise-additional-feature-report"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
-          Report 7
+          Hall Wise Additional Feature Report
         </a>
         <a
-          href="/dashboard/report8"
+          href="/dashboard/booking-information-report"
           className=" w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
         >
-          Report 8
+          Booking Information Report
         </a>
       </div>
     </div>

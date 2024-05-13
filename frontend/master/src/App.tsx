@@ -14,6 +14,14 @@ import EditAdmin from "./pages/editAdmin";
 import Admins from "./pages/Admins";
 import Dashboard from "./pages/dashboard/dashboard";
 import Report1 from "./pages/dashboard/report1";
+import Report2 from "./pages/dashboard/report2";
+import Report3 from "./pages/dashboard/report3";
+import Report4 from "./pages/dashboard/report4";
+import Report5 from "./pages/dashboard/report5";
+import Report6 from "./pages/dashboard/report6";
+import Report7 from "./pages/dashboard/report7";
+import Report8 from "./pages/dashboard/report8";
+import Constants from "./pages/Constants";
 export const queryClient = new QueryClient();
 
 export default function App() {
@@ -79,10 +87,67 @@ export default function App() {
           }
         />
         <Route
-          path="/dashboard/report1"
+          path="/dashboard/hall-wise-bookings"
           element={
             <ProtectedRoute>
               <Report1 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/get-session-wise-bookings"
+          element={
+            <ProtectedRoute>
+              <Report2 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/get-booking-type-counts"
+          element={
+            <ProtectedRoute>
+              <Report3 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/get-collection-details"
+          element={
+            <ProtectedRoute>
+              <Report4 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/get-monthwise-collection-details"
+          element={
+            <ProtectedRoute>
+              <Report5 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/total-interaction"
+          element={
+            <ProtectedRoute>
+              <Report6 />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/hall-wise-additional-feature-report"
+          element={
+            <ProtectedRoute>
+              <Report7 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/booking-information-report"
+          element={
+            <ProtectedRoute>
+              <Report8 />
             </ProtectedRoute>
           }
         />
@@ -91,6 +156,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Login />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/constants"
+          element={
+            <ProtectedRoute>
+              <Constants />
             </ProtectedRoute>
           }
         />

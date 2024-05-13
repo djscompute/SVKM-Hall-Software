@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosInstance";
 import { toast } from "react-toastify";
@@ -8,10 +9,10 @@ import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
 
 const PieChartComponent = ({ data }: { data: any }) => {
   const chartData = {
-    labels: data.map((item: any) => item.hallName),
+    labels: data.bookingTypes.map((booking: any) => booking.type),
     datasets: [
       {
-        data: data.map((item: any) => item.bookingCount),
+        data: data.bookingTypes.map((booking: any) => booking.count),
         backgroundColor: [
           "#FF6384",
           "#36A2EB",
@@ -53,13 +54,13 @@ const PieChartComponent = ({ data }: { data: any }) => {
 
 const BarChartComponent = ({ data }: { data: any }) => {
   const chartData = {
-    labels: data.map((item: any) => item.hallName),
+    labels: data.bookingTypes.map((booking: any) => booking.type),
     datasets: [
       {
         label: "Booking Count",
-        data: data.map((item: any) => item.bookingCount),
-        backgroundColor: ["rgba(11, 127, 225, 0.8)"],
-        borderColor: ["rgba(11, 127, 225, 0.8)"],
+        data: data.bookingTypes.map((booking: any) => booking.count),
+        backgroundColor: "rgba(11, 127, 225, 0.8)",
+        borderColor: "rgba(11, 127, 225, 1)",
         borderWidth: 1,
       },
     ],
@@ -94,7 +95,19 @@ const BarChartComponent = ({ data }: { data: any }) => {
   );
 };
 
-function Report1() {
+function Report3() {
+  const [allHalls, setAllHalls] = useState([{ id: -1, name: "All" }]);
+  const [selectedHall, setSelectedHall] = useState<string>("");
+  async function getHalls() {
+    try {
+      const response = await axiosInstance.get("getAllHalls");
+      if (response.data.length > 0) {
+        setAllHalls(response.data);
+      }
+    } catch (error) {
+      console.log("Error while fetching hall data:", error);
+    }
+  }
   const [queryFilter, setQueryFilter] = useState<{
     from: string;
     to: string;
@@ -124,11 +137,13 @@ function Report1() {
 
   const getData = async ({ from, to }: { from: string; to: string }) => {
     if (!from || !to) return;
+    console.log(selectedHall);
     const responsePromise = axiosInstance.post(
-      "dashboard/getHallWiseBookingsCount",
+      "dashboard/getBookingTypeCounts",
       {
         fromDate: from,
         toDate: to,
+        hallName: selectedHall,
       }
     );
     toast.promise(responsePromise, {
@@ -173,6 +188,10 @@ function Report1() {
     handleHumanReadable(queryFilter.from, queryFilter.to);
   }, [queryFilter]);
 
+  useEffect(() => {
+    getHalls();
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
       <span className=" text-xl font-medium mt-5">Hall Wise Bookings</span>
@@ -189,6 +208,22 @@ function Report1() {
           }}
           timePickerName="to"
         />
+      </div>
+      <div>
+        <select
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md"
+          onChange={(event) => {
+            setSelectedHall(event.target.value);
+          }}
+        >
+          <option key="1" value="">
+            Select a hall
+          </option>
+          <option value={"all"}>All</option>
+          {allHalls.map((hall) => (
+            <option value={hall.name}>{hall.name}</option>
+          ))}
+        </select>
       </div>
       <button
         className="bg-blue-500 text-white px-2 py-1 rounded-md"
@@ -216,20 +251,27 @@ function Report1() {
         Get for this Year
       </button>
 
-      {data?.length > 0 && (
-        <div className="flex flex-col items-center mt-5 gap-10">
-          <span className="font-medium text-lg">
-            Showing analytics from {humanReadable.fromHuman} to
-            {humanReadable.toHuman}
-          </span>
-          <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
-            <PieChartComponent data={data} />
-            <BarChartComponent data={data} />
-          </div>
-        </div>
+      {data && (
+        <>
+          {data.map(
+            (hall: any) =>
+              hall.bookingTypes.length && (
+                <>
+                  <span className="font-medium text-lg">
+                    Showing analytics from {humanReadable.fromHuman} to
+                    {humanReadable.toHuman} for {hall.hallName}
+                  </span>
+                  <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
+                    <PieChartComponent data={hall} />
+                    <BarChartComponent data={hall} />
+                  </div>
+                </>
+              )
+          )}
+        </>
       )}
     </div>
   );
 }
 
-export default Report1;
+export default Report3;

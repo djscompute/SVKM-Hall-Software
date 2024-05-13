@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosInstance";
 import { toast } from "react-toastify";
@@ -8,10 +9,10 @@ import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
 
 const PieChartComponent = ({ data }: { data: any }) => {
   const chartData = {
-    labels: data.map((item: any) => item.hallName),
+    labels: data.map((item: any) => item.month),
     datasets: [
       {
-        data: data.map((item: any) => item.bookingCount),
+        data: data.map((item: any) => item.collection),
         backgroundColor: [
           "#FF6384",
           "#36A2EB",
@@ -53,11 +54,11 @@ const PieChartComponent = ({ data }: { data: any }) => {
 
 const BarChartComponent = ({ data }: { data: any }) => {
   const chartData = {
-    labels: data.map((item: any) => item.hallName),
+    labels: data.map((item: any) => item.month),
     datasets: [
       {
-        label: "Booking Count",
-        data: data.map((item: any) => item.bookingCount),
+        label: "Collection",
+        data: data.map((item: any) => item.collection),
         backgroundColor: ["rgba(11, 127, 225, 0.8)"],
         borderColor: ["rgba(11, 127, 225, 0.8)"],
         borderWidth: 1,
@@ -94,7 +95,20 @@ const BarChartComponent = ({ data }: { data: any }) => {
   );
 };
 
-function Report1() {
+function Report5() {
+  const [allHalls, setAllHalls] = useState([]);
+  const [selectedHall, setSelectedHall] = useState<string>("");
+  async function getHalls() {
+    console.log("hii");
+    try {
+      const response = await axiosInstance.get("getAllHalls");
+      if (response.data.length > 0) {
+        setAllHalls(response.data);
+      }
+    } catch (error) {
+      console.log("Error while fetching hall data:", error);
+    }
+  }
   const [queryFilter, setQueryFilter] = useState<{
     from: string;
     to: string;
@@ -124,11 +138,13 @@ function Report1() {
 
   const getData = async ({ from, to }: { from: string; to: string }) => {
     if (!from || !to) return;
+    console.log(selectedHall);
     const responsePromise = axiosInstance.post(
-      "dashboard/getHallWiseBookingsCount",
+      "dashboard/getMonthwiseCollectionDetails",
       {
         fromDate: from,
         toDate: to,
+        hallName: selectedHall,
       }
     );
     toast.promise(responsePromise, {
@@ -136,7 +152,7 @@ function Report1() {
       error: "Failed to fetch Report. Please contact maintainer.",
     });
     const response = await responsePromise;
-    console.log(response.data);
+    console.log("response:", response.data);
     setData(response.data);
   };
 
@@ -173,9 +189,17 @@ function Report1() {
     handleHumanReadable(queryFilter.from, queryFilter.to);
   }, [queryFilter]);
 
+  useEffect(() => {
+    getHalls();
+  }, []);
+
+  const DownloadReport = () => {
+    // jspdf was generating more than 9 mb pdf,so this was optimal soln
+    window.print();
+  };
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
-      <span className=" text-xl font-medium mt-5">Hall Wise Bookings</span>
+      <span className=" text-xl font-medium mt-5">Month Wise Collections</span>
       <div className="flex gap-2">
         <BasicDateTimePicker
           timeModifier={(time) => {
@@ -190,11 +214,32 @@ function Report1() {
           timePickerName="to"
         />
       </div>
+      <div>
+        <select
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md"
+          onChange={(event) => {
+            setSelectedHall(event.target.value);
+          }}
+        >
+          <option key="1" value="">
+            Select a hall
+          </option>
+          {allHalls.map((hall: any) => (
+            <option value={hall.hall}>{hall.name}</option>
+          ))}
+        </select>
+      </div>
       <button
         className="bg-blue-500 text-white px-2 py-1 rounded-md"
         onClick={() => getData(queryFilter)}
       >
         Get for Time Period
+      </button>
+      <button
+        className="bg-blue-500 text-white px-2 py-1 rounded-md"
+        onClick={() => DownloadReport()}
+      >
+        Download Report
       </button>
       <span>or</span>
       <button
@@ -223,7 +268,6 @@ function Report1() {
             {humanReadable.toHuman}
           </span>
           <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
-            <PieChartComponent data={data} />
             <BarChartComponent data={data} />
           </div>
         </div>
@@ -232,4 +276,4 @@ function Report1() {
   );
 }
 
-export default Report1;
+export default Report5;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosInstance";
 import { toast } from "react-toastify";
@@ -56,7 +57,7 @@ const BarChartComponent = ({ data }: { data: any }) => {
     labels: data.map((item: any) => item.hallName),
     datasets: [
       {
-        label: "Booking Count",
+        label: "Collection",
         data: data.map((item: any) => item.bookingCount),
         backgroundColor: ["rgba(11, 127, 225, 0.8)"],
         borderColor: ["rgba(11, 127, 225, 0.8)"],
@@ -94,7 +95,7 @@ const BarChartComponent = ({ data }: { data: any }) => {
   );
 };
 
-function Report1() {
+function Report6() {
   const [queryFilter, setQueryFilter] = useState<{
     from: string;
     to: string;
@@ -125,10 +126,11 @@ function Report1() {
   const getData = async ({ from, to }: { from: string; to: string }) => {
     if (!from || !to) return;
     const responsePromise = axiosInstance.post(
-      "dashboard/getHallWiseBookingsCount",
+      "dashboard/getTotalInteraction",
       {
         fromDate: from,
         toDate: to,
+        hallName: "all",
       }
     );
     toast.promise(responsePromise, {
@@ -136,7 +138,7 @@ function Report1() {
       error: "Failed to fetch Report. Please contact maintainer.",
     });
     const response = await responsePromise;
-    console.log(response.data);
+    console.log("response:", response.data);
     setData(response.data);
   };
 
@@ -173,9 +175,13 @@ function Report1() {
     handleHumanReadable(queryFilter.from, queryFilter.to);
   }, [queryFilter]);
 
+  const DownloadReport = () => {
+    // jspdf was generating more than 9 mb pdf,so this was optimal soln
+    window.print();
+  };
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
-      <span className=" text-xl font-medium mt-5">Hall Wise Bookings</span>
+      <span className=" text-xl font-medium mt-5">Total Interactions</span>
       <div className="flex gap-2">
         <BasicDateTimePicker
           timeModifier={(time) => {
@@ -195,6 +201,12 @@ function Report1() {
         onClick={() => getData(queryFilter)}
       >
         Get for Time Period
+      </button>
+      <button
+        className="bg-blue-500 text-white px-2 py-1 rounded-md"
+        onClick={() => DownloadReport()}
+      >
+        Download Report
       </button>
       <span>or</span>
       <button
@@ -222,14 +234,32 @@ function Report1() {
             Showing analytics from {humanReadable.fromHuman} to
             {humanReadable.toHuman}
           </span>
-          <div className="flex flex-row flex-wrap justify-evenly items-end gap-5">
-            <PieChartComponent data={data} />
-            <BarChartComponent data={data} />
-          </div>
+
+          <BarChartComponent data={data} />
+          <table className="min-w-full table-auto border-2">
+            <thead className="bg-gray-800 text-white">
+              <tr>
+                <th className="px-4 py-2">Hall Name</th>
+                <th className="px-4 py-2">Interaction</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((hallCollection: any, index: number) => (
+                <tr key={index} className="bg-white border-b">
+                  <td className="px-4 py-2 text-center">
+                    {hallCollection.hallName}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    {hallCollection.bookingCount}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
   );
 }
 
-export default Report1;
+export default Report6;

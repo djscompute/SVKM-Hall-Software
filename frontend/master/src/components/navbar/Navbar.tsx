@@ -111,6 +111,14 @@ const NavBar = () => {
             </nav>
             <nav className="hidden md:flex space-x-10">
               <Link
+                to="/constants"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Constants
+              </Link>
+            </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
                 to="/dashboard"
                 className="text-base font-medium text-gray-500 hover:text-gray-900"
               >
@@ -220,6 +228,14 @@ const NavBar = () => {
                   className="text-base font-medium text-gray-900 hover:text-gray-700"
                 >
                   Admin
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                <Link
+                  to="/constants"
+                  className="text-base font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Constants
                 </Link>
               </div>
               <div className="grid grid-cols-2 gap-y-4 gap-x-8">

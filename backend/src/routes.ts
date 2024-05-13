@@ -46,6 +46,10 @@ import {
   removeBookingHandler,
 } from "./controller/booking.controller";
 
+//Constants
+import { ConstantsZodSchema } from "./schema/constants.schema";
+import { createConstantHandler, getAllConstantsHandler, updateConstantByNameHandler, deleteConstantByNameHandler } from "./controller/constants.controller";
+
 // ImageHandler
 import { uploadImageHandler } from "./controller/image.controller";
 import { UploadImageZodSchema } from "./schema/image.schema";
@@ -62,6 +66,7 @@ import {
   getSessionsWithCategoriesByHallNameHandler
 } from "./controller/dashboard.controller";
 import { getAllHallNamesAndIds } from "./service/getHallConfig";
+
 
 // const upload = multer({ dest: "uploads/" });
 const upload = multer({ storage: multer.memoryStorage() });
@@ -124,6 +129,31 @@ export default function routes(app: Express) {
     requireMasterRole,
     updateAdminByIdHandler,
   ])
+
+  //Constants routes
+  app.post("/createConstant", [
+    validateCookie,
+    validateRequest(ConstantsZodSchema),
+    requireMasterRole,
+    createConstantHandler,
+  ]);
+  app.get("/getAllConstants", [
+    validateCookie,
+    requireMasterRole,
+    getAllConstantsHandler,
+  ]);
+  app.post("/updateConstant" ,[
+    validateCookie,
+    validateRequest(ConstantsZodSchema),
+    requireMasterRole,
+    updateConstantByNameHandler
+    ])
+    app.delete("/deleteConstant", [
+      validateCookie,
+      requireMasterRole,
+      deleteConstantByNameHandler,
+    ]);
+
 
 
 
