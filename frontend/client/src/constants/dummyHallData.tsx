@@ -2,73 +2,120 @@ import { EachHallType } from "../types/Hall.types";
 
 const dummyHallData: EachHallType[] = [
   {
-    _id: "123",
-    name: "BJ Hall",
+    _id: "hall001",
+    name: "Grand Conference Center",
+    person: "John Doe",
     location: {
-      desc1: "1, N S Rd Number 3, Navpada, JVPD Scheme",
-      desc2: "Vile Parle West, Mumbai, Maharashtra 400056",
-      iframe:
-        "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15080.001689782257!2d72.8371015!3d19.1076374!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c9c6505a00af%3A0x13b8ff72726ae189!2sBabubhai%20Jagjivandas%20Hall!5e0!3m2!1sen!2sin!4v1707924301059!5m2!1sen!2sin",
+      desc1: "GCC",
+      desc2: "12345 Conference Blvd, Event City, EC 54321",
+      gmapurl: "https://maps.google.com/?q=location",
+      iframe: "<iframe src='https://maps.google.com/?q=location'></iframe>",
     },
-    about: ["Welcome to our hall!"],
-    timings: { from: "9am", to: "10pm" },
-    pricing: undefined,
-    capacity: "500 people",
-    seating: "100 people",
+    about: [
+      "The Grand Conference Center is ideal for corporate events and large gatherings, featuring state-of-the-art facilities.",
+      "Equipped with modern audio-visual technology and comfortable seating."
+    ],
+    capacity: "Up to 2000 attendees",
     additionalFeatures: [
       {
-        heading: "Projector",
-        desc: "We provide projector for presentations.",
+        _id: "feat001",
+        heading: "High-Speed Internet",
+        desc: "Wi-Fi access throughout the venue to keep everyone connected.",
+        stats: ["1000 Mbps speed", "Unlimited devices"],
+        price: 0  // Assuming free Wi-Fi service
       },
       {
-        heading: "Catering",
-        desc: "We offer catering services.",
-      },
+        _id: "feat002",
+        heading: "Catering Services",
+        desc: "Full-service catering available to meet all dietary requirements.",
+        price: 50  // Pricing per attendee
+      }
     ],
     images: [
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://images.unsplash.com/photo-1543325768-b7c960228a24?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cGFydHklMjBoYWxsfGVufDB8fDB8fHww",
-      "https://images.unsplash.com/photo-1620735692151-26a7e0748429?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2098&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://images.unsplash.com/photo-1542665952-14513db15293?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://example.com/images/hall1.jpg",
+      "https://example.com/images/hall2.jpg"
     ],
+    sessions: [
+      {
+        _id: "sess001",
+        active: true,
+        name: "Morning Session",
+        from: "9:00 AM",
+        to: "12:00 PM",
+        price: [
+          { categoryName: "Standard", price: 100 },
+          { categoryName: "VIP", price: 200 }
+        ]
+      },
+      {
+        _id: "sess002",
+        active: true,
+        name: "Afternoon Session",
+        from: "1:00 PM",
+        to: "5:00 PM",
+        price: [
+          { categoryName: "Standard", price: 150 },
+          { categoryName: "VIP", price: 250 }
+        ]
+      }
+    ],
+    eventRestrictions: "No outside food or drink, No pets",
+    securityDeposit: 500,
     createdAt: new Date(),
-    updatedAt: new Date(),
+    updatedAt: new Date()
   },
   {
-    _id: "456",
-    name: "NMIMS Hall",
+    _id: "hall002",
+    name: "Urban Art Gallery",
+    person: "Jane Smith",
     location: {
-      desc1: "1, N S Rd Number 3, Navpada, JVPD Scheme, lorem ipsum dolor sit amet ",
-      desc2: "Vile Parle West, Mumbai, Maharashtra 400056",
-      iframe:
-        "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15080.001689782257!2d72.8371015!3d19.1076374!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c9c6505a00af%3A0x13b8ff72726ae189!2sBabubhai%20Jagjivandas%20Hall!5e0!3m2!1sen!2sin!4v1707924301059!5m2!1sen!2sin",
+      desc1: "UAG",
+      desc2: "67890 Art St, Culture District, CD 67890",
+      gmapurl: "https://maps.google.com/?q=location",
+      iframe: "<iframe src='https://maps.google.com/?q=location'></iframe>",
     },
-    about: ["Welcome to our hall!"],
-    timings: { from: "9am", to: "10pm" },
-    pricing: undefined,
-    capacity: "300 people",
-    seating: "50 people",
+    about: [
+      "Our Urban Art Gallery offers a unique setting for events surrounded by contemporary art exhibitions.",
+      "Perfect for receptions, workshops, and small concerts."
+    ],
+    capacity: "500 guests",
     additionalFeatures: [
       {
-        heading: "Projector",
-        desc: "We provide projector for presentations.",
+        _id: "feat003",
+        heading: "Audio Equipment",
+        desc: "High-quality sound systems for music and speeches.",
+        stats: ["PA system", "Microphones"],
+        price: 75
       },
       {
-        heading: "Catering",
-        desc: "We offer catering services.",
-      },
+        _id: "feat004",
+        heading: "Event Planning Services",
+        desc: "Professional event planners to assist in organizing your perfect event.",
+        price: 200
+      }
     ],
     images: [
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://images.unsplash.com/photo-1543325768-b7c960228a24?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cGFydHklMjBoYWxsfGVufDB8fDB8fHww",
-      "https://images.unsplash.com/photo-1620735692151-26a7e0748429?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2098&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://images.unsplash.com/photo-1542665952-14513db15293?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://example.com/images/gallery1.jpg",
+      "https://example.com/images/gallery2.jpg"
     ],
+    sessions: [
+      {
+        _id: "sess003",
+        active: false,
+        name: "Evening Gathering",
+        from: "6:00 PM",
+        to: "9:00 PM",
+        price: [
+          { categoryName: "General", price: 120 },
+          { categoryName: "Premium", price: 240 }
+        ]
+      }
+    ],
+    eventRestrictions: "No flash photography, No large bags",
+    securityDeposit: 300,
     createdAt: new Date(),
-    updatedAt: new Date(),
-  },
+    updatedAt: new Date()
+  }
 ];
 
 export default dummyHallData;
