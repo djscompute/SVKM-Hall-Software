@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axiosInstance from "../../config/axiosInstance";
+import axiosMasterInstance from "../../config/axiosMasterInstance";
 import { toast } from "react-toastify";
 import "chart.js/auto";
 import dayjs from "dayjs";
@@ -17,7 +17,7 @@ function Report7() {
     queryKey: ["allhalls"],
     queryFn: async () => {
       try {
-        const responsePromise = axiosInstance.get("getAllHalls");
+        const responsePromise = axiosMasterInstance.get("getAllHalls");
         console.log("FETCHING");
         toast.promise(responsePromise, {
           pending: "Fetching halls...",
@@ -128,7 +128,7 @@ function Report7() {
       hallName: hallName,
       additionalFeatures: additionalFeatures,
     });
-    const responsePromise = axiosInstance.post(
+    const responsePromise = axiosMasterInstance.post(
       "dashboard/generateAdditionalFeatureReport",
       {
         fromDate: from,

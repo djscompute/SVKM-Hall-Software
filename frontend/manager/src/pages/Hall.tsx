@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "../config/axiosInstance.ts";
+import axiosManagerInstance from "../config/axiosManagerInstance.ts";
 import { EachHallType } from "../types/Hall.types.ts";
 import { toast } from "react-toastify";
 import Calendar from "../components/Calender/calendar.tsx";
@@ -13,7 +13,7 @@ function Hall() {
     queryKey: ["allhalls", `hall-${id}`],
     queryFn: async () => {
       try {
-        const responsePromise = axiosInstance.get(`getHall/${id}`);
+        const responsePromise = axiosManagerInstance.get(`getHall/${id}`);
         toast.promise(responsePromise, {
           pending: "Fetching hall...",
           // success: "Hall fetched successfully!",

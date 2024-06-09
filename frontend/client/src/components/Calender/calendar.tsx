@@ -3,7 +3,7 @@ import { useState } from "react";
 import { EachHallType, bookingStatusType } from "../../types/Hall.types";
 import EachDay from "./eachDay";
 import EachMobileDay from "./eachMobileDay";
-import axiosInstance from "../../config/axiosInstance";
+import axiosClientInstance from "../../config/axiosClientInstance";
 import { useQuery } from "@tanstack/react-query";
 import Legends from "./legends";
 import dayjs from "dayjs";
@@ -41,7 +41,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
   } = useQuery({
     queryKey: [`bookings-${startDate}-${endDate}`],
     queryFn: async () => {
-      const response = await axiosInstance.get("getBooking", {
+      const response = await axiosClientInstance.get("getBooking", {
         params: {
           from: startDate,
           to: endDate,

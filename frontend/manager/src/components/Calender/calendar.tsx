@@ -4,7 +4,7 @@ import { EachHallType } from "../../types/Hall.types";
 import EachDay from "./eachDay";
 import EachMobileDay from "./eachMobileDay";
 import dayjs from "dayjs";
-import axiosInstance from "../../config/axiosInstance";
+import axiosManagerInstance from "../../config/axiosManagerInstance";
 import { useQuery } from "@tanstack/react-query";
 import Legends from "./legends";
 
@@ -36,7 +36,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
   } = useQuery({
     queryKey: [`bookings-${startDate}-${endDate}`],
     queryFn: async () => {
-      const response = await axiosInstance.get("getBooking", {
+      const response = await axiosManagerInstance.get("getBooking", {
         params: {
           from: startDate,
           to: endDate,

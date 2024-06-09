@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import useAuthStore from "../../store/authStore";
-import axiosInstance from "../../config/axiosInstance";
+import axiosManagerInstance from "../../config/axiosManagerInstance";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -15,7 +15,7 @@ const Login: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const responsePromise = axiosInstance.post("/loginAdmin", {
+      const responsePromise = axiosManagerInstance.post("/loginAdmin", {
         email,
         password,
       });

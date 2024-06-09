@@ -26,7 +26,7 @@ const useAuthStore = create<AuthState & AuthActions>()(
       },
     })),
     {
-      name: "authStore",
+      name: "authManagerStore",
     }
   )
 );

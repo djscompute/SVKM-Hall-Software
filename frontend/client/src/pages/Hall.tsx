@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "../config/axiosInstance.ts";
+import axiosClientInstance from "../config/axiosClientInstance.ts";
 import { EachHallType } from "../types/Hall.types.ts";
 import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat.tsx";
 import { toast } from "react-toastify";
@@ -21,7 +21,7 @@ function Hall() {
     queryKey: ["allhalls", `hall-${id}`],
     queryFn: async () => {
       try {
-        const responsePromise = axiosInstance.get(`getHall/${id}`);
+        const responsePromise = axiosClientInstance.get(`getHall/${id}`);
         toast.promise(responsePromise, {
           pending: "Fetching hall...",
           // success: "Hall fetched successfully!",

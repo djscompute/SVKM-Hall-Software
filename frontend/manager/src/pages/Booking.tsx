@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import axiosInstance from "../config/axiosInstance";
+import axiosManagerInstance from "../config/axiosManagerInstance";
 import { toast } from "react-toastify";
 import {
   EachHallType,
@@ -32,7 +32,7 @@ function Booking() {
     queryKey: [`booking/${bookingId}`],
     queryFn: async () => {
       try {
-        const responsePromise = axiosInstance.get(
+        const responsePromise = axiosManagerInstance.get(
           `getBookingByID?_id=${bookingId}`
         );
         toast.promise(responsePromise, {
@@ -41,7 +41,7 @@ function Booking() {
         });
         const response = await responsePromise;
         if (response.data.hallId) {
-          const result = await axiosInstance.get(
+          const result = await axiosManagerInstance.get(
             `getHall/${response.data.hallId}`
           );
           setHallData(result.data);
@@ -57,7 +57,7 @@ function Booking() {
   const editBookingStatus = useMutation({
     mutationFn: async (newStatus: bookingStatusType) => {
       console.log(hallData);
-      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
+      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
         ...data,
         status: newStatus,
         cancellationReason: showCancellationReason
@@ -85,7 +85,7 @@ function Booking() {
 
   const editTransactionType = useMutation({
     mutationFn: async (newTransaction: transactionType) => {
-      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
+      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
         ...data,
         transaction: {
           ...data?.transaction,
@@ -113,7 +113,7 @@ function Booking() {
 
   const editIsDepositApplicable = useMutation({
     mutationFn: async (newDeposit: boolean) => {
-      const responsePromise = axiosInstance.post(`/editBooking/${bookingId}`, {
+      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
         ...data,
         isDeposit: newDeposit,
       });
@@ -144,7 +144,7 @@ function Booking() {
   };
 
   const handleSave = async () => {
-    const responsePromise = axiosInstance.post(
+    const responsePromise = axiosManagerInstance.post(
       `/editBooking/${bookingId}`,
       editedData
     );
@@ -179,7 +179,7 @@ function Booking() {
       cancellationReason: cancellationReason,
     };
 
-    const responsePromise = axiosInstance.post(
+    const responsePromise = axiosManagerInstance.post(
       `/editBooking/${bookingId}`,
       updatedData
     );

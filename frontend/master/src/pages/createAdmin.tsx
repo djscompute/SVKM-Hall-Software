@@ -1,5 +1,5 @@
 import { useState, ChangeEvent, FormEvent } from "react";
-import axiosInstance from "../config/axiosInstance";
+import axiosMasterInstance from "../config/axiosMasterInstance";
 import { adminType } from "../../../../types/global";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -69,7 +69,7 @@ function CreateAdmin() {
             return;
         }
         try {
-            const responsePromise = axiosInstance.post("/createAdmin", JSON.stringify(adminData));
+            const responsePromise = axiosMasterInstance.post("/createAdmin", JSON.stringify(adminData));
             toast.promise(responsePromise, {
                 pending: "Creating a new Admin...",
             });

@@ -4,7 +4,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:3000";
 
-const axiosInstance = axios.create({
+const axiosMasterInstance = axios.create({
   baseURL: API_URL,
   //   timeout: 10000, // in milliseconds
   headers: {
@@ -13,4 +13,4 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-export default axiosInstance;
+export default axiosMasterInstance;

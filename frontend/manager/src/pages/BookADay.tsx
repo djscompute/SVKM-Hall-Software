@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "../config/axiosInstance";
+import axiosManagerInstance from "../config/axiosManagerInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import {
@@ -50,7 +50,7 @@ function BookADay() {
     queryKey: ["bookaday", `${humanReadableDate}`],
     queryFn: async () => {
       try {
-        const responsePromise = axiosInstance.get(`getHall/${id}`);
+        const responsePromise = axiosManagerInstance.get(`getHall/${id}`);
         toast.promise(responsePromise, {
           pending: "Fetching hall...",
           error: "Failed to fetch Hall. Please try again.",
@@ -67,7 +67,7 @@ function BookADay() {
 
   const addBookingMutation = useMutation({
     mutationFn: () =>
-      axiosInstance
+      axiosManagerInstance
         .post(`/addBooking`, {
           user: {
             username: name,

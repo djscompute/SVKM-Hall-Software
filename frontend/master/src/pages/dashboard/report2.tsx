@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import axiosInstance from "../../config/axiosInstance";
+import axiosMasterInstance from "../../config/axiosMasterInstance";
 import { toast } from "react-toastify";
 import { Bar, Pie } from "react-chartjs-2";
 import "chart.js/auto";
@@ -100,7 +100,7 @@ function Report2() {
   const [selectedHall, setSelectedHall] = useState<string>("");
   async function getHalls() {
     try {
-      const response = await axiosInstance.get("getAllHalls");
+      const response = await axiosMasterInstance.get("getAllHalls");
       if (response.data.length > 0) {
         setAllHalls(response.data);
       }
@@ -139,7 +139,7 @@ function Report2() {
   const getData = async ({ from, to }: { from: string; to: string }) => {
     if (!from || !to) return;
     console.log(selectedHall);
-    const responsePromise = axiosInstance.post(
+    const responsePromise = axiosMasterInstance.post(
       "dashboard/getSessionWiseBookings",
       {
         fromDate: from,

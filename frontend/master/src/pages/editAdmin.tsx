@@ -5,7 +5,7 @@ import { adminType } from '../../../../types/global';
 import EditableField from '../components/editAdmin/editableField';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axiosInstance from '../config/axiosInstance';
+import axiosMasterInstance from '../config/axiosMasterInstance';
 import AddHalltoManager from '../components/createAdmin.tsx/addHalltoManager';
 
 type UpdateAdminType = Pick<adminType, '_id' | 'role' | 'managedHalls' | 'username' | 'contact' | 'email'>;
@@ -86,7 +86,7 @@ export default function EditAdmin() {
                 setSelectedHallIds([])
             }
         try {
-            const responsePromise = axiosInstance.post("/updateAdmin", JSON.stringify(admin));
+            const responsePromise = axiosMasterInstance.post("/updateAdmin", JSON.stringify(admin));
             toast.promise(responsePromise, {
                 pending: "Updating admin...",
             });
@@ -126,7 +126,7 @@ export default function EditAdmin() {
 
         const fetchAdmin = async () => {
             try {
-                const response = await axiosInstance.get(`/getAdmin/id/${adminId}`);
+                const response = await axiosMasterInstance.get(`/getAdmin/id/${adminId}`);
                 const { _id, role, username, contact, email, managedHalls } = response.data
                 setAdmin({ _id, role, username, contact, email, managedHalls })
                 setSelectedHallIds(response.data.managedHalls)

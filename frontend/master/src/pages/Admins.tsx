@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "../config/axiosInstance.ts";
+import axiosMasterInstance from "../config/axiosMasterInstance.ts";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Card from "../components/admins/Card.tsx";
@@ -10,7 +10,7 @@ function Admins() {
     queryKey: ["admins"],
     queryFn: async () => {
       try {
-        const responsePromise = axiosInstance.get("getAllAdmins");
+        const responsePromise = axiosMasterInstance.get("getAllAdmins");
         console.log("FETCHING");
         toast.promise(responsePromise, {
           pending: "Fetching admins...",
