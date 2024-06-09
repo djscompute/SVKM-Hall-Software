@@ -73,6 +73,7 @@ function Booking() {
       console.log(response.data);
     },
     onSuccess: async () => {
+      setEditingMode(false);
       console.log("REVALIDATING");
       await queryClient.refetchQueries({
         queryKey: [`booking/${bookingId}`],
@@ -672,7 +673,16 @@ function Booking() {
         </span>
       </div>
 
-      <span className=" text-lg font-medium">Transaction Details</span>
+      {editingMode ? (
+        <button
+          onClick={handleSave}
+          className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg mt-4"
+        >
+          Save Details
+        </button>
+      ) : <></>}
+      
+      <span className="text-lg font-medium">Transaction Details</span>
       <span>
         <label htmlFor="transaction">Choose a Transaction Type </label>
         <select
@@ -912,35 +922,29 @@ function Booking() {
       )}
 
       {editingMode ? (
+        <>
+        <h1 className="text-lg font-medium">Set Booking Status</h1>
         <span className="space-x-4 space-y-4">
           <button
-            onClick={() => {
-              handleSave();
-              setShowCancellationReason(true);
-            }}
+            onClick={() => {setShowCancellationReason(true)}}
             className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
           >
-            Cancel & Save
+            Cancelled
           </button>
           <button
-            onClick={() => {
-              handleSave();
-              editBookingStatus.mutate("ENQUIRY" as bookingStatusType);
-            }}
+            onClick={() => {editBookingStatus.mutate("ENQUIRY" as bookingStatusType)}}
             className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
           >
-            Enquiry & Save
+            Enquiry
           </button>
           <button
-            onClick={() => {
-              handleSave();
-              editBookingStatus.mutate("CONFIRMED" as bookingStatusType);
-            }}
+            onClick={async () => {editBookingStatus.mutate("CONFIRMED" as bookingStatusType)}}
             className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
           >
-            Confirm & Save
+            Confirmed
           </button>
         </span>
+        </>
       ) : (
         <></>
       )}
