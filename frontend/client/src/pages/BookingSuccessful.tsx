@@ -58,8 +58,12 @@ const BookingSuccessful = () => {
                   </td>
                 </tr>
                 <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">Estimated Cost</td>
+                  <td className="font-medium py-2 w-1/2">Base Cost</td>
                   <td className="w-1/2">₹{bookingDetails.estimatedPrice}</td>
+                </tr>
+                <tr className="border-b-2">
+                  <td className="font-medium py-2 w-1/2">Security Deposit</td>
+                  <td className="w-1/2">₹{bookingDetails.securityDeposit}</td>
                 </tr>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">
@@ -70,14 +74,17 @@ const BookingSuccessful = () => {
                       ? Object.values(bookingDetails.additionalFeatures)?.map(
                           (each: any) => (
                             <div className="flex flex-col items-start gap-2">
-                              <span>{each.heading}</span>
-                              <span>{each.desc}</span>
-                              <span>{each.price}</span>
+                              <span>{each.heading} </span>
+                              <span>Charge: ₹{each.price}</span>
                             </div>
                           )
                         )
                       : "None"}
                   </td>
+                </tr>
+                <tr className="border-b-2">
+                  <td className="font-medium py-2 w-1/2">Total Estimated Cost</td>
+                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} + GST (if applicable)</td>
                 </tr>
               </tbody>
             </table>

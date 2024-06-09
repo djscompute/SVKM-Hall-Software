@@ -40,6 +40,7 @@ function BookADay() {
     [key: string]: EachHallAdditonalFeaturesType;
   }>({});
   const [price, setPrice] = useState<number>(0);
+  const [securityDeposit,setSecurityDeposit] = useState<number>(0);
   const [isSame, setIsSame] = useState<boolean>(false);
   const [isDetailsConfirmed, setIsDetailsConfirmed] = useState<boolean>(false);
 
@@ -64,6 +65,14 @@ function BookADay() {
     },
     staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
+
+  useEffect(() => {
+    if (selectedCategory?.toLowerCase() === "svkm institute") {
+      setSecurityDeposit(0);
+    } else if (HallData) {
+      setSecurityDeposit(HallData.securityDeposit || 0);
+    }
+  }, [selectedCategory, HallData]);
 
   const addBookingMutation = useMutation({
     mutationFn: () =>
@@ -121,6 +130,7 @@ function BookADay() {
                 (ecssn) => ecssn._id == selectedSessionId
               )?.name,
               estimatedPrice: price,
+              securityDeposit: securityDeposit,
               additionalFeatures: selectedFeatures,
               date: humanReadableDate,
               startTime: `${day}T${
@@ -278,7 +288,7 @@ function BookADay() {
 
   useEffect(() => {
     let totalPrice = 0;
-    if (selectedCategory !== "Inter Institute") {
+    if (selectedCategory?.toLowerCase() !== "svkm institute") {
       totalPrice = Object.values(selectedFeatures).reduce(
         (acc, feature) => acc + feature.price,
         0
@@ -299,7 +309,7 @@ function BookADay() {
         Book {HallData?.name} for {humanReadableDate}
       </h1>
       <span className="text-center">
-        <b>Estimated Price :</b> ₹{price} + GST (if applicable)
+      <b>Estimated Price :</b> ₹{price} + GST (if applicable) + Security Deposit ₹{securityDeposit}
       </span>
       <div className="flex flex-col gap-4">
         <label htmlFor="session">
@@ -455,6 +465,10 @@ function BookADay() {
           />
           {errors.purpose && <p className="text-red-500">{errors.purpose}</p>}
         </div>
+
+        <h6 className="text-red-500">
+          <b>Security Deposit Charges Applicable: ₹{securityDeposit}</b>
+        </h6>
 
         <h6>
           <b>Additional Features</b>
