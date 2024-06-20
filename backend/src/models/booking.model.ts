@@ -13,7 +13,7 @@ export const CustomerSchema = new mongoose.Schema<CustomerType>({
   username: { type: String, required: true },
   contact: { type: String },
   email: { type: String },
-  aadharNo: { type: String },
+  gstNo: { type: String },
   panNo: { type: String },
   address: { type: String },
   mobile: { type: String, required: true },

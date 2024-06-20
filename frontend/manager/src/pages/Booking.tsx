@@ -318,7 +318,7 @@ function Booking() {
                 };
               })
             }
-            placeholder="Enter Aadhar Number"
+            placeholder="Enter GST Number"
             className="px-2"
           />
         </div>
@@ -331,10 +331,10 @@ function Booking() {
 
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Aadhar No</span>
+          <span className="w-full text-left">GST No</span>
           <input
             type="text"
-            value={editedData?.user?.aadharNo}
+            value={editedData?.user?.gstNo}
             onChange={(e) =>
               setEditedData((prev) => {
                 if (!prev) return undefined;
@@ -342,20 +342,20 @@ function Booking() {
                   ...prev,
                   user: {
                     ...prev.user,
-                    aadharNo: e.target.value,
+                    gstNo: e.target.value,
                   },
                 };
               })
             }
-            placeholder="Enter Aadhar Number"
+            placeholder="Enter GST Number"
             className="px-2"
           />
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Aadhar No</span>
+          <span className="w-full text-left">GST No</span>
           <span className="w-full text-right">
-            {data?.user.aadharNo || "-"}
+            {data?.user.gstNo || "-"}
           </span>
         </div>
       )}
