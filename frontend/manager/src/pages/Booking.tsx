@@ -213,7 +213,6 @@ function Booking() {
         editedData?.transaction.bank &&
         editedData?.transaction.payeeName
       ) {
-        console.log("Good cheque");
         return true;
       }
     }
@@ -222,18 +221,15 @@ function Booking() {
         editedData?.transaction.date &&
         editedData?.transaction.transactionID
       ) {
-        console.log("good upi");
         return true;
       }
     }
     if (["neft/rtgs"].includes(data?.transaction?.type || "")) {
       if (editedData?.transaction.date && editedData?.transaction.utrNo) {
-        console.log("good neft");
         return true;
       }
     }
     if (["svkminstitute"].includes(data?.transaction?.type || "")) {
-      console.log("good institute");
       return true;
     }
     toast.error("Please enter the payment details");
