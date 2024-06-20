@@ -31,7 +31,7 @@ const to = convert_IST_TimeString_To12HourFormat(
 const date = extractDate(bookingDetails.startTime);
 
 
-  console.log("HEREEE", bookingDetails.additionalFeatures);
+  console.log("HEREEE", bookingDetails);
 
   return (
     <div className="flex flex-col py-4 gap-6 md:w-2/3 lg:w-1/2 mx-auto">
@@ -96,7 +96,10 @@ const date = extractDate(bookingDetails.startTime);
                 </tr>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">Total Estimated Cost</td>
-                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} + GST (if applicable)</td>
+                  {bookingDetails.paymentType=='SVKM INSTITUTE'?
+                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} </td>
+                  :
+                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} + GST (if applicable)</td>}
                 </tr>
                 <tr>
                   <p className=" text-sm font-bold pt-1 text-red-400">*GST is applicable as per prevailing rates.</p>

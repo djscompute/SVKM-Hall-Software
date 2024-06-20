@@ -129,6 +129,7 @@ function BookADay() {
               sessionName: HallData?.sessions.find(
                 (ecssn) => ecssn._id == selectedSessionId
               )?.name,
+              paymentType: selectedCategory,
               estimatedPrice: price,
               securityDeposit: securityDeposit,
               additionalFeatures: selectedFeatures,
