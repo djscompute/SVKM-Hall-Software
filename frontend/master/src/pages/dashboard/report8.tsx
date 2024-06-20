@@ -32,7 +32,7 @@ function Report8() {
 
   const [data, setData] = useState<any>();
   const [selectedHall, setSelectedHall] = useState<string>();
-  const [selectedHallId, setSelectedHallId] = useState<string>();
+  const [selectedHallId, setSelectedHallId] = useState<string>("All");
   const [selectedSession, setSelectedSession] = useState<string>("All");
   const [selectedCategory, setSelectedCategory] = useState<string>();
   const [hallCharges, setHallCharges] = useState<boolean>(false);
@@ -216,13 +216,14 @@ function Report8() {
             }
           }}
         >
-          <option value="">Select Hall</option>
+          <option value="All">All</option>
           {hallData &&
             hallData.map((hall) => (
               <option key={hall._id} value={hall.name}>
                 {hall.name}
               </option>
             ))}
+            
         </select>
       </div>
 
