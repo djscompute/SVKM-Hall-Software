@@ -57,13 +57,16 @@ function Booking() {
   const editBookingStatus = useMutation({
     mutationFn: async (newStatus: bookingStatusType) => {
       console.log(hallData);
-      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
-        ...data,
-        status: newStatus,
-        cancellationReason: showCancellationReason
-          ? cancellationReason
-          : undefined,
-      });
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${bookingId}`,
+        {
+          ...data,
+          status: newStatus,
+          cancellationReason: showCancellationReason
+            ? cancellationReason
+            : undefined,
+        }
+      );
       toast.promise(responsePromise, {
         pending: "Updating...",
         success: "Booking Status Edited!",
@@ -86,13 +89,16 @@ function Booking() {
 
   const editTransactionType = useMutation({
     mutationFn: async (newTransaction: transactionType) => {
-      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
-        ...data,
-        transaction: {
-          ...data?.transaction,
-          type: newTransaction,
-        },
-      });
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${bookingId}`,
+        {
+          ...data,
+          transaction: {
+            ...data?.transaction,
+            type: newTransaction,
+          },
+        }
+      );
       toast.promise(responsePromise, {
         pending: "Updating...",
         success: "Booking Status Edited!",
@@ -114,10 +120,13 @@ function Booking() {
 
   const editIsDepositApplicable = useMutation({
     mutationFn: async (newDeposit: boolean) => {
-      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
-        ...data,
-        isDeposit: newDeposit,
-      });
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${bookingId}`,
+        {
+          ...data,
+          isDeposit: newDeposit,
+        }
+      );
       toast.promise(responsePromise, {
         pending: "Updating...",
         success: "Booking Status Edited!",
@@ -354,9 +363,7 @@ function Booking() {
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">GST No</span>
-          <span className="w-full text-right">
-            {data?.user.gstNo || "-"}
-          </span>
+          <span className="w-full text-right">{data?.user.gstNo || "-"}</span>
         </div>
       )}
 
@@ -486,7 +493,11 @@ function Booking() {
         <span className="w-full text-right">{data?.purpose || "-"}</span>
       </div>
       <span className=" text-lg font-medium">Additional Features</span>
-      {!data?.features.length ? <p className="text-lg font-medium">No Additional Features Selected</p> : <></>}
+      {!data?.features.length ? (
+        <p className="text-lg font-medium">No Additional Features Selected</p>
+      ) : (
+        <></>
+      )}
       {data?.features.map((eachFeature, index) => (
         <div key={index} className="flex flex-col w-full mb-2">
           <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
@@ -557,17 +568,29 @@ function Booking() {
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">CGST %</span>
         <span className="w-full text-right">
-          {data?.price
-            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
-            : "-"}
+          {["svkminstitute"].includes(data?.transaction?.type || "") ? (
+            <div>0</div>
+          ) : (
+            <div>
+              {data?.price
+                ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
+                : "-"}
+            </div>
+          )}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">SGST %</span>
         <span className="w-full text-right">
-          {data?.price
-            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
-            : "-"}
+          {["svkminstitute"].includes(data?.transaction?.type || "") ? (
+            <div>0</div>
+          ) : (
+            <div>
+              {data?.price
+                ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
+                : "-"}
+            </div>
+          )}
         </span>
       </div>
       <span>
@@ -662,14 +685,33 @@ function Booking() {
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Total Payable Amount</span>
         <span className="w-full text-right">
-          {data
-            ? data?.price -
-              0.01 * data?.baseDiscount * data?.price +
-              0.18 * (data?.price - 0.01 * data?.baseDiscount * data?.price) +
-              (data.isDeposit
-                ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
-                : 0)
-            : 0}
+          <span className="w-full text-right">
+            {["svkminstitute"].includes(data?.transaction?.type || "") ? (
+              <div>
+                {data
+                  ? data?.price -
+                    0.01 * data?.baseDiscount * data?.price +
+                    (data.isDeposit
+                      ? data?.deposit -
+                        0.01 * data?.depositDiscount * data?.deposit
+                      : 0)
+                  : 0}
+              </div>
+            ) : (
+              <div>
+                {data
+                  ? data?.price -
+                    0.01 * data?.baseDiscount * data?.price +
+                    0.18 *
+                      (data?.price - 0.01 * data?.baseDiscount * data?.price) +
+                    (data.isDeposit
+                      ? data?.deposit -
+                        0.01 * data?.depositDiscount * data?.deposit
+                      : 0)
+                  : 0}
+              </div>
+            )}
+          </span>
         </span>
       </div>
 
@@ -680,8 +722,10 @@ function Booking() {
         >
           Save Details
         </button>
-      ) : <></>}
-      
+      ) : (
+        <></>
+      )}
+
       <span className="text-lg font-medium">Transaction Details</span>
       <span>
         <label htmlFor="transaction">Choose a Transaction Type </label>
@@ -923,27 +967,33 @@ function Booking() {
 
       {editingMode ? (
         <>
-        <h1 className="text-lg font-medium">Set Booking Status</h1>
-        <span className="space-x-4 space-y-4">
-          <button
-            onClick={() => {setShowCancellationReason(true)}}
-            className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
-          >
-            Cancelled
-          </button>
-          <button
-            onClick={() => {editBookingStatus.mutate("ENQUIRY" as bookingStatusType)}}
-            className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
-          >
-            Enquiry
-          </button>
-          <button
-            onClick={async () => {editBookingStatus.mutate("CONFIRMED" as bookingStatusType)}}
-            className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
-          >
-            Confirmed
-          </button>
-        </span>
+          <h1 className="text-lg font-medium">Set Booking Status</h1>
+          <span className="space-x-4 space-y-4">
+            <button
+              onClick={() => {
+                setShowCancellationReason(true);
+              }}
+              className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
+            >
+              Cancelled
+            </button>
+            <button
+              onClick={() => {
+                editBookingStatus.mutate("ENQUIRY" as bookingStatusType);
+              }}
+              className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+            >
+              Enquiry
+            </button>
+            <button
+              onClick={async () => {
+                editBookingStatus.mutate("CONFIRMED" as bookingStatusType);
+              }}
+              className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
+            >
+              Confirmed
+            </button>
+          </span>
         </>
       ) : (
         <></>

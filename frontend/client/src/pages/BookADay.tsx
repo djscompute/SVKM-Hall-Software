@@ -40,7 +40,7 @@ function BookADay() {
     [key: string]: EachHallAdditonalFeaturesType;
   }>({});
   const [price, setPrice] = useState<number>(0);
-  const [securityDeposit,setSecurityDeposit] = useState<number>(0);
+  const [securityDeposit, setSecurityDeposit] = useState<number>(0);
   const [isSame, setIsSame] = useState<boolean>(false);
   const [isDetailsConfirmed, setIsDetailsConfirmed] = useState<boolean>(false);
 
@@ -309,7 +309,17 @@ function BookADay() {
         Book {HallData?.name} for {humanReadableDate}
       </h1>
       <span className="text-center">
-        <b>Estimated Price :</b> ₹{price} + GST (if applicable) + Security Deposit ₹{securityDeposit}
+        {selectedCategory == "SVKM INSTITUTE" ? (
+          <div>
+            <b>Estimated Price :</b> ₹{price} + Security Deposit ₹
+            {securityDeposit}
+          </div>
+        ) : (
+          <div>
+            <b>Estimated Price :</b> ₹{price} + GST (if applicable) + Security
+            Deposit ₹{securityDeposit}
+          </div>
+        )}
       </span>
       <div className="flex flex-col gap-4">
         <label htmlFor="session">
@@ -470,7 +480,7 @@ function BookADay() {
           <b>Security Deposit Charges Applicable: ₹{securityDeposit}</b>
         </h6>
 
-        <h6 >
+        <h6>
           <b>Additional Features</b>
         </h6>
         {HallData?.additionalFeatures?.map((eachFeature) => (
@@ -483,7 +493,9 @@ function BookADay() {
             />
             <label htmlFor={eachFeature._id}>
               {eachFeature.heading} - ₹
-              {selectedCategory?.toLowerCase() === "svkm institute" ? 0 : eachFeature.price}
+              {selectedCategory?.toLowerCase() === "svkm institute"
+                ? 0
+                : eachFeature.price}
             </label>
           </span>
         ))}
