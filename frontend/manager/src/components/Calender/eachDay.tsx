@@ -90,6 +90,14 @@ function EachDay({
     window.open(url, "_blank");
   }
 
+  const hasConfirmedStatus = () => {
+    return finalArr.some(item => 
+      item.subarray.some(subItem => 
+        subItem.status === "CONFIRMED"
+      )
+    );
+  };
+
   return (
     <div
       key={`day-${i}`}
@@ -138,7 +146,7 @@ function EachDay({
       ) : (
         <span className="my-auto mx-auto">---</span>
       )}
-      <div
+      {!hasConfirmedStatus() && <div
         className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 my-2 mx-auto w-fit rounded-md cursor-pointer"
         onClick={openEnquireTab}
         data-hall-id={hallId}
@@ -147,7 +155,7 @@ function EachDay({
           .format("YYYY-MM-DD")}
       >
         New Booking
-      </div>
+      </div>}
     </div>
   );
 }
