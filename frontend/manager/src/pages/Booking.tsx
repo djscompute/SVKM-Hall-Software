@@ -31,6 +31,7 @@ function Booking() {
   const { data, error, isFetching } = useQuery({
     queryKey: [`booking/${bookingId}`],
     queryFn: async () => {
+      // eslint-disable-next-line no-useless-catch
       try {
         const responsePromise = axiosManagerInstance.get(
           `getBookingByID?_id=${bookingId}`
@@ -581,31 +582,31 @@ function Booking() {
       </div>
       <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span>Additional Feature Charges</span>
-        {editingMode? (
-          <input
-            type="number"
-            value={editedData?.features[index]?.price}
-            onChange={(e) =>
-              setEditedData((prev) => {
-                if (!prev) return undefined;
-                return {
-                  ...prev,
-                  features: prev.features.map((feature, i) =>
-                    i === index? {...feature, price: e.target.value } : feature
-                  ),
-                };
-              })
-            }
-            placeholder="Enter Charges"
-            className="px-2"
-          />
-        ) : (
-          <span>
-            {data?.booking_type === "SVKM Institute"
-              ? 0
-              : eachFeature.price || "-"}
-          </span>
-        )}
+        {editingMode ? (
+  <input
+    type="number"
+    value={editedData?.features[index]?.price || ''}
+    onChange={(e) =>
+      setEditedData((prev) => {
+        if (!prev) return prev; // Return previous state if undefined
+        const updatedFeatures = prev.features.map((feature, i) =>
+          i === index ? { ...feature, price: parseInt(e.target.value) } : feature
+        );
+        return {
+          ...prev,
+          features: updatedFeatures,
+        };
+      })
+    }
+    placeholder="Enter Charges"
+    className="px-2"
+  />
+) : (
+  <span>
+    {data?.booking_type === "SVKM Institute" ? 0 : eachFeature.price || "-"}
+  </span>
+)}
+
       </div>
     </div>
   ))
