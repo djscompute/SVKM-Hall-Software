@@ -205,6 +205,37 @@ function Booking() {
     });
   };
 
+  const paymentDetails = () => {
+    if (["cheque"].includes(data?.transaction?.type || "")) {
+      if (
+        editedData?.transaction.date &&
+        editedData?.transaction.chequeNo &&
+        editedData?.transaction.bank &&
+        editedData?.transaction.payeeName
+      ) {
+        return true;
+      }
+    }
+    if (["upi"].includes(data?.transaction?.type || "")) {
+      if (
+        editedData?.transaction.date &&
+        editedData?.transaction.transactionID
+      ) {
+        return true;
+      }
+    }
+    if (["neft/rtgs"].includes(data?.transaction?.type || "")) {
+      if (editedData?.transaction.date && editedData?.transaction.utrNo) {
+        return true;
+      }
+    }
+    if (["svkminstitute"].includes(data?.transaction?.type || "")) {
+      return true;
+    }
+    toast.error("Please enter the payment details");
+    return false;
+  };
+
   if (isFetching) return <h1>Loading</h1>;
 
   return (
@@ -493,31 +524,94 @@ function Booking() {
         <span className="w-full text-right">{data?.purpose || "-"}</span>
       </div>
       <span className=" text-lg font-medium">Additional Features</span>
-      {!data?.features.length ? (
-        <p className="text-lg font-medium">No Additional Features Selected</p>
-      ) : (
-        <></>
-      )}
-      {data?.features.map((eachFeature, index) => (
-        <div key={index} className="flex flex-col w-full mb-2">
-          <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>Name</span>
-            <span>{eachFeature.heading || "-"}</span>
-          </div>
-          <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>Description</span>
-            <span>{eachFeature.desc || "-"}</span>
-          </div>
-          <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>Additional Feature Charges</span>
-            <span>
-              {data?.booking_type === "SVKM Institute"
-                ? 0
-                : eachFeature.price || "-"}
-            </span>
-          </div>
-        </div>
-      ))}
+
+
+{!data?.features.length? (
+  <p className="text-lg font-medium">No Additional Features Selected</p>
+) : (
+  data?.features.map((eachFeature, index) => (
+    <div key={index} className="flex flex-col w-full mb-2">
+      <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span>Name</span>
+        {editingMode? (
+          <input
+            type="text"
+            value={editedData?.features[index]?.heading}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  features: prev.features.map((feature, i) =>
+                    i === index? {...feature, heading: e.target.value } : feature
+                  ),
+                };
+              })
+            }
+            placeholder="Enter Name"
+            className="px-2"
+          />
+        ) : (
+          <span>{eachFeature.heading || "-"}</span>
+        )}
+      </div>
+      <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span>Description</span>
+        {editingMode? (
+          <input
+            type="text"
+            value={editedData?.features[index]?.desc}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  features: prev.features.map((feature, i) =>
+                    i === index? {...feature, desc: e.target.value } : feature
+                  ),
+                };
+              })
+            }
+            placeholder="Enter Description"
+            className="px-2"
+          />
+        ) : (
+          <span>{eachFeature.desc || "-"}</span>
+        )}
+      </div>
+      <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span>Additional Feature Charges</span>
+        {editingMode? (
+          <input
+            type="number"
+            value={editedData?.features[index]?.price}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  features: prev.features.map((feature, i) =>
+                    i === index? {...feature, price: e.target.value } : feature
+                  ),
+                };
+              })
+            }
+            placeholder="Enter Charges"
+            className="px-2"
+          />
+        ) : (
+          <span>
+            {data?.booking_type === "SVKM Institute"
+              ? 0
+              : eachFeature.price || "-"}
+          </span>
+        )}
+      </div>
+    </div>
+  ))
+)}
+
+
 
       <span className=" text-lg font-medium">Billing</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
@@ -987,7 +1081,10 @@ function Booking() {
             </button>
             <button
               onClick={async () => {
-                editBookingStatus.mutate("CONFIRMED" as bookingStatusType);
+
+                paymentDetails() &&
+                  editBookingStatus.mutate("CONFIRMED" as bookingStatusType);
+
               }}
               className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
             >
