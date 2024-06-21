@@ -309,7 +309,17 @@ function BookADay() {
         Book {HallData?.name} for {humanReadableDate}
       </h1>
       <span className="text-center">
-      <b>Estimated Price :</b> ₹{price} + GST (if applicable) + Security Deposit ₹{securityDeposit}
+      {selectedCategory == "SVKM INSTITUTE" ? (
+          <div>
+            <b>Estimated Price :</b> ₹{price} + Security Deposit ₹
+            {securityDeposit}
+          </div>
+        ) : (
+          <div>
+            <b>Estimated Price :</b> ₹{price} + GST (if applicable) + Security
+            Deposit ₹{securityDeposit}
+          </div>
+        )}
       </span>
       <div className="flex flex-col gap-4">
         <label htmlFor="session">
