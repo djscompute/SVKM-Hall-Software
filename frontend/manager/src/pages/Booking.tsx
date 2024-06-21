@@ -57,13 +57,16 @@ function Booking() {
   const editBookingStatus = useMutation({
     mutationFn: async (newStatus: bookingStatusType) => {
       console.log(hallData);
-      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
-        ...data,
-        status: newStatus,
-        cancellationReason: showCancellationReason
-          ? cancellationReason
-          : undefined,
-      });
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${bookingId}`,
+        {
+          ...data,
+          status: newStatus,
+          cancellationReason: showCancellationReason
+            ? cancellationReason
+            : undefined,
+        }
+      );
       toast.promise(responsePromise, {
         pending: "Updating...",
         success: "Booking Status Edited!",
@@ -86,13 +89,16 @@ function Booking() {
 
   const editTransactionType = useMutation({
     mutationFn: async (newTransaction: transactionType) => {
-      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
-        ...data,
-        transaction: {
-          ...data?.transaction,
-          type: newTransaction,
-        },
-      });
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${bookingId}`,
+        {
+          ...data,
+          transaction: {
+            ...data?.transaction,
+            type: newTransaction,
+          },
+        }
+      );
       toast.promise(responsePromise, {
         pending: "Updating...",
         success: "Booking Status Edited!",
@@ -114,10 +120,13 @@ function Booking() {
 
   const editIsDepositApplicable = useMutation({
     mutationFn: async (newDeposit: boolean) => {
-      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
-        ...data,
-        isDeposit: newDeposit,
-      });
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${bookingId}`,
+        {
+          ...data,
+          isDeposit: newDeposit,
+        }
+      );
       toast.promise(responsePromise, {
         pending: "Updating...",
         success: "Booking Status Edited!",
@@ -194,6 +203,37 @@ function Booking() {
     await queryClient.refetchQueries({
       queryKey: [`booking/${bookingId}`],
     });
+  };
+
+  const paymentDetails = () => {
+    if (["cheque"].includes(data?.transaction?.type || "")) {
+      if (
+        editedData?.transaction.date &&
+        editedData?.transaction.chequeNo &&
+        editedData?.transaction.bank &&
+        editedData?.transaction.payeeName
+      ) {
+        return true;
+      }
+    }
+    if (["upi"].includes(data?.transaction?.type || "")) {
+      if (
+        editedData?.transaction.date &&
+        editedData?.transaction.transactionID
+      ) {
+        return true;
+      }
+    }
+    if (["neft/rtgs"].includes(data?.transaction?.type || "")) {
+      if (editedData?.transaction.date && editedData?.transaction.utrNo) {
+        return true;
+      }
+    }
+    if (["svkminstitute"].includes(data?.transaction?.type || "")) {
+      return true;
+    }
+    toast.error("Please enter the payment details");
+    return false;
   };
 
   if (isFetching) return <h1>Loading</h1>;
@@ -486,6 +526,7 @@ function Booking() {
         <span className="w-full text-right">{data?.purpose || "-"}</span>
       </div>
       <span className=" text-lg font-medium">Additional Features</span>
+//booking-conf-with-details
 {!data?.features.length? (
   <p className="text-lg font-medium">No Additional Features Selected</p>
 ) : (
@@ -570,6 +611,7 @@ function Booking() {
     </div>
   ))
 )}
+
 
       <span className=" text-lg font-medium">Billing</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
@@ -743,8 +785,10 @@ function Booking() {
         >
           Save Details
         </button>
-      ) : <></>}
-      
+      ) : (
+        <></>
+      )}
+
       <span className="text-lg font-medium">Transaction Details</span>
       <span>
         <label htmlFor="transaction">Choose a Transaction Type </label>
@@ -986,27 +1030,34 @@ function Booking() {
 
       {editingMode ? (
         <>
-        <h1 className="text-lg font-medium">Set Booking Status</h1>
-        <span className="space-x-4 space-y-4">
-          <button
-            onClick={() => {setShowCancellationReason(true)}}
-            className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
-          >
-            Cancelled
-          </button>
-          <button
-            onClick={() => {editBookingStatus.mutate("ENQUIRY" as bookingStatusType)}}
-            className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
-          >
-            Enquiry
-          </button>
-          <button
-            onClick={async () => {editBookingStatus.mutate("CONFIRMED" as bookingStatusType)}}
-            className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
-          >
-            Confirmed
-          </button>
-        </span>
+          <h1 className="text-lg font-medium">Set Booking Status</h1>
+          <span className="space-x-4 space-y-4">
+            <button
+              onClick={() => {
+                setShowCancellationReason(true);
+              }}
+              className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
+            >
+              Cancelled
+            </button>
+            <button
+              onClick={() => {
+                editBookingStatus.mutate("ENQUIRY" as bookingStatusType);
+              }}
+              className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+            >
+              Enquiry
+            </button>
+            <button
+              onClick={async () => {
+                paymentDetails() &&
+                  editBookingStatus.mutate("CONFIRMED" as bookingStatusType);
+              }}
+              className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
+            >
+              Confirmed
+            </button>
+          </span>
         </>
       ) : (
         <></>
