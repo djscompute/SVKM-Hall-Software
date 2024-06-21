@@ -394,9 +394,7 @@ function Booking() {
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">GST No</span>
-          <span className="w-full text-right">
-            {data?.user.gstNo || "-"}
-          </span>
+          <span className="w-full text-right">{data?.user.gstNo || "-"}</span>
         </div>
       )}
 
@@ -526,7 +524,8 @@ function Booking() {
         <span className="w-full text-right">{data?.purpose || "-"}</span>
       </div>
       <span className=" text-lg font-medium">Additional Features</span>
-//booking-conf-with-details
+
+
 {!data?.features.length? (
   <p className="text-lg font-medium">No Additional Features Selected</p>
 ) : (
@@ -613,6 +612,7 @@ function Booking() {
 )}
 
 
+
       <span className=" text-lg font-medium">Billing</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Total Hall Charges</span>
@@ -662,17 +662,29 @@ function Booking() {
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">CGST %</span>
         <span className="w-full text-right">
-          {data?.price
-            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
-            : "-"}
+          {["svkminstitute"].includes(data?.transaction?.type || "") ? (
+            <div>0</div>
+          ) : (
+            <div>
+              {data?.price
+                ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
+                : "-"}
+            </div>
+          )}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">SGST %</span>
         <span className="w-full text-right">
-          {data?.price
-            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
-            : "-"}
+          {["svkminstitute"].includes(data?.transaction?.type || "") ? (
+            <div>0</div>
+          ) : (
+            <div>
+              {data?.price
+                ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
+                : "-"}
+            </div>
+          )}
         </span>
       </div>
       <span>
@@ -767,14 +779,33 @@ function Booking() {
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Total Payable Amount</span>
         <span className="w-full text-right">
-          {data
-            ? data?.price -
-              0.01 * data?.baseDiscount * data?.price +
-              0.18 * (data?.price - 0.01 * data?.baseDiscount * data?.price) +
-              (data.isDeposit
-                ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
-                : 0)
-            : 0}
+          <span className="w-full text-right">
+            {["svkminstitute"].includes(data?.transaction?.type || "") ? (
+              <div>
+                {data
+                  ? data?.price -
+                    0.01 * data?.baseDiscount * data?.price +
+                    (data.isDeposit
+                      ? data?.deposit -
+                        0.01 * data?.depositDiscount * data?.deposit
+                      : 0)
+                  : 0}
+              </div>
+            ) : (
+              <div>
+                {data
+                  ? data?.price -
+                    0.01 * data?.baseDiscount * data?.price +
+                    0.18 *
+                      (data?.price - 0.01 * data?.baseDiscount * data?.price) +
+                    (data.isDeposit
+                      ? data?.deposit -
+                        0.01 * data?.depositDiscount * data?.deposit
+                      : 0)
+                  : 0}
+              </div>
+            )}
+          </span>
         </span>
       </div>
 
@@ -1050,8 +1081,10 @@ function Booking() {
             </button>
             <button
               onClick={async () => {
+
                 paymentDetails() &&
                   editBookingStatus.mutate("CONFIRMED" as bookingStatusType);
+
               }}
               className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
             >
