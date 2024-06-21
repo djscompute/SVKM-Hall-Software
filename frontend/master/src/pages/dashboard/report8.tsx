@@ -32,11 +32,11 @@ function Report8() {
 
   const [data, setData] = useState<any>();
   const [selectedHall, setSelectedHall] = useState<string>();
-  const [selectedHallId, setSelectedHallId] = useState<string>();
+  const [selectedHallId, setSelectedHallId] = useState<string>("All");
   const [selectedSession, setSelectedSession] = useState<string>("All");
   const [selectedCategory, setSelectedCategory] = useState<string>();
   const [hallCharges, setHallCharges] = useState<boolean>(false);
-  const [responseHallCharges, setresponseHallCharges] = useState<boolean>()
+  const [responseHallCharges, setresponseHallCharges] = useState<boolean>();
   const [selectedDisplayPeriod, setSelectedDisplayPeriod] =
     useState<string>("Select");
 
@@ -72,17 +72,17 @@ function Report8() {
       humanReadableFrom = dayjs().format("MMMM D, YYYY");
       humanReadableTo = dayjs().format("MMMM D, YYYY");
     } else if (selectedDisplayPeriod === "Tomorrow") {
-      humanReadableFrom = dayjs().add(1, 'day').format("MMMM D, YYYY");
-      humanReadableTo = dayjs().add(1, 'day').format("MMMM D, YYYY");
+      humanReadableFrom = dayjs().add(1, "day").format("MMMM D, YYYY");
+      humanReadableTo = dayjs().add(1, "day").format("MMMM D, YYYY");
     } else if (selectedDisplayPeriod === "Week") {
-      humanReadableFrom = dayjs().startOf('week').format("MMMM D, YYYY");
-      humanReadableTo = dayjs().endOf('week').format("MMMM D, YYYY");
+      humanReadableFrom = dayjs().startOf("week").format("MMMM D, YYYY");
+      humanReadableTo = dayjs().endOf("week").format("MMMM D, YYYY");
     } else if (selectedDisplayPeriod === "Month") {
-      humanReadableFrom = dayjs().startOf('month').format("MMMM D, YYYY");
-      humanReadableTo = dayjs().endOf('month').format("MMMM D, YYYY");
+      humanReadableFrom = dayjs().startOf("month").format("MMMM D, YYYY");
+      humanReadableTo = dayjs().endOf("month").format("MMMM D, YYYY");
     } else if (selectedDisplayPeriod === "Year") {
-      humanReadableFrom = dayjs().startOf('year').format("MMMM D, YYYY");
-      humanReadableTo = dayjs().endOf('year').format("MMMM D, YYYY");
+      humanReadableFrom = dayjs().startOf("year").format("MMMM D, YYYY");
+      humanReadableTo = dayjs().endOf("year").format("MMMM D, YYYY");
     } else {
       if (from) {
         humanReadableFrom = dayjs(from).format("MMMM D, YYYY");
@@ -119,8 +119,8 @@ function Report8() {
     displayHallCharges: boolean;
   }) => {
     if (!displayPeriod) return;
-    setresponseHallCharges(displayHallCharges)
-    setHumanReadableRequest(humanReadable)
+    setresponseHallCharges(displayHallCharges);
+    setHumanReadableRequest(humanReadable);
     let request;
     if (displayPeriod === "Select") {
       request = {
@@ -206,17 +206,21 @@ function Report8() {
         <select
           className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
           onChange={(e) => {
-            const selectedHallName = e.target.value;
-            const selectedHallId = hallData.find(
-              (hall) => hall.name === selectedHallName
-            )?._id;
-            setSelectedHall(selectedHallName);
-            if (selectedHallId) {
-              setSelectedHallId(selectedHallId);
+            if (e.target.value == "All") {
+              setSelectedHallId("All");
+            } else {
+              const selectedHallName = e.target.value;
+              const selectedHallId = hallData.find(
+                (hall) => hall.name === selectedHallName
+              )?._id;
+              setSelectedHall(selectedHallName);
+              if (selectedHallId) {
+                setSelectedHallId(selectedHallId);
+              }
             }
           }}
         >
-          <option value="">Select Hall</option>
+          <option value="All">All</option>
           {hallData &&
             hallData.map((hall) => (
               <option key={hall._id} value={hall.name}>
@@ -341,7 +345,8 @@ function Report8() {
       {data?.length && (
         <div className="flex flex-col items-center w-full overflow-x-auto mt-5">
           <span className="font-medium text-lg my-5">
-            Showing analytics from {humanReadableRequest.fromHuman} to {humanReadableRequest.toHuman}
+            Showing analytics from {humanReadableRequest.fromHuman} to{" "}
+            {humanReadableRequest.toHuman}
           </span>
           <div className=" flex flex-row items-center gap-3 mb-3">
             <span className="font-medium ">{data?.length} entries found </span>
@@ -378,26 +383,54 @@ function Report8() {
                 <th className="px-4 py-2 text-center">Customer Name</th>
                 <th className="px-4 py-2 text-center">Contact Person</th>
                 <th className="px-4 py-2 text-center">Contact No.</th>
-                {responseHallCharges && <th className="px-4 py-2 text-center">Booking Amount</th>}
-                {responseHallCharges && <th className="px-4 py-2 text-center">Amount Paid</th>}
+                {responseHallCharges && (
+                  <th className="px-4 py-2 text-center">Booking Amount</th>
+                )}
+                {responseHallCharges && (
+                  <th className="px-4 py-2 text-center">Amount Paid</th>
+                )}
               </tr>
             </thead>
             <tbody>
               {data.map((booking: any, index: number) => (
                 <tr key={index} className="bg-white border-b">
                   <td className="px-4 py-2 text-center">{booking.Date}</td>
-                  <td className="px-4 py-2 text-center">{booking["Hall Name"]}</td>
-                  <td className="px-4 py-2 text-center">{booking["Session"]}</td>
-                  <td className="px-4 py-2 text-center">{booking["Additional Facility"]?booking["Additional Facility"]:'None'}</td>
-                  <td className="px-4 py-2 text-center">{booking["Manager Name"]}</td>
+                  <td className="px-4 py-2 text-center">
+                    {booking["Hall Name"]}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    {booking["Session"]}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    {booking["Additional Facility"]
+                      ? booking["Additional Facility"]
+                      : "None"}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    {booking["Manager Name"]}
+                  </td>
                   <td className="px-4 py-2 text-center">
                     {booking["Customer Category"]}
                   </td>
-                  <td className="px-4 py-2 text-center">{booking["Customer Name"]}</td>
-                  <td className="px-4 py-2 text-center">{booking["Contact Person"]}</td>
-                  <td className="px-4 py-2 text-center">{booking["Contact No."]}</td>
-                  {responseHallCharges && <td className="px-4 py-2 text-center">{booking["Booking Amount"]}</td>}
-                  {responseHallCharges && <td className="px-4 py-2 text-center">{booking["Amount Paid"]}</td>}
+                  <td className="px-4 py-2 text-center">
+                    {booking["Customer Name"]}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    {booking["Contact Person"]}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    {booking["Contact No."]}
+                  </td>
+                  {responseHallCharges && (
+                    <td className="px-4 py-2 text-center">
+                      {booking["Booking Amount"]}
+                    </td>
+                  )}
+                  {responseHallCharges && (
+                    <td className="px-4 py-2 text-center">
+                      {booking["Amount Paid"]}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
