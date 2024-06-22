@@ -54,6 +54,33 @@ function Booking() {
     },
     staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
+  console.log("The data is ",data)
+
+  const {
+    data: allBookingData,
+    error: bookingError,
+    isFetching: bookingIsFetching,
+  } = useQuery({
+    queryKey: [`bookings-${data?.from}-${data?.to}`],
+    queryFn: async () => {
+      const response = await axiosManagerInstance.get("getBooking", {
+        params: {
+          from: data?.from,
+          to: data?.to,
+          hallId:data?.hallId
+        },
+      });
+      console.log(response.data);
+      if (response.data.message == "No bookings found for the specified range.")
+        return [];
+      // sort based of from
+      response.data.sort((a: any, b: any) => dayjs(a.from).diff(dayjs(b.from)));
+      return response.data;
+    },
+    staleTime: 1 * 60 * 1000, // Data is considered fresh for 1 minutes
+  });
+
+  console.log(allBookingData);
 
   const editBookingStatus = useMutation({
     mutationFn: async (newStatus: bookingStatusType) => {
@@ -236,6 +263,19 @@ function Booking() {
     toast.error("Please enter the payment details");
     return false;
   };
+
+  const confirmExists = () => {
+    // Iterate through each booking in the array
+    for (let booking of allBookingData) {
+      // Check if the status of the current booking is "CONFIRMED"
+      if (booking.status === "CONFIRMED") {
+        toast.error("There is already a confirmed hall in this session")
+        return true;
+      }
+    }
+    // If no booking with status "CONFIRMED" is found, return false
+    return false;
+  }
 
   if (isFetching) return <h1>Loading</h1>;
 
@@ -1086,7 +1126,7 @@ function Booking() {
             </button>
             <button
               onClick={async () => {
-                paymentDetails() &&
+                !confirmExists() && paymentDetails() &&
                   editBookingStatus.mutate("CONFIRMED" as bookingStatusType);
               }}
               className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"

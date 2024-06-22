@@ -90,13 +90,33 @@ function EachDay({
     window.open(url, "_blank");
   }
 
-  const hasConfirmedStatus = () => {
-    return finalArr.some(item => 
-      item.subarray.some(subItem => 
-        subItem.status === "CONFIRMED"
-      )
+  function appendEmptySessions() {
+    // Create a new array to store the result
+    const appendedArray = JSON.parse(JSON.stringify(finalArr));
+  
+    // Create a Set of existing sessionIds for quick lookup
+    const existingSessionIds = new Set(appendedArray.map((item: { sessionId: any; }) => item.sessionId));
+  
+    // Iterate through HallSessionsArray
+    HallSessionsArray.forEach(session => {
+      // Check if the session is active and its ID doesn't exist in finalArr
+      if (session.active && !existingSessionIds.has(session._id)) {
+        // Add a new entry with empty subarray
+        appendedArray.push({
+          sessionId: session._id,
+          subarray: []
+        });
+      }
+    });
+    return appendedArray
+  }
+
+  function hasAllSessionsConfirmed() {
+    const appendedArray: { sessionId: string; subarray: HallBookingType[] }[] = appendEmptySessions()
+    return appendedArray.every(session => 
+      session.subarray.some(booking => booking.status === "CONFIRMED")
     );
-  };
+  }
 
   return (
     <div
@@ -146,7 +166,7 @@ function EachDay({
       ) : (
         <span className="my-auto mx-auto">---</span>
       )}
-      {!hasConfirmedStatus() && <div
+      {!hasAllSessionsConfirmed() && <div
         className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 my-2 mx-auto w-fit rounded-md cursor-pointer"
         onClick={openEnquireTab}
         data-hall-id={hallId}
