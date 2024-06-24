@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import Card from "../components/homePage/Card";
-import axiosInstance from "../config/axiosInstance.ts";
+import axiosClientInstance from "../config/axiosClientInstance.ts";
 // import { EachHallType } from "../types/Hall.types.ts";
 import { EachHallType } from "../../../../types/global.ts";
 import { toast } from "react-toastify";
@@ -11,7 +11,7 @@ function HomePage() {
     queryKey: ["allhalls"],
     queryFn: async () => {
       try {
-        const responsePromise = axiosInstance.get("getAllHalls");
+        const responsePromise = axiosClientInstance.get("getAllHalls");
         toast.promise(responsePromise, {
           pending: "Fetching halls...",
           // success: "Halls fetched successfully!",

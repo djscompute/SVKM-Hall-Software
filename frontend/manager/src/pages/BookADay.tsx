@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "../config/axiosInstance";
+import axiosManagerInstance from "../config/axiosManagerInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import {
@@ -40,6 +40,7 @@ function BookADay() {
     [key: string]: EachHallAdditonalFeaturesType;
   }>({});
   const [price, setPrice] = useState<number>(0);
+  const [securityDeposit,setSecurityDeposit] = useState<number>(0);
   const [isSame, setIsSame] = useState<boolean>(false);
   const [isDetailsConfirmed, setIsDetailsConfirmed] = useState<boolean>(false);
 
@@ -50,7 +51,7 @@ function BookADay() {
     queryKey: ["bookaday", `${humanReadableDate}`],
     queryFn: async () => {
       try {
-        const responsePromise = axiosInstance.get(`getHall/${id}`);
+        const responsePromise = axiosManagerInstance.get(`getHall/${id}`);
         toast.promise(responsePromise, {
           pending: "Fetching hall...",
           error: "Failed to fetch Hall. Please try again.",
@@ -65,9 +66,17 @@ function BookADay() {
     staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
 
+  useEffect(() => {
+    if (selectedCategory?.toLowerCase() === "svkm institute") {
+      setSecurityDeposit(0);
+    } else if (HallData) {
+      setSecurityDeposit(HallData.securityDeposit || 0);
+    }
+  }, [selectedCategory, HallData]);
+
   const addBookingMutation = useMutation({
     mutationFn: () =>
-      axiosInstance
+      axiosManagerInstance
         .post(`/addBooking`, {
           user: {
             username: name,
@@ -121,6 +130,7 @@ function BookADay() {
                 (ecssn) => ecssn._id == selectedSessionId
               )?.name,
               estimatedPrice: price,
+              securityDeposit: securityDeposit,
               additionalFeatures: selectedFeatures,
               date: humanReadableDate,
               startTime: `${day}T${
@@ -278,7 +288,7 @@ function BookADay() {
 
   useEffect(() => {
     let totalPrice = 0;
-    if (selectedCategory !== "Inter Institute") {
+    if (selectedCategory?.toLowerCase() !== "svkm institute") {
       totalPrice = Object.values(selectedFeatures).reduce(
         (acc, feature) => acc + feature.price,
         0
@@ -299,7 +309,17 @@ function BookADay() {
         Book {HallData?.name} for {humanReadableDate}
       </h1>
       <span className="text-center">
-        <b>Estimated Price :</b> ₹{price} + GST (if applicable)
+      {selectedCategory == "SVKM INSTITUTE" ? (
+          <div>
+            <b>Estimated Price :</b> ₹{price} + Security Deposit ₹
+            {securityDeposit}
+          </div>
+        ) : (
+          <div>
+            <b>Estimated Price :</b> ₹{price} + GST (if applicable) + Security
+            Deposit ₹{securityDeposit}
+          </div>
+        )}
       </span>
       <div className="flex flex-col gap-4">
         <label htmlFor="session">
@@ -455,6 +475,10 @@ function BookADay() {
           />
           {errors.purpose && <p className="text-red-500">{errors.purpose}</p>}
         </div>
+
+        <h6 className="text-red-500">
+          <b>Security Deposit Charges Applicable: ₹{securityDeposit}</b>
+        </h6>
 
         <h6>
           <b>Additional Features</b>

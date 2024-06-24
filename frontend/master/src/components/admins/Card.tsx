@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { EachHallType, adminType } from "../../../../../types/global";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "../../config/axiosInstance";
+import axiosMasterInstance from "../../config/axiosMasterInstance";
 
 export default function Card({ adminData }: { adminData: adminType }) {
   const managedHalls = adminData.managedHalls || [];
@@ -17,7 +17,7 @@ export default function Card({ adminData }: { adminData: adminType }) {
 
       try {
         const promises = managedHalls?.map((id) =>
-          axiosInstance.get(`getHall/${id}`)
+          axiosMasterInstance.get(`getHall/${id}`)
         );
         const responses = await Promise.all(promises);
         const hallData = responses.map(

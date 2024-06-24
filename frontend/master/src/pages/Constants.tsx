@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import axiosInstance from '../config/axiosInstance';
+import axiosMasterInstance from '../config/axiosMasterInstance';
 
 interface Constant {
     _id: string;
@@ -23,7 +23,7 @@ const ConstantsManager: React.FC = () => {
     const [totalConstants, setTotalConstants] = useState<number | null>(null);
     const fetchConstants = async () => {
         try {
-            const response = await axiosInstance.get<Constant[]>('/getAllConstants');
+            const response = await axiosMasterInstance.get<Constant[]>('/getAllConstants');
             setConstants(response.data);
             setTotalConstants(response.data.length);
             setLoading(false);
@@ -47,7 +47,7 @@ const ConstantsManager: React.FC = () => {
                 return;
             }
             try {
-                await axiosInstance.post("/createConstant", { constantName: newConstantName, value: newConstantValue });
+                await axiosMasterInstance.post("/createConstant", { constantName: newConstantName, value: newConstantValue });
                 setNewConstantName("");
                 setNewConstantValue(null);
                 setShowCreateConstantFields(false);
@@ -77,7 +77,7 @@ const ConstantsManager: React.FC = () => {
 
     const saveUpdatedValue = async () => {
         try {
-            await axiosInstance.post(`/updateConstant`, { constantName: editedName, value: editedValue });
+            await axiosMasterInstance.post(`/updateConstant`, { constantName: editedName, value: editedValue });
             setEditedName(null);
             setEditedValue(null);
             toast.success("Constant Value Updated")
@@ -101,7 +101,7 @@ const ConstantsManager: React.FC = () => {
         const confirmation = window.confirm("Are you sure you want to delete this constant?");
         if (confirmation) {
             try {
-                await axiosInstance.delete(`/deleteConstant`, { data: { constantName: name } });
+                await axiosMasterInstance.delete(`/deleteConstant`, { data: { constantName: name } });
                 toast.success("Deleted Constant Successfully!");
                 fetchConstants();
             } catch (error: any) {

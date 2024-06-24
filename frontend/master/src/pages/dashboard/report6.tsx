@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import axiosInstance from "../../config/axiosInstance";
+import axiosMasterInstance from "../../config/axiosMasterInstance";
 import { toast } from "react-toastify";
 import { Bar, Pie } from "react-chartjs-2";
 import "chart.js/auto";
@@ -125,7 +125,7 @@ function Report6() {
 
   const getData = async ({ from, to }: { from: string; to: string }) => {
     if (!from || !to) return;
-    const responsePromise = axiosInstance.post(
+    const responsePromise = axiosMasterInstance.post(
       "dashboard/getTotalInteraction",
       {
         fromDate: from,

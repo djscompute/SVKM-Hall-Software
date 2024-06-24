@@ -38,6 +38,7 @@ export default function HallCapacity({ data, capacity, setHallData }: props) {
       ...prev,
       capacity: modalData.data.capacity,
       securityDeposit: modalData.data.securityDeposit,
+      eventRestrictions: modalData.data.eventRestrictions,
     }));
     toggleModal();
   };
@@ -142,6 +143,21 @@ export default function HallCapacity({ data, capacity, setHallData }: props) {
                   <textarea
                     name="securityDeposit"
                     value={modalData.data.securityDeposit}
+                    rows={1}
+                    onChange={handleChange}
+                    className="bg-black text-white px-3 py-1 w-[170px] rounded  h-auto  mx-auto sm:mx-0"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+              <div className="w-1/2 text-center sm:text-right">
+                  <h1 className="self-baseline">Restrictions:</h1>{" "}
+                </div>
+                <div className="w-1/2 flex flex-col">
+                  <textarea
+                    name="eventRestrictions"
+                    value={modalData.data.eventRestrictions}
                     rows={1}
                     onChange={handleChange}
                     className="bg-black text-white px-3 py-1 w-[170px] rounded  h-auto  mx-auto sm:mx-0"

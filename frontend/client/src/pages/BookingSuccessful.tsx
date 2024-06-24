@@ -4,22 +4,34 @@ import { EachHallAdditonalFeaturesType } from "../types/Hall.types";
 
 const BookingSuccessful = () => {
   const location = useLocation();
-  const bookingDetails = location.state?.bookingDetails;
-  const extractTime = (dateTimeString: string) => {
-    return dateTimeString.split("T")[1].split(".")[0];
-  };
-  const extractDate = (dateTimeString: string) => {
-    return dateTimeString.split("T")[0];
-  };
-  const from = convert_IST_TimeString_To12HourFormat(
-    extractTime(bookingDetails.startTime)
-  );
-  const to = convert_IST_TimeString_To12HourFormat(
-    extractTime(bookingDetails.endTime)
-  );
-  const date = extractDate(bookingDetails.startTime);
+const bookingDetails = location.state?.bookingDetails;
 
-  console.log("HEREEE", bookingDetails.additionalFeatures);
+const extractTime = (dateTimeString: string) => {
+  return dateTimeString.split("T")[1].split(".")[0];
+};
+
+const extractDate = (dateTimeString: string) => {
+  const dateParts = dateTimeString.split("T")[0].split("-");
+  return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`; // Rearranged to DD-MM-YYYY
+};
+
+// const convert_IST_TimeString_To12HourFormat = (timeString: string) => {
+//   const [hours, minutes, seconds] = timeString.split(":");
+//   const period = parseInt(hours) >= 12 ? 'PM' : 'AM';
+//   const formattedHours = ((parseInt(hours) % 12) || 12).toString().padStart(2, '0');
+//   return `${formattedHours}:${minutes}:${seconds} ${period}`;
+// };
+
+const from = convert_IST_TimeString_To12HourFormat(
+  extractTime(bookingDetails.startTime)
+);
+const to = convert_IST_TimeString_To12HourFormat(
+  extractTime(bookingDetails.endTime)
+);
+const date = extractDate(bookingDetails.startTime);
+
+
+  console.log("HEREEE", bookingDetails);
 
   return (
     <div className="flex flex-col py-4 gap-6 md:w-2/3 lg:w-1/2 mx-auto">
@@ -58,8 +70,12 @@ const BookingSuccessful = () => {
                   </td>
                 </tr>
                 <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">Estimated Cost</td>
+                  <td className="font-medium py-2 w-1/2">Base Cost</td>
                   <td className="w-1/2">₹{bookingDetails.estimatedPrice}</td>
+                </tr>
+                <tr className="border-b-2">
+                  <td className="font-medium py-2 w-1/2">Security Deposit</td>
+                  <td className="w-1/2">₹{bookingDetails.securityDeposit}</td>
                 </tr>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">
@@ -70,14 +86,24 @@ const BookingSuccessful = () => {
                       ? Object.values(bookingDetails.additionalFeatures)?.map(
                           (each: any) => (
                             <div className="flex flex-col items-start gap-2">
-                              <span>{each.heading}</span>
-                              <span>{each.desc}</span>
-                              <span>{each.price}</span>
+                              <span>{each.heading} </span>
+                              <span>Charge: ₹{each.price}</span>
                             </div>
                           )
                         )
                       : "None"}
                   </td>
+                </tr>
+                <tr className="border-b-2">
+                  <td className="font-medium py-2 w-1/2">Total Estimated Cost</td>
+                  {bookingDetails.paymentType=='SVKM INSTITUTE'?
+                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} </td>
+                  :
+                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} + GST (if applicable)</td>}
+                </tr>
+                <tr>
+                  <p className=" text-sm font-bold pt-1 text-red-400">*GST is applicable as per prevailing rates.</p>
+                  <p className=" text-sm font-bold text-red-400">*Security deposits to be displayed.</p>
                 </tr>
               </tbody>
             </table>

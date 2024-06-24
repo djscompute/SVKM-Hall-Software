@@ -8,7 +8,7 @@ import { EachHallType } from "../types/Hall.types";
 import "../styles/hallInfo.css";
 import HallSessions from "../components/editHall/HallSessions";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import axiosInstance from "../config/axiosInstance";
+import axiosMasterInstance from "../config/axiosMasterInstance";
 import { useParams } from "react-router-dom";
 import { queryClient } from "../App";
 import { toast } from "react-toastify";
@@ -25,7 +25,7 @@ export default function EditHall() {
     queryFn: async () => {
       // try {
       console.log("FETCHING");
-      const responsePromise = axiosInstance.get(`getHall/${HallID}`);
+      const responsePromise = axiosMasterInstance.get(`getHall/${HallID}`);
       toast.promise(responsePromise, {
         pending: "Updating with latest data...",
         success: "Fetched Hall Data",
@@ -41,7 +41,7 @@ export default function EditHall() {
   const editHallMutation = useMutation({
     mutationFn: async () => {
       console.log(hallData);
-      const responsePromise = axiosInstance.post(
+      const responsePromise = axiosMasterInstance.post(
         `/editHall/${HallID}`,
         hallData
       );

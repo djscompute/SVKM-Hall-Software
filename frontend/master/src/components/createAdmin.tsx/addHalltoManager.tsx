@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from '../../config/axiosInstance';
+import axiosMasterInstance from '../../config/axiosMasterInstance';
 import { EachHallType } from '../../types/Hall.types';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -24,7 +24,7 @@ const AddHalltoManager: React.FC<AddHalltoManagerProps> = ({
   useEffect(() => {
     const fetchHalls = async () => {
       try {
-        const responsePromise = axiosInstance.get<EachHallType[]>('/getAllHalls/');
+        const responsePromise = axiosMasterInstance.get<EachHallType[]>('/getAllHalls/');
         const response = await responsePromise
         setHalls(response.data);
         setLoading(false);

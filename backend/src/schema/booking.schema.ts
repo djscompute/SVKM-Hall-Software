@@ -19,7 +19,7 @@ export const AddBookingZodSchema = z.object({
       username: z.string(stringErrorHandler("name")),
       contact: z.string(stringErrorHandler("person")),
       email: z.string(stringErrorHandler("email")).email(),
-      aadharNo: z.string(stringErrorHandler("aadharNo")).optional(),
+      gstNo: z.string(stringErrorHandler("gstNo")).optional(),
       panNo: z.string(stringErrorHandler("panNo")).optional(),
       address: z.string(stringErrorHandler("address")).optional(),
       mobile: z.string(stringErrorHandler("mobile")),

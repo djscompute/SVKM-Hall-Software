@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
-import axiosInstance from "../../config/axiosInstance";
+import axiosMasterInstance from "../../config/axiosMasterInstance";
 import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
 import svkmLogo from "../../assets/svkm-logo.png";
@@ -19,7 +19,7 @@ const NavBar = () => {
   useQuery({
     queryKey: ["loggedIn"],
     queryFn: async () => {
-      const response = await axiosInstance.get("isLoggedIn");
+      const response = await axiosMasterInstance.get("isLoggedIn");
       if (!response.data.isLoggedIn) {
         logout();
         navigate("/login");
@@ -33,7 +33,7 @@ const NavBar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axiosInstance.get("/logoutAdmin");
+      const response = await axiosMasterInstance.get("/logoutAdmin");
       if (response.status === 200) {
         const data = await response.data;
         logout();

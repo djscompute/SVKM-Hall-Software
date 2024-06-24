@@ -91,7 +91,8 @@ export async function editBookingHandler(req: Request, res: Response) {
       time,
       purpose,
       cancellationReason
-    } = req.body as HallBookingType;
+    } = req.body as HallBookingType; // Ensure this matches your schema type
+
     const bookingId: string = req.params.id;
 
     const updatedBooking = await BookingModel.findByIdAndUpdate(
@@ -117,6 +118,7 @@ export async function editBookingHandler(req: Request, res: Response) {
       },
       { new: true }
     );
+
     if (!updatedBooking) {
       return res
         .status(404)

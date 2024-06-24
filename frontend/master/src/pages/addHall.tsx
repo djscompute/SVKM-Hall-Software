@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 import { useMutation } from "@tanstack/react-query";
-import axiosInstance from "../config/axiosInstance";
+import axiosMasterInstance from "../config/axiosMasterInstance";
 import HallLocation from "../components/addHall/HallLocation";
 import AboutHall from "../components/addHall/AboutHall";
 import HallCapacity from "../components/addHall/HallCapacity";
@@ -98,7 +98,7 @@ function AddHall() {
 
   const addHallMutation = useMutation({
     mutationFn: () =>
-      toast.promise(axiosInstance.post(`/addHall`, hallData), {
+      toast.promise(axiosMasterInstance.post(`/addHall`, hallData), {
         success: "Hall added successfully!",
         error: "Error adding hall.",
         pending: "Adding hall...",

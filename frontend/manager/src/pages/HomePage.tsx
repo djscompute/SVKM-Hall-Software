@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import Card from "../components/homePage/Card";
-import axiosInstance from "../config/axiosInstance.ts";
+import axiosManagerInstance from "../config/axiosManagerInstance.ts";
 import { EachHallType } from "../types/Hall.types.ts";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,7 +13,7 @@ function HomePage() {
     queryKey: ["allhalls"],
     queryFn: async () => {
       try {
-        const responsePromise = axiosInstance.get(
+        const responsePromise = axiosManagerInstance.get(
           `getHallsforAdmin/${user?.email}`
         );
         toast.promise(responsePromise, {

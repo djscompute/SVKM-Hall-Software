@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { EachHallType } from "../../types/Hall.types";
-import axiosInstance from "../../config/axiosInstance";
+import axiosMasterInstance from "../../config/axiosMasterInstance";
 
 type props = {
   images: string[];
@@ -25,7 +25,7 @@ export default function ImageCarousel({ images, setHallData }: props) {
     try {
       const formData = new FormData();
       formData.append("image", newImage);
-      const response = await axiosInstance.post(
+      const response = await axiosMasterInstance.post(
         "http://localhost:3000/uploadImage",
         formData,
         {
