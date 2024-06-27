@@ -27,6 +27,7 @@ function Booking() {
   const [editedData, setEditedData] = useState<HallBookingType>();
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
+  let totalFeatureCharges = 0;
 
   const { data, error, isFetching } = useQuery({
     queryKey: [`booking/${bookingId}`],
@@ -637,6 +638,13 @@ function Booking() {
                           ? { ...feature, price: parseInt(e.target.value) }
                           : feature
                       );
+                      let totalFeatureCharges = 0;
+
+                          if (editingMode) {
+                            totalFeatureCharges = editedData?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0;
+                          } else {
+                            totalFeatureCharges = data?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0;
+                          }
                       return {
                         ...prev,
                         features: updatedFeatures,
@@ -822,38 +830,45 @@ function Booking() {
       </div>
 
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Total Payable Amount</span>
-        <span className="w-full text-right">
-          <span className="w-full text-right">
-            {data?.booking_type == "SVKM INSTITUTE" ? (
-              <div>
-                {data
-                  ? data?.price -
-                    0.01 * data?.baseDiscount * data?.price +
-                    (data.isDeposit
-                      ? data?.deposit -
-                        0.01 * data?.depositDiscount * data?.deposit
-                      : 0)
-                  : 0}
-              </div>
-            ) : (
-              <div>
-                {data
-                  ? data?.price -
-                    0.01 * data?.baseDiscount * data?.price +
-                    0.18 *
-                      (data?.price - 0.01 * data?.baseDiscount * data?.price) +
-                    (data.isDeposit
-                      ? data?.deposit -
-                        0.01 * data?.depositDiscount * data?.deposit
-                      : 0)
-                  : 0}
-              </div>
-            )}
-          </span>
-        </span>
-      </div>
-
+      <span className="w-full text-left">Total Payable Amount</span>
+  <span className="w-full text-right">
+    <span className="w-full text-right">
+    {data?.booking_type == "SVKM INSTITUTE"? (
+        <div>
+          {data
+        ? (
+                data.price -
+                0.01 * data.baseDiscount * data.price +
+                (data.isDeposit
+              ? data.deposit - 0.01 * data.depositDiscount * data.deposit
+                  : 0) +
+                (editingMode
+                ? editedData?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0
+                  : data?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0 )
+              )
+            : 0}
+        </div>
+      ) : (
+        <div>
+          {data
+        ? (
+                data.price -
+                0.01 * data.baseDiscount * data.price +
+                0.18 *
+                  (data.price - 0.01 * data.baseDiscount * data.price) +
+                (data.isDeposit
+              ? data.deposit - 0.01 * data.depositDiscount * data.deposit
+                  : 0) +
+                (editingMode
+                ? editedData?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0
+                  : data?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0)
+              )
+            : 0}
+        </div>
+      )}
+    </span>
+  </span>
+</div>
       {editingMode ? (
         <button
           onClick={handleSave}
