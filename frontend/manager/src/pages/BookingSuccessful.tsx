@@ -57,7 +57,7 @@ const BookingSuccessful = () => {
                   </td>
                 </tr>
                 <tr className="border-b-2">
-                <td className="font-medium py-2 w-1/2">Base Cost</td>
+                <td className="font-medium py-2 w-1/2">Hall Charges</td>
                   <td className="w-1/2">₹{bookingDetails.estimatedPrice}</td>
                 </tr>
                 <tr className="border-b-2">
@@ -66,7 +66,7 @@ const BookingSuccessful = () => {
                 </tr>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">
-                    Additional Features
+                    Additional Facilities
                   </td>
                   <td className="w-1/2">
                     {bookingDetails.additionalFeatures
@@ -82,7 +82,7 @@ const BookingSuccessful = () => {
                   </td>
                 </tr>
                 <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">Total Estimated Cost</td>
+                  <td className="font-medium py-2 w-1/2">Total Payable</td>
                   <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} + GST (if applicable)</td>
                 </tr>
               </tbody>
