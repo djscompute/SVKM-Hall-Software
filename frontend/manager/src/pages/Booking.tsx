@@ -713,7 +713,7 @@ function Booking() {
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">CGST %</span>
+        <span className="w-full text-left">CGST 9%</span>
         <span className="w-full text-right">
           {data?.booking_type == "SVKM INSTITUTE" ? (
             <div>0</div>
@@ -727,7 +727,7 @@ function Booking() {
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">SGST %</span>
+        <span className="w-full text-left">SGST 9%</span>
         <span className="w-full text-right">
           {data?.booking_type == "SVKM INSTITUTE" ? (
             <div>0</div>

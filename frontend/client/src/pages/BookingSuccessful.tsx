@@ -70,7 +70,7 @@ const date = extractDate(bookingDetails.startTime);
                   </td>
                 </tr>
                 <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">Base Cost</td>
+                  <td className="font-medium py-2 w-1/2">Hall Changes</td>
                   <td className="w-1/2">₹{bookingDetails.estimatedPrice}</td>
                 </tr>
                 <tr className="border-b-2">
@@ -79,7 +79,7 @@ const date = extractDate(bookingDetails.startTime);
                 </tr>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">
-                    Additional Features
+                    Additional Facilities
                   </td>
                   <td className="w-1/2">
                     {bookingDetails.additionalFeatures
@@ -95,7 +95,7 @@ const date = extractDate(bookingDetails.startTime);
                   </td>
                 </tr>
                 <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">Total Estimated Cost</td>
+                  <td className="font-medium py-2 w-1/2">Total Payable</td>
                   {bookingDetails.paymentType=='SVKM INSTITUTE'?
                   <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} </td>
                   :
@@ -103,7 +103,6 @@ const date = extractDate(bookingDetails.startTime);
                 </tr>
                 <tr>
                   <p className=" text-sm font-bold pt-1 text-red-400">*GST is applicable as per prevailing rates.</p>
-                  <p className=" text-sm font-bold text-red-400">*Security deposits to be displayed.</p>
                 </tr>
               </tbody>
             </table>
