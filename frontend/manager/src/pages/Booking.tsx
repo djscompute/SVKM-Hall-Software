@@ -83,6 +83,37 @@ function Booking() {
 
   console.log(allBookingData);
 
+
+  // Seperate mutation for confirm and save booking
+
+  const confirmAndSaveBooking = useMutation({
+    mutationFn: async () => {
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${bookingId}`,
+        {
+          ...editedData,
+          status: "CONFIRMED" as bookingStatusType,
+        }
+      );
+      toast.promise(responsePromise, {
+        pending: "Updating and Confirming Booking...",
+        success: "Booking Confirmed and Updated Successfully!",
+        error: "Failed to Confirm and Update Booking. Please try again.",
+      });
+      const response = await responsePromise;
+      return response.data;
+    },
+    onSuccess: async () => {
+      setEditingMode(false);
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${bookingId}`],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   const editBookingStatus = useMutation({
     mutationFn: async (newStatus: bookingStatusType) => {
       console.log(hallData);
@@ -1139,14 +1170,16 @@ function Booking() {
             >
               Enquiry
             </button>
+            {/* Confirmed button with saving the edits */}
             <button
               onClick={async () => {
-                !confirmExists() && paymentDetails() &&
-                  editBookingStatus.mutate("CONFIRMED" as bookingStatusType);
-              }}
-              className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
+                 if (!confirmExists() && paymentDetails()) {
+                    await confirmAndSaveBooking.mutateAsync();
+                  }
+                 }}
+               className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
             >
-              Confirmed
+             Confirmed
             </button>
           </span>
         </>
