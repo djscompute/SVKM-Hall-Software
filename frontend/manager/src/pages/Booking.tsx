@@ -198,6 +198,11 @@ function Booking() {
 
   if (isFetching) return <h1>Loading</h1>;
 
+
+
+
+
+
   return (
     <div className="flex flex-col items-center my-10 w-11/12 sm:w-3/4 lg:w-1/2 mx-auto">
       {editingMode ? (
@@ -282,6 +287,7 @@ function Booking() {
                 if (!prev) return undefined;
                 return {
                   ...prev,
+
                   user: {
                     ...prev.user,
                     contact: e.target.value,
@@ -574,7 +580,7 @@ function Booking() {
         <label htmlFor="isDeposit">Security Deposit Applicable </label>
         <select
           id="isDeposit"
-          value={data?.isDeposit === true ? "yes" : "no" || ""}
+          value={data?.isDeposit === true ? "yes" : "no" || false}
           className="px-2 py-1 rounded-md border border-gray-400 my-1"
           onChange={(e) => {
             if (e.target.value === "yes") {
@@ -582,6 +588,7 @@ function Booking() {
             }
             if (e.target.value === "no") {
               editIsDepositApplicable.mutate(false);
+
             }
           }}
         >
@@ -594,18 +601,23 @@ function Booking() {
       </span>
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Enter Security Deposit</span>
+          <span className="w-full text-left">Enter Security Deposit {editedData?.deposit}</span>
           <input
             type="text"
             value={editedData?.deposit}
-            onChange={(e) =>
+            onChange={(e) =>{
               setEditedData((prev) => {
                 if (!prev) return undefined;
                 return {
                   ...prev,
-                  deposit: Number(e.target.value),
+                deposit: Number(e.target.value) ,
                 };
               })
+           
+            
+              // data?.deposit=editedData?.deposit
+            
+            }
             }
             placeholder="Enter Security Deposit"
             className="px-2"
@@ -614,7 +626,11 @@ function Booking() {
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">Security Deposit Amount</span>
-          <span className="w-full text-right">{data?.deposit}</span>
+          {/* <span className="w-full text-right">{data?.deposit}</span> */}
+          <span className="w-full text-right">
+            {editedData?.deposit ?? data?.deposit}
+
+          </span>
         </div>
       )}
       {editingMode ? (
@@ -644,7 +660,28 @@ function Booking() {
           </span>
         </div>
       )}
+
+      {
+        editingMode?<>
+
+<div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Deposit Discount Amount</span>
+        <span className="w-full text-right">
+          {editedData?.deposit ? 0.01 * editedData?.depositDiscount * editedData?.deposit : "-"}
+        </span>
+      </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Deposit Discounted Price</span>
+        <span className="w-full text-right">
+          {editedData?.deposit
+            ? editedData?.deposit - 0.01 * editedData?.depositDiscount * editedData?.deposit
+            : "-"}
+        </span>
+      </div>
+</>
+
+        :<>
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Deposit Discount Amount</span>
         <span className="w-full text-right">
           {data?.deposit ? 0.01 * data?.depositDiscount * data?.deposit : "-"}
@@ -658,20 +695,87 @@ function Booking() {
             : "-"}
         </span>
       </div>
-
+</>
+          
+      }
+      {/* <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Deposit Discount Amount</span>
+        <span className="w-full text-right">
+          {data?.deposit ? 0.01 * data?.depositDiscount * data?.deposit : "-"}
+        </span>
+      </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Deposit Discounted Price</span>
+        <span className="w-full text-right">
+          {data?.deposit
+            ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
+            : "-"}
+        </span>
+      </div> */}
+
+
+
+
+
+      {
+        editedData?<>
+
+
+<div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Total Payable Amount</span>
+        <span className="w-full text-right">
+          {editedData
+            ? editedData?.price -
+              (0.01 * editedData?.baseDiscount * editedData?.price )+
+              0.18 * (editedData?.price - 0.01 * editedData?.baseDiscount * editedData?.price) +
+              (editedData.isDeposit
+                ? editedData?.deposit - 0.01 * editedData?.depositDiscount * editedData?.deposit
+                : 0)
+            : 0} 
+
+          
+        </span>
+      </div>
+
+        </>:<>
+
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Total Payable Amount</span>
         <span className="w-full text-right">
           {data
             ? data?.price -
-              0.01 * data?.baseDiscount * data?.price +
+              (0.01 * data?.baseDiscount * data?.price )+
               0.18 * (data?.price - 0.01 * data?.baseDiscount * data?.price) +
               (data.isDeposit
                 ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
                 : 0)
-            : 0}
+            : 0} 
+
+          
         </span>
       </div>
+
+
+
+        </>
+      }
+
+      {/* <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span className="w-full text-left">Total Payable Amount</span>
+        <span className="w-full text-right">
+          {data?.isDeposit} is
+          {data
+            ? data?.price -
+              (0.01 * data?.baseDiscount * data?.price )+
+              0.18 * (data?.price - 0.01 * data?.baseDiscount * data?.price) +
+              (data.isDeposit
+                ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
+                : 0)
+            : 0} 
+
+          
+        </span>
+      </div> */}
 
       {editingMode ? (
         <button

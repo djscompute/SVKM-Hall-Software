@@ -22,6 +22,8 @@ function HomePage() {
           error: "Failed to fetch Halls. Please try again.",
         });
         const response = await responsePromise;
+        console.log("resposne is ",response.data);
+        
         return response.data as EachHallType[];
       } catch (error) {
         throw error;
@@ -36,6 +38,7 @@ function HomePage() {
       <h1 className=" text-3xl font-semibold my-5">All Halls</h1>
       <div className="flex flex-wrap justify-around w-full">
         {data?.map((hallProp) => (
+          
           <Card hallData={hallProp} />
         ))}
       </div>

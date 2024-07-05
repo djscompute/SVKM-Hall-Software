@@ -29,3 +29,10 @@ export const convert_IST_DateTimeString_To12HourFormat = (
 
   return istTime.format("h:mm A");
 };
+
+export const  convertTo12Hour=(time: string): string =>{
+  let [hours, minutes] = time.split(':').map(Number);
+  let period = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12; 
+  return `${hours}:${minutes.toString().padStart(2, '0')} ${period}`;
+}
