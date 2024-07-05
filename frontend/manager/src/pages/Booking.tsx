@@ -1006,6 +1006,8 @@ function Booking() {
           </span>
         </span>
       </div>
+        </>
+      }
       {editingMode ? (
         <button
           onClick={handleSave}
