@@ -10,7 +10,7 @@ import {
 } from "../../../../types/global";
 import { useParams } from "react-router-dom";
 // import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { queryClient } from "../App";
 
 const possibleBookingTypes: bookingStatusType[] = [
@@ -21,13 +21,14 @@ const possibleBookingTypes: bookingStatusType[] = [
 ];
 
 function Booking() {
+  const [totalFeatureCharges, setTotalFeatureCharges] = useState(0);
   const { bookingId } = useParams<{ bookingId: string }>();
   const [hallData, setHallData] = useState<EachHallType>();
   const [editingMode, setEditingMode] = useState(false);
   const [editedData, setEditedData] = useState<HallBookingType>();
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
-  let totalFeatureCharges = 0;
+  // let totalFeatureCharges = 0;
 
   const { data, error, isFetching } = useQuery({
     queryKey: [`booking/${bookingId}`],
@@ -55,7 +56,7 @@ function Booking() {
     },
     staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
-  console.log("The data is ",data)
+  console.log("The data is ", data);
 
   const {
     data: allBookingData,
@@ -68,7 +69,7 @@ function Booking() {
         params: {
           from: data?.from,
           to: data?.to,
-          hallId:data?.hallId
+          hallId: data?.hallId,
         },
       });
       console.log(response.data);
@@ -82,7 +83,6 @@ function Booking() {
   });
 
   console.log(allBookingData);
-
 
   // Seperate mutation for confirm and save booking
 
@@ -113,6 +113,22 @@ function Booking() {
       console.log(error);
     },
   });
+
+  useEffect(() => {
+    if (editingMode && editedData) {
+      const newTotalFeatureCharges = editedData.features.reduce(
+        (acc, feature) => acc + (feature.price || 0),
+        0
+      );
+      setTotalFeatureCharges(newTotalFeatureCharges);
+    } else if (data) {
+      const newTotalFeatureCharges = data.features.reduce(
+        (acc, feature) => acc + (feature.price || 0),
+        0
+      );
+      setTotalFeatureCharges(newTotalFeatureCharges);
+    }
+  }, [editingMode, editedData, data]);
 
   const editBookingStatus = useMutation({
     mutationFn: async (newStatus: bookingStatusType) => {
@@ -301,13 +317,13 @@ function Booking() {
     for (let booking of allBookingData) {
       // Check if the status of the current booking is "CONFIRMED"
       if (booking.status === "CONFIRMED") {
-        toast.error("There is already a confirmed hall in this session")
+        toast.error("There is already a confirmed hall in this session");
         return true;
       }
     }
     // If no booking with status "CONFIRMED" is found, return false
     return false;
-  }
+  };
 
   if (isFetching) return <h1>Loading</h1>;
 
@@ -658,30 +674,25 @@ function Booking() {
             <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
               <span>Additional Feature Charges</span>
               {editingMode ? (
-                <input
-                  type="number"
-                  value={editedData?.features[index]?.price || ""}
-                  onChange={(e) =>
-                    setEditedData((prev) => {
-                      if (!prev) return prev; // Return previous state if undefined
-                      const updatedFeatures = prev.features.map((feature, i) =>
-                        i === index
-                          ? { ...feature, price: parseInt(e.target.value) }
-                          : feature
-                      );
-                      let totalFeatureCharges = 0;
-
-                          if (editingMode) {
-                            totalFeatureCharges = editedData?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0;
-                          } else {
-                            totalFeatureCharges = data?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0;
-                          }
-                      return {
-                        ...prev,
-                        features: updatedFeatures,
-                      };
-                    })
-                  }
+              <input
+                type="number"
+                value={editedData?.features[index]?.price || ""}
+                onChange={(e) =>
+                  setEditedData((prev) => {
+                    if (!prev) return prev;
+                    const updatedFeatures = prev.features.map((feature, i) =>
+                      i === index
+                        ? { ...feature, price: parseInt(e.target.value) || 0 }
+                        : feature
+                    );
+                    const newTotalFeatureCharges = updatedFeatures.reduce((acc, feature) => acc + (feature.price || 0), 0);
+                    setTotalFeatureCharges(newTotalFeatureCharges);
+                    return {
+                      ...prev,
+                      features: updatedFeatures,
+                    };
+                  })
+                }
                   placeholder="Enter Charges"
                   className="px-2"
                 />
@@ -700,7 +711,11 @@ function Booking() {
       <span className=" text-lg font-medium">Billing</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Total Hall Charges</span>
-        <span className="w-full text-right">{data?.price || "-"}</span>
+        <span className="w-full text-right">
+          {editingMode
+            ? (editedData?.price || 0) + totalFeatureCharges
+            : (data?.price || 0) + totalFeatureCharges}
+        </span>
       </div>
 
       {editingMode ? (
@@ -861,45 +876,55 @@ function Booking() {
       </div>
 
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-      <span className="w-full text-left">Total Payable Amount</span>
-  <span className="w-full text-right">
-    <span className="w-full text-right">
-    {data?.booking_type == "SVKM INSTITUTE"? (
-        <div>
-          {data
-        ? (
-                data.price -
-                0.01 * data.baseDiscount * data.price +
-                (data.isDeposit
-              ? data.deposit - 0.01 * data.depositDiscount * data.deposit
-                  : 0) +
-                (editingMode
-                ? editedData?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0
-                  : data?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0 )
-              )
-            : 0}
-        </div>
-      ) : (
-        <div>
-          {data
-        ? (
-                data.price -
-                0.01 * data.baseDiscount * data.price +
-                0.18 *
-                  (data.price - 0.01 * data.baseDiscount * data.price) +
-                (data.isDeposit
-              ? data.deposit - 0.01 * data.depositDiscount * data.deposit
-                  : 0) +
-                (editingMode
-                ? editedData?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0
-                  : data?.features?.reduce((acc, feature) => acc + feature.price, 0) || 0)
-              )
-            : 0}
-        </div>
-      )}
-    </span>
-  </span>
-</div>
+        <span className="w-full text-left">Total Payable Amount</span>
+        <span className="w-full text-right">
+          <span className="w-full text-right">
+            {data?.booking_type == "SVKM INSTITUTE" ? (
+              <div>
+                {data
+                  ? data.price -
+                    0.01 * data.baseDiscount * data.price +
+                    (data.isDeposit
+                      ? data.deposit -
+                        0.01 * data.depositDiscount * data.deposit
+                      : 0) +
+                    (editingMode
+                      ? editedData?.features?.reduce(
+                          (acc, feature) => acc + feature.price,
+                          0
+                        ) || 0
+                      : data?.features?.reduce(
+                          (acc, feature) => acc + feature.price,
+                          0
+                        ) || 0)
+                  : 0}
+              </div>
+            ) : (
+              <div>
+                {data
+                  ? data.price -
+                    0.01 * data.baseDiscount * data.price +
+                    0.18 *
+                      (data.price - 0.01 * data.baseDiscount * data.price) +
+                    (data.isDeposit
+                      ? data.deposit -
+                        0.01 * data.depositDiscount * data.deposit
+                      : 0) +
+                    (editingMode
+                      ? editedData?.features?.reduce(
+                          (acc, feature) => acc + feature.price,
+                          0
+                        ) || 0
+                      : data?.features?.reduce(
+                          (acc, feature) => acc + feature.price,
+                          0
+                        ) || 0)
+                  : 0}
+              </div>
+            )}
+          </span>
+        </span>
+      </div>
       {editingMode ? (
         <button
           onClick={handleSave}
@@ -1173,13 +1198,13 @@ function Booking() {
             {/* Confirmed button with saving the edits */}
             <button
               onClick={async () => {
-                 if (!confirmExists() && paymentDetails()) {
-                    await confirmAndSaveBooking.mutateAsync();
-                  }
-                 }}
-               className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
+                if (!confirmExists() && paymentDetails()) {
+                  await confirmAndSaveBooking.mutateAsync();
+                }
+              }}
+              className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
             >
-             Confirmed
+              Confirmed
             </button>
           </span>
         </>
