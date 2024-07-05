@@ -39,8 +39,7 @@ const date = extractDate(bookingDetails.startTime);
         Enquiry Successful for {bookingDetails.hallName}
       </h1>
       <p className="text-center">
-        Thank you for your enquiry! Keep an eye on your email inbox to get
-        further details.
+        Thank you for your enquiry! For further details please check your inbox.
       </p>
       {bookingDetails && (
         <>
@@ -70,12 +69,8 @@ const date = extractDate(bookingDetails.startTime);
                   </td>
                 </tr>
                 <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">Hall Changes</td>
+                  <td className="font-medium py-2 w-1/2">Hall Charges</td>
                   <td className="w-1/2">₹{bookingDetails.estimatedPrice}</td>
-                </tr>
-                <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">Security Deposit</td>
-                  <td className="w-1/2">₹{bookingDetails.securityDeposit}</td>
                 </tr>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">
@@ -94,6 +89,11 @@ const date = extractDate(bookingDetails.startTime);
                       : "None"}
                   </td>
                 </tr>
+                <tr className="border-b-2">
+                  <td className="font-medium py-2 w-1/2">Security Deposit</td>
+                  <td className="w-1/2">₹{bookingDetails.securityDeposit}</td>
+                </tr>
+                
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">Total Payable</td>
                   {bookingDetails.paymentType=='SVKM INSTITUTE'?

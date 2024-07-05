@@ -14,6 +14,8 @@ const Login: React.FC = () => {
   ]);
 
   const handleLogin = async () => {
+    console.log("Login attempt")
+
     try {
       const responsePromise = axiosMasterInstance.post("/loginAdmin", {
         email,
@@ -21,19 +23,19 @@ const Login: React.FC = () => {
       });
 
       toast.promise(responsePromise, {
-        success: "LOGGED IN",
         pending: "logging in...",
         error: "Failed to log in. check ur email, password",
       });
-
       const response = await responsePromise;
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.data.role ==="MASTER") {
+        toast.success("Logged in")
         const data = await response.data;
         login(email, password);
-        console.log(data);
+        console.log("The login data is ",data);
         window.location.href = "/";
       } else {
+        toast.error("Failed to log in. check ur email, password")
         setErrorMessage("Invalid login credentials");
       }
     } catch (error) {
