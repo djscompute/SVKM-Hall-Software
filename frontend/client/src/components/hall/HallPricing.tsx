@@ -1,17 +1,21 @@
 import { EachHallType } from "../../types/Hall.types";
+import { convertTo12Hour } from "../../utils/convert_IST_TimeString_To12HourFormat";
 
 function HallPricing({ data }: { data: EachHallType }) {
+
+
+
   return (
     <div className="flex flex-col gap-3 w-full">
       <h1 className="text-base sm:text-lg md:text-2xl font-medium">
-        Pricing
+        Pricing 
       </h1>
       {data.sessions.map((session,index)=>(
         <div className="flex flex-col text-lg my-2" key={index}>
             <div className="flex my-2">
                 <span className="font-semibold w-[220px]">{session.name}</span>
-                <span className="w-[200px]">From: {session.from}</span>
-                <span className="w-[200px]">To: {session.to}</span>
+                <span className="w-[200px]">From: {convertTo12Hour(session.from)}</span>
+                <span className="w-[200px]">To: {convertTo12Hour(session.to)}</span>
             </div>
             <div className="flex  flex-col w-full">
                 <div className="w-full justify-evenly text-center hidden lg:flex">
