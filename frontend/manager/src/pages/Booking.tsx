@@ -10,7 +10,7 @@ import {
 } from "../../../../types/global";
 import { useParams } from "react-router-dom";
 // import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { queryClient } from "../App";
 
 const possibleBookingTypes: bookingStatusType[] = [
@@ -21,16 +21,19 @@ const possibleBookingTypes: bookingStatusType[] = [
 ];
 
 function Booking() {
+  const [totalFeatureCharges, setTotalFeatureCharges] = useState(0);
   const { bookingId } = useParams<{ bookingId: string }>();
   const [hallData, setHallData] = useState<EachHallType>();
   const [editingMode, setEditingMode] = useState(false);
   const [editedData, setEditedData] = useState<HallBookingType>();
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
+  // let totalFeatureCharges = 0;
 
   const { data, error, isFetching } = useQuery({
     queryKey: [`booking/${bookingId}`],
     queryFn: async () => {
+      // eslint-disable-next-line no-useless-catch
       try {
         const responsePromise = axiosManagerInstance.get(
           `getBookingByID?_id=${bookingId}`
@@ -53,17 +56,93 @@ function Booking() {
     },
     staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
+  console.log("The data is ", data);
+
+  const {
+    data: allBookingData,
+    error: bookingError,
+    isFetching: bookingIsFetching,
+  } = useQuery({
+    queryKey: [`bookings-${data?.from}-${data?.to}`],
+    queryFn: async () => {
+      const response = await axiosManagerInstance.get("getBooking", {
+        params: {
+          from: data?.from,
+          to: data?.to,
+          hallId: data?.hallId,
+        },
+      });
+      console.log(response.data);
+      if (response.data.message == "No bookings found for the specified range.")
+        return [];
+      // sort based of from
+      response.data.sort((a: any, b: any) => dayjs(a.from).diff(dayjs(b.from)));
+      return response.data;
+    },
+    staleTime: 1 * 60 * 1000, // Data is considered fresh for 1 minutes
+  });
+
+  console.log(allBookingData);
+
+  // Seperate mutation for confirm and save booking
+
+  const confirmAndSaveBooking = useMutation({
+    mutationFn: async () => {
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${bookingId}`,
+        {
+          ...editedData,
+          status: "CONFIRMED" as bookingStatusType,
+        }
+      );
+      toast.promise(responsePromise, {
+        pending: "Updating and Confirming Booking...",
+        success: "Booking Confirmed and Updated Successfully!",
+        error: "Failed to Confirm and Update Booking. Please try again.",
+      });
+      const response = await responsePromise;
+      return response.data;
+    },
+    onSuccess: async () => {
+      setEditingMode(false);
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${bookingId}`],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  useEffect(() => {
+    if (editingMode && editedData) {
+      const newTotalFeatureCharges = editedData.features.reduce(
+        (acc, feature) => acc + (feature.price || 0),
+        0
+      );
+      setTotalFeatureCharges(newTotalFeatureCharges);
+    } else if (data) {
+      const newTotalFeatureCharges = data.features.reduce(
+        (acc, feature) => acc + (feature.price || 0),
+        0
+      );
+      setTotalFeatureCharges(newTotalFeatureCharges);
+    }
+  }, [editingMode, editedData, data]);
 
   const editBookingStatus = useMutation({
     mutationFn: async (newStatus: bookingStatusType) => {
       console.log(hallData);
-      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
-        ...data,
-        status: newStatus,
-        cancellationReason: showCancellationReason
-          ? cancellationReason
-          : undefined,
-      });
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${bookingId}`,
+        {
+          ...data,
+          status: newStatus,
+          cancellationReason: showCancellationReason
+            ? cancellationReason
+            : undefined,
+        }
+      );
       toast.promise(responsePromise, {
         pending: "Updating...",
         success: "Booking Status Edited!",
@@ -86,13 +165,16 @@ function Booking() {
 
   const editTransactionType = useMutation({
     mutationFn: async (newTransaction: transactionType) => {
-      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
-        ...data,
-        transaction: {
-          ...data?.transaction,
-          type: newTransaction,
-        },
-      });
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${bookingId}`,
+        {
+          ...data,
+          transaction: {
+            ...data?.transaction,
+            type: newTransaction,
+          },
+        }
+      );
       toast.promise(responsePromise, {
         pending: "Updating...",
         success: "Booking Status Edited!",
@@ -114,10 +196,13 @@ function Booking() {
 
   const editIsDepositApplicable = useMutation({
     mutationFn: async (newDeposit: boolean) => {
-      const responsePromise = axiosManagerInstance.post(`/editBooking/${bookingId}`, {
-        ...data,
-        isDeposit: newDeposit,
-      });
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${bookingId}`,
+        {
+          ...data,
+          isDeposit: newDeposit,
+        }
+      );
       toast.promise(responsePromise, {
         pending: "Updating...",
         success: "Booking Status Edited!",
@@ -194,6 +279,50 @@ function Booking() {
     await queryClient.refetchQueries({
       queryKey: [`booking/${bookingId}`],
     });
+  };
+
+  const paymentDetails = () => {
+    if (["cheque"].includes(data?.transaction?.type || "")) {
+      if (
+        editedData?.transaction.date &&
+        editedData?.transaction.chequeNo &&
+        editedData?.transaction.bank &&
+        editedData?.transaction.payeeName
+      ) {
+        return true;
+      }
+    }
+    if (["upi"].includes(data?.transaction?.type || "")) {
+      if (
+        editedData?.transaction.date &&
+        editedData?.transaction.transactionID
+      ) {
+        return true;
+      }
+    }
+    if (["neft/rtgs"].includes(data?.transaction?.type || "")) {
+      if (editedData?.transaction.date && editedData?.transaction.utrNo) {
+        return true;
+      }
+    }
+    if (["svkminstitute"].includes(data?.transaction?.type || "")) {
+      return true;
+    }
+    toast.error("Please enter the payment details");
+    return false;
+  };
+
+  const confirmExists = () => {
+    // Iterate through each booking in the array
+    for (let booking of allBookingData) {
+      // Check if the status of the current booking is "CONFIRMED"
+      if (booking.status === "CONFIRMED") {
+        toast.error("There is already a confirmed hall in this session");
+        return true;
+      }
+    }
+    // If no booking with status "CONFIRMED" is found, return false
+    return false;
   };
 
   if (isFetching) return <h1>Loading</h1>;
@@ -360,9 +489,7 @@ function Booking() {
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">GST No</span>
-          <span className="w-full text-right">
-            {data?.user.gstNo || "-"}
-          </span>
+          <span className="w-full text-right">{data?.user.gstNo || "-"}</span>
         </div>
       )}
 
@@ -492,32 +619,109 @@ function Booking() {
         <span className="w-full text-right">{data?.purpose || "-"}</span>
       </div>
       <span className=" text-lg font-medium">Additional Features</span>
-      {!data?.features.length ? <p className="text-lg font-medium">No Additional Features Selected</p> : <></>}
-      {data?.features.map((eachFeature, index) => (
-        <div key={index} className="flex flex-col w-full mb-2">
-          <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>Name</span>
-            <span>{eachFeature.heading || "-"}</span>
+
+      {!data?.features.length ? (
+        <p className="text-lg font-medium">No Additional Features Selected</p>
+      ) : (
+        data?.features.map((eachFeature, index) => (
+          <div key={index} className="flex flex-col w-full mb-2">
+            <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+              <span>Name</span>
+              {editingMode ? (
+                <input
+                  type="text"
+                  value={editedData?.features[index]?.heading}
+                  onChange={(e) =>
+                    setEditedData((prev) => {
+                      if (!prev) return undefined;
+                      return {
+                        ...prev,
+                        features: prev.features.map((feature, i) =>
+                          i === index
+                            ? { ...feature, heading: e.target.value }
+                            : feature
+                        ),
+                      };
+                    })
+                  }
+                  placeholder="Enter Name"
+                  className="px-2"
+                />
+              ) : (
+                <span>{eachFeature.heading || "-"}</span>
+              )}
+            </div>
+            <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+              <span>Description</span>
+              {editingMode ? (
+                <input
+                  type="text"
+                  value={editedData?.features[index]?.desc}
+                  onChange={(e) =>
+                    setEditedData((prev) => {
+                      if (!prev) return undefined;
+                      return {
+                        ...prev,
+                        features: prev.features.map((feature, i) =>
+                          i === index
+                            ? { ...feature, desc: e.target.value }
+                            : feature
+                        ),
+                      };
+                    })
+                  }
+                  placeholder="Enter Description"
+                  className="px-2"
+                />
+              ) : (
+                <span>{eachFeature.desc || "-"}</span>
+              )}
+            </div>
+            <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+              <span>Additional Feature Charges</span>
+              {editingMode ? (
+              <input
+                type="number"
+                value={editedData?.features[index]?.price || ""}
+                onChange={(e) =>
+                  setEditedData((prev) => {
+                    if (!prev) return prev;
+                    const updatedFeatures = prev.features.map((feature, i) =>
+                      i === index
+                        ? { ...feature, price: parseInt(e.target.value) || 0 }
+                        : feature
+                    );
+                    const newTotalFeatureCharges = updatedFeatures.reduce((acc, feature) => acc + (feature.price || 0), 0);
+                    setTotalFeatureCharges(newTotalFeatureCharges);
+                    return {
+                      ...prev,
+                      features: updatedFeatures,
+                    };
+                  })
+                }
+                  placeholder="Enter Charges"
+                  className="px-2"
+                />
+              ) : (
+                <span>
+                  {data?.booking_type === "SVKM Institute"
+                    ? 0
+                    : eachFeature.price || "-"}
+                </span>
+              )}
+            </div>
           </div>
-          <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>Description</span>
-            <span>{eachFeature.desc || "-"}</span>
-          </div>
-          <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span>Additional Feature Charges</span>
-            <span>
-              {data?.booking_type === "SVKM Institute"
-                ? 0
-                : eachFeature.price || "-"}
-            </span>
-          </div>
-        </div>
-      ))}
+        ))
+      )}
 
       <span className=" text-lg font-medium">Billing</span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Total Hall Charges</span>
-        <span className="w-full text-right">{data?.price || "-"}</span>
+        <span className="w-full text-right">
+          {editingMode
+            ? (editedData?.price || 0) + totalFeatureCharges
+            : (data?.price || 0) + totalFeatureCharges}
+        </span>
       </div>
 
       {editingMode ? (
@@ -561,19 +765,31 @@ function Booking() {
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">CGST %</span>
+        <span className="w-full text-left">CGST 9%</span>
         <span className="w-full text-right">
-          {data?.price
-            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
-            : "-"}
+          {data?.booking_type == "SVKM INSTITUTE" ? (
+            <div>0</div>
+          ) : (
+            <div>
+              {data?.price
+                ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
+                : "-"}
+            </div>
+          )}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">SGST %</span>
+        <span className="w-full text-left">SGST 9%</span>
         <span className="w-full text-right">
-          {data?.price
-            ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
-            : "-"}
+          {data?.booking_type == "SVKM INSTITUTE" ? (
+            <div>0</div>
+          ) : (
+            <div>
+              {data?.price
+                ? 0.09 * (data?.price - 0.01 * data?.baseDiscount * data?.price)
+                : "-"}
+            </div>
+          )}
         </span>
       </div>
       <span>
@@ -742,41 +958,54 @@ function Booking() {
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Total Payable Amount</span>
         <span className="w-full text-right">
-          {data
-            ? data?.price -
-              (0.01 * data?.baseDiscount * data?.price )+
-              0.18 * (data?.price - 0.01 * data?.baseDiscount * data?.price) +
-              (data.isDeposit
-                ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
-                : 0)
-            : 0} 
 
-          
+          <span className="w-full text-right">
+            {data?.booking_type == "SVKM INSTITUTE" ? (
+              <div>
+                {data
+                  ? data.price -
+                    0.01 * data.baseDiscount * data.price +
+                    (data.isDeposit
+                      ? data.deposit -
+                        0.01 * data.depositDiscount * data.deposit
+                      : 0) +
+                    (editingMode
+                      ? editedData?.features?.reduce(
+                          (acc, feature) => acc + feature.price,
+                          0
+                        ) || 0
+                      : data?.features?.reduce(
+                          (acc, feature) => acc + feature.price,
+                          0
+                        ) || 0)
+                  : 0}
+              </div>
+            ) : (
+              <div>
+                {data
+                  ? data.price -
+                    0.01 * data.baseDiscount * data.price +
+                    0.18 *
+                      (data.price - 0.01 * data.baseDiscount * data.price) +
+                    (data.isDeposit
+                      ? data.deposit -
+                        0.01 * data.depositDiscount * data.deposit
+                      : 0) +
+                    (editingMode
+                      ? editedData?.features?.reduce(
+                          (acc, feature) => acc + feature.price,
+                          0
+                        ) || 0
+                      : data?.features?.reduce(
+                          (acc, feature) => acc + feature.price,
+                          0
+                        ) || 0)
+                  : 0}
+              </div>
+            )}
+          </span>
         </span>
       </div>
-
-
-
-        </>
-      }
-
-      {/* <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Total Payable Amount</span>
-        <span className="w-full text-right">
-          {data?.isDeposit} is
-          {data
-            ? data?.price -
-              (0.01 * data?.baseDiscount * data?.price )+
-              0.18 * (data?.price - 0.01 * data?.baseDiscount * data?.price) +
-              (data.isDeposit
-                ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
-                : 0)
-            : 0} 
-
-          
-        </span>
-      </div> */}
-
       {editingMode ? (
         <button
           onClick={handleSave}
@@ -784,8 +1013,10 @@ function Booking() {
         >
           Save Details
         </button>
-      ) : <></>}
-      
+      ) : (
+        <></>
+      )}
+
       <span className="text-lg font-medium">Transaction Details</span>
       <span>
         <label htmlFor="transaction">Choose a Transaction Type </label>
@@ -1027,27 +1258,36 @@ function Booking() {
 
       {editingMode ? (
         <>
-        <h1 className="text-lg font-medium">Set Booking Status</h1>
-        <span className="space-x-4 space-y-4">
-          <button
-            onClick={() => {setShowCancellationReason(true)}}
-            className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
-          >
-            Cancelled
-          </button>
-          <button
-            onClick={() => {editBookingStatus.mutate("ENQUIRY" as bookingStatusType)}}
-            className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
-          >
-            Enquiry
-          </button>
-          <button
-            onClick={async () => {editBookingStatus.mutate("CONFIRMED" as bookingStatusType)}}
-            className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
-          >
-            Confirmed
-          </button>
-        </span>
+          <h1 className="text-lg font-medium">Set Booking Status</h1>
+          <span className="space-x-4 space-y-4">
+            <button
+              onClick={() => {
+                setShowCancellationReason(true);
+              }}
+              className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
+            >
+              Cancelled
+            </button>
+            <button
+              onClick={() => {
+                editBookingStatus.mutate("ENQUIRY" as bookingStatusType);
+              }}
+              className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+            >
+              Enquiry
+            </button>
+            {/* Confirmed button with saving the edits */}
+            <button
+              onClick={async () => {
+                if (!confirmExists() && paymentDetails()) {
+                  await confirmAndSaveBooking.mutateAsync();
+                }
+              }}
+              className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
+            >
+              Confirmed
+            </button>
+          </span>
         </>
       ) : (
         <></>

@@ -31,7 +31,7 @@ const to = convert_IST_TimeString_To12HourFormat(
 const date = extractDate(bookingDetails.startTime);
 
 
-  console.log("HEREEE", bookingDetails.additionalFeatures);
+  console.log("HEREEE", bookingDetails);
 
   return (
     <div className="flex flex-col py-4 gap-6 md:w-2/3 lg:w-1/2 mx-auto">
@@ -39,8 +39,7 @@ const date = extractDate(bookingDetails.startTime);
         Enquiry Successful for {bookingDetails.hallName}
       </h1>
       <p className="text-center">
-        Thank you for your enquiry! Keep an eye on your email inbox to get
-        further details.
+        Thank you for your enquiry! For further details please check your inbox.
       </p>
       {bookingDetails && (
         <>
@@ -70,16 +69,12 @@ const date = extractDate(bookingDetails.startTime);
                   </td>
                 </tr>
                 <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">Base Cost</td>
+                  <td className="font-medium py-2 w-1/2">Hall Charges</td>
                   <td className="w-1/2">₹{bookingDetails.estimatedPrice}</td>
                 </tr>
                 <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">Security Deposit</td>
-                  <td className="w-1/2">₹{bookingDetails.securityDeposit}</td>
-                </tr>
-                <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">
-                    Additional Features
+                    Additional Facilities
                   </td>
                   <td className="w-1/2">
                     {bookingDetails.additionalFeatures
@@ -95,12 +90,19 @@ const date = extractDate(bookingDetails.startTime);
                   </td>
                 </tr>
                 <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">Total Estimated Cost</td>
-                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} + GST (if applicable)</td>
+                  <td className="font-medium py-2 w-1/2">Security Deposit</td>
+                  <td className="w-1/2">₹{bookingDetails.securityDeposit}</td>
+                </tr>
+                
+                <tr className="border-b-2">
+                  <td className="font-medium py-2 w-1/2">Total Payable</td>
+                  {bookingDetails.paymentType=='SVKM INSTITUTE'?
+                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} </td>
+                  :
+                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} + GST (if applicable)</td>}
                 </tr>
                 <tr>
                   <p className=" text-sm font-bold pt-1 text-red-400">*GST is applicable as per prevailing rates.</p>
-                  <p className=" text-sm font-bold text-red-400">*Security deposits to be displayed.</p>
                 </tr>
               </tbody>
             </table>
