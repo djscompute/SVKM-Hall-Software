@@ -109,6 +109,18 @@ export const IdAdminZodSchema = z.object({
   }),
 });
 
+export const DeleteAdminZodSchema = z.object({
+  body: z
+    .object({
+      _id: z.string({
+        required_error: "_id cannot be empty",
+        invalid_type_error: "_id should be a string value.",
+      }),
+    })
+    .strict(),
+});
+
+
 
 
 //type
@@ -118,6 +130,10 @@ export type CreateAdminReqType = {
 
 export type LoginAdminReqType = {
   body: Pick<adminType, "email" | "password">;
+};
+
+export type DeleteAdminReqType = {
+  body: Pick<adminType, "_id">;
 };
 
 // type createadminType = z.infer<typeof CreateUserZodSchema>

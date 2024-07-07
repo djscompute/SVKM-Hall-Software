@@ -19,3 +19,15 @@ export async function updateUserById(userId: string, updateData: Partial<adminTy
     return null;
   }
 }
+
+export async function deleteAdminById(id: string) {
+  try {
+    const admin = await Admin.findByIdAndDelete(id);
+    if (!admin) {
+      throw new Error("Admin not found");
+    }
+    return admin;
+  } catch (error) {
+    throw error;
+  }
+}
