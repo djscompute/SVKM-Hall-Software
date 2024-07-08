@@ -93,28 +93,31 @@ function EachDay({
   function appendEmptySessions() {
     // Create a new array to store the result
     const appendedArray = JSON.parse(JSON.stringify(finalArr));
-  
+
     // Create a Set of existing sessionIds for quick lookup
-    const existingSessionIds = new Set(appendedArray.map((item: { sessionId: any; }) => item.sessionId));
-  
+    const existingSessionIds = new Set(
+      appendedArray.map((item: { sessionId: any }) => item.sessionId)
+    );
+
     // Iterate through HallSessionsArray
-    HallSessionsArray.forEach(session => {
+    HallSessionsArray.forEach((session) => {
       // Check if the session is active and its ID doesn't exist in finalArr
       if (session.active && !existingSessionIds.has(session._id)) {
         // Add a new entry with empty subarray
         appendedArray.push({
           sessionId: session._id,
-          subarray: []
+          subarray: [],
         });
       }
     });
-    return appendedArray
+    return appendedArray;
   }
 
   function hasAllSessionsConfirmed() {
-    const appendedArray: { sessionId: string; subarray: HallBookingType[] }[] = appendEmptySessions()
-    return appendedArray.every(session => 
-      session.subarray.some(booking => booking.status === "CONFIRMED")
+    const appendedArray: { sessionId: string; subarray: HallBookingType[] }[] =
+      appendEmptySessions();
+    return appendedArray.every((session) =>
+      session.subarray.some((booking) => booking.status === "CONFIRMED")
     );
   }
 
@@ -134,7 +137,7 @@ function EachDay({
         {i}
       </span>
       {/* SLOT INFO */}
-      {finalArr.length > 0 ? (
+      {/* {finalArr.length > 0 ? (
         <>
           <div className="hidden lg:flex flex-col items-center justify-start gap-1 w-full">
             {finalArr.map((eachSessionGroup) => (
@@ -146,6 +149,15 @@ function EachDay({
                     )?.name
                   }
                 </span>
+                {HallSessionsArray.map((session) =>
+                  session.active ? (
+                    <span
+                      className="overflow-x-auto font-medium pt-2 px-1 text-center bg-gray-300"
+                    >
+                      {session.name}
+                    </span>
+                  ) : null
+                )}
                 {eachSessionGroup.subarray.map((eachBookingInfo) => (
                   <a
                     href={`/booking/${eachBookingInfo._id}`}
@@ -165,17 +177,53 @@ function EachDay({
         </>
       ) : (
         <span className="my-auto mx-auto">---</span>
+      )} */}
+
+      {HallSessionsArray.map((session) =>
+        session.active ? (
+          <>
+            <span className="overflow-x-auto font-medium pt-2 px-1 text-center bg-gray-300 w-[-webkit-fill-available]">
+              {session.name}
+            </span>
+            {finalArr.map((eachSessionGroup) => (
+              <div className="w-[-webkit-fill-available]" key={eachSessionGroup.sessionId}>
+                {eachSessionGroup.subarray
+                  .filter(
+                    (eachBookingInfo) =>
+                      session._id === eachSessionGroup.sessionId
+                  )
+                  .map((eachBookingInfo) => (
+                    <a
+                      key={eachBookingInfo._id}
+                      href={`/booking/${eachBookingInfo._id}`}
+                      className={`flex flex-col justify-between items-center w-full ${getSlotColour(
+                        eachBookingInfo.status
+                      )} px-2 overflow-x-auto cursor-pointer`}
+                    >
+                      <span className="text-center w-full border-b border-gray-500 truncate ">
+                        {eachBookingInfo.user.username} -{" "}
+                        {eachBookingInfo.user.mobile}
+                      </span>
+                    </a>
+                  ))}
+              </div>
+            ))}
+          </>
+        ) : null
       )}
-      {!hasAllSessionsConfirmed() && <div
-        className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 my-2 mx-auto w-fit rounded-md cursor-pointer"
-        onClick={openEnquireTab}
-        data-hall-id={hallId}
-        data-date={dayjs(currentDate)
-          .add(i - 1, "day")
-          .format("YYYY-MM-DD")}
-      >
-        New Booking
-      </div>}
+
+      {!hasAllSessionsConfirmed() && (
+        <div
+          className="hidden lg:block bg-blue-700 hover:bg-blue-800 active:bg-blue-300 text-white text-center text-xs p-1 my-2 mx-auto w-fit rounded-md cursor-pointer"
+          onClick={openEnquireTab}
+          data-hall-id={hallId}
+          data-date={dayjs(currentDate)
+            .add(i - 1, "day")
+            .format("YYYY-MM-DD")}
+        >
+          New Booking
+        </div>
+      )}
     </div>
   );
 }
