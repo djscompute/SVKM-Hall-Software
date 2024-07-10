@@ -970,7 +970,7 @@ function Booking() {
                         0.01 * data.depositDiscount * data.deposit
                       : 0) +
                     (editingMode
-                      ? editedData?.features?.reduce(
+                      ? editedData!.features?.reduce(
                           (acc, feature) => acc + feature.price,
                           0
                         ) || 0
@@ -992,7 +992,7 @@ function Booking() {
                         0.01 * data.depositDiscount * data.deposit
                       : 0) +
                     (editingMode
-                      ? editedData?.features?.reduce(
+                      ? editedData!.features?.reduce(
                           (acc, feature) => acc + feature.price,
                           0
                         ) || 0
