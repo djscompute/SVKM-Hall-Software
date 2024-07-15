@@ -31,7 +31,7 @@ function Report8() {
   });
 
   const [data, setData] = useState<any>();
-  const [selectedHall, setSelectedHall] = useState<string>();
+  const [selectedHall, setSelectedHall] = useState<string>("All");
   const [selectedHallId, setSelectedHallId] = useState<string>("All");
   const [selectedSession, setSelectedSession] = useState<string>("All");
   const [selectedCategory, setSelectedCategory] = useState<string>();
@@ -153,7 +153,7 @@ function Report8() {
       error: "Failed to fetch Report. Please contact maintainer.",
     });
     const response = await responsePromise;
-    console.log(response.data);
+    console.log("data here ", response.data);
     setData(response.data);
   };
 
@@ -343,98 +343,132 @@ function Report8() {
 
       {/* Display Data */}
       {data?.length && (
-        <div className="flex flex-col items-center w-full overflow-x-auto mt-5">
-          <span className="font-medium text-lg my-5">
-            Showing analytics from {humanReadableRequest.fromHuman} to{" "}
-            {humanReadableRequest.toHuman}
-          </span>
-          <div className=" flex flex-row items-center gap-3 mb-3">
-            <span className="font-medium ">{data?.length} entries found </span>
-            <button
-              onClick={downloadCsv}
-              className="flex items-center gap-2 bg-green-500 border-green-600 border text-white text-sm font-bold px-2 py-1 rounded-lg shadow-xl"
-            >
-              Download
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="2.5"
-                stroke="currentColor"
-                className="w-5 h-5"
+        <div className="flex flex-col w-full mt-5">
+          <div className="flex flex-col w-full items-center ">
+            <span className="font-medium text-lg my-5">
+              Showing analytics from {humanReadableRequest.fromHuman} to{" "}
+              {humanReadableRequest.toHuman}
+            </span>
+            <div className=" flex flex-row items-center gap-3 mb-3">
+              <span className="font-medium ">
+                {data?.length} entries found{" "}
+              </span>
+              <button
+                onClick={downloadCsv}
+                className="flex items-center gap-2 bg-green-500 border-green-600 border text-white text-sm font-bold px-2 py-1 rounded-lg shadow-xl"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
-                />
-              </svg>
-            </button>
+                Download
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2.5"
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
-          <table className="min-w-full table-auto">
-            <thead className="bg-gray-800 text-white">
-              <tr>
-                <th className="px-4 py-2 text-center">Date</th>
-                <th className="px-4 py-2 text-center">Hall Name</th>
-                <th className="px-4 py-2 text-center">Session</th>
-                <th className="px-4 py-2 text-center">Additional Facility</th>
-                <th className="px-4 py-2 text-center">Manager Name</th>
-                <th className="px-4 py-2 text-center">Customer Category</th>
-                <th className="px-4 py-2 text-center">Customer Name</th>
-                <th className="px-4 py-2 text-center">Contact Person</th>
-                <th className="px-4 py-2 text-center">Contact No.</th>
-                {responseHallCharges && (
-                  <th className="px-4 py-2 text-center">Booking Amount</th>
-                )}
-                {responseHallCharges && (
-                  <th className="px-4 py-2 text-center">Amount Paid</th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((booking: any, index: number) => (
-                <tr key={index} className="bg-white border-b">
-                  <td className="px-4 py-2 text-center">{booking.Date}</td>
-                  <td className="px-4 py-2 text-center">
-                    {booking["Hall Name"]}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {booking["Session"]}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {booking["Additional Facility"]
-                      ? booking["Additional Facility"]
-                      : "None"}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {booking["Manager Name"]}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {booking["Customer Category"]}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {booking["Customer Name"]}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {booking["Contact Person"]}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {booking["Contact No."]}
-                  </td>
+          <div className=" w-full overflow-x-auto">
+            <table className=" overflow-auto overflow-x-scroll">
+              <thead className="bg-gray-800 text-white">
+                <tr>
+                  <th className="px-4 py-2 text-center">Date</th>
+                  <th className="px-4 py-2 text-center">Hall Name</th>
+                  <th className="px-4 py-2 text-center">Session</th>
+                  <th className="px-4 py-2 text-center">Additional Facility</th>
+                  <th className="px-4 py-2 text-center">Manager Name</th>
+                  <th className="px-4 py-2 text-center">Customer Category</th>
+                  <th className="px-4 py-2 text-center">Customer Name</th>
+                  <th className="px-4 py-2 text-center">Contact Person</th>
+                  <th className="px-4 py-2 text-center">Contact No.</th>
                   {responseHallCharges && (
-                    <td className="px-4 py-2 text-center">
-                      {booking["Booking Amount"]}
-                    </td>
+                    <th className="px-4 py-2 text-center">Booking Amount</th>
                   )}
                   {responseHallCharges && (
-                    <td className="px-4 py-2 text-center">
-                      {booking["Amount Paid"]}
-                    </td>
+                    <th className="px-4 py-2 text-center">Amount Paid</th>
                   )}
+                  <th className="px-4 py-2 text-center">transaction type</th>
+                  <th className="px-4 py-2 text-center">date</th>
+                  <th className="px-4 py-2 text-center">transaction id</th>
+                  <th className="px-4 py-2 text-center">payee Name</th>
+                  <th className="px-4 py-2 text-center">utr no.</th>
+                  <th className="px-4 py-2 text-center">cheque no.</th>
+                  <th className="px-4 py-2 text-center">bank</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.map((booking: any, index: number) => (
+                  <tr key={index} className="bg-white border-b">
+                    <td className="px-4 py-2 text-center">{booking.Date}</td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["Hall Name"]}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["Session"]}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["Additional Facility"]
+                        ? booking["Additional Facility"]
+                        : "None"}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["Manager Name"]}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["Customer Category"]}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["Customer Name"]}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["Contact Person"]}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["Contact No."]}
+                    </td>
+                    {responseHallCharges && (
+                      <td className="px-4 py-2 text-center">
+                        {booking["Booking Amount"]}
+                      </td>
+                    )}
+                    {responseHallCharges && (
+                      <td className="px-4 py-2 text-center">
+                        {booking["Amount Paid"]}
+                      </td>
+                    )}
+                    <td className="px-4 py-2 text-center">
+                      {booking["transaction"]?.type}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["transaction"]?.date}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["transaction"]?.transactionID}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["transaction"]?.payeeName}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["transaction"]?.utrNo}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["transaction"]?.chequeNo}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {booking["transaction"]?.bank}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
