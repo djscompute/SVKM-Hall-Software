@@ -31,7 +31,7 @@ function Report8() {
   });
 
   const [data, setData] = useState<any>();
-  const [selectedHall, setSelectedHall] = useState<string>();
+  const [selectedHall, setSelectedHall] = useState<string>("All");
   const [selectedHallId, setSelectedHallId] = useState<string>("All");
   const [selectedSession, setSelectedSession] = useState<string>("All");
   const [selectedCategory, setSelectedCategory] = useState<string>();
