@@ -5,7 +5,7 @@ function HallPricing({ data }: { data: EachHallType }) {
 
   console.log("value is",data.sessions);
 const dataWithActiveSessions=data.sessions.filter((data)=>data.active==true);
-console.log("updated value is",dataWithActiveSessions);
+console.log("updated value ",dataWithActiveSessions);
 
 
   return (
