@@ -212,26 +212,3 @@ export async function getBookingByIdHandler(req: Request, res: Response) {
     res.status(500).json({ message: "Internal server error", error: error });
   }
 }
-export async function getBookingByUser(req: Request, res: Response) {
-  try {
-    const { number } = req.query;
-
-    if (!number) {
-      return res.status(400).json({ message: "Mobile number is required" });
-    }
-
-    const bookings = await BookingModel.find({ 
-      "user.mobile": number.toString(),
-      status: "ENQUIRY"
-    });
-
-    if (bookings.length === 0) {
-      return res.status(404).json({ message: "No bookings found" });
-    }
-
-    return res.status(200).json(bookings);
-  } catch (error) {
-    console.error("Error in getBookingsByUser:", error);
-    res.status(500).json({ message: "Internal server error", error: error });
-  }
-}

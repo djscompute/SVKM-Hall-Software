@@ -96,11 +96,6 @@ export const getBookingByIdZodSchema = z.object({
     _id: z.string(),
   }),
 });
-export const getBookingByUserZodSchema = z.object({
-  query: z.object({
-    number: z.string(),
-  }),
-});
 // THIS IS A FUNCITON TO CREATE UTC STANDARD TIME DATETIME STRING.
 // ZOD SUPPORTS ONLY UTC STANDARD TIME
 // function createDateTimeString(year:number, month:number, day:number, hour:number) {

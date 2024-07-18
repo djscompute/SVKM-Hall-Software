@@ -35,14 +35,12 @@ import {
   AddBookingZodSchema,
   RemoveBookingZodSchema,
   getBookingByIdZodSchema,
-  getBookingByUserZodSchema,
   getBookingZodSchema,
 } from "./schema/booking.schema";
 import {
   addBookingHandler,
   editBookingHandler,
   getBookingByIdHandler,
-  getBookingByUser,
   getBookingHandler,
   getBookingHandlerWithoutUser,
   removeBookingHandler,
@@ -238,12 +236,6 @@ export default function routes(app: Express) {
   app.get("/getBookingByID", [
     validateRequest(getBookingByIdZodSchema),
     getBookingByIdHandler,
-  ]);
-
-  //Get Booking by User
-  app.get("/getBookingByUser", [
-    validateRequest(getBookingByUserZodSchema),
-    getBookingByUser,
   ]);
 
   //Logout a admin
