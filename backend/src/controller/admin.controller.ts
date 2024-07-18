@@ -4,15 +4,30 @@ import createUser from "../service/createAdmin";
 import authenticateUser from "../service/authAdmin";
 import { signAccessToken, signRefreshToken } from "../utils/signToken";
 import {getUserDatabyEmail, getUserDatabyUsername, getUserDatabyId, getUsers} from "../service/getAdminData";
-import { updateUserById } from "../service/updateAdminData";
+import { updateUserById,deleteAdminById } from "../service/updateAdminData";
 import { createSession } from "../service/createSession";
 import { deleteSession } from "../service/deleteSession";
 import { AuthenticatedRequest } from "../types/requests";
 import { HallModel } from "../models/hall.model";
 import { adminType } from "../models/admin.model";
 
+export async function deleteAdminByIdHandler(req: Request, res: Response) {
+  try {
+    const { _id } = req.body;
 
+    const deletedUser = await deleteAdminById(_id);
+    if (!deletedUser) {
+      return res.status(404).json({ error: "Admin not found or already deleted" });
+    }
+
+    return res.status(200).json({ message: "Admin deleted successfully", deletedUser });
+  } catch (error: any) {
+    console.error("Error deleting admin by id:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
 export async function updateAdminByIdHandler(req: Request, res: Response) {
+  console.log()
   try {
     const { _id, ...updateData } = req.body;
 
@@ -233,3 +248,5 @@ export async function getHallsforAdminHandler(req: Request, res: Response) {
     return res.status(500).json({ message: "Internal server error" });
   }
 }
+
+

@@ -3,6 +3,9 @@ import { convertTo12Hour } from "../../utils/convert_IST_TimeString_To12HourForm
 
 function HallPricing({ data }: { data: EachHallType }) {
 
+  console.log("value is",data.sessions);
+const dataWithActiveSessions=data.sessions.filter((data)=>data.active==true);
+console.log("updated value ",dataWithActiveSessions);
 
 
   return (
@@ -10,7 +13,7 @@ function HallPricing({ data }: { data: EachHallType }) {
       <h1 className="text-base sm:text-lg md:text-2xl font-medium">
         Pricing 
       </h1>
-      {data.sessions.map((session,index)=>(
+      {dataWithActiveSessions.map((session,index)=>(
         <div className="flex flex-col text-lg my-2" key={index}>
             <div className="flex my-2">
                 <span className="font-semibold w-[220px]">{session.name}</span>

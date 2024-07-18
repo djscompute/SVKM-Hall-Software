@@ -2,6 +2,7 @@ import { EachHallType } from "../../types/Hall.types";
 import arrowList from "../../assets/arrowList.svg";
 
 function HallAdditionalFeatures({ data }: { data: EachHallType }) {
+  
   return (
     <div className="flex flex-col gap-3 w-full">
       <h1 className="text-base sm:text-lg md:text-2xl font-medium">

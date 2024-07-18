@@ -9,6 +9,7 @@ import {
 } from "./controller/hall.controller";
 import {
   createAdminHandler,
+  deleteAdminByIdHandler,
   getAdminByEmailHandler,
   getAdminByIdHandler,
   getAdminHandler,
@@ -22,6 +23,7 @@ import { validateRequest, validateCookie, validateLogin } from "./middleware/val
 import { AddHallZodSchema, RemoveHallZodSchema } from "./schema/hall.schema";
 import {
   CreateAdminZodSchema,
+  DeleteAdminZodSchema,
   EmailAdminZodSchema,
   IdAdminZodSchema,
   LoginAdminZodSchema,
@@ -131,7 +133,12 @@ export default function routes(app: Express) {
     requireMasterRole,
     updateAdminByIdHandler,
   ])
-
+  app.post("/deleteAdmin", [
+    validateCookie,
+    validateRequest(DeleteAdminZodSchema),
+    requireMasterRole,
+    deleteAdminByIdHandler,
+  ]);
   //Constants routes
   app.post("/createConstant", [
     validateCookie,
