@@ -13,26 +13,21 @@ import { adminType } from "../models/admin.model";
 
 export async function deleteAdminByIdHandler(req: Request, res: Response) {
   try {
-    const userId = req.params.id;
+    const { _id } = req.body;
 
-    const existingUser = await getUserDatabyId(userId);
-    if (!existingUser) {
-      return res.status(404).json({ error: "Admin not found" });
-    }
-
-    // Delete the admin
-    const deletedUser = await deleteAdminById(userId);
+    const deletedUser = await deleteAdminById(_id);
     if (!deletedUser) {
-      return res.status(500).json({ error: "Failed to delete admin" });
+      return res.status(404).json({ error: "Admin not found or already deleted" });
     }
 
-    return res.status(200).json({ message: "Admin deleted successfully" });
+    return res.status(200).json({ message: "Admin deleted successfully", deletedUser });
   } catch (error: any) {
     console.error("Error deleting admin by id:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 }
 export async function updateAdminByIdHandler(req: Request, res: Response) {
+  console.log()
   try {
     const { _id, ...updateData } = req.body;
 

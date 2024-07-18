@@ -20,14 +20,13 @@ export async function updateUserById(userId: string, updateData: Partial<adminTy
   }
 }
 
-export async function deleteAdminById(id: string) {
+
+export async function deleteAdminById(_id: string): Promise<adminType | null> {
   try {
-    const admin = await Admin.findByIdAndDelete(id);
-    if (!admin) {
-      throw new Error("Admin not found");
-    }
-    return admin;
+    const deletedAdmin = await Admin.findByIdAndDelete(_id);
+    return deletedAdmin;
   } catch (error) {
+    console.error("Error deleting admin:", error);
     throw error;
   }
 }

@@ -64,10 +64,11 @@ export default function EditAdmin() {
   
   const handleDeleteAdmin = async () => {
     if (window.confirm("Are you sure you want to delete this admin?")) {
-        try {
-          console.log(`Deleting admin with ID: ${adminId}`);
-          const requestBody = { _id: adminId };
-          const response = await axiosMasterInstance.post("/deleteAdmin", requestBody);
+      console.log(`Deleting admin with ID: ${adminId}`);
+      try {
+        const requestBody = { _id: adminId };
+        const response = await axiosMasterInstance.post("/deleteAdmin", requestBody);
+        
         if (response.status === 200) {
           navigate("/admins");
           toast.success("Admin deleted successfully", {
@@ -123,6 +124,7 @@ export default function EditAdmin() {
 
   const handleSubmitChanges = async () => {
     admin.managedHalls = selectedHallIds;
+    console.log(`updating admin with ID: ${adminId}`);
     if (admin.role === "MASTER" && selectedHallIds.length != 0) {
       toast.info("Selected Halls will be removed for master");
       admin.managedHalls = [];
