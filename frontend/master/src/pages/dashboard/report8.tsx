@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
 import { EachHallType } from "../../../../../types/global.ts";
 import { useQuery } from "@tanstack/react-query";
+import { getFinancialYearEnd, getFinancialYearStart } from "../../utils/financialYearRange.tsx";
 
 function Report8() {
   const [hallData, setHallData] = useState<EachHallType[]>([]);
@@ -83,7 +84,10 @@ function Report8() {
     } else if (selectedDisplayPeriod === "Year") {
       humanReadableFrom = dayjs().startOf("year").format("MMMM D, YYYY");
       humanReadableTo = dayjs().endOf("year").format("MMMM D, YYYY");
-    } else {
+    } else if(selectedDisplayPeriod === "Fin-Year"){
+      humanReadableFrom = getFinancialYearStart().format("MMMM D, YYYY");
+      humanReadableTo = getFinancialYearEnd().format("MMMM D, YYYY");
+    }else {
       if (from) {
         humanReadableFrom = dayjs(from).format("MMMM D, YYYY");
       }
@@ -199,6 +203,7 @@ function Report8() {
           <option value="Week">This week</option>
           <option value="Month">Current Month</option>
           <option value="Year">Current Year</option>
+          <option value="Fin-Year">Financial Year</option>
         </select>
       </div>
       {/* SELECT HALL */}

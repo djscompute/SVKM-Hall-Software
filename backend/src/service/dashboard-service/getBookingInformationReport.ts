@@ -1,3 +1,4 @@
+import { start } from "repl";
 import { BookingModel, HallBookingType } from "../../models/booking.model";
 import { getHallNameById } from "../getHallName";
 import { getManagerNamesByHallId } from "../getManagerName";
@@ -170,6 +171,56 @@ export async function getBookingInformationReport(
         ).exec();
         bookings.push(...bookingsThisYear);
         break;
+      case "Fin-Year":
+        //calculating
+        const currentYear = today.getFullYear();
+        const fiscalYearStartMonth = 3; //april 0 indexed
+
+        let startOfFinYear, endOfFinYear;
+        if (today.getMonth() < fiscalYearStartMonth) {
+          //if current month befure april
+          startOfFinYear = new Date(
+            currentYear - 1,
+            fiscalYearStartMonth,
+            1
+          ).toISOString();
+          endOfFinYear = new Date(
+            currentYear,
+            fiscalYearStartMonth - 1,
+            31,
+            23,
+            59,
+            59
+          ).toISOString();
+        } else {
+          //if current month after april
+          startOfFinYear = new Date(
+            currentYear,
+            fiscalYearStartMonth,
+            1
+          ).toISOString();
+          endOfFinYear = new Date(
+            currentYear + 1,
+            fiscalYearStartMonth - 1,
+            31,
+            23,
+            59,
+            59
+          ).toISOString();
+        }
+
+        const findQueryThisFinYear = {
+          from: { $gte: startOfFinYear },
+          to: { $lte: endOfFinYear },
+          status: "CONFIRMED",
+        };
+
+        const bookingsThisFinYear = await BookingModel.find(
+          findQueryThisFinYear
+        ).exec();
+        bookings.push(...bookingsThisFinYear);
+        break;
+
       default:
         throw new Error("Invalid display period");
     }
@@ -208,7 +259,6 @@ export async function getBookingInformationReport(
         "Amount Paid": params.displayHallCharges
           ? calculateAmountPaid(booking)
           : "Cannot Display",
-        "transaction": booking.transaction,
       }))
     );
 
