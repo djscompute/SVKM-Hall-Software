@@ -30,6 +30,14 @@ const to = convert_IST_TimeString_To12HourFormat(
 );
 const date = extractDate(bookingDetails.startTime);
 
+const calculateAdditionalFeaturesTotal = (additionalFeatures: any) => {
+  if (!additionalFeatures) return 0;
+  return Object.values(additionalFeatures).reduce((total: number, feature: any) => total + (feature.price || 0), 0);
+};
+
+const additionalFeaturesTotal = calculateAdditionalFeaturesTotal(bookingDetails.additionalFeatures);
+const hallBaseCharges = bookingDetails.estimatedPrice-additionalFeaturesTotal
+
 
   console.log("HEREEE", bookingDetails);
 
@@ -70,7 +78,7 @@ const date = extractDate(bookingDetails.startTime);
                 </tr>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">Hall Charges</td>
-                  <td className="w-1/2">₹{bookingDetails.estimatedPrice}</td>
+                  <td className="w-1/2">₹{hallBaseCharges}</td>
                 </tr>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">
@@ -97,9 +105,9 @@ const date = extractDate(bookingDetails.startTime);
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">Total Payable</td>
                   {bookingDetails.paymentType=='SVKM INSTITUTE'?
-                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} </td>
+                  <td className="w-1/2">₹{hallBaseCharges+bookingDetails.securityDeposit} </td>
                   :
-                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} + GST (if applicable)</td>}
+                  <td className="w-1/2">₹{hallBaseCharges+bookingDetails.securityDeposit+additionalFeaturesTotal} + GST (if applicable)</td>}
                 </tr>
                 <tr>
                   <p className=" text-sm font-bold pt-1 text-red-400">*GST is applicable as per prevailing rates.</p>
