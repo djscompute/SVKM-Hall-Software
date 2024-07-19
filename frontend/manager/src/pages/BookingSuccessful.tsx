@@ -30,7 +30,9 @@ const BookingSuccessful = () => {
   };
 
   const additionalFeaturesTotal = calculateAdditionalFeaturesTotal(bookingDetails.additionalFeatures);
-  const totalPayable = bookingDetails.estimatedPrice + bookingDetails.securityDeposit + additionalFeaturesTotal;
+  const hallBaseCharges = bookingDetails.estimatedPrice-additionalFeaturesTotal
+
+  const totalPayable = hallBaseCharges + bookingDetails.securityDeposit + additionalFeaturesTotal;
 
 
   console.log("HEREEE", bookingDetails.additionalFeatures);
@@ -72,7 +74,7 @@ const BookingSuccessful = () => {
                 </tr>
                 <tr className="border-b-2">
                 <td className="font-medium py-2 w-1/2">Hall Charges</td>
-                  <td className="w-1/2">₹{bookingDetails.estimatedPrice}</td>
+                  <td className="w-1/2">₹{hallBaseCharges}</td>
                 </tr>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">
