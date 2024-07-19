@@ -7,8 +7,13 @@ const BookingSuccessful = () => {
   const extractTime = (dateTimeString: string) => {
     return dateTimeString.split("T")[1].split(".")[0];
   };
-  const extractDate = (dateTimeString: string) => {
-    return dateTimeString.split("T")[0];
+  const extractDate = (dateTimeString: string): string => {
+    // for date format (DD. MM. YYYY)
+    const date = new Date(dateTimeString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString().slice(-2);
+    return `${day}-${month}-${year}`;
   };
   const from = convert_IST_TimeString_To12HourFormat(
     extractTime(bookingDetails.startTime)
@@ -17,6 +22,16 @@ const BookingSuccessful = () => {
     extractTime(bookingDetails.endTime)
   );
   const date = extractDate(bookingDetails.startTime);
+  
+  // Total price of all additional features
+  const calculateAdditionalFeaturesTotal = (additionalFeatures: any) => {
+    if (!additionalFeatures) return 0;
+    return Object.values(additionalFeatures).reduce((total: number, feature: any) => total + (feature.price || 0), 0);
+  };
+
+  const additionalFeaturesTotal = calculateAdditionalFeaturesTotal(bookingDetails.additionalFeatures);
+  const totalPayable = bookingDetails.estimatedPrice + bookingDetails.securityDeposit + additionalFeaturesTotal;
+
 
   console.log("HEREEE", bookingDetails.additionalFeatures);
 
@@ -26,8 +41,7 @@ const BookingSuccessful = () => {
         Enquiry Successful for {bookingDetails.hallName}
       </h1>
       <p className="text-center">
-        Thank you for your enquiry! Keep an eye on your email inbox to get
-        further details.
+        Thank you for your enquiry! For further details please check your inbox
       </p>
       {bookingDetails && (
         <>
@@ -61,10 +75,6 @@ const BookingSuccessful = () => {
                   <td className="w-1/2">₹{bookingDetails.estimatedPrice}</td>
                 </tr>
                 <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">Security Deposit</td>
-                  <td className="w-1/2">₹{bookingDetails.securityDeposit}</td>
-                </tr>
-                <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">
                     Additional Facilities
                   </td>
@@ -82,8 +92,12 @@ const BookingSuccessful = () => {
                   </td>
                 </tr>
                 <tr className="border-b-2">
+                  <td className="font-medium py-2 w-1/2">Security Deposit</td>
+                  <td className="w-1/2">₹{bookingDetails.securityDeposit}</td>
+                </tr>
+                <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">Total Payable</td>
-                  <td className="w-1/2">₹{bookingDetails.estimatedPrice+bookingDetails.securityDeposit} + GST (if applicable)</td>
+                  <td className="w-1/2">₹ {totalPayable} + GST (if applicable)</td>
                 </tr>
               </tbody>
             </table>
