@@ -63,6 +63,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
   const firstDayOfMonth = dayjs(currentDate).startOf("month").day();
 
   const onNextMonth = () => {
+    if(dayjs(currentDate).isAfter(dayjs().add(2,'y').subtract(1, 'month'))) return;
     setCurrentDate(
       new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
     );
@@ -96,6 +97,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
               setCurrentDate(dayjs(newState).startOf("month").toDate());
             }}
             views={["year", "month"]}
+            maxDate={dayjs().add(2,'y')}
           />
         </LocalizationProvider>
         {/* Top heading */}
