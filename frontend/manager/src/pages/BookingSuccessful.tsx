@@ -99,7 +99,7 @@ const BookingSuccessful = () => {
                 </tr>
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">Total Payable</td>
-                  <td className="w-1/2">₹ {totalPayable} + GST (if applicable)</td>
+                  <td className="w-1/2">₹ {hallBaseCharges + additionalFeaturesTotal} + GST (if applicable) +{bookingDetails.securityDeposit}</td>
                 </tr>
               </tbody>
             </table>

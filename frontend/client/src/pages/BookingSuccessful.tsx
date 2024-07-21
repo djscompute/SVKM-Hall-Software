@@ -107,7 +107,7 @@ const hallBaseCharges = bookingDetails.estimatedPrice-additionalFeaturesTotal
                   {bookingDetails.paymentType=='SVKM INSTITUTE'?
                   <td className="w-1/2">₹{hallBaseCharges+bookingDetails.securityDeposit} </td>
                   :
-                  <td className="w-1/2">₹{hallBaseCharges+bookingDetails.securityDeposit+additionalFeaturesTotal} + GST (if applicable)</td>}
+                  <td className="w-1/2">₹{hallBaseCharges+additionalFeaturesTotal} + GST (if applicable) +{bookingDetails.securityDeposit}</td>}
                 </tr>
                 <tr>
                   <p className=" text-sm font-bold pt-1 text-red-400">*GST is applicable as per prevailing rates.</p>
