@@ -728,15 +728,15 @@ function Booking() {
           <input
             type="text"
             value={editedData?.baseDiscount}
-            onChange={(e) =>
+            onChange={(e) => {
               setEditedData((prev) => {
                 if (!prev) return undefined;
                 return {
                   ...prev,
                   baseDiscount: Number(e.target.value),
                 };
-              })
-            }
+              });
+            }}
             placeholder="Enter Discount %"
             className="px-2"
           />
@@ -752,17 +752,28 @@ function Booking() {
         <span className="w-full text-left">Hall Discount Amount</span>
         <span className="w-full text-right">
           {editingMode
-            ? 0.01 * editedData!.baseDiscount * data!.price
-            : 0.01 * data!.baseDiscount * data!.price}
+            ? 0.01 *
+              editedData!.baseDiscount *
+              ((priceEntry?.price || 0) + totalFeatureCharges)
+            : 0.01 *
+              data!.baseDiscount *
+              ((priceEntry?.price || 0) + totalFeatureCharges)}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Hall Discounted Price</span>
         <span className="w-full text-right">
           {editingMode
-            ? editedData!.price -
-              0.01 * editedData!.baseDiscount * editedData!.price
-            : data!.price - 0.01 * data!.baseDiscount * data!.price}
+            ? (priceEntry?.price || 0) +
+              totalFeatureCharges -
+              0.01 *
+                editedData!.baseDiscount *
+                ((priceEntry?.price || 0) + totalFeatureCharges)
+            : (priceEntry?.price || 0) +
+              totalFeatureCharges -
+              0.01 *
+                data!.baseDiscount *
+                ((priceEntry?.price || 0) + totalFeatureCharges)}
         </span>
       </div>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
@@ -774,10 +785,17 @@ function Booking() {
             <div>
               {editingMode
                 ? 0.09 *
-                  (editedData!.price -
-                    0.01 * editedData!.baseDiscount * editedData!.price)
+                  ((priceEntry?.price || 0) +
+                    totalFeatureCharges -
+                    0.01 *
+                      editedData!.baseDiscount *
+                      ((priceEntry?.price || 0) + totalFeatureCharges))
                 : 0.09 *
-                  (data!.price - 0.01 * data!.baseDiscount * data!.price)}
+                  ((priceEntry?.price || 0) +
+                    totalFeatureCharges -
+                    0.01 *
+                      data!.baseDiscount *
+                      ((priceEntry?.price || 0) + totalFeatureCharges))}
             </div>
           )}
         </span>
@@ -791,10 +809,17 @@ function Booking() {
             <div>
               {editingMode
                 ? 0.09 *
-                  (editedData!.price -
-                    0.01 * editedData!.baseDiscount * editedData!.price)
+                  ((priceEntry?.price || 0) +
+                    totalFeatureCharges -
+                    0.01 *
+                      editedData!.baseDiscount *
+                      ((priceEntry?.price || 0) + totalFeatureCharges))
                 : 0.09 *
-                  (data!.price - 0.01 * data!.baseDiscount * data!.price)}
+                  ((priceEntry?.price || 0) +
+                    totalFeatureCharges -
+                    0.01 *
+                      data!.baseDiscount *
+                      ((priceEntry?.price || 0) + totalFeatureCharges))}
             </div>
           )}
         </span>
@@ -808,9 +833,23 @@ function Booking() {
           onChange={(e) => {
             if (e.target.value === "yes") {
               editIsDepositApplicable.mutate(true);
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  isDeposit: true,
+                };
+              })
             }
             if (e.target.value === "no") {
               editIsDepositApplicable.mutate(false);
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  isDeposit: false,
+                };
+              })
             }
           }}
         >
@@ -942,11 +981,17 @@ function Booking() {
 
             <span className="w-full text-right">
               {editedData
-                ? editedData.price -
-                  0.01 * editedData?.baseDiscount * editedData.price +
+                ? (priceEntry?.price || 0) +
+                  totalFeatureCharges -
+                  0.01 *
+                    editedData!.baseDiscount *
+                    ((priceEntry?.price || 0) + totalFeatureCharges) +
                   0.18 *
-                    (editedData?.price -
-                      0.01 * editedData?.baseDiscount * editedData?.price) +
+                    ((priceEntry?.price || 0) +
+                      totalFeatureCharges -
+                      0.01 *
+                        editedData!.baseDiscount *
+                        ((priceEntry?.price || 0) + totalFeatureCharges)) +
                   (editedData.isDeposit
                     ? editedData?.deposit -
                       0.01 * editedData?.depositDiscount * editedData?.deposit
@@ -964,8 +1009,11 @@ function Booking() {
                 {data?.booking_type == "SVKM INSTITUTE" ? (
                   <div>
                     {data
-                      ? data.price -
-                        0.01 * data.baseDiscount * data.price +
+                      ? (priceEntry?.price || 0) +
+                        totalFeatureCharges -
+                        0.01 *
+                          data!.baseDiscount *
+                          ((priceEntry?.price || 0) + totalFeatureCharges) +
                         (data.isDeposit
                           ? data.deposit -
                             0.01 * data.depositDiscount * data.deposit
@@ -975,10 +1023,18 @@ function Booking() {
                 ) : (
                   <div>
                     {data
-                      ? data.price -
-                        0.01 * data.baseDiscount * data.price +
+                      ? (priceEntry?.price || 0) +
+                        totalFeatureCharges -
+                        0.01 *
+                          data!.baseDiscount *
+                          ((priceEntry?.price || 0) + totalFeatureCharges) +
                         0.18 *
-                          (data.price - 0.01 * data.baseDiscount * data.price) +
+                          ((priceEntry?.price || 0) +
+                            totalFeatureCharges -
+                            0.01 *
+                              data!.baseDiscount *
+                              ((priceEntry?.price || 0) +
+                                totalFeatureCharges)) +
                         (data.isDeposit
                           ? data.deposit -
                             0.01 * data.depositDiscount * data.deposit
