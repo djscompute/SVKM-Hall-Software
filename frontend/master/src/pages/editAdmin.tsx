@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosMasterInstance from "../config/axiosMasterInstance";
 import AddHalltoManager from "../components/createAdmin.tsx/addHalltoManager";
+import axios from "axios";
 
 
 type UpdateAdminType = Pick<
@@ -68,7 +69,7 @@ export default function EditAdmin() {
       try {
         const requestBody = { _id: adminId };
         const response = await axiosMasterInstance.post("/deleteAdmin", requestBody);
-        
+  
         if (response.status === 200) {
           navigate("/admins");
           toast.success("Admin deleted successfully", {
@@ -81,13 +82,20 @@ export default function EditAdmin() {
           });
         }
       } catch (error) {
-        if (error.response) {
-          console.error(`Error deleting admin: ${error.response.status} - ${error.response.data.error}`);
-          toast.error(`Failed to delete admin: ${error.response.data.error}`, {
-            autoClose: 2000,
-          });
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            console.error(`Error deleting admin: ${error.response.status} - ${error.response.data.error}`);
+            toast.error(`Failed to delete admin: ${error.response.data.error}`, {
+              autoClose: 2000,
+            });
+          } else {
+            console.error("Error deleting admin:", error.message);
+            toast.error("Failed to delete admin. Please try again.", {
+              autoClose: 2000,
+            });
+          }
         } else {
-          console.error("Error deleting admin:", error);
+          console.error("Unexpected error deleting admin:", error);
           toast.error("Failed to delete admin. Please try again.", {
             autoClose: 2000,
           });
@@ -95,6 +103,7 @@ export default function EditAdmin() {
       }
     }
   };
+  
 
   const handleSave = () => {
     if (!validInput) {
