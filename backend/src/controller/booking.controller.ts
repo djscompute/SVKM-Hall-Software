@@ -10,11 +10,18 @@ export async function addBookingHandler(req: Request, res: Response) {
       features,
       status,
       price,
+      transaction,
+      baseDiscount,
+      deposit,
+      isDeposit,
+      depositDiscount,
       hallId,
       session_id,
+      booking_type,
       from,
       to,
       time,
+      purpose,
     } = req.body as HallBookingType;
 
     if (from >= to) {
@@ -35,8 +42,7 @@ export async function addBookingHandler(req: Request, res: Response) {
 
     // Check for overlapping time slots with non-empty or non-enquiry statuses
     const overlappingBooking = existingBookings.find(
-      // (booking) => booking.status !== "EMPTY" && booking.status !== "ENQUIRY"
-      (booking) => booking.status !== "EMPTY" && booking.status != "ENQUIRY"
+      (booking) => booking.status == "CONFIRMED"
     );
 
     if (overlappingBooking) {
@@ -50,13 +56,21 @@ export async function addBookingHandler(req: Request, res: Response) {
       features,
       status,
       price,
+      transaction,
+      baseDiscount,
+      deposit,
+      isDeposit,
+      depositDiscount,
       hallId,
       session_id,
+      booking_type,
       from,
       to,
       time,
+      purpose,
     });
     await newBooking.save();
+    console.log("added new booking");
 
     return res.status(200).json(newBooking);
   } catch (error: any) {
@@ -71,35 +85,22 @@ export async function editBookingHandler(req: Request, res: Response) {
       features,
       status,
       price,
+      transaction,
+      baseDiscount,
+      deposit,
+      isDeposit,
+      depositDiscount,
       hallId,
       session_id,
+      booking_type,
       from,
       to,
       time,
-    } = req.body as HallBookingType;
+      purpose,
+      cancellationReason
+    } = req.body as HallBookingType; // Ensure this matches your schema type
+
     const bookingId: string = req.params.id;
-
-    // Check for existing bookings within the specified time range
-    const existingBookings = await BookingModel.find({
-      hallId,
-      $or: [
-        { $and: [{ from: { $lte: from } }, { to: { $gte: from } }] }, // Overlapping at the start
-        { $and: [{ from: { $lte: to } }, { to: { $gte: to } }] }, // Overlapping at the end
-        { $and: [{ from: { $gte: from } }, { to: { $lte: to } }] }, // Fully contained within the range
-      ],
-    });
-
-    // Check for overlapping time slots with non-empty or non-enquiry statuses
-    const overlappingBooking = existingBookings.find(
-      // (booking) => booking.status !== "EMPTY" && booking.status !== "ENQUIRY"
-      (booking) => booking.status !== "EMPTY"
-    );
-
-    if (overlappingBooking) {
-      return res.status(400).json({
-        message: "Booking cannot be added due to overlapping time slot.",
-      });
-    }
 
     const updatedBooking = await BookingModel.findByIdAndUpdate(
       bookingId,
@@ -108,14 +109,23 @@ export async function editBookingHandler(req: Request, res: Response) {
         features,
         status,
         price,
+        transaction,
+        baseDiscount,
+        deposit,
+        isDeposit,
+        depositDiscount,
         hallId,
         session_id,
+        booking_type,
         from,
         to,
         time,
+        purpose,
+        cancellationReason
       },
       { new: true }
     );
+
     if (!updatedBooking) {
       return res
         .status(404)
@@ -146,8 +156,9 @@ export async function removeBookingHandler(req: Request, res: Response) {
 //Handler to get Session details during a range including user info
 export async function getBookingHandler(req: Request, res: Response) {
   try {
-    const { from, to } = req.query;
+    const { from, to, hallId } = req.query;
     const bookings = await BookingModel.find({
+      hallId: hallId,
       from: { $gte: from },
       to: { $lte: to },
     });

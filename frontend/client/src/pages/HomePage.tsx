@@ -1,19 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
 import Card from "../components/homePage/Card";
-import axiosInstance from "../config/axiosInstance.ts";
+import axiosClientInstance from "../config/axiosClientInstance.ts";
 // import { EachHallType } from "../types/Hall.types.ts";
 import { EachHallType } from "../../../../types/global.ts";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function HomePage() {
-  //getAllHalls
-  // hallProps
-
   const { data, error, isFetching } = useQuery({
     queryKey: ["allhalls"],
     queryFn: async () => {
-      const response = await axiosInstance.get("getAllHalls");
-      return response.data as EachHallType[];
+      try {
+        const responsePromise = axiosClientInstance.get("getAllHalls");
+        toast.promise(responsePromise, {
+          pending: "Fetching halls...",
+          // success: "Halls fetched successfully!",
+          error: "Failed to fetch Halls. Please reload.",
+        });
+        const response = await responsePromise;
+        return response.data as EachHallType[];
+      } catch (error) {
+        console.log("ERROR WHILE FETCHING HALLS");
+        throw error;
+      }
     },
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
 
   if (isFetching) {
@@ -21,24 +32,10 @@ function HomePage() {
   }
 
   return (
-    <div className="flex flex-col items-center">
-      <h1 className=" text-3xl font-semibold my-5">All Halls</h1>
-      <div className="flex flex-wrap justify-around w-full">
-        {data?.map((hallProp) => (
-          <Card
-            key={hallProp._id}
-            id={hallProp._id}
-            img={hallProp.images[0]}
-            tagline={hallProp.about}
-            name={hallProp.name}
-            place={hallProp.location.desc1}
-            numPhotos={hallProp.images.length}
-            minCapacity={hallProp.capacity}
-            maxCapacity={hallProp.capacity}
-            price={hallProp.pricing}
-          />
-        ))}
-      </div>
+    <div className="flex flex-wrap justify-around w-full my-10">
+      {data?.map((hallProp) => (
+        <Card hallData={hallProp} />
+      ))}
     </div>
   );
 }

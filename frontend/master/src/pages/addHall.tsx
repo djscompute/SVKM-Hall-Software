@@ -1,18 +1,23 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { EachHallType } from "../types/Hall.types";
 import { useMutation } from "@tanstack/react-query";
-import axiosInstance from "../config/axiosInstance";
+import axiosMasterInstance from "../config/axiosMasterInstance";
 import HallLocation from "../components/addHall/HallLocation";
 import AboutHall from "../components/addHall/AboutHall";
 import HallCapacity from "../components/addHall/HallCapacity";
-import HallPricing from "../components/addHall/HallPricing";
 import HallSessions from "../components/addHall/HallSessions";
 import HallAdditionalFeatures from "../components/addHall/HallAdditionalFeatures";
 import ImageCarousel from "../components/addHall/ImageCarousel";
+import { queryClient } from "../App";
+import HallRestrictions from "../components/addHall/HallRestrictions";
+import HallDeposit from "../components/addHall/HallDeposit";
+import HallPricing from "../components/addHall/HallPricing";
+import { toast } from "react-toastify";
 
 function AddHall() {
   const [hallData, setHallData] = useState<EachHallType>({
     name: "HALL NAME",
+    person: "Someone",
     location: {
       desc1: "Juhu, Mumbai",
       desc2:
@@ -27,24 +32,19 @@ function AddHall() {
       "BJ Hall Vile Parle has an inviting ambiance which makes everyone feel welcomed. The elegant décor of the venue makes it an ideal option for a grand wedding. Host your events at BJ Hall Mumbai to make them outstanding. Ticking all the right boxes, this one must certainly be on your cards.",
     ],
     capacity: "500 people",
-    seating: "100 seats",
-    pricing: "200 per day",
     additionalFeatures: [
       {
-        heading: "Gorgeous Ambience",
-        desc: " We have got a very good ambience",
-      },
-      {
-        heading: "In-house decorators",
-        desc: "In-house decorators make the venue more stunning",
+        heading: "Dining Area",
+        desc: "We have a dinign area with exceptional ambience.",
+        price: 0,
       },
     ],
     sessions: [
       {
         active: true,
-        name: "Morning first session",
-        from: "3:40:00.000Z",
-        to: "20:30:00.000Z",
+        name: "Morning First session",
+        from: "8:00:00",
+        to: "12:00:00",
         price: [
           {
             categoryName: "Student",
@@ -58,9 +58,25 @@ function AddHall() {
       },
       {
         active: true,
-        name: "Morning 7 hours",
-        from: "3:40:00.000Z",
-        to: "20:30:00.000Z",
+        name: "Afternoon Session",
+        from: "13:00:00",
+        to: "17:00:00",
+        price: [
+          {
+            categoryName: "Student",
+            price: 2000,
+          },
+          {
+            categoryName: "Politician",
+            price: 4000,
+          },
+        ],
+      },
+      {
+        active: true,
+        name: "Night Session",
+        from: "18:00:00",
+        to: "22:00:00",
         price: [
           {
             categoryName: "Student",
@@ -76,22 +92,22 @@ function AddHall() {
     images: [
       "https://img.weddingbazaar.com/shaadisaga_production/photos/pictures/006/353/648/new_large/ss20230327-3861-13nkp45.jpg",
     ],
+    eventRestrictions: "Sleeping",
+    securityDeposit: 100000,
   });
 
   const addHallMutation = useMutation({
     mutationFn: () =>
-      axiosInstance
-        .post(`/addHall`, hallData)
-        .then((response) => {
-          console.log(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        }),
+      toast.promise(axiosMasterInstance.post(`/addHall`, hallData), {
+        success: "Hall added successfully!",
+        error: "Error adding hall.",
+        pending: "Adding hall...",
+      }),
     mutationKey: ["addhall"],
-    onSuccess: () => {
-      // revalidate the query for getting all halls data.
-      // set the halldata back to default Hall Data
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: [`allhalls`],
+      });
     },
   });
 
@@ -102,7 +118,7 @@ function AddHall() {
   };
 
   return (
-    <div className="hall-info-container grid place-items-center gap-y-12 mx-auto w-11/12 pt-10 overflow-y-hidden">
+    <div className="flex w-full flex-col items-center gap-5 sm:gap-10 px-3 sm:px-10 md:px-16 lg:px-28">
       <div className="flex flex-col items-center">
         <p className="text-blue-700 font-semibold">Add New Hall</p>
         <input
@@ -110,24 +126,37 @@ function AddHall() {
           onChange={(e) =>
             setHallData((prev) => ({ ...prev, name: e.target.value }))
           }
-          className="text-5xl text-center border border-gray-300"
+          className="text-3xl md:text-4xl lg:text-5xl text-center border border-gray-400"
         />
       </div>
       <HallLocation location={hallData.location} setHallData={setHallData} />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <AboutHall about={hallData.about} setHallData={setHallData} />
-      <HallCapacity
-        capacity={hallData.capacity}
-        seating={hallData.seating}
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
+      <h2 className="font-semibold text-xl mb-3 text-center">
+        Capacity, Deposit, Restrictions
+      </h2>
+      <HallCapacity capacity={hallData.capacity} setHallData={setHallData} />
+      <HallDeposit
+        securityDeposit={hallData.securityDeposit}
         setHallData={setHallData}
       />
-      <HallPricing pricing={hallData.pricing} setHallData={setHallData} />
+      <HallRestrictions
+        eventRestrictions={hallData.eventRestrictions}
+        setHallData={setHallData}
+      />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <HallSessions sessions={hallData.sessions} setHallData={setHallData} />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
+      <HallPricing sessions={hallData.sessions} setHallData={setHallData} />
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       {hallData.additionalFeatures && (
         <HallAdditionalFeatures
           additionalFeatures={hallData.additionalFeatures}
           setHallData={setHallData}
         />
       )}
+      <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <ImageCarousel images={hallData.images} setHallData={setHallData} />
       <div className="flex mb-20">
         <button

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import useAuthStore from "../../store/authStore";
-import axiosInstance from "../../config/axiosInstance";
+import axiosMasterInstance from "../../config/axiosMasterInstance";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -12,18 +14,28 @@ const Login: React.FC = () => {
   ]);
 
   const handleLogin = async () => {
+    console.log("Login attempt")
+
     try {
-      const response = await axiosInstance.post("/loginAdmin", {
+      const responsePromise = axiosMasterInstance.post("/loginAdmin", {
         email,
         password,
       });
 
-      if (response.status === 200) {
+      toast.promise(responsePromise, {
+        pending: "logging in...",
+        error: "Failed to log in. check ur email, password",
+      });
+      const response = await responsePromise;
+
+      if (response.status === 200 && response.data.role ==="MASTER") {
+        toast.success("Logged in")
         const data = await response.data;
         login(email, password);
-
+        console.log("The login data is ",data);
         window.location.href = "/";
       } else {
+        toast.error("Failed to log in. check ur email, password")
         setErrorMessage("Invalid login credentials");
       }
     } catch (error) {
@@ -39,7 +51,9 @@ const Login: React.FC = () => {
           <p>You are already logged in.</p>
         ) : (
           <div className="flex flex-col border-2 border-gray-300 bg-gray-200 px-4 py-5 rounded-md w-[50vh] gap-3">
-            <h1 className="text-3xl font-bold flex justify-center">Login</h1>
+            <h1 className="text-3xl font-bold flex justify-center">
+              Svkm Admin Login
+            </h1>
             <div className="flex flex-col">
               <label>Email:</label>
               <input

@@ -25,10 +25,14 @@ export const requireManagerRole = (
   next: NextFunction
 ) => {
   const authenticatedReq = req as AuthenticatedRequest;
-  if (authenticatedReq.userRole !== "MANAGER") {
+  if (
+    authenticatedReq.userRole == "MANAGER" ||
+    authenticatedReq.userRole == "MASTER"
+  ) {
+    next();
+  } else {
     return res
       .status(403)
       .json({ message: "Access denied. MANAGER role required" });
   }
-  next();
 };

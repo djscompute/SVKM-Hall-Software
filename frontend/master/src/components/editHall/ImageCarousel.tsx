@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-// import Carousel from "./Carousel";
 import { EachHallType } from "../../types/Hall.types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axiosInstance from "../../config/axiosInstance";
+import axiosMasterInstance from "../../config/axiosMasterInstance";
+import { toast } from "react-toastify";
 
 type props = {
   images: string[];
@@ -21,13 +20,14 @@ export default function ImageCarousel({ images, setHallData }: props) {
 
   // ImageHandler
   const [newImage, setNewImage] = useState<File | null>(null);
+  const [imageIndex, setImageIndex] = useState(0);
 
   const handleImageUpload = async () => {
     if (!newImage) return;
     try {
       const formData = new FormData();
       formData.append("image", newImage);
-      const response = await axiosInstance.post(
+      const responsePromise = axiosMasterInstance.post(
         "http://localhost:3000/uploadImage",
         formData,
         {
@@ -36,8 +36,15 @@ export default function ImageCarousel({ images, setHallData }: props) {
           },
         }
       );
+      toast.promise(responsePromise, {
+        pending: "Uploading your image...",
+        success: "Image uploaded succesfully",
+        error: "Failed to upload image",
+      });
+      const response = await responsePromise;
       const { imageUrl } = response.data;
       setHallData((prev) => ({ ...prev, images: [...prev.images, imageUrl] }));
+      setNewImage(null);
     } catch (error) {
       console.error("Error uploading image:", error);
     }
@@ -79,49 +86,74 @@ export default function ImageCarousel({ images, setHallData }: props) {
 
   return (
     <div className="flex flex-col items-center w-full rounded-xl">
-      <p className=" text-xl font-semibold">IMAGES</p>
-      <div className="flex flex-col items-center w-full mb-20">
-        {images.map((imageSrc, index) => (
-          <div className=" relative w-1/2 my-2">
-            <p className="absolute top-0 z-10 bg-gray-600 text-white text-2xl p-1 px-2 rounded-xl">
-              {index}
-            </p>
-            <img
-              key={index}
-              src={imageSrc}
-              className=" h-auto w-full object-cover rounded-t-xl"
-            />
-            <div className="flex justify-evenly">
-              <button
-                className="w-full bg-red-500 text-xl text-white rounded-bl-xl py-1 border-2 border-black"
-                onClick={() => deleteImage(imageSrc)}
-              >
-                Del
-              </button>
-              <button
-                className={`w-full  ${
-                  index == 0 ? "bg-gray-400" : "bg-blue-500"
-                } text-xl text-white  py-1  border-y-2 border-black`}
-                onClick={() => updatePosition(imageSrc, false)}
-                disabled={index == 0}
-              >
-                Up
-              </button>
-              <button
-                className={`w-full  ${
-                  index == images.length - 1 ? "bg-gray-400" : "bg-blue-500"
-                } text-xl text-white  py-1 rounded-br-xl border-2 border-black`}
-                onClick={() => updatePosition(imageSrc, true)}
-                disabled={index == images.length - 1}
-              >
-                Down
-              </button>
+      <div className="flex flex-col justify-center items-center w-full mb-20 gap-5 ">
+        {/* Image Display */}
+        <div className="w-full">
+          <h2 className=" text-base sm:text-lg md:text-2xl font-medium mb-4">
+            Photos
+          </h2>
+          <div className="flex flex-row gap-3 items-start h-[10em] sm:h-[15em] md:h-[20em] lg:h-[35em]">
+            <div
+              id="leftImageScroller"
+              className="flex flex-col w-1/5 h-[10em] sm:h-[15em] md:h-[20em] lg:h-[35em] overflow-y-auto"
+            >
+              {images.map((eachImg, index) => (
+                <img
+                  key={index}
+                  alt={`Hall Image ${index + 1}`}
+                  className={`mb-2 h-auto rounded-lg object-cover ${
+                    imageIndex != index && "opacity-50"
+                  }`}
+                  src={eachImg}
+                  onClick={() => setImageIndex(index)}
+                  style={{ cursor: "pointer" }}
+                />
+              ))}
+            </div>
+            <div className="flex flex-col relative rounded-lg object-cover w-4/5 h-[10em] sm:h-[15em] md:h-[20em] lg:h-[35em]">
+              <p className="absolute top-0 z-10 bg-gray-600 text-white text-2xl p-1 px-2 rounded-xl ">
+                {imageIndex + 1}
+              </p>
+              <img
+                key={imageIndex}
+                src={images[imageIndex]}
+                className="h-full object-cover rounded-t-xl"
+              />
+              <div className="flex justify-evenly">
+                <button
+                  className="w-full bg-red-500 text-xl text-white rounded-bl-xl py-1 border-2 border-black"
+                  onClick={() => deleteImage(images[imageIndex])}
+                >
+                  Del
+                </button>
+                <button
+                  className={`w-full  ${
+                    imageIndex == 0 ? "bg-gray-400" : "bg-blue-500"
+                  } text-xl text-white  py-1  border-y-2 border-black`}
+                  onClick={() => updatePosition(images[imageIndex], false)}
+                  disabled={imageIndex == 0}
+                >
+                  Up
+                </button>
+                <button
+                  className={`w-full  ${
+                    imageIndex == images.length - 1
+                      ? "bg-gray-400"
+                      : "bg-blue-500"
+                  } text-xl text-white  py-1 rounded-br-xl border-2 border-black`}
+                  onClick={() => updatePosition(images[imageIndex], true)}
+                  disabled={imageIndex == images.length - 1}
+                >
+                  Down
+                </button>
+              </div>
             </div>
           </div>
-        ))}
+        </div>
+
         {/* Image upload */}
         <div
-          className="relative w-1/2 my-2 border-2 border-dashed border-gray-400 rounded-lg flex flex-col items-center justify-center"
+          className="flex flex-col items-center justify-center w-full border-2 border-dashed border-gray-400 rounded-lg z-20"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
         >
@@ -148,7 +180,7 @@ export default function ImageCarousel({ images, setHallData }: props) {
             <button
               className={`px-4 py-2  text-white rounded  focus:outline-none ${
                 !newImage ? "bg-gray-400" : ""
-              }  ${newImage ? "bg-SAPBlue-800 hover:bg-SAPBlue-900" : ""}`}
+              }  ${newImage ? "bg-sapblue-800 hover:bg-sapblue-900" : ""}`}
               onClick={handleImageUpload}
               disabled={!newImage}
             >

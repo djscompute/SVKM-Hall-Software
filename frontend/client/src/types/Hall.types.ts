@@ -3,6 +3,7 @@ import {
   EachHallAdditonalFeaturesType,
   EachHallSessionType,
   EachHallType,
+  bookingStatusType
 } from "../../../../types/global";
 
 ////////////////////////////////////////////
@@ -15,4 +16,5 @@ export type {
   EachHallAdditonalFeaturesType,
   EachHallSessionType,
   EachHallType,
+  bookingStatusType
 };

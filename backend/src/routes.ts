@@ -6,23 +6,34 @@ import {
   editHallHandler,
   getAllHallsHandler,
   getHallByIdHandler,
+  deleteHallHandler
 } from "./controller/hall.controller";
 import {
   createAdminHandler,
+  deleteAdminByIdHandler,
   getAdminByEmailHandler,
+  getAdminByIdHandler,
   getAdminHandler,
+  getAdmins,
   getHallsforAdminHandler,
   loginAdminHandler,
   logoutAdminHandler,
+  updateAdminByIdHandler,
 } from "./controller/admin.controller";
-import { validateRequest, validateCookie } from "./middleware/validator";
+import { validateRequest, validateCookie, validateLogin } from "./middleware/validator";
 import { AddHallZodSchema, RemoveHallZodSchema } from "./schema/hall.schema";
 import {
   CreateAdminZodSchema,
+  DeleteAdminZodSchema,
   EmailAdminZodSchema,
+  IdAdminZodSchema,
   LoginAdminZodSchema,
+  UpdateAdminZodSchema,
 } from "./schema/admin.schema";
-import { requireMasterRole } from "./middleware/accessControl";
+import {
+  requireManagerRole,
+  requireMasterRole,
+} from "./middleware/accessControl";
 import {
   AddBookingZodSchema,
   RemoveBookingZodSchema,
@@ -40,9 +51,27 @@ import {
   sendEmailHandler,
 } from "./controller/booking.controller";
 
+//Constants
+import { ConstantsZodSchema } from "./schema/constants.schema";
+import { createConstantHandler, getAllConstantsHandler, updateConstantByNameHandler, deleteConstantByNameHandler } from "./controller/constants.controller";
+
 // ImageHandler
 import { uploadImageHandler } from "./controller/image.controller";
 import { UploadImageZodSchema } from "./schema/image.schema";
+import { 
+  getAdditionalFeatureReportHandler,
+  getAllHallNamesAndIdsHandler,
+  getBookingInformationReportHandler,
+  getBookingTypeCountsHandler, 
+  getCollectionDetailsHandler,
+  getHallBookingsCountHandler, 
+  getInteractionCountHandler,
+  getMonthwiseCollectionDetailsHandler,
+  getSessionWiseBookingHandler,
+  getSessionsWithCategoriesByHallNameHandler
+} from "./controller/dashboard.controller";
+import { getAllHallNamesAndIds } from "./service/getHallConfig";
+
 
 // const upload = multer({ dest: "uploads/" });
 const upload = multer({ storage: multer.memoryStorage() });
@@ -53,6 +82,11 @@ export default function routes(app: Express) {
       return res.status(200).send("Hello World");
     },
   ]);
+
+  //Chek if user is logged in
+  app.get("/isLoggedIn", [validateLogin, (req: Request, res: Response) => {
+    return res.status(200).json({ isLoggedIn: true });
+  }]);
 
   //Login a admin
   app.post("/loginAdmin", [
@@ -68,16 +102,70 @@ export default function routes(app: Express) {
     createAdminHandler,
   ]);
 
+  //Get all admins
+  app.get("/getAllAdmins", [
+    validateCookie,
+    requireMasterRole,
+    getAdmins,
+  ]);
+
   //Get data of the admin who is sending the requests
   app.get("/getCurrentAdmin", [validateCookie, getAdminHandler]);
 
   // GET DATA OF A SPECIFIED USER USING UNIQUE EMAIL
-  app.get("/getAdmin/:email", [
+  app.get("/getAdmin/email/:email", [
     validateCookie,
     validateRequest(EmailAdminZodSchema),
     requireMasterRole,
     getAdminByEmailHandler,
   ]);
+
+  // GET DATA OF A SPECIFIED USER USING UNIQUE _ID
+  app.get("/getAdmin/id/:id", [
+    validateCookie,
+    validateRequest(IdAdminZodSchema),
+    requireMasterRole,
+    getAdminByIdHandler,
+  ]);
+
+  app.post("/updateAdmin", [
+    validateCookie,
+    validateRequest(UpdateAdminZodSchema),
+    requireMasterRole,
+    updateAdminByIdHandler,
+  ])
+  app.post("/deleteAdmin", [
+    validateCookie,
+    validateRequest(DeleteAdminZodSchema),
+    requireMasterRole,
+    deleteAdminByIdHandler,
+  ]);
+  //Constants routes
+  app.post("/createConstant", [
+    validateCookie,
+    validateRequest(ConstantsZodSchema),
+    requireMasterRole,
+    createConstantHandler,
+  ]);
+  app.get("/getAllConstants", [
+    validateCookie,
+    requireMasterRole,
+    getAllConstantsHandler,
+  ]);
+  app.post("/updateConstant" ,[
+    validateCookie,
+    validateRequest(ConstantsZodSchema),
+    requireMasterRole,
+    updateConstantByNameHandler
+    ])
+    app.delete("/deleteConstant", [
+      validateCookie,
+      requireMasterRole,
+      deleteConstantByNameHandler,
+    ]);
+
+
+
 
   //Add a new hall
   app.post("/addHall", [
@@ -85,6 +173,14 @@ export default function routes(app: Express) {
     requireMasterRole,
     validateRequest(AddHallZodSchema),
     addHallHandler,
+  ]);
+
+  //Remove Hall completely
+  app.delete("/halls/:id", [
+    validateCookie,
+    requireMasterRole,
+    validateRequest(RemoveHallZodSchema),
+    deleteHallHandler,
   ]);
 
   //Remove a hall
@@ -101,11 +197,6 @@ export default function routes(app: Express) {
     requireMasterRole,
     validateRequest(RemoveHallZodSchema),
     validateRequest(AddHallZodSchema),
-    // @ts-ignore
-    (res, req, next) => {
-      console.log("HERE");
-      next();
-    },
     editHallHandler,
   ]);
 
@@ -121,7 +212,7 @@ export default function routes(app: Express) {
   // FUTURE: GET ALL HALLS WHOM THE MANAGER HAS ACCESS TO
   app.get("/getHallsforAdmin/:email", [
     validateCookie,
-    requireMasterRole,
+    requireManagerRole,
     validateRequest(EmailAdminZodSchema),
     getHallsforAdminHandler,
   ]);
@@ -133,9 +224,10 @@ export default function routes(app: Express) {
 
   app.post("/editBooking/:id", [
     validateCookie,
-    requireMasterRole,
+    requireManagerRole,
     validateRequest(RemoveBookingZodSchema),
     validateRequest(AddBookingZodSchema),
+    // validateRequest(EditBookingZodSchema),
     editBookingHandler,
   ]);
 
@@ -176,6 +268,67 @@ export default function routes(app: Express) {
     upload.single("image"),
     uploadImageHandler
   );
+  {/********************* Dashboard Routes Begin *********************/}
+  app.post(
+    "/dashboard/getHallWiseBookingsCount",
+    validateCookie,
+    requireMasterRole,
+    getHallBookingsCountHandler
+  )
+  app.post(
+    "/dashboard/getSessionWiseBookings",
+    validateCookie,
+    requireMasterRole,
+    getSessionWiseBookingHandler
+  )
+  app.post(
+    "/dashboard/getBookingTypeCounts",
+    validateCookie,
+    requireMasterRole,
+    getBookingTypeCountsHandler
+  )
+  app.post(
+    "/dashboard/getCollectionDetails",
+    validateCookie,
+    requireMasterRole,
+    getCollectionDetailsHandler
+  )
+  app.post(
+    "/dashboard/getMonthwiseCollectionDetails",
+    validateCookie,
+    requireMasterRole,
+    getMonthwiseCollectionDetailsHandler
+  )
+  app.post(
+    "/dashboard/getTotalInteraction",
+    validateCookie,
+    requireMasterRole,
+    getInteractionCountHandler
+  )
+  app.post(
+    "/dashboard/generateBookingInformationReport",
+    validateCookie,
+    requireMasterRole,
+    getBookingInformationReportHandler
+  )
+  app.post(
+    "/dashboard/generateAdditionalFeatureReport",
+    validateCookie,
+    requireMasterRole,
+    getAdditionalFeatureReportHandler
+  )
+  {/********************* Dashboard Routes End *********************/}
+
+  {/********************* Helper Routes Begin *********************/}
+  app.get(
+    '/getAllHallNameID',
+    getAllHallNamesAndIdsHandler
+  )
+  app.get(
+    '/getSessionAndCategoryByHall',
+    getSessionsWithCategoriesByHallNameHandler
+  )
+  {/********************* Helper Routes End*********************/}
 
   app.post(
     "/sendEmail",

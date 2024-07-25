@@ -1,17 +1,24 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
+import { faPenToSquare, faTrashCan } from "@fortawesome/free-regular-svg-icons";
+import arrowList from "../../assets/arrowList.svg";
+
 import {
   EachHallAdditonalFeaturesType,
   EachHallType,
 } from "../../types/Hall.types";
 
 type Props = {
+  data: EachHallType;
   additionalFeatures: EachHallAdditonalFeaturesType[];
   setHallData: React.Dispatch<React.SetStateAction<EachHallType>>;
 };
 
-const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
+const HallAdditionalFeatures = ({
+  data,
+  additionalFeatures,
+  setHallData,
+}: Props) => {
   const [modalData, setModalData] =
     useState<EachHallAdditonalFeaturesType[]>(additionalFeatures);
   const [modal, setModal] = useState(false);
@@ -20,12 +27,32 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   const [newItem, setNewItem] = useState<EachHallAdditonalFeaturesType>({
     heading: "",
     desc: "",
+    price: 0,
   });
   const [editIndex, setEditIndex] = useState<number>(-1);
 
   const toggleModal = () => {
     setEditedFeatures(modalData);
     setModal(!modal);
+  };
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    index: number,
+    field: string
+  ) => {
+    const value =
+      field === "price" ? parseFloat(event.target.value) : event.target.value;
+    const updatedFeatures = editedFeatures.map((feature, i) => {
+      if (i === index) {
+        return {
+          ...feature,
+          [field]: value,
+        };
+      }
+      return feature;
+    });
+    setEditedFeatures(updatedFeatures);
   };
 
   const handleFormSubmit = () => {
@@ -39,27 +66,8 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   };
 
   const handleAddItem = () => {
-    if (newItem.heading.trim() !== "" && newItem.desc.trim() !== "") {
-      if (editIndex !== -1) {
-        const updatedList = [...editedFeatures];
-        updatedList[editIndex] = newItem;
-        setEditedFeatures(updatedList);
-        setEditIndex(-1);
-      } else {
-        setEditedFeatures([...editedFeatures, newItem]);
-      }
-      setNewItem({  heading: "", desc: "" });
-    }
-  };
-
-  const handleEditItem = (index: number) => {
-    setNewItem(editedFeatures[index]);
-    setEditIndex(index);
-  };
-
-  const handleDontEditItem = () => {
-    setNewItem({ heading: "", desc: "" });
-    setEditIndex(-1);
+    setEditedFeatures([...editedFeatures, newItem]);
+    console.log(editedFeatures);
   };
 
   const handleDeleteItem = (index: number) => {
@@ -70,19 +78,11 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
   };
 
   return (
-    <div className="about-hall flex justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
-      <div className="hall-additional-features-info w-11/12">
-        <h2 className="font-bold text-xl mb-3">Additional Features</h2>
-        <div className="about-hall text-lg">
-          {additionalFeatures.map((feature, index) => (
-            <div key={index} className="flex flex-col mb-3">
-              <p className="font-medium text-lg">{feature.heading}</p>
-              <p>{feature.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="hall-info-edit h-fit relative">
+    <div className="about-hall w-[80%] md:w-[90%] lg:w-full py-5 px-7 rounded-md">
+      <div className="flex justify-between">
+        <h1 className="text-base sm:text-lg md:text-2xl font-medium">
+          Additional Features
+        </h1>
         <div className="show-on-hover cursor-pointer opacity-100 hover:opacity-100">
           <FontAwesomeIcon
             icon={faPenToSquare}
@@ -90,75 +90,110 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
             onClick={toggleModal}
           />
         </div>
+      </div>
 
-        {modal && (
-          <div className="modal-message fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50">
-            <div className="message bg-white p-6 rounded w-3/5">
-              <div className="flex flex-col gap-3 mb-5">
-                <h2 className="font-bold text-xl mb-3 text-center">
-                  Additional Features
-                </h2>
-                <ul className="max-h-80 overflow-scroll">
-                  {editedFeatures.map((item, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center justify-between mb-1 border-b border-gray-300"
-                    >
-                      <div className="flex flex-col w-full gap-1">
-                        <span className=" font-semibold">{item.heading}</span>
-                        <span className="">{item.desc}</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          className="bg-blue-700 p-2 rounded text-white hover:bg-blue-500 transform active:scale-95 transition duration-300"
-                          onClick={() => handleEditItem(index)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300"
-                          onClick={() => handleDeleteItem(index)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex gap-2">
-                  <textarea
-                    value={newItem.heading}
-                    onChange={(e) =>
-                      setNewItem({ ...newItem, heading: e.target.value })
-                    }
-                    className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
-                    placeholder="Heading"
+      {/* Additional Features */}
+      <div className="flex flex-col gap-3 w-full">
+        <div className="ml-8 mt-1">
+          <ul className="list-disc text-gray-600">
+            {data.additionalFeatures?.map((feature, index) => (
+              <div key={index}>
+                <div className="flex">
+                  <img
+                    src={arrowList}
+                    alt="arrow"
+                    className="self-baseline translate-y-[40%] mr-2"
                   />
-                  <textarea
-                    value={newItem.desc}
-                    onChange={(e) =>
-                      setNewItem({ ...newItem, desc: e.target.value })
-                    }
-                    className="bg-gray-300 text-black px-5 py-2 rounded resize-none flex-grow border-x-black"
-                    placeholder="Description"
-                  />
-                  {editIndex != -1 && (
-                    <button
-                      className="bg-red-700 p-2 rounded text-white hover:bg-green-500 transform active:scale-95 transition duration-300"
-                      onClick={handleDontEditItem}
-                    >
-                      Dont Edit
-                    </button>
-                  )}
-                  <button
-                    className="bg-green-700 p-2 rounded text-white hover:bg-green-500 transform active:scale-95 transition duration-300"
-                    onClick={handleAddItem}
-                  >
-                    {editIndex !== -1 ? "Update" : "Add"}
-                  </button>
+                  <div className="">
+                    <span className="font-bold text-black">
+                      {feature.heading}:{" "}
+                    </span>
+                    {feature.desc}
+                    <br />
+                    <span className="text-[#5AA7A0] font-semibold">
+                      Price: ₹{feature.price}
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="buttons flex justify-end gap-3 mt-5">
+            ))}
+          </ul>
+        </div>
+      </div>
+      {/* Additional Features */}
+
+      <div className="hall-info-edit h-fit relative">
+        {modal && (
+          <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50 h-screen overflow-y-auto">
+            <div className="flex flex-col message bg-white p-6 rounded w-4/5 md:w-3/5 lg:w-2/5 gap-2">
+              <p className="w-full text-center text-xl font-semibold mb-2">
+                Additional Features
+              </p>
+              <div className="flex flex-col sm:flex-row gap-10 items-center flex-wrap">
+                {editedFeatures.map((feature, index) => (
+                  <div className="flex flex-col gap-2 w-full" key={index}>
+                    <div className="flex justify-center gap-5">
+                      <h1 className="">
+                        Additional Feature {index + 1}
+                      </h1>
+                      <button>
+                        <FontAwesomeIcon
+                          icon={faTrashCan}
+                          className="show-on-hover h-6 cursor-pointer opacity-50 hover:opacity-100"
+                          onClick={()=>{
+                            handleDeleteItem(index)
+                          }}
+                        />
+                      </button>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="w-[150px]">
+                        <h1 className="self-baseline">Heading:</h1>{" "}
+                      </div>
+                      <input
+                        type="text"
+                        name="heading"
+                        value={feature.heading}
+                        onChange={(e) => handleChange(e, index, "heading")}
+                        className="bg-black text-white px-3 py-1 w-[400px] rounded  h-auto  mx-auto sm:mx-0"
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <div className="w-[150px] ">
+                        <h1 className="self-baseline">Description:</h1>{" "}
+                      </div>
+                      <textarea
+                        name="desc"
+                        value={feature.desc}
+                        rows={6}
+                        onChange={(e) => handleChange(e, index, "desc")}
+                        className="bg-black text-white px-3 py-1 w-[400px] rounded  h-auto  mx-auto sm:mx-0"
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <div className="w-[150px] ">
+                        <h1 className="self-baseline">Price:</h1>{" "}
+                      </div>
+                      <input
+                        type="number"
+                        name="price"
+                        value={feature.price}
+                        onChange={(e) => handleChange(e, index, "price")}
+                        className="bg-black text-white px-3 py-1 w-[400px] rounded  h-auto  mx-auto sm:mx-0"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="buttons flex justify-end gap-3 mt-10">
+                <button
+                  className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300"
+                  onClick={handleAddItem}
+                >
+                  Add
+                </button>
                 <button
                   className="bg-red-700 p-2 rounded text-white hover:bg-red-500 transform active:scale-95 transition duration-300"
                   onClick={toggleModal}
@@ -166,7 +201,7 @@ const HallAdditionalFeatures = ({ additionalFeatures, setHallData }: Props) => {
                   Cancel
                 </button>
                 <button
-                  className="bg-SAPBlue-700 p-2 rounded text-white hover:bg-SAPBlue-900 transform active:scale-95 transition duration-300"
+                  className="bg-sapblue-700 p-2 rounded text-white hover:bg-sapblue-900 transform active:scale-95 transition duration-300"
                   onClick={handleFormSubmit}
                 >
                   Submit

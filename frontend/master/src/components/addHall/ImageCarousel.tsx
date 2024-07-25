@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-// import Carousel from "./Carousel";
 import { EachHallType } from "../../types/Hall.types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axiosInstance from "../../config/axiosInstance";
+import axiosMasterInstance from "../../config/axiosMasterInstance";
 
 type props = {
   images: string[];
@@ -27,7 +25,7 @@ export default function ImageCarousel({ images, setHallData }: props) {
     try {
       const formData = new FormData();
       formData.append("image", newImage);
-      const response = await axiosInstance.post(
+      const response = await axiosMasterInstance.post(
         "http://localhost:3000/uploadImage",
         formData,
         {
@@ -78,7 +76,7 @@ export default function ImageCarousel({ images, setHallData }: props) {
   }
 
   return (
-    <div className="flex flex-col items-center w-full rounded-xl">
+    <div className="flex flex-col items-center w-[60%] md:w-[90%] lg:w-full rounded-xl">
       <p className=" text-xl font-semibold">IMAGES</p>
       <div className="flex flex-col items-center w-full">
         {images.map((imageSrc, index) => (
@@ -148,7 +146,7 @@ export default function ImageCarousel({ images, setHallData }: props) {
             <button
               className={`px-4 py-2  text-white rounded  focus:outline-none ${
                 !newImage ? "bg-gray-400" : ""
-              }  ${newImage ? "bg-SAPBlue-800 hover:bg-SAPBlue-900" : ""}`}
+              }  ${newImage ? "bg-sapblue-800 hover:bg-sapblue-900" : ""}`}
               onClick={handleImageUpload}
               disabled={!newImage}
             >

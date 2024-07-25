@@ -1,14 +1,52 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
+import axiosMasterInstance from "../../config/axiosMasterInstance";
+import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
+import svkmLogo from "../../assets/svkm-logo.png";
 
 const NavBar = () => {
   const [open, setOpen] = useState(false);
 
-  const [isAuthenticated, logout] = useAuthStore((store) => [
+  const [isAuthenticated, user, logout] = useAuthStore((store) => [
     store.isAuthenticated,
+    store.user,
     store.logout,
   ]);
+  const navigate = useNavigate();
+
+  useQuery({
+    queryKey: ["loggedIn"],
+    queryFn: async () => {
+      const response = await axiosMasterInstance.get("isLoggedIn");
+      if (!response.data.isLoggedIn) {
+        logout();
+        navigate("/login");
+        return response.data;
+      } else {
+        return null;
+      }
+    },
+    // Dont put stale time
+  });
+
+  const handleLogout = async () => {
+    try {
+      const response = await axiosMasterInstance.get("/logoutAdmin");
+      if (response.status === 200) {
+        const data = await response.data;
+        logout();
+        toast.success("logged Out");
+        console.log(data);
+        navigate("/login");
+      } else {
+        toast.error("error while logging you out.");
+      }
+    } catch (error) {
+      console.error("Error during authentication:", error);
+    }
+  };
 
   return (
     <>
@@ -17,7 +55,8 @@ const NavBar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center  py-6 md:justify-start md:space-x-10">
             <div className="flex justify-start lg:w-0 lg:flex-1">
-              <Link to="/">
+              <Link className="flex flex-row items-center gap-2" to="/">
+                <img className="h-10 w-auto" src={svkmLogo} />
                 <h1 className="text-xl font-semibold">SVKM Halls</h1>
               </Link>
             </div>
@@ -54,14 +93,61 @@ const NavBar = () => {
                 Home
               </Link>
             </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/addnewhall"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Add Hall
+              </Link>
+            </nav>
+
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/deletehall"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Delete Hall
+              </Link>
+            </nav>
+            
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/admins"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Admins
+              </Link>
+            </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/constants"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Constants
+              </Link>
+            </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/dashboard"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Dashboard
+              </Link>
+            </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
               {isAuthenticated ? (
-                <span
-                  onClick={logout}
-                  className="whitespace-nowrap text-base font-medium text-red-500 hover:text-red-900 cursor-pointer"
-                >
-                  Log Out
-                </span>
+                <div className="flex items-center gap-2">
+                  <span>
+                    <span className=" text-gray-500">master</span> {user?.email}
+                  </span>
+                  <span
+                    onClick={handleLogout}
+                    className="whitespace-nowrap text-base font-medium text-red-500 hover:text-red-900 cursor-pointer"
+                  >
+                    Log Out
+                  </span>
+                </div>
               ) : (
                 <Link
                   to="/login"
@@ -70,12 +156,6 @@ const NavBar = () => {
                   Sign in
                 </Link>
               )}
-              {/* <Link
-                to="#"
-                className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-SAPBlue-800 hover:bg-SAPBlue-900"
-              >
-                Sign up
-              </Link> */}
             </div>
           </div>
         </div>
@@ -94,7 +174,7 @@ const NavBar = () => {
           className={
             open
               ? "opacity-100 scale-100 ease-out duration-200 absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden z-40"
-              : "opacity-0 scale-95 absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden z-40"
+              : "hidden scale-95 absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden z-40"
           }
         >
           <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50">
@@ -144,22 +224,60 @@ const NavBar = () => {
                   Home
                 </Link>
               </div>
-              <div>
+              <div className="grid grid-cols-2 gap-y-4 gap-x-8">
                 <Link
-                  to="#"
-                  className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-SAPBlue-800 hover:bg-SAPBlue-900"
+                  to="/addnewhall"
+                  className="text-base font-medium text-gray-900 hover:text-gray-700"
                 >
-                  Sign up
+                  Add Hall
                 </Link>
-                <p className="mt-6 text-center text-base font-medium text-gray-500">
-                  Existing customer?
+              </div>
+              <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                <Link
+                  to="/admins"
+                  className="text-base font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Admin
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                <Link
+                  to="/constants"
+                  className="text-base font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Constants
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                <Link
+                  to="/dashboard"
+                  className="text-base font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Dashboard
+                </Link>
+              </div>
+              <div className="">
+                {isAuthenticated ? (
+                  <div className="flex flex-col gap-2">
+                    <span>
+                      <span className=" text-gray-500">master</span>{" "}
+                      {user?.email}
+                    </span>
+                    <span
+                      onClick={handleLogout}
+                      className="whitespace-nowrap text-base font-medium text-red-500 hover:text-red-900 cursor-pointer"
+                    >
+                      Log Out
+                    </span>
+                  </div>
+                ) : (
                   <Link
-                    to="#"
-                    className="text-SAPBlue-800 hover:text-SAPBlue-900"
+                    to="/login"
+                    className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
                   >
                     Sign in
                   </Link>
-                </p>
+                )}
               </div>
             </div>
           </div>

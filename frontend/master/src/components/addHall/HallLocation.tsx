@@ -1,4 +1,3 @@
-// import EditComponent from "./EditComponent";
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
@@ -10,24 +9,22 @@ type props = {
 };
 
 export default function HallLocation({ location, setHallData }: props) {
-  const handleChange = (event: React.ChangeEvent<any>) => {
-    const { name, value } = event.target;
-    setHallData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
   let finalIframeUrl = location.iframe?.replace(/&#39;/g, "'");
   return (
-    <div className="hall-location flex flex-col gap-3 justify-between bg-blue-100 w-full py-5 px-7 rounded-lg">
+    <div className="flex flex-col gap-3 justify-between w-full py-5">
       <p className="w-full text-center text-xl font-semibold mb-2">Location</p>
       <div className="flex gap-3 items-center">
         <h1 className="w-1/5 ">Small Address:</h1>{" "}
         <textarea
           name="desc1"
           value={location.desc1}
-          onChange={handleChange}
-          className="bg-black text-white px-3 py-1 rounded w-full h-auto"
+          onChange={(e) =>
+            setHallData((prev) => ({
+              ...prev,
+              location: { ...prev.location, desc1: e.target.value },
+            }))
+          }
+          className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
         />
       </div>
       <div className="flex gap-3 items-center">
@@ -35,8 +32,13 @@ export default function HallLocation({ location, setHallData }: props) {
         <textarea
           name="desc2"
           value={location.desc2}
-          onChange={handleChange}
-          className="bg-black text-white px-3 py-1 rounded w-full h-auto"
+          onChange={(e) =>
+            setHallData((prev) => ({
+              ...prev,
+              location: { ...prev.location, desc2: e.target.value },
+            }))
+          }
+          className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
         />
       </div>
       <div className=" flex flex-col">
@@ -45,8 +47,13 @@ export default function HallLocation({ location, setHallData }: props) {
           <textarea
             name="gmapurl"
             value={location.gmapurl}
-            onChange={handleChange}
-            className="bg-black text-white px-3 py-1 rounded w-full h-auto"
+            onChange={(e) =>
+              setHallData((prev) => ({
+                ...prev,
+                location: { ...prev.location, gmapurl: e.target.value },
+              }))
+            }
+            className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
           />
         </div>
         <p className=" w-full text-center mt-1">
@@ -76,16 +83,22 @@ export default function HallLocation({ location, setHallData }: props) {
           <textarea
             name="iframe"
             value={location.iframe}
-            onChange={handleChange}
-            className="bg-black text-white px-3 py-1 rounded w-full h-auto"
+            onChange={(e) =>
+              setHallData((prev) => ({
+                ...prev,
+                location: { ...prev.location, iframe: e.target.value },
+              }))
+            }
+            className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
           />
         </div>
-        <div className=" flex gap-2 items-center mt-2">
+        <div className="flex flex-col gap-2 items-center mt-5 sm:flex-row sm:items-center">
           <p>Preview of the embed here 👉🏻</p>
           <iframe
             src={finalIframeUrl}
-            width="400"
-            height="200"
+            className="w-full"
+            //width="400"
+            //height="200"
             // @ts-ignore
             allowFullScreen=""
             // @ts-ignore

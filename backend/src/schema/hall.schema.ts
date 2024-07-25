@@ -34,8 +34,6 @@ export const AddHallZodSchema = z.object({
     }),
     about: z.array(z.string(stringErrorHandler("about"))),
     capacity: z.string(stringErrorHandler("capacity")),
-    seating: z.string(stringErrorHandler("seatings")),
-    pricing: z.string(stringErrorHandler("pricing")).optional(),
     additionalFeatures: z.array(
       z.object({
         heading: z.string(stringErrorHandler("additionalFeatures.heading")),
@@ -43,9 +41,7 @@ export const AddHallZodSchema = z.object({
         stats: z
           .array(z.string(stringErrorHandler("additionalFeatures.stats")))
           .optional(),
-        price: z
-          .string(stringErrorHandler("additionalFeatures.price"))
-          .optional(),
+        price: z.number(stringErrorHandler("additionalFeatures.price")),
       })
     ),
     images: z.array(z.string(stringErrorHandler("images"))).optional(),
@@ -60,6 +56,10 @@ export const AddHallZodSchema = z.object({
         ),
       })
     ),
+    eventRestrictions: z
+      .string(stringErrorHandler("eventRestrictions"))
+      .optional(),
+    securityDeposit: z.number(stringErrorHandler("securityDeposit")).optional(),
   }),
 });
 

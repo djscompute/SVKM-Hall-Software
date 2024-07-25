@@ -16,14 +16,14 @@ export type EachHallAdditonalFeaturesType = {
   heading: string; // heading of the additional feature. (eg. PODIUM )
   desc: string; // description about what the feature is
   stats?: string[]; // stats about the feature for example dimensions, duration, anything
-  price?: number; //  price obviously per hour or something.
+  price: number; //  price obviously per hour or something.
 };
 
 export type EachHallSessionType = {
   readonly _id?: string;
   active: boolean;
   name: string;
-  from?: string;
+  from: string;
   to: string;
   price: { categoryName: string; price: number }[];
 };
@@ -34,35 +34,62 @@ export type EachHallSessionType = {
 export interface EachHallType {
   readonly _id?: string; // UNIQUE KEY. This will be used to query Booking table in a certain time frame.
   name: string; // damn i forgot this
+  person: string;
   location: EachHallLocationType; // location of the hall
   about: string[]; // description of the hall. can be buletins
   capacity: string; // obvio
-  seating: string; // obvio
-  pricing: string | undefined; // pricing. can be either price per time OR ask manager for final qoutation
   additionalFeatures?: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
   sessions: EachHallSessionType[];
+  eventRestrictions: string;
+  securityDeposit: number;
   readonly createdAt?: Date;
   readonly updatedAt?: Date;
 }
+
+export type bookingStatusType =
+  | "CONFIRMED"
+  //| "TENTATIVE"
+  | "CANCELLED"
+  | "ENQUIRY";
+
+export type transactionType = "cheque" | "upi" | "neft/rtgs" | "svkminstitute";
+
+export type bookingTransactionType = {
+  type: transactionType;
+  date: string;
+  transactionID: string;
+  payeeName: string;
+  utrNo: string;
+  chequeNo: string;
+  bank: string;
+};
 
 // ================================================
 // This will be in Bookings Table
 // ================================================
 export type HallBookingType = {
-  id: string; // UNIQUE KEY
+  readonly _id: string;
   user: CustomerType; // the User who booked this hall
   features: EachHallAdditonalFeaturesType[]; // the Ammenities which the user has booked for himself
-  status: "CONFIRMED" | "TENTATIVE" | "EMPTY" | "DISABLED" | "ENQUIRY"; // payment and booking status is reflected here
+  status: bookingStatusType; // payment and booking status is reflected here
   price: number; // obvio bro
+  transaction: bookingTransactionType;
+  baseDiscount: number;
+  deposit: number;
+  isDeposit: boolean;
+  depositDiscount: number;
   hallId: string;
   session_id: string; // the sesison id
+  booking_type: string;
   from: string; // starting time of session
   to: string; // ending time of session
   time: {
     from: string; // start time
     to: string; // end time
   };
+  purpose: string; //purpose for which the hall is being booked by the user (event type)
+  cancellationReason?: string; // reason for cancellation
 };
 
 // ================================================
@@ -73,9 +100,10 @@ export interface adminType {
   readonly _id: string;
   role: string;
   username: string;
+  contact: string;
   email: string;
   password: string;
-  managedHalls?: string[];
+  managedHalls?: string[]; // id of the halls which he has the access to
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
@@ -86,11 +114,13 @@ export interface adminType {
 export type CustomerType = {
   readonly _id: string; // unique customer id
   username: string; // name
+  contact: string;
   email?: string; // email ( maybe UNIQUE KEY )
-  aadharNo?: string; // adhar no. ( dont know if this is required )
+  gstNo?: string; // adhar no. ( dont know if this is required )
   panNo?: string; // pan no. ( dont know if this is required )
   address?: string; // address
   mobile: string; // mobile number ( maybe UNIQUE )
+  remark?: string; // any remark
 };
 
 // ================================================

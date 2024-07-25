@@ -43,13 +43,13 @@ const HallSchema = new mongoose.Schema<EachHallType>(
     location: { type: HallLocationSchema, required: true },
     about: { type: [String], required: true },
     capacity: { type: String },
-    seating: { type: String },
-    pricing: { type: String },
     additionalFeatures: {
       type: [HallAdditonalFeaturesSchema],
     },
     images: { type: [String], required: true },
     sessions: { type: [HallSessionSchema], required: true },
+    eventRestrictions : {type: String, required: true},
+    securityDeposit: {type: Number }
   },
   {
     timestamps: true,
