@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { BookingModel, HallBookingType } from "../models/booking.model";
 import { getBookingZodSchema } from "../schema/booking.schema";
+import { sendEmail } from "../utils/email";
 
 export async function addBookingHandler(req: Request, res: Response) {
   try {
@@ -204,6 +205,17 @@ export async function getBookingByIdHandler(req: Request, res: Response) {
     return res.status(200).json(booking);
   } catch (error) {
     console.error("Error in getSessionByIdHandler:", error);
+    res.status(500).json({ message: "Internal server error", error: error });
+  }
+}
+
+export async function sendEmailHandler(req: Request, res: Response) {
+  try {    
+    const { to, subject, text, filename, path } = req.body;
+    sendEmail({to, subject, text, filename, path});
+    return res.status(200).json({message:"email sent"})
+  } catch (error) {
+    console.error("Error in sending email:", error);
     res.status(500).json({ message: "Internal server error", error: error });
   }
 }

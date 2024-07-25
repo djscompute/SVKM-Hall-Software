@@ -48,13 +48,13 @@ export const RemoveBookingZodSchema = z.object({
 //Zod Schema for getting a session by {from, to}
 export const getBookingZodSchema = z.object({
   query: z.object({
-    from: z.string().refine((from) => from.trim() !== '', {
+    from: z.string().refine((from) => from.trim() !== "", {
       message: "from cannot be empty",
-      path: ['from'],
+      path: ["from"],
     }),
-    to: z.string().refine((to) => to.trim() !== '', {
+    to: z.string().refine((to) => to.trim() !== "", {
       message: "to cannot be empty",
-      path: ['to'],
+      path: ["to"],
     }),
   }),
 });
@@ -62,8 +62,17 @@ export const getBookingZodSchema = z.object({
 //Zod schema for getting a session by ID
 export const getBookingByIdZodSchema = z.object({
   query: z.object({
-    _id: z.string()
-  })
+    _id: z.string(),
+  }),
+});
+export const EmailZodSchema = z.object({
+  body: z.object({
+    to: z.string(),
+    subject: z.string(),
+    text: z.string(),
+    filename: z.string().optional(),
+    path: z.string().optional(),
+  }),
 });
 // THIS IS A FUNCITON TO CREATE UTC STANDARD TIME DATETIME STRING.
 // ZOD SUPPORTS ONLY UTC STANDARD TIME

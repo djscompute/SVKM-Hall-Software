@@ -28,6 +28,7 @@ import {
   RemoveBookingZodSchema,
   getBookingByIdZodSchema,
   getBookingZodSchema,
+  EmailZodSchema
 } from "./schema/booking.schema";
 import {
   addBookingHandler,
@@ -36,6 +37,7 @@ import {
   getBookingHandler,
   getBookingHandlerWithoutUser,
   removeBookingHandler,
+  sendEmailHandler,
 } from "./controller/booking.controller";
 
 // ImageHandler
@@ -174,4 +176,10 @@ export default function routes(app: Express) {
     upload.single("image"),
     uploadImageHandler
   );
+
+  app.post(
+    "/sendEmail",
+    validateRequest(EmailZodSchema),
+    sendEmailHandler,
+  )
 }
