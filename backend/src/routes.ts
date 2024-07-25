@@ -6,6 +6,7 @@ import {
   editHallHandler,
   getAllHallsHandler,
   getHallByIdHandler,
+  deleteHallHandler
 } from "./controller/hall.controller";
 import {
   createAdminHandler,
@@ -170,6 +171,14 @@ export default function routes(app: Express) {
     requireMasterRole,
     validateRequest(AddHallZodSchema),
     addHallHandler,
+  ]);
+
+  //Remove Hall completely
+  app.delete("/halls/:id", [
+    validateCookie,
+    requireMasterRole,
+    validateRequest(RemoveHallZodSchema),
+    deleteHallHandler,
   ]);
 
   //Remove a hall

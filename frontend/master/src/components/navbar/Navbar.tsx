@@ -101,6 +101,16 @@ const NavBar = () => {
                 Add Hall
               </Link>
             </nav>
+
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/deletehall"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Delete Hall
+              </Link>
+            </nav>
+            
             <nav className="hidden md:flex space-x-10">
               <Link
                 to="/admins"
