@@ -39,14 +39,18 @@ import {
   RemoveBookingZodSchema,
   getBookingByIdZodSchema,
   getBookingZodSchema,
+  EmailZodSchema,
+  InvoiceAndReceiptSchema
 } from "./schema/booking.schema";
 import {
   addBookingHandler,
   editBookingHandler,
+  generateReceiptAndInvoiceHandler,
   getBookingByIdHandler,
   getBookingHandler,
   getBookingHandlerWithoutUser,
   removeBookingHandler,
+  sendEmailHandler,
 } from "./controller/booking.controller";
 
 //Constants
@@ -327,4 +331,16 @@ export default function routes(app: Express) {
     getSessionsWithCategoriesByHallNameHandler
   )
   {/********************* Helper Routes End*********************/}
+
+  app.post(
+    "/generateReceiptAndInvoice",
+    validateRequest(InvoiceAndReceiptSchema),
+    generateReceiptAndInvoiceHandler,
+  )
+
+  app.post(
+    "/sendEmail",
+    validateRequest(EmailZodSchema),
+    sendEmailHandler,
+  )
 }
