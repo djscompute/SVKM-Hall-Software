@@ -24,9 +24,13 @@ export async function sendEmail(props: emailType) {
       subject: `${props.subject}`,
       text: `${props.text}`,
       attachments: [{
-          filename: `${props.filename}`,
-          path: `./${props.filename}`
-      }]
+          filename: `Customer_${props.filename}_Invoice.pdf`,
+          path: `./src/files/Customer_${props.filename}_Invoice.pdf`
+      },
+    {
+      filename: `Customer_${props.filename}_Receipt.pdf`,
+      path: `./src/files/Customer_${props.filename}_Receipt.pdf`
+    }]
     };
 
     transporter.sendMail(

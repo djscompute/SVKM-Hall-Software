@@ -96,6 +96,7 @@ export const getBookingByIdZodSchema = z.object({
     _id: z.string(),
   }),
 });
+
 export const EmailZodSchema = z.object({
   body: z.object({
     to: z.string(),
@@ -103,6 +104,24 @@ export const EmailZodSchema = z.object({
     text: z.string(),
     filename: z.string().optional(),
     path: z.string().optional(),
+  })
+});
+
+export const InvoiceAndReceiptSchema = z.object({
+  body: z.object({
+    name: z.string(),
+    address: z.string(),
+    location: z.string(),
+    city: z.string(),
+    pincode: z.number(),
+    country: z.string(),
+    stateCode: z.string(),
+    date: z.string(),
+    paymentType: z.string(),
+    hallName: z.string(),
+    amount: z.number(),
+    panNo: z.string(),
+    gstNo: z.string(),
   })
 });
 // THIS IS A FUNCITON TO CREATE UTC STANDARD TIME DATETIME STRING.

@@ -119,7 +119,7 @@ export async function generateInvoice(props: invoiceType) {
     const page = await browser.newPage();
 
     const invoice = invoiceHtmlTemplate(props);
-    const pdfPath = `./backend/src/files/Customer_${props.name}_Invoice.pdf`;
+    const pdfPath = `./src/files/Customer_${props.name}_Invoice.pdf`;
 
     await page.setContent(invoice);
     await page.pdf({ path: `${pdfPath}`, format: "A4" });

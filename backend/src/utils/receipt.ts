@@ -51,7 +51,7 @@ export async function generateReceipt(props: receiptType) {
     const page = await browser.newPage();
 
     const receipt = receiptHtmlTemplate(props);
-    const pdfPath = `./backend/src/files/Customer_${props.name}_Receipt.pdf`;   
+    const pdfPath = `./src/files/Customer_${props.name}_Receipt.pdf`;   
 
     await page.setContent(receipt);
     await page.pdf({ path: `${pdfPath}`, format: "A4" });
