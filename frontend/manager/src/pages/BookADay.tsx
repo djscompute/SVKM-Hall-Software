@@ -129,6 +129,7 @@ function BookADay() {
               sessionName: HallData?.sessions.find(
                 (ecssn) => ecssn._id == selectedSessionId
               )?.name,
+              booking_type: selectedCategory,
               estimatedPrice: price,
               securityDeposit: securityDeposit,
               additionalFeatures: selectedFeatures,
@@ -493,7 +494,7 @@ function BookADay() {
             />
             <label htmlFor={eachFeature._id}>
               {eachFeature.heading} - ₹
-              {selectedCategory === "Inter Institute" ? 0 : eachFeature.price}
+              {selectedCategory === "SVKM INSTITUTE" ? 0 : eachFeature.price}
             </label>
           </span>
         ))}
