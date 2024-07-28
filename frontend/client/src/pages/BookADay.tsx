@@ -117,6 +117,49 @@ function BookADay() {
       if (data.error) {
         console.error(data.error);
       } else {
+
+        axiosClientInstance
+        .post(`/generateReceiptAndInvoice`, {
+          name: name, 
+          address: "User's address", 
+          location: "User's location", 
+          city: "User's city", 
+          pincode: 400064, 
+          country: "User's country", 
+          stateCode: "User's state code", 
+          date: day, 
+          paymentType: "Payment method", 
+          hallName: HallData?.name || "",
+          amount: price, 
+          panNo: "User's PAN number", 
+          gstNo: "Hall's GST number", 
+        })
+        .then((response) => {
+          console.log(response.data);
+          return response.data;
+        })
+        .catch((error) => {
+          console.log(error);
+          throw error;
+        });
+
+        axiosClientInstance
+        .post(`/sendEmail`, {
+          to: email,
+          subject: `SVKM Hall Booking for ${day}` ,
+          text: "Your enquiry for hall booking has been received. Please find the attachments below.",
+          filename: name,
+          path: "",
+        })
+        .then((response) => {
+          console.log(response.data);
+          return response.data;
+        })
+        .catch((error) => {
+          console.log(error);
+          throw error;
+        })
+
         navigate("/bookingsuccessful", {
           state: {
             bookingDetails: {

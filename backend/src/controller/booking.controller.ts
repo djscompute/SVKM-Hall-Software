@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { BookingModel, HallBookingType } from "../models/booking.model";
 import { getBookingZodSchema } from "../schema/booking.schema";
+import { sendEmail } from "../utils/email";
+import { generateInvoice } from "../utils/invoice";
+import { generateReceipt } from "../utils/receipt";
+
 
 export async function addBookingHandler(req: Request, res: Response) {
   try {
@@ -22,6 +26,12 @@ export async function addBookingHandler(req: Request, res: Response) {
       time,
       purpose,
     } = req.body as HallBookingType;
+
+    if (from >= to) {
+      return res.status(400).json({
+        message: "'from' time must be less than 'to' time.",
+      });
+    }
 
     // Check for existing bookings within the specified time range
     const existingBookings = await BookingModel.find({
@@ -209,6 +219,42 @@ export async function getBookingByIdHandler(req: Request, res: Response) {
     return res.status(200).json(booking);
   } catch (error) {
     console.error("Error in getSessionByIdHandler:", error);
+    res.status(500).json({ message: "Internal server error", error: error });
+  }
+}
+
+export async function generateReceiptAndInvoiceHandler(req: Request, res: Response) {
+  try {    
+    const { name, address, location, city, pincode, country, stateCode, date, paymentType, hallName, amount, panNo, gstNo } = req.body;
+    generateInvoice({
+      name,
+      address,
+      location,
+      city,
+      pincode,
+      country,
+      stateCode,
+      date,
+      paymentType,
+      hallName,
+      amount,
+      panNo,
+      gstNo
+    });
+    generateReceipt({name, hallName, amount})
+    return res.status(200).json({message:"Receipt and invoice generated"})
+  } catch (error) {
+    console.error("Error in generating:", error);
+    res.status(500).json({ message: "Internal server error", error: error });
+  }
+}
+export async function sendEmailHandler(req: Request, res: Response) {
+  try {    
+    const { to, subject, text, filename, path } = req.body;
+    sendEmail({to, subject, text, filename, path});
+    return res.status(200).json({message:"email sent"})
+  } catch (error) {
+    console.error("Error in sending email:", error);
     res.status(500).json({ message: "Internal server error", error: error });
   }
 }
