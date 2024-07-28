@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 // import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
 import { useEffect, useState } from 'react';
 import { queryClient } from '../App';
+import Login from '../components/login/Login';
 
 const possibleBookingTypes: bookingStatusType[] = [
   'CONFIRMED',
@@ -249,7 +250,11 @@ function Booking() {
       setEditedData(data);
     }
   };
-
+  useEffect(() => {
+    if (data !== null) {
+      setEditedData(data);
+    }
+  }, [data]);
   const handleSave = async () => {
     const dataToSend = {
       ...editedData,
@@ -257,11 +262,12 @@ function Booking() {
         ? editedData.features
         : [editedData?.features],
     };
+
     const responsePromise = axiosManagerInstance.post(
       `/editBooking/${bookingId}`,
       dataToSend
     );
-
+    console.log('new ', await responsePromise);
     toast.promise(responsePromise, {
       pending: 'Updating...',
       success: 'Booking Status Edited!',
@@ -274,6 +280,10 @@ function Booking() {
     await queryClient.refetchQueries({
       queryKey: [`booking/${bookingId}`],
     });
+
+    if (addAdditional) {
+      setAdditional(!addAdditional);
+    }
   };
 
   const session = hallData?.sessions.find(
@@ -289,6 +299,10 @@ function Booking() {
     setShowCancellationReason(false);
   };
 
+  const handleAllEdit = () => {
+    setAdditional(!addAdditional);
+    // setEditingMode(!editingMode);
+  };
   const handleSaveCancellationReason = async () => {
     const updatedData = {
       ...data,
@@ -354,7 +368,6 @@ function Booking() {
     // If no booking with status "CONFIRMED" is found, return false
     return false;
   };
- 
 
   if (isFetching) return <h1>Loading</h1>;
 
@@ -652,19 +665,21 @@ function Booking() {
             No Additional Features Selected
           </p>
           <button
-            onClick={() => {
-              setAdditional(!addAdditional);
-            }}
+            // onClick={() => {
+            //   setAdditional(!addAdditional);
+
+            // }}
+            onClick={handleAllEdit}
             className=" mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg m-1"
           >
             Add Additonal Features
           </button>
 
-          {addAdditional ? (
+          {addAdditional || editingMode ? (
             <div className="flex flex-col w-full mb-2">
               <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
                 <span>Name</span>
-                {editingMode ? (
+                {editingMode || addAdditional ? (
                   <input
                     type="text"
                     // value={editedData?.features[0]?.heading || ''}
@@ -684,62 +699,62 @@ function Booking() {
                     className="px-2"
                   />
                 ) : (
-                  <>{data?.features[0]?.heading || "-"}</>
+                  <>{data?.features[0]?.heading || '-'}</>
                 )}
               </div>
               <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
                 <span>Description</span>
-                {editingMode ? (
-                  <input
-                    type="text"
-                    onChange={(e) =>
-                      setEditedData((prev) => {
-                        if (!prev) return undefined;
-                        return {
-                          ...prev,
-                          features: {
-                            ...prev.features,
-                            desc: e.target.value,
-                          },
-                        };
-                      })
-                    }
-                    placeholder="Enter Description"
-                    className="px-2"
-                  />
-                ) : (
-                  <span>{data?.features[0]?.desc || "-"}</span>
-                )}
+                {/* {editingMode ? ( */}
+                <input
+                  type="text"
+                  onChange={(e) =>
+                    setEditedData((prev) => {
+                      if (!prev) return undefined;
+                      return {
+                        ...prev,
+                        features: {
+                          ...prev.features,
+                          desc: e.target.value,
+                        },
+                      };
+                    })
+                  }
+                  placeholder="Enter Description"
+                  className="px-2"
+                />
+                {/* ) : ( */}
+                {/* <span>{data?.features[0]?.desc || "-"}</span> */}
+                {/* )} */}
               </div>
               <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
                 <span>Additional Feature Charges</span>
-                {editingMode ? (
-                  <input
-                    type="number"
-                    // value={editedData?.features[2]?.price || ""}
-                    onChange={(e) =>
-                      setEditedData((prev) => {
-                        if (!prev) return undefined;
+                {/* {editingMode ? ( */}
+                <input
+                  type="number"
+                  // value={editedData?.features[2]?.price || ""}
+                  onChange={(e) =>
+                    setEditedData((prev) => {
+                      if (!prev) return undefined;
 
-                        return {
-                          ...prev,
-                          features: {
-                            ...prev.features,
-                            price: parseInt(e.target.value),
-                          },
-                        };
-                      })
-                    }
-                    placeholder="Enter Charges"
-                    className="px-2"
-                  />
-                ) : (
-                  <span>
+                      return {
+                        ...prev,
+                        features: {
+                          ...prev.features,
+                          price: parseInt(e.target.value),
+                        },
+                      };
+                    })
+                  }
+                  placeholder="Enter Charges"
+                  className="px-2"
+                />
+                {/* ) : ( */}
+                {/* <span>
                     {datas?.booking_type === 'SVKM Institute'
                       ? 0
                       : data?.features[2]?.price || '-'}
-                  </span>
-                )}
+                  </span> */}
+                {/* )} */}
               </div>
             </div>
           ) : (
@@ -753,7 +768,7 @@ function Booking() {
           <div key={index} className="flex flex-col w-full mb-2">
             <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
               <span>Name</span>
-              {editingMode ? (
+              {editingMode || addAdditional ? (
                 <input
                   type="text"
                   value={editedData?.features[index]?.heading}
@@ -779,7 +794,7 @@ function Booking() {
             </div>
             <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
               <span>Description</span>
-              {editingMode ? (
+              {editingMode || addAdditional ? (
                 <input
                   type="text"
                   value={editedData?.features[index]?.desc}
@@ -805,7 +820,7 @@ function Booking() {
             </div>
             <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
               <span>Additional Feature Charges</span>
-              {editingMode ? (
+              {editingMode || addAdditional ? (
                 <input
                   type="number"
                   value={editedData?.features[index]?.price || ''}
@@ -1165,7 +1180,7 @@ function Booking() {
           </div>
         </>
       )}
-      {editingMode ? (
+      {editingMode || addAdditional ? (
         <button
           onClick={handleSave}
           className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg mt-4"
