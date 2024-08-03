@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { BookingModel, HallBookingType } from "../models/booking.model";
 import { getBookingZodSchema } from "../schema/booking.schema";
 import { sendEmail } from "../utils/email";
-import { generateInvoice } from "../utils/invoice";
-import { generateReceipt } from "../utils/receipt";
+import { generateConfirmation } from "../utils/confirmation";
+import { generateInquiry } from "../utils/inquiry";
 
 
 export async function addBookingHandler(req: Request, res: Response) {
@@ -25,6 +25,7 @@ export async function addBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
+      enquiryNumber
     } = req.body as HallBookingType;
 
     if (from >= to) {
@@ -71,10 +72,10 @@ export async function addBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
+      enquiryNumber
     });
     await newBooking.save();
     console.log("added new booking");
-
     return res.status(200).json(newBooking);
   } catch (error: any) {
     res.status(400).json({ name: error.name, message: error.message });
@@ -100,7 +101,8 @@ export async function editBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
-      cancellationReason
+      cancellationReason,
+      enquiryNumber
     } = req.body as HallBookingType; // Ensure this matches your schema type
 
     const bookingId: string = req.params.id;
@@ -124,7 +126,8 @@ export async function editBookingHandler(req: Request, res: Response) {
         to,
         time,
         purpose,
-        cancellationReason
+        cancellationReason,
+        enquiryNumber
       },
       { new: true }
     );
@@ -223,29 +226,103 @@ export async function getBookingByIdHandler(req: Request, res: Response) {
   }
 }
 
-export async function generateReceiptAndInvoiceHandler(req: Request, res: Response) {
-  try {    
-    const { name, address, location, city, pincode, country, stateCode, date, paymentType, hallName, amount, panNo, gstNo } = req.body;
-    generateInvoice({
-      name,
-      address,
-      location,
-      city,
-      pincode,
-      country,
-      stateCode,
+export async function generateInquiryHandler(req: Request, res: Response) {
+  try {
+    const { 
+      date, 
+      customerName, 
+      contactPerson, 
+      contactNo, 
+      enquiryNumber, 
+      hallName, 
+      dateOfEvent, 
+      slotTime, 
+      purposeOfBooking, 
+      hallCharges, 
+      additionalFacilities, 
+      hallDeposit, 
+      totalPayable 
+    } = req.body;
+
+    generateInquiry({
       date,
-      paymentType,
+      customerName,
+      contactPerson,
+      contactNo,
+      enquiryNumber,
       hallName,
-      amount,
-      panNo,
-      gstNo
+      dateOfEvent,
+      slotTime,
+      purposeOfBooking,
+      hallCharges,
+      additionalFacilities,
+      hallDeposit,
+      totalPayable
     });
-    generateReceipt({name, hallName, amount})
-    return res.status(200).json({message:"Receipt and invoice generated"})
+
+    return res.status(200).json({ message: "Inquiry generated" });
   } catch (error) {
-    console.error("Error in generating:", error);
-    res.status(500).json({ message: "Internal server error", error: error });
+    console.error("Error in generating inquiry:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+}
+
+export async function generateConfirmationHandler(req: Request, res: Response) {
+  try {
+    const { 
+      date, 
+      customerName, 
+      contactPerson, 
+      contactNo, 
+      enquiryNumber, 
+      gstNo, 
+      pan, 
+      modeOfPayment, 
+      additionalPaymentDetails, 
+      hallName, 
+      dateOfEvent, 
+      slotTime, 
+      purposeOfBooking, 
+      hallCharges, 
+      additionalFacilities, 
+      discountPercent,
+      sgst, 
+      cgst, 
+      hallDeposit, 
+      depositDiscount, 
+      totalPayable,
+      email 
+    } = req.body;
+    
+    generateConfirmation({
+      date, 
+      customerName, 
+      contactPerson, 
+      contactNo, 
+      enquiryNumber, 
+      gstNo, 
+      pan, 
+      modeOfPayment, 
+      additionalPaymentDetails, 
+      hallName, 
+      dateOfEvent, 
+      slotTime, 
+      purposeOfBooking, 
+      hallCharges, 
+      additionalFacilities, 
+      discountPercent,
+      sgst, 
+      cgst, 
+      hallDeposit, 
+      depositDiscount, 
+      totalPayable,
+      email
+    });
+
+    return res.status(200).json({ message: "Confirmation generated" });
+  } catch (error) {
+    console.error("Error in generating confirmation:", error);
+    res.status(500).json({ message: "Internal server error", error });
   }
 }
 export async function sendEmailHandler(req: Request, res: Response) {

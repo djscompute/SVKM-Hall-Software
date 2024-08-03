@@ -74,6 +74,8 @@ function BookADay() {
     }
   }, [selectedCategory, HallData]);
 
+  const enquiryNumber = `ENQ-${dayjs().format("YYYYMMDD-HHmmss")}`;
+
   const addBookingMutation = useMutation({
     mutationFn: () =>
       axiosManagerInstance
@@ -103,6 +105,7 @@ function BookADay() {
               ?.to as string
           }`,
           purpose: purpose,
+          enquiryNumber: enquiryNumber
         })
         .then((response) => {
           console.log(response.data);

@@ -40,12 +40,14 @@ import {
   getBookingByIdZodSchema,
   getBookingZodSchema,
   EmailZodSchema,
-  InvoiceAndReceiptSchema
+  InquirySchema,
+  ConfirmationSchema
 } from "./schema/booking.schema";
 import {
   addBookingHandler,
   editBookingHandler,
-  generateReceiptAndInvoiceHandler,
+  generateInquiryHandler,
+  generateConfirmationHandler,
   getBookingByIdHandler,
   getBookingHandler,
   getBookingHandlerWithoutUser,
@@ -333,9 +335,15 @@ export default function routes(app: Express) {
   {/********************* Helper Routes End*********************/}
 
   app.post(
-    "/generateReceiptAndInvoice",
-    validateRequest(InvoiceAndReceiptSchema),
-    generateReceiptAndInvoiceHandler,
+    "/generateInquiry",
+    validateRequest(InquirySchema),
+    generateInquiryHandler,
+  )
+
+  app.post(
+    "/generateConfirmation",
+    validateRequest(ConfirmationSchema),
+    generateConfirmationHandler,
   )
 
   app.post(
