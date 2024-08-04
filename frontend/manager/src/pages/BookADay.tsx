@@ -120,6 +120,69 @@ function BookADay() {
       if (data.error) {
         console.error(data.error);
       } else {
+        const additionalFacilities =
+        selectedCategory === "SVKM INSTITUTE"
+          ? 0
+          : Object.values(selectedFeatures).reduce(
+              (acc, feature) => acc + feature.price,
+              0
+            );
+
+      const sessionPrice =
+        HallData?.sessions
+          .find((ss) => ss._id === selectedSessionId)
+          ?.price.find((e) => e.categoryName === selectedCategory)?.price ||
+        0;
+
+      const totalPayable =
+        sessionPrice + additionalFacilities + securityDeposit;
+      axiosManagerInstance
+        .post(`/generateInquiry`, {
+          date: day, // Assuming 'day' is the date of booking
+          customerName: name,
+          contactPerson: person,
+          contactNo: mobileNumber,
+          enquiryNumber: enquiryNumber, // Generate a unique enquiry number
+          hallName: HallData?.name,
+          dateOfEvent: day,
+          slotTime: `${convert_IST_TimeString_To12HourFormat(
+            HallData?.sessions.find((ss) => ss._id === selectedSessionId)
+              ?.from!
+          )} - ${convert_IST_TimeString_To12HourFormat(
+            HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to!
+          )}`,
+          purposeOfBooking: purpose,
+          hallCharges: sessionPrice,
+          additionalFacilities: additionalFacilities,
+          hallDeposit: securityDeposit,
+          totalPayable: totalPayable,
+        })
+        .then((response) => {
+          console.log(response.data);
+          return response.data;
+        })
+        .catch((error) => {
+          console.log(error);
+          throw error;
+        });
+
+      axiosManagerInstance
+        .post(`/sendEmail`, {
+          to: email,
+          subject: `SVKM Hall Booking for ${day}`,
+          text: "Your enquiry for hall booking has been received. Please find the attachments below.",
+          filename: `${name}_${enquiryNumber}_inquiry`,
+          path: "",
+        })
+        .then((response) => {
+          console.log(response.data);
+          return response.data;
+        })
+        .catch((error) => {
+          console.log(error);
+          throw error;
+        });
+
         navigate("/bookingsuccessful", {
           state: {
             bookingDetails: {

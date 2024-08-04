@@ -169,6 +169,24 @@ function Booking() {
         console.log(error);
         throw error;
       });
+
+      axiosManagerInstance
+          .post(`/sendEmail`, {
+            to: editedData?.user.email || data?.user.email || "",
+            subject: `SVKM Hall Booking for ${dayjs(editedData?.from || data?.from).format("YYYY-MM-DD")}`,
+            text: "Your enquiry for hall booking has been received. Please find the attachments below.",
+            filename: `${editedData?.user.username || data?.user.username}_${editedData?.enquiryNumber || data?.enquiryNumber || ""}_confirmation`,
+            path: "",
+          })
+          .then((response) => {
+            console.log(response.data);
+            return response.data;
+          })
+          .catch((error) => {
+            console.log(error);
+            throw error;
+          });
+
   };
 
   // Helper function to get additional payment details
