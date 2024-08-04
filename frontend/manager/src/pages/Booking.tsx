@@ -121,6 +121,124 @@ function Booking() {
     },
   });
 
+  const generateConfirmationAndEmail = () => {
+    console.log("generating confirmation");
+    axiosManagerInstance
+      .post(`/generateConfirmation`, {
+        date: dayjs().format("YYYY-MM-DD"), // Current date
+        customerName: editedData?.user.username || data?.user.username,
+        contactPerson: editedData?.user.contact || data?.user.contact,
+        contactNo: editedData?.user.mobile || data?.user.mobile,
+        enquiryNumber: editedData?.enquiryNumber || data?.enquiryNumber || "",
+        gstNo: editedData?.user.gstNo || data?.user.gstNo || "",
+        pan: editedData?.user.panNo || data?.user.panNo || "",
+        modeOfPayment:
+          editedData?.transaction?.type || data?.transaction?.type || "",
+        additionalPaymentDetails: getAdditionalPaymentDetails(),
+        hallName: hallData?.name || "",
+        dateOfEvent: dayjs(editedData?.from || data?.from).format("YYYY-MM-DD"),
+        slotTime: `${dayjs(editedData?.from || data?.from).format(
+          "HH:mm"
+        )} - ${dayjs(editedData?.to || data?.to).format("HH:mm")}`,
+        purposeOfBooking: editedData?.purpose || data?.purpose || "",
+        hallCharges: priceEntry?.price || 0,
+        additionalFacilities: totalFeatureCharges,
+        discountPercent: editedData?.baseDiscount || data?.baseDiscount || 0,
+        sgst:
+          data?.booking_type === "SVKM INSTITUTE"
+            ? 0
+            : 0.09 *
+              ((priceEntry?.price || 0) +
+                totalFeatureCharges -
+                0.01 *
+                  (editedData?.baseDiscount || data?.baseDiscount || 0) *
+                  ((priceEntry?.price || 0) + totalFeatureCharges)),
+        cgst:
+          data?.booking_type === "SVKM INSTITUTE"
+            ? 0
+            : 0.09 *
+              ((priceEntry?.price || 0) +
+                totalFeatureCharges -
+                0.01 *
+                  (editedData?.baseDiscount || data?.baseDiscount || 0) *
+                  ((priceEntry?.price || 0) + totalFeatureCharges)),
+        hallDeposit: editedData?.deposit || data?.deposit || 0,
+        depositDiscount:
+          editedData?.depositDiscount || data?.depositDiscount || 0,
+        totalPayable: calculateTotalPayable(),
+        email: editedData?.user.email || data?.user.email || "",
+      })
+      .then((response) => {
+        console.log(response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+        throw error;
+      });
+
+      axiosManagerInstance
+          .post(`/sendEmail`, {
+            to: editedData?.user.email || data?.user.email || "",
+            subject: `SVKM Hall Booking for ${dayjs(editedData?.from || data?.from).format("YYYY-MM-DD")}`,
+            text: "Your enquiry for hall booking has been received. Please find the attachments below.",
+            filename: `${editedData?.user.username || data?.user.username}_${editedData?.enquiryNumber || data?.enquiryNumber || ""}_confirmation`,
+            path: "",
+          })
+          .then((response) => {
+            console.log(response.data);
+            return response.data;
+          })
+          .catch((error) => {
+            console.log(error);
+            throw error;
+          });
+
+  };
+
+  // Helper function to get additional payment details
+  const getAdditionalPaymentDetails = () => {
+    const transactionType =
+      editedData?.transaction?.type || data?.transaction?.type;
+    if (transactionType === "cheque") {
+      return `Cheque No: ${
+        editedData?.transaction?.chequeNo || data?.transaction?.chequeNo
+      }, Bank: ${
+        editedData?.transaction?.bank || data?.transaction?.bank
+      }, Payee: ${
+        editedData?.transaction?.payeeName || data?.transaction?.payeeName
+      }`;
+    } else if (transactionType === "upi") {
+      return `Transaction ID: ${
+        editedData?.transaction?.transactionID ||
+        data?.transaction?.transactionID
+      }`;
+    } else if (transactionType === "neft/rtgs") {
+      return `UTR No: ${
+        editedData?.transaction?.utrNo || data?.transaction?.utrNo
+      }`;
+    }
+    return "";
+  };
+
+  // Helper function to calculate total payable amount
+  const calculateTotalPayable = () => {
+    const basePrice = (priceEntry?.price || 0) + totalFeatureCharges;
+    const discountedPrice =
+      basePrice -
+      0.01 * (editedData?.baseDiscount || data?.baseDiscount || 0) * basePrice;
+    const gst =
+      data?.booking_type === "SVKM INSTITUTE" ? 0 : 0.18 * discountedPrice;
+    const depositAmount =
+      editedData?.isDeposit || data?.isDeposit
+        ? (editedData?.deposit || data?.deposit || 0) -
+          0.01 *
+            (editedData?.depositDiscount || data?.depositDiscount || 0) *
+            (editedData?.deposit || data?.deposit || 0)
+        : 0;
+    return discountedPrice + gst + depositAmount;
+  };
+
   // useEffect(() => {
   //   if (editingMode && editedData) {
   //     const newTotalFeatureCharges = editedData.features.reduce(
@@ -1113,23 +1231,45 @@ function Booking() {
             <span className="w-full text-left">Total Payable Amount</span>
 
             <span className="w-full text-right">
-              {editedData
-                ? (priceEntry?.price || 0) +
-                  totalFeatureCharges -
-                  0.01 *
-                    editedData!.baseDiscount *
-                    ((priceEntry?.price || 0) + totalFeatureCharges) +
-                  0.18 *
-                    ((priceEntry?.price || 0) +
+              {editedData?.booking_type == "SVKM INSTITUTE" ? (
+                <div>
+                  {editedData
+                    ? (priceEntry?.price || 0) +
                       totalFeatureCharges -
                       0.01 *
                         editedData!.baseDiscount *
-                        ((priceEntry?.price || 0) + totalFeatureCharges)) +
-                  (editedData.isDeposit
-                    ? editedData?.deposit -
-                      0.01 * editedData?.depositDiscount * editedData?.deposit
-                    : 0)
-                : 0}
+                        ((priceEntry?.price || 0) + totalFeatureCharges) +
+                      (editedData.isDeposit
+                        ? editedData?.deposit -
+                          0.01 *
+                            editedData?.depositDiscount *
+                            editedData?.deposit
+                        : 0)
+                    : 0}
+                </div>
+              ) : (
+                <div>
+                  {editedData
+                    ? (priceEntry?.price || 0) +
+                      totalFeatureCharges -
+                      0.01 *
+                        editedData!.baseDiscount *
+                        ((priceEntry?.price || 0) + totalFeatureCharges) +
+                      0.18 *
+                        ((priceEntry?.price || 0) +
+                          totalFeatureCharges -
+                          0.01 *
+                            editedData!.baseDiscount *
+                            ((priceEntry?.price || 0) + totalFeatureCharges)) +
+                      (editedData.isDeposit
+                        ? editedData?.deposit -
+                          0.01 *
+                            editedData?.depositDiscount *
+                            editedData?.deposit
+                        : 0)
+                    : 0}
+                </div>
+              )}
             </span>
           </div>
         </>
@@ -1455,6 +1595,7 @@ function Booking() {
               onClick={async () => {
                 if (!confirmExists() && paymentDetails()) {
                   await confirmAndSaveBooking.mutateAsync();
+                  generateConfirmationAndEmail();
                 }
               }}
               className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
