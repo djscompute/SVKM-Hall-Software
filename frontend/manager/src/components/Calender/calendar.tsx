@@ -7,6 +7,11 @@ import dayjs from "dayjs";
 import axiosManagerInstance from "../../config/axiosManagerInstance";
 import { useQuery } from "@tanstack/react-query";
 import Legends from "./legends";
+import utc from "dayjs/plugin/utc";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers";
+
 
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -17,6 +22,7 @@ type Props = {
 
 //calendar
 const Calendar = ({ hallId, HallData }: Props) => {
+  dayjs.extend(utc);
   const [currentDate, setCurrentDate] = useState(
     dayjs().startOf("month").toDate()
   );
@@ -60,6 +66,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
   const firstDayOfMonth = dayjs(currentDate).startOf("month").day();
 
   const onNextMonth = () => {
+    if(dayjs(currentDate).isAfter(dayjs().add(2,'y').subtract(1, 'month'))) return;
     setCurrentDate(
       new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
     );
@@ -84,6 +91,18 @@ const Calendar = ({ hallId, HallData }: Props) => {
   return (
     <div className=" flex justify-center items-center">
       <div className="flex flex-col justify-center w-full md:mx-10 h-full border-[3px] border-border-color rounded-lg shadow-custom p-4">
+        {/* Date  */}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            value={dayjs(currentDate)}
+            onChange={(newState): any => {
+              console.log(newState);
+              setCurrentDate(dayjs(newState).startOf("month").toDate());
+            }}
+            views={["year", "month"]}
+            maxDate={dayjs().add(2,'y')}
+          />
+        </LocalizationProvider>
         {/* Top heading */}
         <div className="flex justify-between items-center mb-4 w-3/4 mx-auto">
           <svg
