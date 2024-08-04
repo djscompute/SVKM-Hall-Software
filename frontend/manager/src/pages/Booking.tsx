@@ -885,6 +885,7 @@ function Booking() {
             }}
             placeholder="Enter Discount %"
             className="px-2"
+            maxLength={2}
           />
         </div>
       ) : (
