@@ -4,11 +4,12 @@ type emailType = {
   to: String,
   subject: String,
   text: String,
-  filename?: String,
+  filename: String,
   path?: String
 }
 
 export async function sendEmail(props: emailType) {
+  const sanitizedCustomerName = props.filename.replace(/\s+/g, '_');
   try {
     var transporter = nodemailer.createTransport({
       service: "gmail",
@@ -24,8 +25,8 @@ export async function sendEmail(props: emailType) {
       subject: `${props.subject}`,
       text: `${props.text}`,
       attachments: [{
-          filename: `Customer_${props.filename}.pdf`,
-          path: `./src/files/Customer_${props.filename}.pdf`
+          filename: `Customer_${sanitizedCustomerName}.pdf`,
+          path: `./src/files/Customer_${sanitizedCustomerName}.pdf`
       },]
     };
 

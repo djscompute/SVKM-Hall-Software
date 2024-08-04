@@ -142,7 +142,8 @@ export async function generateInquiry(props: inquiryType) {
     const page = await browser.newPage();
 
     const inquiry = inquiryHtmlTemplate(props);
-    const pdfPath = `./src/files/Customer_${props.customerName}_${props.enquiryNumber}_inquiry.pdf`;
+    const sanitizedCustomerName = props.customerName.replace(/\s+/g, '_');
+    const pdfPath = `./src/files/Customer_${sanitizedCustomerName}_${props.enquiryNumber}_inquiry.pdf`;
 
     await page.setContent(inquiry);
     await page.pdf({ path: `${pdfPath}`, format: "A4" });

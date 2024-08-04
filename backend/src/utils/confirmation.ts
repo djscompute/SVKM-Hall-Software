@@ -171,20 +171,22 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
 
 
 export async function generateConfirmation(props: confirmationType) {
-  try {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-
-    const confirmation = confirmationHtmlTemplate(props);
-    const pdfPath = `./src/files/Customer_${props.customerName}_${props.enquiryNumber}_confirmation.pdf`;
-
-    await page.setContent(confirmation);
-    await page.pdf({ path: `${pdfPath}`, format: "A4" });
-
-    console.log(`PDF generated for customer ${props.customerName}: ${pdfPath}`);
-
-    await browser.close();
-  } catch (error) {
-    console.log(error);
+    try {
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+  
+      const confirmation = confirmationHtmlTemplate(props);
+      const sanitizedCustomerName = props.customerName.replace(/\s+/g, '_');
+      const pdfPath = `./src/files/Customer_${sanitizedCustomerName}_${props.enquiryNumber}_confirmation.pdf`;
+  
+      await page.setContent(confirmation);
+      await page.pdf({ path: `${pdfPath}`, format: "A4" });
+  
+      console.log(`PDF generated for customer ${props.customerName}: ${pdfPath}`);
+  
+      await browser.close();
+    } catch (error) {
+      console.log(error);
+    }
   }
-}
+  
