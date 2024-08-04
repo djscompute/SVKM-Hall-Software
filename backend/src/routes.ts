@@ -71,6 +71,9 @@ import {
 } from "./controller/dashboard.controller";
 import { getAllHallNamesAndIds } from "./service/getHallConfig";
 
+import { MultipleBookingSchema, CheckBookingInMultipleSchema } from "./schema/multipleBooking.schema";
+import { addMultipleBookingHandler, getMultipleBookingHandler,  checkBookingInMultipleHandler } from "./controller/multipleBooking.controller";
+
 
 // const upload = multer({ dest: "uploads/" });
 const upload = multer({ storage: multer.memoryStorage() });
@@ -251,6 +254,19 @@ export default function routes(app: Express) {
   app.get("/getBookingByUser", [
     validateRequest(getBookingByUserZodSchema),
     getBookingByUser,
+  ]);
+
+  // Multiple Booking routes
+  app.post("/multipleBookings", [
+    validateRequest(MultipleBookingSchema),
+    addMultipleBookingHandler
+  ]);
+
+  app.get("/multipleBookings/:id", getMultipleBookingHandler);
+
+  app.get("/checkBookingInMultiple/:id", [
+    validateRequest(CheckBookingInMultipleSchema),
+    checkBookingInMultipleHandler
   ]);
 
   //Logout a admin
