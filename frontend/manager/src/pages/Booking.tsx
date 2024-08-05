@@ -28,6 +28,12 @@ function Booking() {
   const [editedData, setEditedData] = useState<HallBookingType>();
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
+  const [selectedOption, setSelectedOption] = useState<string>('');
+
+  const handleSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedOption(event.target.value);
+  };
+
   // let totalFeatureCharges = 0;
 
   const { data, error, isFetching } = useQuery({
@@ -56,7 +62,7 @@ function Booking() {
     },
     staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
-  console.log("The data is ", data);
+  // console.log("The data is ", data);
 
   const {
     data: allBookingData,
@@ -72,7 +78,7 @@ function Booking() {
           hallId: data?.hallId,
         },
       });
-      console.log(response.data);
+      // console.log(response.data);
       if (response.data.message == "No bookings found for the specified range.")
         return [];
       // sort based of from
@@ -81,11 +87,29 @@ function Booking() {
     },
     staleTime: 1 * 60 * 1000, // Data is considered fresh for 1 minutes
   });
-
-  console.log(allBookingData);
-
-  // Seperate mutation for confirm and save booking
-
+  const {
+    data: enquiries,
+    error: equiryError,
+    isFetching: enquiryFetching,
+  } = useQuery({
+    queryKey: [`getBookingByUser`],
+    queryFn: async () => {
+      console.log(`Vedant ${data?.user.mobile}`);
+      const response = await axiosManagerInstance.get("getBookingByUser", {
+        params: {
+          number:  "9999999999"  // data?.user.mobile
+        },
+      });
+      console.log(response.data);
+      // console.log("asdasdasdasdadasd\n\n\n\n\n\n\nfdfdsf")
+      
+      return response.data;
+    },
+    staleTime: 1 * 60 * 1000, // Data is considered fresh for 1 minutes
+  });
+  // console.log(allBookingData);
+  
+  
   const confirmAndSaveBooking = useMutation({
     mutationFn: async () => {
       const responsePromise = axiosManagerInstance.post(
@@ -128,11 +152,14 @@ function Booking() {
       );
       setTotalFeatureCharges(newTotalFeatureCharges);
     }
+    
   }, [editingMode, editedData, data]);
+
+ 
 
   const editBookingStatus = useMutation({
     mutationFn: async (newStatus: bookingStatusType) => {
-      console.log(hallData);
+      // console.log(hallData);
       const responsePromise = axiosManagerInstance.post(
         `/editBooking/${bookingId}`,
         {
@@ -149,7 +176,7 @@ function Booking() {
         error: "Failed to Booking Hall. Please Reload and try again.",
       });
       const response = await responsePromise;
-      console.log(response.data);
+      // console.log(response.data);
     },
     onSuccess: async () => {
       setEditingMode(false);
@@ -181,7 +208,7 @@ function Booking() {
         error: "Failed to Booking Hall. Please Reload and try again.",
       });
       const response = await responsePromise;
-      console.log(response.data);
+      // console.log(response.data);
     },
     onSuccess: async () => {
       console.log("REVALIDATING");
@@ -209,7 +236,7 @@ function Booking() {
         error: "Failed to Booking Hall. Please Reload and try again.",
       });
       const response = await responsePromise;
-      console.log(response.data);
+      // console.log(response.data);
     },
     onSuccess: async () => {
       console.log("REVALIDATING");
@@ -325,6 +352,10 @@ function Booking() {
     return false;
   };
 
+  const [selectedEnquiries, setSelectedEnquiries] = useState([]);
+
+
+
   if (isFetching) return <h1>Loading</h1>;
 
 
@@ -334,6 +365,22 @@ function Booking() {
 
   return (
     <div className="flex flex-col items-center my-10 w-11/12 sm:w-3/4 lg:w-1/2 mx-auto">
+      <div className="w-64 mx-auto mt-5 mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="options">
+          Select Option
+        </label>
+        <select
+          id="options"
+          value={selectedOption}
+          onChange={handleSelect}
+          className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+        >
+          <option value="" disabled>Select an option</option>
+          <option value="single">Single</option>
+          <option value="multiple">Multiple</option>
+        </select>
+      </div>
+
       {editingMode ? (
         <></>
       ) : (
@@ -579,9 +626,50 @@ function Booking() {
           <span className="w-full text-left">Remark</span>
           <span className="w-full text-right">{data?.user.remark || "-"}</span>
         </div>
-      )}
+        )}
+        {selectedOption === 'multiple' && (
+          
+        <div className="w-100 mx-auto mt-5 mb-4 flex space-x-4">
+          <div>
+          <div className="flex items-center">
+            <input type="checkbox" id="a" name="a" value="a" className="mr-2" />
+            <label htmlFor="a">Enquiry <br/> 2024-06-30T10:00:00 </label>
 
-      <span className=" text-lg font-medium">Slot</span>
+          </div>
+          <div className="flex items-center">
+            <input type="checkbox" id="a" name="a" value="a" className="mr-2" />
+            <label htmlFor="a">Enquiry <br/> 2024-06-30T08:00:00 </label>
+
+          </div>
+          <div className="flex items-center">
+            <input type="checkbox" id="a" name="a" value="a" className="mr-2" />
+            <label htmlFor="a">Enquiry <br/> 2024-07-02T06:00:00</label>
+
+          </div>
+          <div className="flex items-center">
+            <input type="checkbox" id="a" name="a" value="a" className="mr-2" />
+            <label htmlFor="a">Enquiry <br/> 2024-07-02T16:00:00 </label>
+
+          </div>
+          </div>
+          <div className="inline-block mx-auto mt-5 mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="options">
+          Select Option
+        </label>
+        <select
+          id="options"
+          value={selectedOption}
+          onChange={handleSelect}
+          className="inline-block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+        >
+          <option value="" disabled>Select an option</option>
+
+
+        </select>
+      </div>
+        </div>
+      )}
+      <span className=" text-lg font-medium"> </span>
       <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
         <span className="w-full text-left">Hall Name</span>
         <span className="w-full text-right">{hallData?.name || "-"}</span>
