@@ -123,6 +123,7 @@ export const InquirySchema = z.object({
     additionalFacilities: z.number(),
     hallDeposit: z.number(),
     totalPayable: z.number(),
+    hallContact: z.string(),
   }),
 });
 
@@ -150,6 +151,7 @@ export const ConfirmationSchema = z.object({
     depositDiscount: z.number(),
     totalPayable: z.number(),
     email: z.string().email(), // Ensuring a valid email format
+    hallContact: z.string(),
   }),
 });
 
