@@ -1333,6 +1333,7 @@ function Booking() {
       )}
 
       <span className="text-lg font-medium">Transaction Details</span>
+      {editingMode?(
       <span>
         <label htmlFor="transaction">Choose a Transaction Type </label>
         <select
@@ -1352,6 +1353,9 @@ function Booking() {
           <option value="svkminstitute">SVKM Institute</option>
         </select>
       </span>
+       ):<></>
+
+         }
       {['cheque', 'upi', 'neft/rtgs'].includes(data?.transaction?.type || '') &&
         (editingMode ? (
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
