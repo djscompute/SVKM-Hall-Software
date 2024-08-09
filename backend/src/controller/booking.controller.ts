@@ -241,7 +241,8 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       hallCharges, 
       additionalFacilities, 
       hallDeposit, 
-      totalPayable 
+      totalPayable,
+      hallContact 
     } = req.body;
 
     generateInquiry({
@@ -257,7 +258,8 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       hallCharges,
       additionalFacilities,
       hallDeposit,
-      totalPayable
+      totalPayable,
+      hallContact
     });
 
     return res.status(200).json({ message: "Inquiry generated" });
@@ -291,7 +293,8 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       hallDeposit, 
       depositDiscount, 
       totalPayable,
-      email 
+      email,
+      hallContact 
     } = req.body;
     
     generateConfirmation({
@@ -316,7 +319,8 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       hallDeposit, 
       depositDiscount, 
       totalPayable,
-      email
+      email,
+      hallContact
     });
 
     return res.status(200).json({ message: "Confirmation generated" });

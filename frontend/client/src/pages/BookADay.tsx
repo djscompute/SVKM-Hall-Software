@@ -135,15 +135,17 @@ function BookADay() {
 
         const totalPayable =
           sessionPrice + additionalFacilities + securityDeposit;
+          const todayDate = dayjs().format("DD-MM-YYYY");
+          const dateOfEvent = dayjs(day).format("DD-MM-YYYY");
         axiosClientInstance
           .post(`/generateInquiry`, {
-            date: day, // Assuming 'day' is the date of booking
+            date: todayDate, // Assuming 'day' is the date of booking
             customerName: name,
             contactPerson: person,
             contactNo: mobileNumber,
             enquiryNumber: enquiryNumber, // Generate a unique enquiry number
             hallName: HallData?.name,
-            dateOfEvent: day,
+            dateOfEvent: dateOfEvent,
             slotTime: `${convert_IST_TimeString_To12HourFormat(
               HallData?.sessions.find((ss) => ss._id === selectedSessionId)
                 ?.from!
@@ -155,6 +157,7 @@ function BookADay() {
             additionalFacilities: additionalFacilities,
             hallDeposit: securityDeposit,
             totalPayable: totalPayable,
+            hallContact: "Email to be entered"
           })
           .then((response) => {
             console.log(response.data);
