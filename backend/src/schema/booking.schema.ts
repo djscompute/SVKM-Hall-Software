@@ -101,6 +101,22 @@ export const getBookingByUserZodSchema = z.object({
     number: z.string(),
   }),
 });
+export const getBookingsByHallZodSchema = z.object({
+  params: z.object({
+    hallId: z.string({
+      invalid_type_error: "Hall ID must be a string.",
+      required_error: "Hall ID is required.",
+    }),
+  }),
+});
+export const getBookingsByHallAndUserZodSchema = z.object({
+  params: z.object({
+    hallId: z.string({
+      invalid_type_error: "Hall ID must be a string.",
+      required_error: "Hall ID is required.",
+    }),
+  }),
+});
 // THIS IS A FUNCITON TO CREATE UTC STANDARD TIME DATETIME STRING.
 // ZOD SUPPORTS ONLY UTC STANDARD TIME
 // function createDateTimeString(year:number, month:number, day:number, hour:number) {

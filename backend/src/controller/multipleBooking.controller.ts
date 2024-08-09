@@ -23,16 +23,15 @@ export async function getMultipleBookingHandler(req: Request, res: Response) {
 }
 
 export async function checkBookingInMultipleHandler(req: Request, res: Response) {
-    try {
-        const { id } = req.params;
-      const multipleBooking = await multipleBookingService.checkBookingInMultiple(id);
-      
-      if (multipleBooking) {
-        res.status(200).json({ exists: true, multipleBooking });
-      } else {
-        res.status(404).json({ exists: false, message: "Booking not found in any MultipleBooking" });
-      }
-    } catch (error) {
-      res.status(500).json({ message: "Failed to check booking" });
+  try {
+    const { id } = req.params;
+    const multipleBooking = await multipleBookingService.checkBookingInMultiple(id);
+    if (multipleBooking) {
+      res.status(200).json({ exists: true, multipleBooking });
+    } else {
+      res.status(200).json({ exists: false, message: 'Booking not found in any MultipleBooking' });
     }
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to check booking' });
   }
+}

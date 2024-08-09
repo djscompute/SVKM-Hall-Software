@@ -27,12 +27,12 @@ export const MultipleBookingSchema = z.object({
 });
 
 export const CheckBookingInMultipleSchema = z.object({
-    params: z.object({
-      id: z.string({
-        invalid_type_error: "Booking ID must be a string.",
-        required_error: "Booking ID is required.",
-      }),
+  params: z.object({
+    id: z.string({
+      invalid_type_error: "Booking ID must be a string.",
+      required_error: "Booking ID is required.",
     }),
+  }),
 });
 
 export type MultipleBookingType = z.infer<typeof MultipleBookingSchema>;

@@ -35,10 +35,12 @@ import {
 } from "./middleware/accessControl";
 import {
   AddBookingZodSchema,
+  getBookingsByHallZodSchema,
   RemoveBookingZodSchema,
   getBookingByIdZodSchema,
   getBookingByUserZodSchema,
   getBookingZodSchema,
+  getBookingsByHallAndUserZodSchema,
 } from "./schema/booking.schema";
 import {
   addBookingHandler,
@@ -47,6 +49,8 @@ import {
   getBookingByUser,
   getBookingHandler,
   getBookingHandlerWithoutUser,
+  getBookingsByHallHandler,
+  getBookingsByUserandHallHandler,
   removeBookingHandler,
 } from "./controller/booking.controller";
 
@@ -248,6 +252,17 @@ export default function routes(app: Express) {
   app.get("/getBookingByID", [
     validateRequest(getBookingByIdZodSchema),
     getBookingByIdHandler,
+  ]);
+
+  // Get Booking by hall ID
+  app.get("/getBookingByHall/:hallId", [
+    validateRequest(getBookingsByHallZodSchema),
+    getBookingsByHallHandler
+  ]);
+  // Get Booking By Hall and User
+  app.get("/getBookingByHallAndUser/:userPhone/:HallId", [
+    // validateRequest(getBookingsByHallAndUserZodSchema),
+    getBookingsByUserandHallHandler
   ]);
 
   //Get Booking by User
