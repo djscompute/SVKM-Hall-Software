@@ -12,8 +12,7 @@ import { useParams } from 'react-router-dom';
 import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
 import { useEffect, useState } from 'react';
 import { queryClient } from '../App';
-import Login from '../components/login/Login';
-import Login from "../components/login/Login";
+
 
 const possibleBookingTypes: bookingStatusType[] = [
   'CONFIRMED',
@@ -27,7 +26,6 @@ function Booking() {
   const { bookingId } = useParams<{ bookingId: string }>();
   const [hallData, setHallData] = useState<EachHallType>();
   const [editingMode, setEditingMode] = useState(false);
-  const [addAdditional, setAdditional] = useState(false);
   const [addAdditional, setAdditional] = useState(false);
   const [editedData, setEditedData] = useState<HallBookingType>();
   const [showCancellationReason, setShowCancellationReason] = useState(false);
@@ -43,10 +41,7 @@ function Booking() {
     features: [{ heading: '', desc: '', price: 0 }],
     booking_type: '',
   });
-  const [datas, setData] = useState({
-    features: [{ heading: "", desc: "", price: 0 }],
-    booking_type: "",
-  });
+
 
   const { data, error, isFetching } = useQuery({
     queryKey: [`booking/${bookingId}`],
