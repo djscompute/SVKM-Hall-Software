@@ -6,6 +6,7 @@ import {
   editHallHandler,
   getAllHallsHandler,
   getHallByIdHandler,
+  deleteHallHandler
 } from "./controller/hall.controller";
 import {
   createAdminHandler,
@@ -38,20 +39,24 @@ import {
   getBookingsByHallZodSchema,
   RemoveBookingZodSchema,
   getBookingByIdZodSchema,
-  getBookingByUserZodSchema,
   getBookingZodSchema,
   getBookingsByHallAndUserZodSchema,
+  EmailZodSchema,
+  InquirySchema,
+  ConfirmationSchema
 } from "./schema/booking.schema";
 import {
   addBookingHandler,
   editBookingHandler,
+  generateInquiryHandler,
+  generateConfirmationHandler,
   getBookingByIdHandler,
-  getBookingByUser,
   getBookingHandler,
   getBookingHandlerWithoutUser,
   getBookingsByHallHandler,
   getBookingsByUserandHallHandler,
   removeBookingHandler,
+  sendEmailHandler,
 } from "./controller/booking.controller";
 
 //Constants
@@ -181,6 +186,14 @@ export default function routes(app: Express) {
     addHallHandler,
   ]);
 
+  //Remove Hall completely
+  app.delete("/halls/:id", [
+    validateCookie,
+    requireMasterRole,
+    validateRequest(RemoveHallZodSchema),
+    deleteHallHandler,
+  ]);
+
   //Remove a hall
   app.delete("/removeHall/:id", [
     validateCookie,
@@ -263,12 +276,6 @@ export default function routes(app: Express) {
   app.get("/getBookingByHallAndUser/:userPhone/:HallId", [
     // validateRequest(getBookingsByHallAndUserZodSchema),
     getBookingsByUserandHallHandler
-  ]);
-
-  //Get Booking by User
-  app.get("/getBookingByUser", [
-    validateRequest(getBookingByUserZodSchema),
-    getBookingByUser,
   ]);
 
   // Multiple Booking routes
@@ -357,4 +364,22 @@ export default function routes(app: Express) {
     getSessionsWithCategoriesByHallNameHandler
   )
   {/********************* Helper Routes End*********************/}
+
+  app.post(
+    "/generateInquiry",
+    validateRequest(InquirySchema),
+    generateInquiryHandler,
+  )
+
+  app.post(
+    "/generateConfirmation",
+    validateRequest(ConfirmationSchema),
+    generateConfirmationHandler,
+  )
+
+  app.post(
+    "/sendEmail",
+    validateRequest(EmailZodSchema),
+    sendEmailHandler,
+  )
 }

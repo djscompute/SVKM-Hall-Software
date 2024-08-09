@@ -9,10 +9,11 @@ import {
   transactionType,
 } from '../../../../types/global';
 import { useParams } from 'react-router-dom';
-// import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
+import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
 import { useEffect, useState } from 'react';
 import { queryClient } from '../App';
 import Login from '../components/login/Login';
+import Login from "../components/login/Login";
 
 const possibleBookingTypes: bookingStatusType[] = [
   'CONFIRMED',
@@ -27,6 +28,7 @@ function Booking() {
   const [hallData, setHallData] = useState<EachHallType>();
   const [editingMode, setEditingMode] = useState(false);
   const [addAdditional, setAdditional] = useState(false);
+  const [addAdditional, setAdditional] = useState(false);
   const [editedData, setEditedData] = useState<HallBookingType>();
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
@@ -35,10 +37,15 @@ function Booking() {
   const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
   const [selectedBookingData, setSelectedBookingData] = useState<HallBookingType | null>(null);
 
+
   // let totalFeatureCharges = 0;
   const [datas, setData] = useState({
     features: [{ heading: '', desc: '', price: 0 }],
     booking_type: '',
+  });
+  const [datas, setData] = useState({
+    features: [{ heading: "", desc: "", price: 0 }],
+    booking_type: "",
   });
 
   const { data, error, isFetching } = useQuery({
@@ -127,9 +134,16 @@ function Booking() {
 
   const generateConfirmationAndEmail = () => {
     console.log("generating confirmation");
+    const hallDeposit = editedData?.isDeposit === false
+    ? 0
+    : editedData?.deposit ?? (data?.isDeposit === false ? 0 : data?.deposit ?? 0);
+    console.log(data?.from)
+    
+    const startTime = dayjs(editedData?.from || data?.from).format("HH:mm:ss");
+    const endTime = dayjs(editedData?.to || data?.to).format("HH:mm:ss");
     axiosManagerInstance
       .post(`/generateConfirmation`, {
-        date: dayjs().format("YYYY-MM-DD"), // Current date
+        date: dayjs().format("DD-MM-YYYY"), // Current date
         customerName: editedData?.user.username || data?.user.username,
         contactPerson: editedData?.user.contact || data?.user.contact,
         contactNo: editedData?.user.mobile || data?.user.mobile,
@@ -140,10 +154,8 @@ function Booking() {
           editedData?.transaction?.type || data?.transaction?.type || "",
         additionalPaymentDetails: getAdditionalPaymentDetails(),
         hallName: hallData?.name || "",
-        dateOfEvent: dayjs(editedData?.from || data?.from).format("YYYY-MM-DD"),
-        slotTime: `${dayjs(editedData?.from || data?.from).format(
-          "HH:mm"
-        )} - ${dayjs(editedData?.to || data?.to).format("HH:mm")}`,
+        dateOfEvent: dayjs(editedData?.from || data?.from).format("DD-MM-YYYY"),
+        slotTime: `${convert_IST_TimeString_To12HourFormat(startTime)} - ${convert_IST_TimeString_To12HourFormat(endTime)}`,
         purposeOfBooking: editedData?.purpose || data?.purpose || "",
         hallCharges: priceEntry?.price || 0,
         additionalFacilities: totalFeatureCharges,
@@ -166,11 +178,12 @@ function Booking() {
                 0.01 *
                   (editedData?.baseDiscount || data?.baseDiscount || 0) *
                   ((priceEntry?.price || 0) + totalFeatureCharges)),
-        hallDeposit: editedData?.deposit || data?.deposit || 0,
+        hallDeposit: hallDeposit,
         depositDiscount:
           editedData?.depositDiscount || data?.depositDiscount || 0,
         totalPayable: calculateTotalPayable(),
         email: editedData?.user.email || data?.user.email || "",
+        hallContact: "Email to be entered"
       })
       .then((response) => {
         console.log(response.data);
@@ -181,23 +194,26 @@ function Booking() {
         throw error;
       });
 
-      axiosManagerInstance
-          .post(`/sendEmail`, {
-            to: editedData?.user.email || data?.user.email || "",
-            subject: `SVKM Hall Booking for ${dayjs(editedData?.from || data?.from).format("YYYY-MM-DD")}`,
-            text: "Your enquiry for hall booking has been received. Please find the attachments below.",
-            filename: `${editedData?.user.username || data?.user.username}_${editedData?.enquiryNumber || data?.enquiryNumber || ""}_confirmation`,
-            path: "",
-          })
-          .then((response) => {
-            console.log(response.data);
-            return response.data;
-          })
-          .catch((error) => {
-            console.log(error);
-            throw error;
-          });
-
+    axiosManagerInstance
+      .post(`/sendEmail`, {
+        to: editedData?.user.email || data?.user.email || "",
+        subject: `SVKM Hall Booking for ${dayjs(
+          editedData?.from || data?.from
+        ).format("DD-MM-YYYY")}`,
+        text: "Your booking has been confirmed. Please find the attachments below.",
+        filename: `${editedData?.user.username || data?.user.username}_${
+          editedData?.enquiryNumber || data?.enquiryNumber || ""
+        }_confirmation`,
+        path: "",
+      })
+      .then((response) => {
+        console.log(response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+        throw error;
+      });
   };
 
   // Helper function to get additional payment details
@@ -392,6 +408,7 @@ function Booking() {
       `/editBooking/${bookingId}`,
       dataToSend
     );
+    console.log("new ", await responsePromise);
     console.log('new ', await responsePromise);
     toast.promise(responsePromise, {
       pending: 'Updating...',
@@ -1307,14 +1324,22 @@ function Booking() {
           <option value="no">No</option>
         </select>
       </span>
+
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">
-            Enter Security Deposit {editedData?.deposit}
+            Enter Security Deposit{" "}
+            {data?.isDeposit === false || editedData?.isDeposit === false
+              ? 0
+              : editedData?.deposit}
           </span>
           <input
             type="text"
-            value={editedData?.deposit}
+            value={
+              data?.isDeposit === false || editedData?.isDeposit === false
+                ? 0
+                : editedData?.deposit
+            }
             onChange={(e) => {
               setEditedData((prev) => {
                 if (!prev) return undefined;
@@ -1328,41 +1353,18 @@ function Booking() {
             }}
             placeholder="Enter Security Deposit"
             className="px-2"
+            disabled={
+              data?.isDeposit === false || editedData?.isDeposit === false
+            }
           />
         </div>
       ) : (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">Security Deposit Amount</span>
-          {/* <span className="w-full text-right">{data?.deposit}</span> */}
           <span className="w-full text-right">
-            {editedData?.deposit ?? data?.deposit}
-          </span>
-        </div>
-      )}
-      {editingMode ? (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Deposit Discount %</span>
-          <input
-            type="text"
-            value={editedData?.depositDiscount}
-            onChange={(e) =>
-              setEditedData((prev) => {
-                if (!prev) return undefined;
-                return {
-                  ...prev,
-                  depositDiscount: Number(e.target.value),
-                };
-              })
-            }
-            placeholder="Enter Security Deposit Discount %"
-            className="px-2"
-          />
-        </div>
-      ) : (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Deposit Discount %</span>
-          <span className="w-full text-right">
-            {data?.depositDiscount || 0}
+            {data?.isDeposit === false || editedData?.isDeposit === false
+              ? 0
+              : editedData?.deposit ?? data?.deposit}
           </span>
         </div>
       )}
@@ -1370,39 +1372,80 @@ function Booking() {
       {editingMode ? (
         <>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Deposit Discount %</span>
+            <input
+              type="text"
+              value={
+                data?.isDeposit === false || editedData?.isDeposit === false
+                  ? 0
+                  : editedData?.depositDiscount
+              }
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    depositDiscount: Number(e.target.value),
+                  };
+                })
+              }
+              placeholder="Enter Security Deposit Discount %"
+              className="px-2"
+              disabled={
+                data?.isDeposit === false || editedData?.isDeposit === false
+              }
+            />
+          </div>
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Deposit Discount Amount</span>
             <span className="w-full text-right">
-              {editedData?.deposit
+              {data?.isDeposit === false || editedData?.isDeposit === false
+                ? 0
+                : editedData?.deposit
                 ? 0.01 * editedData?.depositDiscount * editedData?.deposit
-                : '-'}
+                : "-"}
             </span>
           </div>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Deposit Discounted Price</span>
             <span className="w-full text-right">
-              {editedData?.deposit
+              {data?.isDeposit === false || editedData?.isDeposit === false
+                ? 0
+                : editedData?.deposit
                 ? editedData?.deposit -
                   0.01 * editedData?.depositDiscount * editedData?.deposit
-                : '-'}
+                : "-"}
             </span>
           </div>
         </>
       ) : (
         <>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Deposit Discount %</span>
+            <span className="w-full text-right">
+              {data?.isDeposit === false || editedData?.isDeposit === false
+                ? 0
+                : data?.depositDiscount || 0}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Deposit Discount Amount</span>
             <span className="w-full text-right">
-              {data?.deposit
+              {data?.isDeposit === false || editedData?.isDeposit === false
+                ? 0
+                : data?.deposit
                 ? 0.01 * data?.depositDiscount * data?.deposit
-                : '-'}
+                : "-"}
             </span>
           </div>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Deposit Discounted Price</span>
             <span className="w-full text-right">
-              {data?.deposit
+              {data?.isDeposit === false || editedData?.isDeposit === false
+                ? 0
+                : data?.deposit
                 ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
-                : '-'}
+                : "-"}
             </span>
           </div>
         </>
@@ -1462,7 +1505,7 @@ function Booking() {
             <span className="w-full text-left">Total Payable Amount</span>
             <span className="w-full text-right">
               <span className="w-full text-right">
-                {data?.booking_type == 'SVKM INSTITUTE' ? (
+                {data?.booking_type == "SVKM INSTITUTE" ? (
                   <div>
                     {data
                       ? (priceEntry?.price || 0) +

@@ -118,3 +118,18 @@ export async function getHallByIdHandler(req: Request, res: Response) {
     res.status(500).json({ name: error.name, message: error.message });
   }
 }
+
+export async function deleteHallHandler(req: Request, res: Response) {
+  try {
+    const hallId: string = req.params.id;
+
+    const deletedHall = await HallModel.findByIdAndDelete(hallId);
+    if (!deletedHall) {
+      return res.status(404).json({ name: "Hall Not Found", message: "Hall not found" });
+    }
+
+    return res.status(200).json({ message: "Hall deleted successfully", hall: deletedHall });
+  } catch (error: any) {
+    return res.status(500).json({ name: error.name, message: error.message });
+  }
+}

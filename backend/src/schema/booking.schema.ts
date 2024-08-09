@@ -48,8 +48,8 @@ export const AddBookingZodSchema = z.object({
       .optional(),
     baseDiscount: z.number(numberErrorHandler("baseDiscount")),
     deposit: z.number(numberErrorHandler("deposit")),
-    isDeposit : z.boolean(booleanErrorHandler("isDeposit")),
-    depositDiscount : z.number(numberErrorHandler("depositDiscount")),
+    isDeposit: z.boolean(booleanErrorHandler("isDeposit")),
+    depositDiscount: z.number(numberErrorHandler("depositDiscount")),
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
     booking_type: z.string(stringErrorHandler("booking_type")),
@@ -59,6 +59,7 @@ export const AddBookingZodSchema = z.object({
     cancellationReason: z
       .string(stringErrorHandler("cancellationReason"))
       .optional(),
+    enquiryNumber: z.string(stringErrorHandler("enquiryNumber")).optional(),
   }),
 });
 
@@ -96,9 +97,61 @@ export const getBookingByIdZodSchema = z.object({
     _id: z.string(),
   }),
 });
-export const getBookingByUserZodSchema = z.object({
-  query: z.object({
-    number: z.string(),
+
+export const EmailZodSchema = z.object({
+  body: z.object({
+    to: z.string(),
+    subject: z.string(),
+    text: z.string(),
+    filename: z.string(),
+    path: z.string().optional(),
+  }),
+});
+
+export const InquirySchema = z.object({
+  body: z.object({
+    date: z.string(),
+    customerName: z.string(),
+    contactPerson: z.string(),
+    contactNo: z.string(),
+    enquiryNumber: z.string(),
+    hallName: z.string(),
+    dateOfEvent: z.string(),
+    slotTime: z.string(),
+    purposeOfBooking: z.string(),
+    hallCharges: z.number(),
+    additionalFacilities: z.number(),
+    hallDeposit: z.number(),
+    totalPayable: z.number(),
+    hallContact: z.string(),
+  }),
+});
+
+export const ConfirmationSchema = z.object({
+  body: z.object({
+    date: z.string(),
+    customerName: z.string(),
+    contactPerson: z.string(),
+    contactNo: z.string(),
+    enquiryNumber: z.string(),
+    gstNo: z.string(),
+    pan: z.string(),
+    modeOfPayment: z.string(),
+    additionalPaymentDetails: z.string().optional(),
+    hallName: z.string(),
+    dateOfEvent: z.string(),
+    slotTime: z.string(),
+    purposeOfBooking: z.string(),
+    hallCharges: z.number(),
+    additionalFacilities: z.number(),
+    discountPercent: z.number(),
+    sgst: z.number(),
+    cgst: z.number(),
+    hallDeposit: z.number(),
+    depositDiscount: z.number(),
+    totalPayable: z.number(),
+    email: z.string().email(), // Ensuring a valid email format
+    hallContact: z.string(),
   }),
 });
 export const getBookingsByHallZodSchema = z.object({
@@ -117,6 +170,7 @@ export const getBookingsByHallAndUserZodSchema = z.object({
     }),
   }),
 });
+
 // THIS IS A FUNCITON TO CREATE UTC STANDARD TIME DATETIME STRING.
 // ZOD SUPPORTS ONLY UTC STANDARD TIME
 // function createDateTimeString(year:number, month:number, day:number, hour:number) {
