@@ -36,9 +36,11 @@ import {
 } from "./middleware/accessControl";
 import {
   AddBookingZodSchema,
+  getBookingsByHallZodSchema,
   RemoveBookingZodSchema,
   getBookingByIdZodSchema,
   getBookingZodSchema,
+  getBookingsByHallAndUserZodSchema,
   EmailZodSchema,
   InquirySchema,
   ConfirmationSchema
@@ -51,6 +53,8 @@ import {
   getBookingByIdHandler,
   getBookingHandler,
   getBookingHandlerWithoutUser,
+  getBookingsByHallHandler,
+  getBookingsByUserandHallHandler,
   removeBookingHandler,
   sendEmailHandler,
 } from "./controller/booking.controller";
@@ -75,6 +79,9 @@ import {
   getSessionsWithCategoriesByHallNameHandler
 } from "./controller/dashboard.controller";
 import { getAllHallNamesAndIds } from "./service/getHallConfig";
+
+import { MultipleBookingSchema, CheckBookingInMultipleSchema } from "./schema/multipleBooking.schema";
+import { addMultipleBookingHandler, getMultipleBookingHandler,  checkBookingInMultipleHandler } from "./controller/multipleBooking.controller";
 
 
 // const upload = multer({ dest: "uploads/" });
@@ -258,6 +265,30 @@ export default function routes(app: Express) {
   app.get("/getBookingByID", [
     validateRequest(getBookingByIdZodSchema),
     getBookingByIdHandler,
+  ]);
+
+  // Get Booking by hall ID
+  app.get("/getBookingByHall/:hallId", [
+    validateRequest(getBookingsByHallZodSchema),
+    getBookingsByHallHandler
+  ]);
+  // Get Booking By Hall and User
+  app.get("/getBookingByHallAndUser/:userPhone/:HallId", [
+    // validateRequest(getBookingsByHallAndUserZodSchema),
+    getBookingsByUserandHallHandler
+  ]);
+
+  // Multiple Booking routes
+  app.post("/multipleBookings", [
+    validateRequest(MultipleBookingSchema),
+    addMultipleBookingHandler
+  ]);
+
+  app.get("/multipleBookings/:id", getMultipleBookingHandler);
+
+  app.get("/checkBookingInMultiple/:id", [
+    validateRequest(CheckBookingInMultipleSchema),
+    checkBookingInMultipleHandler
   ]);
 
   //Logout a admin
