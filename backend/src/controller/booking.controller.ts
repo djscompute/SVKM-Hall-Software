@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { BookingModel, HallBookingType } from "../models/booking.model";
 import { getBookingZodSchema } from "../schema/booking.schema";
+import { sendEmail } from "../utils/email";
+import { generateConfirmation } from "../utils/confirmation";
+import { generateInquiry } from "../utils/inquiry";
+
 
 export async function addBookingHandler(req: Request, res: Response) {
   try {
@@ -21,7 +25,14 @@ export async function addBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
+      enquiryNumber
     } = req.body as HallBookingType;
+
+    if (from >= to) {
+      return res.status(400).json({
+        message: "'from' time must be less than 'to' time.",
+      });
+    }
 
     // Check for existing bookings within the specified time range
     const existingBookings = await BookingModel.find({
@@ -61,10 +72,10 @@ export async function addBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
+      enquiryNumber
     });
     await newBooking.save();
     console.log("added new booking");
-
     return res.status(200).json(newBooking);
   } catch (error: any) {
     res.status(400).json({ name: error.name, message: error.message });
@@ -90,7 +101,8 @@ export async function editBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
-      cancellationReason
+      cancellationReason,
+      enquiryNumber
     } = req.body as HallBookingType; // Ensure this matches your schema type
 
     const bookingId: string = req.params.id;
@@ -114,7 +126,8 @@ export async function editBookingHandler(req: Request, res: Response) {
         to,
         time,
         purpose,
-        cancellationReason
+        cancellationReason,
+        enquiryNumber
       },
       { new: true }
     );
@@ -212,3 +225,137 @@ export async function getBookingByIdHandler(req: Request, res: Response) {
     res.status(500).json({ message: "Internal server error", error: error });
   }
 }
+
+export async function generateInquiryHandler(req: Request, res: Response) {
+  try {
+    const { 
+      date, 
+      customerName, 
+      contactPerson, 
+      contactNo, 
+      enquiryNumber, 
+      hallName, 
+      dateOfEvent, 
+      slotTime, 
+      purposeOfBooking, 
+      hallCharges, 
+      additionalFacilities, 
+      hallDeposit, 
+      totalPayable,
+      hallContact 
+    } = req.body;
+
+    generateInquiry({
+      date,
+      customerName,
+      contactPerson,
+      contactNo,
+      enquiryNumber,
+      hallName,
+      dateOfEvent,
+      slotTime,
+      purposeOfBooking,
+      hallCharges,
+      additionalFacilities,
+      hallDeposit,
+      totalPayable,
+      hallContact
+    });
+
+    return res.status(200).json({ message: "Inquiry generated" });
+  } catch (error) {
+    console.error("Error in generating inquiry:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+}
+
+export async function generateConfirmationHandler(req: Request, res: Response) {
+  try {
+    const { 
+      date, 
+      customerName, 
+      contactPerson, 
+      contactNo, 
+      enquiryNumber, 
+      gstNo, 
+      pan, 
+      modeOfPayment, 
+      additionalPaymentDetails, 
+      hallName, 
+      dateOfEvent, 
+      slotTime, 
+      purposeOfBooking, 
+      hallCharges, 
+      additionalFacilities, 
+      discountPercent,
+      sgst, 
+      cgst, 
+      hallDeposit, 
+      depositDiscount, 
+      totalPayable,
+      email,
+      hallContact 
+    } = req.body;
+    
+    generateConfirmation({
+      date, 
+      customerName, 
+      contactPerson, 
+      contactNo, 
+      enquiryNumber, 
+      gstNo, 
+      pan, 
+      modeOfPayment, 
+      additionalPaymentDetails, 
+      hallName, 
+      dateOfEvent, 
+      slotTime, 
+      purposeOfBooking, 
+      hallCharges, 
+      additionalFacilities, 
+      discountPercent,
+      sgst, 
+      cgst, 
+      hallDeposit, 
+      depositDiscount, 
+      totalPayable,
+      email,
+      hallContact
+    });
+
+    return res.status(200).json({ message: "Confirmation generated" });
+  } catch (error) {
+    console.error("Error in generating confirmation:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+}
+export async function sendEmailHandler(req: Request, res: Response) {
+  try {    
+    const { to, subject, text, filename, path } = req.body;
+    sendEmail({to, subject, text, filename, path});
+    return res.status(200).json({message:"email sent"})
+  } catch (error) {
+    console.error("Error in sending email:", error);
+    res.status(500).json({ message: "Internal server error", error: error });
+  }
+}
+
+export async function getBookingsByHallHandler(req: Request, res: Response) {
+  try {
+    const { hallId } = req.params;
+    const bookings = await BookingModel.find({ hallId });
+    res.status(200).json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch bookings' });
+  }
+}
+export async function getBookingsByUserandHallHandler(req: Request, res: Response) {
+  try {
+    const { userPhone, HallId } = req.params;
+    const bookings = await BookingModel.find({ hallId: HallId, 'user.mobile': userPhone });
+    res.status(200).json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch bookings' });
+  }
+}
+

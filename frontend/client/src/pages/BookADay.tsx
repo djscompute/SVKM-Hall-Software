@@ -43,7 +43,6 @@ function BookADay() {
   const [securityDeposit, setSecurityDeposit] = useState<number>(0);
   const [isSame, setIsSame] = useState<boolean>(false);
   const [isDetailsConfirmed, setIsDetailsConfirmed] = useState<boolean>(false);
-
   const dayjsObject = dayjs(day);
   const humanReadableDate = dayjsObject.format("MMMM D, YYYY");
 
@@ -74,6 +73,8 @@ function BookADay() {
     }
   }, [selectedCategory, HallData]);
 
+  const enquiryNumber = `ENQ-${dayjs().format("YYYYMMDD-HHmmss")}`;
+
   const addBookingMutation = useMutation({
     mutationFn: () =>
       axiosClientInstance
@@ -103,6 +104,7 @@ function BookADay() {
               ?.to as string
           }`,
           purpose: purpose,
+          enquiryNumber: enquiryNumber
         })
         .then((response) => {
           console.log(response.data);
@@ -117,6 +119,72 @@ function BookADay() {
       if (data.error) {
         console.error(data.error);
       } else {
+        const additionalFacilities =
+          selectedCategory === "SVKM INSTITUTE"
+            ? 0
+            : Object.values(selectedFeatures).reduce(
+                (acc, feature) => acc + feature.price,
+                0
+              );
+
+        const sessionPrice =
+          HallData?.sessions
+            .find((ss) => ss._id === selectedSessionId)
+            ?.price.find((e) => e.categoryName === selectedCategory)?.price ||
+          0;
+
+        const totalPayable =
+          sessionPrice + additionalFacilities + securityDeposit;
+          const todayDate = dayjs().format("DD-MM-YYYY");
+          const dateOfEvent = dayjs(day).format("DD-MM-YYYY");
+        axiosClientInstance
+          .post(`/generateInquiry`, {
+            date: todayDate, // Assuming 'day' is the date of booking
+            customerName: name,
+            contactPerson: person,
+            contactNo: mobileNumber,
+            enquiryNumber: enquiryNumber, // Generate a unique enquiry number
+            hallName: HallData?.name,
+            dateOfEvent: dateOfEvent,
+            slotTime: `${convert_IST_TimeString_To12HourFormat(
+              HallData?.sessions.find((ss) => ss._id === selectedSessionId)
+                ?.from!
+            )} - ${convert_IST_TimeString_To12HourFormat(
+              HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to!
+            )}`,
+            purposeOfBooking: purpose,
+            hallCharges: sessionPrice,
+            additionalFacilities: additionalFacilities,
+            hallDeposit: securityDeposit,
+            totalPayable: totalPayable,
+            hallContact: "Email to be entered"
+          })
+          .then((response) => {
+            console.log(response.data);
+            return response.data;
+          })
+          .catch((error) => {
+            console.log(error);
+            throw error;
+          });
+
+        axiosClientInstance
+          .post(`/sendEmail`, {
+            to: email,
+            subject: `SVKM Hall Booking for ${day}`,
+            text: "Your enquiry for hall booking has been received. Please find the attachments below.",
+            filename: `${name}_${enquiryNumber}_inquiry`,
+            path: "",
+          })
+          .then((response) => {
+            console.log(response.data);
+            return response.data;
+          })
+          .catch((error) => {
+            console.log(error);
+            throw error;
+          });
+
         navigate("/bookingsuccessful", {
           state: {
             bookingDetails: {
@@ -232,9 +300,9 @@ function BookADay() {
     if (hasErrors) {
       return;
     }
-
     // Proceed with mutation
     if (isDetailsConfirmed) {
+      const enquiryNumber = "ENQ" + new Date().getTime();
       const bookingData = {
         user: {
           username: name,

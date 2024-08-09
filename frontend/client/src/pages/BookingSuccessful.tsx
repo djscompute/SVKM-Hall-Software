@@ -4,40 +4,49 @@ import { EachHallAdditonalFeaturesType } from "../types/Hall.types";
 
 const BookingSuccessful = () => {
   const location = useLocation();
-const bookingDetails = location.state?.bookingDetails;
+  const bookingDetails = location.state?.bookingDetails;
 
-const extractTime = (dateTimeString: string) => {
-  return dateTimeString.split("T")[1].split(".")[0];
-};
+  const extractTime = (dateTimeString: string) => {
+    return dateTimeString.split("T")[1].split(".")[0];
+  };
 
-const extractDate = (dateTimeString: string) => {
-  const dateParts = dateTimeString.split("T")[0].split("-");
-  return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`; // Rearranged to DD-MM-YYYY
-};
+  const extractDate = (dateTimeString: string) => {
+    const dateParts = dateTimeString.split("T")[0].split("-");
+    return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`; // Rearranged to DD-MM-YYYY
+  };
 
-// const convert_IST_TimeString_To12HourFormat = (timeString: string) => {
-//   const [hours, minutes, seconds] = timeString.split(":");
-//   const period = parseInt(hours) >= 12 ? 'PM' : 'AM';
-//   const formattedHours = ((parseInt(hours) % 12) || 12).toString().padStart(2, '0');
-//   return `${formattedHours}:${minutes}:${seconds} ${period}`;
-// };
+  // const convert_IST_TimeString_To12HourFormat = (timeString: string) => {
+  //   const [hours, minutes, seconds] = timeString.split(":");
+  //   const period = parseInt(hours) >= 12 ? 'PM' : 'AM';
+  //   const formattedHours = ((parseInt(hours) % 12) || 12).toString().padStart(2, '0');
+  //   return `${formattedHours}:${minutes}:${seconds} ${period}`;
+  // };
 
-const from = convert_IST_TimeString_To12HourFormat(
-  extractTime(bookingDetails.startTime)
-);
-const to = convert_IST_TimeString_To12HourFormat(
-  extractTime(bookingDetails.endTime)
-);
-const date = extractDate(bookingDetails.startTime);
+  const from = convert_IST_TimeString_To12HourFormat(
+    extractTime(bookingDetails.startTime)
+  );
+  const to = convert_IST_TimeString_To12HourFormat(
+    extractTime(bookingDetails.endTime)
+  );
+  const date = extractDate(bookingDetails.startTime);
 
-const calculateAdditionalFeaturesTotal = (additionalFeatures: any) => {
-  if (!additionalFeatures) return 0;
-  return Object.values(additionalFeatures).reduce((total: number, feature: any) => total + (feature.price || 0), 0);
-};
+  const calculateAdditionalFeaturesTotal = (additionalFeatures: any) => {
+    if (!additionalFeatures) return 0;
+    return Object.values(additionalFeatures).reduce(
+      (total: number, feature: any) => total + (feature.price || 0),
+      0
+    );
+  };
 
-const additionalFeaturesTotal = calculateAdditionalFeaturesTotal(bookingDetails.additionalFeatures);
-const hallBaseCharges = bookingDetails.estimatedPrice-additionalFeaturesTotal
-
+  const additionalFeaturesTotal = calculateAdditionalFeaturesTotal(
+    bookingDetails.additionalFeatures
+  );
+  let hallBaseCharges: number;
+  if (bookingDetails.paymentType === "SVKM INSTITUTE") {
+    hallBaseCharges = bookingDetails.estimatedPrice;
+  } else {
+    hallBaseCharges = bookingDetails.estimatedPrice - additionalFeaturesTotal;
+  }
 
   console.log("HEREEE", bookingDetails);
 
@@ -90,7 +99,12 @@ const hallBaseCharges = bookingDetails.estimatedPrice-additionalFeaturesTotal
                           (each: any) => (
                             <div className="flex flex-col items-start gap-2">
                               <span>{each.heading} </span>
-                              <span>Charge: ₹{each.price}</span>
+                              <span>
+                                Charge: ₹
+                                {bookingDetails.paymentType === "SVKM INSTITUTE"
+                                  ? 0
+                                  : each.price}
+                              </span>
                             </div>
                           )
                         )
@@ -101,16 +115,24 @@ const hallBaseCharges = bookingDetails.estimatedPrice-additionalFeaturesTotal
                   <td className="font-medium py-2 w-1/2">Security Deposit</td>
                   <td className="w-1/2">₹{bookingDetails.securityDeposit}</td>
                 </tr>
-                
+
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">Total Payable</td>
-                  {bookingDetails.paymentType=='SVKM INSTITUTE'?
-                  <td className="w-1/2">₹{hallBaseCharges+bookingDetails.securityDeposit} </td>
-                  :
-                  <td className="w-1/2">₹{hallBaseCharges+additionalFeaturesTotal} + GST (if applicable) +{bookingDetails.securityDeposit}</td>}
+                  {bookingDetails.paymentType == "SVKM INSTITUTE" ? (
+                    <td className="w-1/2">
+                      ₹{hallBaseCharges + bookingDetails.securityDeposit}{" "}
+                    </td>
+                  ) : (
+                    <td className="w-1/2">
+                      ₹{hallBaseCharges + additionalFeaturesTotal} + GST (if
+                      applicable) +{bookingDetails.securityDeposit}
+                    </td>
+                  )}
                 </tr>
                 <tr>
-                  <p className=" text-sm font-bold pt-1 text-red-400">*GST is applicable as per prevailing rates.</p>
+                  <p className=" text-sm font-bold pt-1 text-red-400">
+                    *GST is applicable as per prevailing rates.
+                  </p>
                 </tr>
               </tbody>
             </table>

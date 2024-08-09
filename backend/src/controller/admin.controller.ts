@@ -71,7 +71,7 @@ export async function createAdminHandler(req: Request, res: Response) {
 
     const existingUserByEmail: Omit<adminType, "password"> = await getUserDatabyEmail(email);
     if (!isOmittedAdminTypeEmpty(existingUserByEmail)) {
-      return res.status(409).json({ error: "Admin with this email already exists" });
+      return res.status(409).json({ error: "Admin with this email already exists please try another email" });
     }
 
     const existingUserByUsername: Omit<adminType, "password"> = await getUserDatabyUsername(username);
