@@ -408,7 +408,7 @@ function Report8() {
                   <th className="px-4 py-2 text-center">bank</th>
                 </tr>
               </thead>
-              <tbody>
+               <tbody>
                 {data.map((booking: any, index: number) => (
                   <tr key={index} className="bg-white border-b">
                     <td className="px-4 py-2 text-center">{booking.Date}</td>
@@ -445,29 +445,39 @@ function Report8() {
                     )}
                     {responseHallCharges && (
                       <td className="px-4 py-2 text-center">
+                        {booking["Security Deposit"]}
+                      </td>
+                    )}
+                     {responseHallCharges && (
+                      <td className="px-4 py-2 text-center">
+                        {booking["GST"]}
+                      </td>
+                    )}
+                     {responseHallCharges && (
+                      <td className="px-4 py-2 text-center">
                         {booking["Amount Paid"]}
                       </td>
                     )}
                     <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.type}
+                      {booking["transaction type"]}
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.date}
+                      {booking["date"]}
+                    </td>
+                    {/* <td className="px-4 py-2 text-center">
+                      {booking["transaction id"]}
+                    </td> */}
+                    <td className="px-4 py-2 text-center">
+                      {booking["payee Name"]}
+                    </td>
+                    {/* <td className="px-4 py-2 text-center">
+                      {booking["utr no"]}
+                    </td> */}
+                    <td className="px-4 py-2 text-center">
+                      {booking["cheque no"]}
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.transactionID}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.payeeName}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.utrNo}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.chequeNo}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.bank}
+                      {booking["bank"]}
                     </td>
                   </tr>
                 ))}
