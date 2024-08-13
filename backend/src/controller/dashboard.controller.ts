@@ -84,7 +84,7 @@ export async function getInteractionCountHandler(req: Request, res: Response) {
 // Handler for generating the booking information report 
 export async function getBookingInformationReportHandler(req: Request, res: Response) {
   try {
-    const { displayPeriod, fromDate, toDate, displayHall, displayCustomerCategory, displaySession, displayHallCharges }: {
+    const { displayPeriod, fromDate, toDate, displayHall, displayCustomerCategory, displaySession, displayHallCharges,displayTransactionType}: {
       displayPeriod: string;
       fromDate?: string;
       toDate?: string;
@@ -92,9 +92,10 @@ export async function getBookingInformationReportHandler(req: Request, res: Resp
       displayCustomerCategory: string;
       displaySession: string;
       displayHallCharges: boolean;
+      displayTransactionType: string;
     } = req.body;
 
-    const reportRows = await getBookingInformationReport({ displayPeriod, fromDate, toDate, displayHall, displayCustomerCategory, displaySession, displayHallCharges });
+    const reportRows = await getBookingInformationReport({ displayPeriod, fromDate, toDate, displayHall, displayCustomerCategory, displaySession, displayHallCharges,displayTransactionType });
     res.status(200).json(reportRows);
   } catch (error) {
     console.log("Error fetching report data !!", error);

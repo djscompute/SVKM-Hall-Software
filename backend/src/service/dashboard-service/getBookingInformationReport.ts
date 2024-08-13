@@ -11,6 +11,7 @@ interface BookingInformationReportRequest {
   displayCustomerCategory: string;
   displaySession: string;
   displayHallCharges: boolean;
+  displayTransactionType: string;
 }
 
 function parseDateTime(dateString: string) {
@@ -259,6 +260,15 @@ export async function getBookingInformationReport(
         "Amount Paid": params.displayHallCharges
           ? calculateAmountPaid(booking)
           : "Cannot Display",
+        "Security Deposit":booking.deposit,
+        "GST": 0.18 * booking.price,
+        "transaction type": booking.transaction.type,
+        "date": booking.transaction.date,
+        "transaction id": booking.transaction.transactionID,
+        "payee Name": booking.transaction.payeeName,
+        "utr no": booking.transaction.utrNo,
+        "cheque no": booking.transaction.chequeNo,
+        "bank": booking.transaction.bank,
       }))
     );
 
