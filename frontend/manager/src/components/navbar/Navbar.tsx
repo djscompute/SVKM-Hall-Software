@@ -93,6 +93,14 @@ const NavBar = () => {
                 Home
               </Link>
             </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/dashboard"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Dashboard
+              </Link>
+            </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
               {isAuthenticated ? (
                 <div className="flex items-center gap-2">
@@ -176,12 +184,22 @@ const NavBar = () => {
             </div>
             <div className="py-6 px-5 space-y-6">
               <div className="grid grid-cols-2 gap-y-4 gap-x-8">
-                <Link
-                  to="/"
-                  className="text-base font-medium text-gray-900 hover:text-gray-700"
-                >
-                  Home
-                </Link>
+              <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Home
+              </Link>
+            </nav>
+            <nav className="hidden md:flex space-x-10">
+              <Link
+                to="/dashboard"
+                className="text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Dashboard
+              </Link>
+            </nav>
               </div>
               <div className="">
                 {isAuthenticated ? (
