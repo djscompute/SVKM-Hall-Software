@@ -397,13 +397,19 @@ function Report8() {
                     <th className="px-4 py-2 text-center">Booking Amount</th>
                   )}
                   {responseHallCharges && (
+                    <th className="px-4 py-2 text-center">Security Deposit</th>
+                  )}
+                  {responseHallCharges && (
+                    <th className="px-4 py-2 text-center">GST</th>
+                  )}
+                  {responseHallCharges && (
                     <th className="px-4 py-2 text-center">Amount Paid</th>
                   )}
                   <th className="px-4 py-2 text-center">transaction type</th>
                   <th className="px-4 py-2 text-center">date</th>
-                  <th className="px-4 py-2 text-center">transaction id</th>
+                  {/* <th className="px-4 py-2 text-center">transaction id</th> */}
                   <th className="px-4 py-2 text-center">payee Name</th>
-                  <th className="px-4 py-2 text-center">utr no.</th>
+                  {/* <th className="px-4 py-2 text-center">utr no.</th> */}
                   <th className="px-4 py-2 text-center">cheque no.</th>
                   <th className="px-4 py-2 text-center">bank</th>
                 </tr>
@@ -445,29 +451,39 @@ function Report8() {
                     )}
                     {responseHallCharges && (
                       <td className="px-4 py-2 text-center">
+                        {booking["Security Deposit"]}
+                      </td>
+                    )}
+                     {responseHallCharges && (
+                      <td className="px-4 py-2 text-center">
+                        {booking["GST"]}
+                      </td>
+                    )}
+                     {responseHallCharges && (
+                      <td className="px-4 py-2 text-center">
                         {booking["Amount Paid"]}
                       </td>
                     )}
                     <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.type}
+                      {booking["transaction type"]}
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.date}
+                      {booking["date"]}
+                    </td>
+                    {/* <td className="px-4 py-2 text-center">
+                      {booking["transaction id"]}
+                    </td> */}
+                    <td className="px-4 py-2 text-center">
+                      {booking["payee Name"]}
+                    </td>
+                    {/* <td className="px-4 py-2 text-center">
+                      {booking["utr no"]}
+                    </td> */}
+                    <td className="px-4 py-2 text-center">
+                      {booking["cheque no"]}
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.transactionID}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.payeeName}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.utrNo}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.chequeNo}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.bank}
+                      {booking["bank"]}
                     </td>
                   </tr>
                 ))}
