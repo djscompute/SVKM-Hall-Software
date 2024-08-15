@@ -8,6 +8,7 @@ import { getAdditionalFeatureReport } from "../service/dashboard-service/getAddi
 import { getBookingInformationReport } from "../service/dashboard-service/getBookingInformationReport";
 import { getMonthwiseCollectionDetails } from "../service/dashboard-service/getMonthwiseCollectionDetails";
 import { getAllHallNamesAndIds, getSessionsWithCategoriesByHallName } from "../service/getHallConfig";
+import { getBookingConfirmationReport } from "../service/dashboard-service/getBookingConfirmationReport";
 
 // Handler for fetching HallName and bookingCount=CONFIRMED within a time frame
 export async function getHallBookingsCountHandler(req: Request, res: Response) {
@@ -96,6 +97,25 @@ export async function getBookingInformationReportHandler(req: Request, res: Resp
     } = req.body;
 
     const reportRows = await getBookingInformationReport({ displayPeriod, fromDate, toDate, displayHall, displayCustomerCategory, displaySession, displayHallCharges,displayTransactionType });
+    res.status(200).json(reportRows);
+  } catch (error) {
+    console.log("Error fetching report data !!", error);
+    res.status(500).json({ error: (error as Error).message || "Internal server error" });
+  }
+}
+export async function getBookingConfirmationReportHandler(req: Request, res: Response) {
+  try {
+    const {displayPeriod, fromDate, toDate, displayHall, displayCustomerCategory, displaySession, displayHallCharges }: {
+      displayPeriod: string;
+      fromDate?: string;
+      toDate?: string;
+      displayHall: string;
+      displayCustomerCategory: string;
+      displaySession: string;
+      displayHallCharges: boolean;
+    } = req.body;
+
+    const reportRows = await getBookingConfirmationReport({ displayPeriod, fromDate, toDate, displayHall, displayCustomerCategory, displaySession, displayHallCharges });
     res.status(200).json(reportRows);
   } catch (error) {
     console.log("Error fetching report data !!", error);
