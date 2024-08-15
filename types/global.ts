@@ -70,6 +70,7 @@ export type bookingTransactionType = {
 // ================================================
 export type HallBookingType = {
   readonly _id: string;
+  date?: string;
   user: CustomerType; // the User who booked this hall
   features: EachHallAdditonalFeaturesType[]; // the Ammenities which the user has booked for himself
   status: bookingStatusType; // payment and booking status is reflected here

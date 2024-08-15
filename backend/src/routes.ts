@@ -69,6 +69,7 @@ import { UploadImageZodSchema } from "./schema/image.schema";
 import { 
   getAdditionalFeatureReportHandler,
   getAllHallNamesAndIdsHandler,
+  getBookingConfirmationReportHandler,
   getBookingInformationReportHandler,
   getBookingTypeCountsHandler, 
   getCollectionDetailsHandler,
@@ -345,6 +346,12 @@ export default function routes(app: Express) {
     validateCookie,
     requireMasterRole,
     getBookingInformationReportHandler
+  )
+  app.post(
+    "/dashboard/generateBookingConfirmationReport",
+    // validateCookie,
+    // requireMasterRole,
+    getBookingConfirmationReportHandler,
   )
   app.post(
     "/dashboard/generateAdditionalFeatureReport",

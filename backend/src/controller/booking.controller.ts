@@ -85,6 +85,7 @@ export async function addBookingHandler(req: Request, res: Response) {
 export async function editBookingHandler(req: Request, res: Response) {
   try {
     const {
+      date,
       user,
       features,
       status,
@@ -110,6 +111,7 @@ export async function editBookingHandler(req: Request, res: Response) {
     const updatedBooking = await BookingModel.findByIdAndUpdate(
       bookingId,
       {
+        date,
         user,
         features,
         status,
