@@ -1,4 +1,5 @@
 import { Express, NextFunction, Request, Response } from "express";
+
 import multer from "multer";
 import {
   addHallHandler,
@@ -83,7 +84,8 @@ import { getAllHallNamesAndIds } from "./service/getHallConfig";
 
 import { MultipleBookingSchema, CheckBookingInMultipleSchema } from "./schema/multipleBooking.schema";
 import { addMultipleBookingHandler, getMultipleBookingHandler,  checkBookingInMultipleHandler } from "./controller/multipleBooking.controller";
-
+//try 
+import { getSessionName } from "./service/getSessionName";
 
 // const upload = multer({ dest: "uploads/" });
 const upload = multer({ storage: multer.memoryStorage() });
@@ -304,47 +306,50 @@ export default function routes(app: Express) {
     upload.single("image"),
     uploadImageHandler
   );
+
+
+
   {/********************* Dashboard Routes Begin *********************/}
   app.post(
     "/dashboard/getHallWiseBookingsCount",
     validateCookie,
-    requireMasterRole,
+   
     getHallBookingsCountHandler
   )
   app.post(
     "/dashboard/getSessionWiseBookings",
     validateCookie,
-    requireMasterRole,
+    
     getSessionWiseBookingHandler
   )
   app.post(
     "/dashboard/getBookingTypeCounts",
     validateCookie,
-    requireMasterRole,
+    
     getBookingTypeCountsHandler
   )
   app.post(
     "/dashboard/getCollectionDetails",
     validateCookie,
-    requireMasterRole,
+    
     getCollectionDetailsHandler
   )
   app.post(
     "/dashboard/getMonthwiseCollectionDetails",
     validateCookie,
-    requireMasterRole,
+   
     getMonthwiseCollectionDetailsHandler
   )
   app.post(
     "/dashboard/getTotalInteraction",
     validateCookie,
-    requireMasterRole,
+    
     getInteractionCountHandler
   )
   app.post(
     "/dashboard/generateBookingInformationReport",
     validateCookie,
-    requireMasterRole,
+    
     getBookingInformationReportHandler
   )
   app.post(
@@ -356,7 +361,7 @@ export default function routes(app: Express) {
   app.post(
     "/dashboard/generateAdditionalFeatureReport",
     validateCookie,
-    requireMasterRole,
+    
     getAdditionalFeatureReportHandler
   )
   {/********************* Dashboard Routes End *********************/}

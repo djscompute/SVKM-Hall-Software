@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import axiosMasterInstance from "../../config/axiosMasterInstance";
+import axiosManagerInstance from "../../config/axiosManagerInstance";
 import { toast } from "react-toastify";
 import "chart.js/auto";
 import dayjs from "dayjs";
-import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
+import BasicDateTimePicker from "../../components/Calender/BasicTimePicker.tsx";
 import { EachHallType } from "../../../../../types/global.ts";
 import { useQuery } from "@tanstack/react-query";
 import { getFinancialYearEnd, getFinancialYearStart } from "../../utils/financialYearRange.tsx";
@@ -15,7 +15,7 @@ function Report8() {
     queryKey: ["allhalls"],
     queryFn: async () => {
       try {
-        const responsePromise = axiosMasterInstance.get("getAllHalls");
+        const responsePromise = axiosManagerInstance.get("getAllHalls");
         console.log("FETCHING");
         toast.promise(responsePromise, {
           pending: "Fetching halls...",
@@ -105,11 +105,6 @@ function Report8() {
     handleHumanReadable(date.from, date.to);
   }, [selectedDisplayPeriod, date.from, date.to]);
 
-  useEffect(()=>{
-    console.log("booking data",data);
-    
-  },[])
-
   const getData = async ({
     displayPeriod,
     fromDate,
@@ -153,7 +148,7 @@ function Report8() {
       console.log(request);
     }
 
-    const responsePromise = axiosMasterInstance.post(
+    const responsePromise = axiosManagerInstance.post(
       "dashboard/generateBookingInformationReport",
       request
     );
@@ -163,11 +158,6 @@ function Report8() {
     });
     const response = await responsePromise;
     console.log("data here ", response.data);
-    // console.log("got session is",data[0].Session);
-    
-    // const newresp=await axiosMasterInstance.post("/getSessionName",{sessionName:data[0].Session});
-    // console.log("session name",newresp.data);
-    
     setData(response.data);
   };
 
@@ -198,13 +188,11 @@ function Report8() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
-      
       <span className="text-xl font-medium mt-5">
         Booking Information Report
       </span>
       {/* SELECT DISPLAY PERIOD */}
       <div className="mt-4">
-      <label htmlFor="hall-charges-select" className="mr-2">Select Display Period</label>
         <select
           className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
           onChange={(e) => setSelectedDisplayPeriod(e.target.value)}
@@ -219,158 +207,144 @@ function Report8() {
         </select>
       </div>
       {/* SELECT HALL */}
-     <div className="my-4 flex items-center">
-  <label htmlFor="hall-select" className="mr-2">Select Hall:</label>
-  <select
-    id="hall-select"
-    className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
-    onChange={(e) => {
-      if (e.target.value == "All") {
-        setSelectedHallId("All");
-      } else {
-        const selectedHallName = e.target.value;
-        const selectedHallId = hallData.find(
-          (hall) => hall.name === selectedHallName
-        )?._id;
-        setSelectedHall(selectedHallName);
-        if (selectedHallId) {
-          setSelectedHallId(selectedHallId);
-        }
-      }
-    }}
-  >
-    <option value="All">All</option>
-    {hallData &&
-      hallData.map((hall) => (
-        <option key={hall._id} value={hall.name}>
-          {hall.name}
-        </option>
-      ))}
-  </select>
-</div>
+      <div className="my-4">
+        <select
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
+          onChange={(e) => {
+            if (e.target.value == "All") {
+              setSelectedHallId("All");
+            } else {
+              const selectedHallName = e.target.value;
+              const selectedHallId = hallData.find(
+                (hall) => hall.name === selectedHallName
+              )?._id;
+              setSelectedHall(selectedHallName);
+              if (selectedHallId) {
+                setSelectedHallId(selectedHallId);
+              }
+            }
+          }}
+        >
+          <option value="All">All</option>
+          {hallData &&
+            hallData.map((hall) => (
+              <option key={hall._id} value={hall.name}>
+                {hall.name}
+              </option>
+            ))}
+        </select>
+      </div>
 
-     {/* SELECT SESSION */}
-<div className="flex items-center my-4">
-  <label htmlFor="session-select" className="mr-2">Select Session:</label>
-  <select
-    id="session-select"
-    className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
-    onChange={(e) => {
-      setSelectedSession(e.target.value);
-    }}
-  >
-    <option value="All">All</option>
-    {hallData
-      .find((hall) => hall.name === selectedHall)
-      ?.sessions.map((session) => (
-        <option key={session.name} value={session._id}>
-          {session.name}
-        </option>
-      ))}
-  </select>
-</div>
+      {/* SELECT SESSION */}
+      <div className="">
+        <select
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
+          onChange={(e) => {
+            setSelectedSession(e.target.value);
+          }}
+        >
+          <option value="All">All</option>
+          {hallData
+            .find((hall) => hall.name === selectedHall)
+            ?.sessions.map((session) => (
+              <option key={session.name} value={session._id}>
+                {session.name}
+              </option>
+            ))}
+        </select>
+      </div>
 
-{/* SELECT CATEGORY */}
-<div className="flex items-center my-4">
-  <label htmlFor="category-select" className="mr-2">Select Category:</label>
-  <select
-    id="category-select"
-    className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
-    onChange={(e) => {
-      setSelectedCategory(e.target.value);
-    }}
-  >
-    <option value="">Select Category</option>
-    <option value="All">All</option>
-    {selectedSession === "All"
-      ? hallData
-          .find((hall) => hall.name === selectedHall)
-          ?.sessions[0]?.price.map((category) => (
-            <option
-              key={category.categoryName}
-              value={category.categoryName}
-            >
-              {category.categoryName}
-            </option>
-          ))
-      : hallData
-          .find((hall) => hall.name === selectedHall)
-          ?.sessions.find((session) => session._id === selectedSession)
-          ?.price.map((category) => (
-            <option
-              key={category.categoryName}
-              value={category.categoryName}
-            >
-              {category.categoryName}
-            </option>
-          ))}
-  </select>
-</div>
+      {/* SELECT CATEGORY */}
+      <div className="my-4">
+        <select
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
+          onChange={(e) => {
+            setSelectedCategory(e.target.value);
+          }}
+        >
+          <option value="">Select Category</option>
+          <option value="All">All</option>
+          {selectedSession === "All"
+            ? hallData
+                .find((hall) => hall.name === selectedHall)
+                ?.sessions[0]?.price.map((category) => (
+                  <option
+                    key={category.categoryName}
+                    value={category.categoryName}
+                  >
+                    {category.categoryName}
+                  </option>
+                ))
+            : hallData
+                .find((hall) => hall.name === selectedHall)
+                ?.sessions.find((session) => session._id === selectedSession)
+                ?.price.map((category) => (
+                  <option
+                    key={category.categoryName}
+                    value={category.categoryName}
+                  >
+                    {category.categoryName}
+                  </option>
+                ))}
+        </select>
+      </div>
 
-{/* SELECT HALL CHARGES */}
-<div className="flex items-center my-4">
-  <label htmlFor="hall-charges-select" className="mr-2">Hall Charges:</label>
-  <select
-    id="hall-charges-select"
-    className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
-    onChange={(e) => {
-      e.target.value === "true"
-        ? setHallCharges(true)
-        : setHallCharges(false);
-    }}
-  >
-    <option value="">Display Hall Charges</option>
-    <option value="true">True</option>
-    <option value="false">False</option>
-  </select>
-</div>
+      {/* SELECT HALL CHARGES */}
+      <div className="">
+        <select
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
+          onChange={(e) => {
+            {
+              e.target.value == "true"
+                ? setHallCharges(true)
+                : setHallCharges(false);
+            }
+          }}
+        >
+          <option value="">Display Hall Charges</option>
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+      </div>
 
       <hr className=" bg-gray-300 h-[1.5px] w-[50%] my-2" />
       {/* SELECT TIME PERIOD */}
-      {selectedDisplayPeriod === "Select" && (
-  <div className="flex flex-col items-center justify-center gap-2">
-    <div className="flex gap-2">
-      <div className="flex flex-col">
-        <label htmlFor="fromDate" className="mb-1 text-sm font-medium text-gray-700">From:</label>
-        <BasicDateTimePicker
-          id="fromDate"
-          timeModifier={(time) => {
-            setDate((prev) => ({ ...prev, from: time }));
-          }}
-          timePickerName="from"
-        />
-      </div>
-      <div className="flex flex-col">
-        <label htmlFor="toDate" className="mb-1 text-sm font-medium text-gray-700">To:</label>
-        <BasicDateTimePicker
-          id="toDate"
-          timeModifier={(time) => {
-            setDate((prev) => ({ ...prev, to: time }));
-          }}
-          timePickerName="to"
-        />
-      </div>
-    </div>
-  </div>
-)}
-<button
-  className="bg-blue-500 text-white px-2 py-1 rounded-md"
-  onClick={() => {
-    if (selectedHallId && selectedCategory) {
-      getData({
-        displayPeriod: selectedDisplayPeriod,
-        fromDate: date.from,
-        toDate: date.to,
-        displayHall: selectedHallId,
-        displayCustomerCategory: selectedCategory,
-        displaySession: selectedSession,
-        displayHallCharges: hallCharges,
-      });
-    }
-  }}
->
-  Get for Time Period
-</button>
+      {selectedDisplayPeriod == "Select" && (
+        <div className={`flex flex-col items-center justify-center gap-2 `}>
+          <div className="flex gap-2">
+            <BasicDateTimePicker
+              timeModifier={(time) => {
+                setDate((prev) => ({ ...prev, from: time }));
+              }}
+              timePickerName="from"
+            />
+            <BasicDateTimePicker
+              timeModifier={(time) => {
+                setDate((prev) => ({ ...prev, to: time }));
+              }}
+              timePickerName="to"
+            />
+          </div>
+        </div>
+      )}
+      <button
+        className="bg-blue-500 text-white px-2 py-1 rounded-md"
+        onClick={() => {
+          if (selectedHallId && selectedCategory) {
+            getData({
+              displayPeriod: selectedDisplayPeriod,
+              fromDate: date.from,
+              toDate: date.to,
+              displayHall: selectedHallId,
+              displayCustomerCategory: selectedCategory,
+              displaySession: selectedSession,
+              displayHallCharges: hallCharges,
+            });
+          }
+        }}
+      >
+        Get for Time Period
+      </button>
 
       {/* Display Data */}
       {data?.length && (
@@ -423,24 +397,18 @@ function Report8() {
                     <th className="px-4 py-2 text-center">Booking Amount</th>
                   )}
                   {responseHallCharges && (
-                    <th className="px-4 py-2 text-center">Security Deposit</th>
-                  )}
-                  {responseHallCharges && (
-                    <th className="px-4 py-2 text-center">GST</th>
-                  )}
-                  {responseHallCharges && (
                     <th className="px-4 py-2 text-center">Amount Paid</th>
                   )}
                   <th className="px-4 py-2 text-center">transaction type</th>
                   <th className="px-4 py-2 text-center">date</th>
-                  {/* <th className="px-4 py-2 text-center">transaction id</th> */}
+                  <th className="px-4 py-2 text-center">transaction id</th>
                   <th className="px-4 py-2 text-center">payee Name</th>
-                  {/* <th className="px-4 py-2 text-center">utr no.</th> */}
+                  <th className="px-4 py-2 text-center">utr no.</th>
                   <th className="px-4 py-2 text-center">cheque no.</th>
                   <th className="px-4 py-2 text-center">bank</th>
                 </tr>
               </thead>
-              <tbody>
+               <tbody>
                 {data.map((booking: any, index: number) => (
                   <tr key={index} className="bg-white border-b">
                     <td className="px-4 py-2 text-center">{booking.Date}</td>
@@ -448,9 +416,7 @@ function Report8() {
                       {booking["Hall Name"]}
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {/* {booking["Session"]} */}
-                      {booking["Session"].name}  {booking["Session"].time.from} -  {booking["Session"].time.to}
-                      
+                      {booking["Session"]}
                     </td>
                     <td className="px-4 py-2 text-center">
                       {booking["Additional Facility"]

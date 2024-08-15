@@ -185,33 +185,24 @@ function Booking() {
         email: editedData?.user.email || data?.user.email || "",
         hallContact: "Email to be entered",
       })
-      .then((response) => {
-        axiosManagerInstance
-        .post(`/sendEmail`, {
-          to: editedData?.user.email || data?.user.email || "",
-          subject: `SVKM Hall Booking for ${dayjs(
-            editedData?.from || data?.from
-          ).format("DD-MM-YYYY")}`,
-          text: "Your booking has been confirmed. Please find the attachments below.",
-          filename: `${editedData?.user.username || data?.user.username}_${
-            editedData?.enquiryNumber || data?.enquiryNumber || ""
-          }_confirmation`,
-          path: "",
-        })
-        .then((response) => {
-          console.log(response.data);
-          return response.data;
-        })
-        .catch((error) => {
-          console.log(error);
-          throw error;
-        });
-        console.log(response.data);
-        return response.data;
+      .then(async (response) => {   
+        await axiosManagerInstance
+          .post(`/sendEmail`, {
+            to: editedData?.user.email || data?.user.email || "",
+            subject: `SVKM Hall Booking for ${dayjs(
+              editedData?.from || data?.from
+            ).format("DD-MM-YYYY")}`,
+            text: "Your booking has been confirmed. Please find the attachments below.",
+            filename: `${editedData?.user.username || data?.user.username}_${
+              editedData?.enquiryNumber || data?.enquiryNumber || ""
+            }_confirmation`,
+            path: "",
+          });
+        
+        console.log("Email sent successfully");
       })
       .catch((error) => {
-        console.log(error);
-        throw error;
+        console.error("Error in generate confirmation or send email:", error);
       });
   };
 
@@ -329,7 +320,12 @@ function Booking() {
   });
 
   const editTransactionType = useMutation({
+
+  
+
     mutationFn: async (newTransaction: transactionType) => {
+      const clearedFields = clearFieldsForTransactionType(newTransaction);
+
       const responsePromise = axiosManagerInstance.post(
         `/editBooking/${bookingId}`,
         {
@@ -337,6 +333,8 @@ function Booking() {
           transaction: {
             ...data?.transaction,
             type: newTransaction,
+            ...clearedFields
+            // date: editedData?.transaction?.date || data?.transaction?.date,
           },
         }
       );
@@ -347,12 +345,18 @@ function Booking() {
       });
       const response = await responsePromise;
       console.log(response.data);
+
+
+    
     },
     onSuccess: async () => {
       console.log("REVALIDATING");
       await queryClient.refetchQueries({
         queryKey: [`booking/${bookingId}`],
       });
+
+
+
     },
     onError: (error) => {
       console.log(error);
@@ -399,12 +403,16 @@ function Booking() {
     }
   }, [data]);
   const handleSave = async () => {
+    const clearedFields = clearFieldsForTransactionType(editedData?.transaction?.type || "");
+
     const dataToSend = {
       ...editedData,
+      ...clearedFields,
       features: Array.isArray(editedData?.features)
         ? editedData.features
         : [editedData?.features],
     };
+
 
     const responsePromise = axiosManagerInstance.post(
       `/editBooking/${bookingId}`,
@@ -428,7 +436,74 @@ function Booking() {
     if (addAdditional) {
       setAdditional(!addAdditional);
     }
+
+
+    // try {
+    //   // Assuming the mutation is triggered on saving
+    //   await editTransactionType.mutateAsync(dataToSend.transaction.type);
+  
+    //   // Here you could also clear other parts of editedData if needed
+    //   setEditedData((prev) => {
+    //     if (!prev) return undefined;
+    //     return {
+    //       ...prev,
+    //       features: [], // Assuming you want to clear features too
+    //       // Reset other fields if needed
+    //     };
+    //   });
+    // } catch (error) {
+    //   console.error("Failed to save data:", error);
+    // }
   };
+
+
+
+
+  const clearFieldsForTransactionType = (transactionType: string) => {
+    switch (transactionType) {
+      case 'cheque':
+        return {
+          transactionID: "",
+          utrNo: "",
+          upiId: "", 
+        };
+      case 'upi':
+        return {
+          chequeNo: "",
+          utrNo: "",
+          bank: "",
+          payeeName: "",
+        };
+      case 'neft/rtgs':
+        return {
+          chequeNo: "",
+          transactionID: "",
+          upiId: "", 
+          bank: "",
+          payeeName: "",
+        };
+      case 'svkminstitute':
+        return {
+          chequeNo: "",
+          utrNo: "",
+          transactionID: "",
+          upiId: "", // Add any other UPI related fields
+          bank: "",
+          payeeName: "",
+        };
+      default:
+        return {};
+    }
+  };
+  
+
+
+
+
+
+
+
+
   const handleBookingSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = event.target.value;
     const selectedBooking = allBookingsOfUser.find(
@@ -1605,6 +1680,8 @@ function Booking() {
             className="px-2 py-1 rounded-md border border-gray-400 my-2"
             onChange={(e) =>
               editTransactionType.mutate(e.target.value as transactionType)
+           
+
             }
           >
             <option value="" disabled>
