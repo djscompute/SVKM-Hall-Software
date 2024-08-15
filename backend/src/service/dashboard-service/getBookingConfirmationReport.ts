@@ -40,20 +40,23 @@ const calculateAmountPaid = (data: any): number => {
     if (Array.isArray(features)) {
       return features.reduce((acc, feature) => acc + (feature.price || 0), 0);
     }
-    return 0; 
+    return 0;
   };
-  const basePrice = (data?.price || 0) + calculateTotalFeatureCharges(data?.features);
-  const discountedPrice = basePrice - 0.01 * (data?.baseDiscount || 0) * basePrice;
-  const gst = data?.booking_type === "SVKM INSTITUTE" ? 0 : 0.18 * discountedPrice;
+  const basePrice =
+    (data?.price || 0) + calculateTotalFeatureCharges(data?.features);
+  const discountedPrice =
+    basePrice - 0.01 * (data?.baseDiscount || 0) * basePrice;
+  const gst =
+    data?.booking_type === "SVKM INSTITUTE" ? 0 : 0.18 * discountedPrice;
   const depositAmount = data?.isDeposit
-    ? (data?.deposit || 0) - 0.01 * (data?.depositDiscount || 0) * (data?.deposit || 0)
+    ? (data?.deposit || 0) -
+      0.01 * (data?.depositDiscount || 0) * (data?.deposit || 0)
     : 0;
-  console.log(`price1 of ${data.from}`,discountedPrice)
-  console.log(`price2 of ${data.from}`,gst)
-  console.log(`price3 of ${data.from}`,depositAmount)
+  console.log(`price1 of ${data.from}`, discountedPrice);
+  console.log(`price2 of ${data.from}`, gst);
+  console.log(`price3 of ${data.from}`, depositAmount);
   return discountedPrice + gst + depositAmount;
 };
-
 
 export async function getBookingConfirmationReport(
   params: BookingConfirmationReportRequest
@@ -75,7 +78,7 @@ export async function getBookingConfirmationReport(
       case "Today":
         const istToday = new Date(today.getTime() + offsetInMilliseconds);
         istToday.setUTCHours(0, 0, 0, 0);
-        const todayDate = istToday.toISOString().split("T")[0];
+        const todayDate = formatDateToDDMMYYYY(istToday);
 
         const findQueryToday = {
           date: todayDate,

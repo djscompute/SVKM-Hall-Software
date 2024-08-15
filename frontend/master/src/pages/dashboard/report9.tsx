@@ -164,15 +164,83 @@ function Report9() {
     setData(response.data);
   };
 
+  const calculateTotalAmountPaid = () => {
+    if (!data || !responseHallCharges) return 0;
+    return data.reduce(
+      (sum: number, booking: { [x: string]: any }) =>
+        sum + Number(booking["Amount Paid"] || 0),
+      0
+    );
+  };
+
+  interface TransactionData {
+    type?: string;
+    date?: string;
+    transactionID?: string;
+    payeeName?: string;
+    utrNo?: string;
+    chequeNo?: string;
+    bank?: string;
+  }
+
+  interface BookingData {
+    "Manager Name": string;
+    "Customer Category": string;
+    "Customer Name": string;
+    "Contact Person": string;
+    "Contact No.": string;
+    "Booking Amount": string;
+    "Amount Paid": string;
+    transaction?: TransactionData;
+    [key: string]: any; // For any additional fields
+  }
+
+  interface FlattenedBookingData extends Omit<BookingData, "transaction"> {
+    "transaction type"?: string;
+    "transaction date"?: string;
+    "transaction id"?: string;
+    "payee Name"?: string;
+    "utr no."?: string;
+    "cheque no."?: string;
+    bank?: string;
+  }
+
   const downloadCsv = () => {
     if (!data) return;
-    const csvRows = [];
-    const headers = Object.keys(data[0]);
-    csvRows.push(headers.join(","));
 
-    for (const row of data) {
+    const flattenedData: FlattenedBookingData[] = data.map(
+      (row: BookingData) => {
+        const flatRow: FlattenedBookingData = { ...row };
+        if (row.transaction) {
+          flatRow["transaction type"] = row.transaction.type || "";
+          flatRow["transaction date"] = row.transaction.date || "";
+          flatRow["transaction id"] = row.transaction.transactionID || "";
+          flatRow["payee Name"] = row.transaction.payeeName || "";
+          flatRow["utr no."] = row.transaction.utrNo || "";
+          flatRow["cheque no."] = row.transaction.chequeNo || "";
+          flatRow["bank"] = row.transaction.bank || "";
+        }
+        delete (flatRow as any).transaction;
+        return flatRow;
+      }
+    );
+
+    const totalAmountPaid = flattenedData.reduce(
+      (sum, row) => sum + (Number(row["Amount Paid"]) || 0),
+      0
+    );
+
+    flattenedData.push({
+      "Manager Name": "Total",
+      "Amount Paid": totalAmountPaid.toFixed(2),
+    } as FlattenedBookingData);
+
+    const headers = Object.keys(flattenedData[0]);
+    const csvRows = [headers.join(",")];
+
+    for (const row of flattenedData) {
       const values = headers.map((header) => {
-        const escaped = ("" + row[header]).replace(/"/g, '\\"');
+        const escaped = ("" + (row[header] || "")).replace(/"/g, '\\"');
         return `"${escaped}"`;
       });
       csvRows.push(values.join(","));
@@ -183,7 +251,7 @@ function Report9() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${selectedHall} Booking Information Reports ${humanReadable.fromHuman}-${humanReadable.toHuman} .csv`;
+    link.download = `${selectedHall} Booking Confirmation Reports ${humanReadable.fromHuman}-${humanReadable.toHuman}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -192,12 +260,17 @@ function Report9() {
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
       <span className="text-xl font-medium mt-5">
-        Booking Information Report
+        Booking Confirmation Report
       </span>
       {/* SELECT DISPLAY PERIOD */}
-      <div className="mt-4">
+      <div>
+      <div className="mt-4 flex items-center gap-4 justify-between">
+        <label htmlFor="displayPeriod" className="font-medium text-nowrap">
+          Display Period:
+        </label>
         <select
-          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
+          id="displayPeriod"
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
           onChange={(e) => setSelectedDisplayPeriod(e.target.value)}
         >
           <option value="Select">Select Display Period</option>
@@ -208,12 +281,17 @@ function Report9() {
           <option value="Fin-Year">Financial Year</option>
         </select>
       </div>
+
       {/* SELECT HALL */}
-      <div className="my-4">
+      <div className="my-4 flex items-center gap-4 justify-between">
+        <label htmlFor="hall" className="font-medium text-nowrap">
+          Select Hall:
+        </label>
         <select
-          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
+          id="hall"
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
           onChange={(e) => {
-            if (e.target.value == "All") {
+            if (e.target.value === "All") {
               setSelectedHallId("All");
             } else {
               const selectedHallName = e.target.value;
@@ -238,9 +316,13 @@ function Report9() {
       </div>
 
       {/* SELECT SESSION */}
-      <div className="">
+      <div className="flex items-center gap-4 justify-between">
+        <label htmlFor="session" className="font-medium text-nowrap">
+          Select Session:
+        </label>
         <select
-          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
+          id="session"
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
           onChange={(e) => {
             setSelectedSession(e.target.value);
           }}
@@ -257,9 +339,13 @@ function Report9() {
       </div>
 
       {/* SELECT CATEGORY */}
-      <div className="my-4">
+      <div className="my-4 flex items-center gap-4 justify-between">
+        <label htmlFor="category" className="font-medium text-nowrap">
+          Select Category:
+        </label>
         <select
-          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
+          id="category"
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
           onChange={(e) => {
             setSelectedCategory(e.target.value);
           }}
@@ -292,23 +378,23 @@ function Report9() {
       </div>
 
       {/* SELECT HALL CHARGES */}
-      <div className="">
+      <div className="flex items-center gap-4 justify-between">
+        <label htmlFor="hallCharges" className="font-medium text-nowrap">
+          Display Hall Charges:
+        </label>
         <select
-          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
+          id="hallCharges"
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
           onChange={(e) => {
-            {
-              e.target.value == "true"
-                ? setHallCharges(true)
-                : setHallCharges(false);
-            }
+            setHallCharges(e.target.value === "true");
           }}
         >
-          <option value="">Display Hall Charges</option>
-          <option value="true">True</option>
-          <option value="false">False</option>
+          <option value="">Select</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
         </select>
       </div>
-
+      </div>
       <hr className=" bg-gray-300 h-[1.5px] w-[50%] my-2" />
       {/* SELECT TIME PERIOD */}
 
@@ -389,36 +475,78 @@ function Report9() {
             <table className="">
               <thead className="bg-gray-800 text-white">
                 <tr>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Confirmation Date</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Event Date</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Hall Name</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Session</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Additional Facility</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Manager Name</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Customer Category</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Customer Name</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Contact Person</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Contact No.</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Confirmation Date
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Event Date
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Hall Name
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Session
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Additional Facility
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Manager Name
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Customer Category
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Customer Name
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Contact Person
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Contact No.
+                  </th>
                   {responseHallCharges && (
-                    <th className="px-4 py-2 text-center whitespace-nowrap">Booking Amount</th>
+                    <th className="px-4 py-2 text-center whitespace-nowrap">
+                      Booking Amount
+                    </th>
                   )}
                   {responseHallCharges && (
-                    <th className="px-4 py-2 text-center whitespace-nowrap">Amount Paid</th>
+                    <th className="px-4 py-2 text-center whitespace-nowrap">
+                      Amount Paid
+                    </th>
                   )}
-                  <th className="px-4 py-2 text-center whitespace-nowrap">transaction type</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">date</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">transaction id</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">payee Name</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">utr no.</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">cheque no.</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">bank</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    transaction type
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    date
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    transaction id
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    payee Name
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    utr no.
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    cheque no.
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    bank
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {data.map((booking: any, index: number) => (
                   <tr key={index} className="bg-white border-b">
-                    <td className="px-4 py-2 text-center">{booking.confirmationDate}</td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">{booking.eventDate}</td>
+                    <td className="px-4 py-2 text-center">
+                      {booking.confirmationDate}
+                    </td>
+                    <td className="px-4 py-2 text-center whitespace-nowrap">
+                      {booking.eventDate}
+                    </td>
                     <td className="px-4 py-2 text-center">
                       {booking["Hall Name"]}
                     </td>
@@ -479,6 +607,22 @@ function Report9() {
                   </tr>
                 ))}
               </tbody>
+              {responseHallCharges && (
+                <tfoot>
+                  <tr className="bg-gray-200 font-bold">
+                    <td
+                      colSpan={responseHallCharges ? 10 : 9}
+                      className="px-4 py-2 text-right"
+                    >
+                      Total Amount Paid:
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {calculateTotalAmountPaid().toFixed(2)}
+                    </td>
+                    <td colSpan={8}></td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         </div>
