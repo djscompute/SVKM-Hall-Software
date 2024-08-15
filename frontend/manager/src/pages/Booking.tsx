@@ -184,33 +184,24 @@ function Booking() {
         email: editedData?.user.email || data?.user.email || "",
         hallContact: "Email to be entered",
       })
-      .then((response) => {
-        axiosManagerInstance
-        .post(`/sendEmail`, {
-          to: editedData?.user.email || data?.user.email || "",
-          subject: `SVKM Hall Booking for ${dayjs(
-            editedData?.from || data?.from
-          ).format("DD-MM-YYYY")}`,
-          text: "Your booking has been confirmed. Please find the attachments below.",
-          filename: `${editedData?.user.username || data?.user.username}_${
-            editedData?.enquiryNumber || data?.enquiryNumber || ""
-          }_confirmation`,
-          path: "",
-        })
-        .then((response) => {
-          console.log(response.data);
-          return response.data;
-        })
-        .catch((error) => {
-          console.log(error);
-          throw error;
-        });
-        console.log(response.data);
-        return response.data;
+      .then(async (response) => {   
+        await axiosManagerInstance
+          .post(`/sendEmail`, {
+            to: editedData?.user.email || data?.user.email || "",
+            subject: `SVKM Hall Booking for ${dayjs(
+              editedData?.from || data?.from
+            ).format("DD-MM-YYYY")}`,
+            text: "Your booking has been confirmed. Please find the attachments below.",
+            filename: `${editedData?.user.username || data?.user.username}_${
+              editedData?.enquiryNumber || data?.enquiryNumber || ""
+            }_confirmation`,
+            path: "",
+          });
+        
+        console.log("Email sent successfully");
       })
       .catch((error) => {
-        console.log(error);
-        throw error;
+        console.error("Error in generate confirmation or send email:", error);
       });
   };
 

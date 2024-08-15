@@ -120,6 +120,38 @@ function BookADay() {
       if (data.error) {
         console.error(data.error);
       } else {
+        navigate("/bookingsuccessful", {
+          state: {
+            bookingDetails: {
+              username: name,
+              contact: person,
+              email: email,
+              mobile: mobileNumber,
+              hallName: HallData?.name,
+              sessionType: selectedSessionId,
+              sessionName: HallData?.sessions.find(
+                (ecssn) => ecssn._id == selectedSessionId
+              )?.name,
+              booking_type: selectedCategory,
+              estimatedPrice: price,
+              securityDeposit: securityDeposit,
+              additionalFeatures: selectedFeatures,
+              date: humanReadableDate,
+              startTime: `${day}T${
+                HallData?.sessions.find(
+                  (ecssn) => ecssn._id == selectedSessionId
+                )?.from
+              }`,
+              endTime: `${day}T${
+                HallData?.sessions.find(
+                  (ecssn) => ecssn._id == selectedSessionId
+                )?.to
+              }`,
+              status: "ENQUIRY",
+              eventPurpose: purpose,
+            },
+          },
+        });       
         const additionalFacilities =
           selectedCategory === "SVKM INSTITUTE"
             ? 0
@@ -160,7 +192,7 @@ function BookADay() {
             totalPayable: totalPayable,
             hallContact: "Email to be entered",
           })
-          .then((response) => {
+          .then(async (response) => {
             axiosManagerInstance
             .post(`/sendEmail`, {
               to: email,
@@ -183,38 +215,6 @@ function BookADay() {
             throw error;
           });
 
-        navigate("/bookingsuccessful", {
-          state: {
-            bookingDetails: {
-              username: name,
-              contact: person,
-              email: email,
-              mobile: mobileNumber,
-              hallName: HallData?.name,
-              sessionType: selectedSessionId,
-              sessionName: HallData?.sessions.find(
-                (ecssn) => ecssn._id == selectedSessionId
-              )?.name,
-              booking_type: selectedCategory,
-              estimatedPrice: price,
-              securityDeposit: securityDeposit,
-              additionalFeatures: selectedFeatures,
-              date: humanReadableDate,
-              startTime: `${day}T${
-                HallData?.sessions.find(
-                  (ecssn) => ecssn._id == selectedSessionId
-                )?.from
-              }`,
-              endTime: `${day}T${
-                HallData?.sessions.find(
-                  (ecssn) => ecssn._id == selectedSessionId
-                )?.to
-              }`,
-              status: "ENQUIRY",
-              eventPurpose: purpose,
-            },
-          },
-        });
       }
       await queryClient.refetchQueries({
         queryKey: ["bookaday", `${humanReadableDate}`],
