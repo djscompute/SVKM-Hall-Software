@@ -25,6 +25,7 @@ function formatIndianCurrency(num: number): string {
   return formatted;
 }
 
+
 function numberToWordsIndian(price: number): string {
     const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
     const dblDigit = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
@@ -111,7 +112,7 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
 </head>
 <body>
     <div class="header">
-        <img src="path_to_svkm_logo.png" alt="SVKM Logo" width="100">
+        <img src="https://static.wixstatic.com/media/2d8aca_ab298473c57c4d32b13b1544c84d5ac9~mv2.png/v1/fill/w_196,h_236,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/svkm%20logo.png" alt="SVKM Logo" width="100">
         <h2>SHRI VILE PARLE KELAVANI MANDAL</h2>
         <h3>INQUIRY ESTIMATE FOR HALL BOOKING</h3>
     </div>
@@ -176,7 +177,38 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
     <div class="page-break"></div>
     <div class="content terms-conditions">
         <h4>Terms & Conditions:</h4>
-        <!-- ... (Terms & Conditions content remains the same) ... -->
+        <p><strong>General -</strong></p>
+        <ol>
+            <li>Extra hour charges are applicable for BJ Hall and Mukesh Patel Auditorium.</li>
+            <li>Extra payment for electrical service charges (as per meter reading) will have to be paid by customer for booking the B.J. Hall.</li>
+            <li>GST will be applicable on Total Payable amount excluding security deposit, if any.</li>
+            <li>Difference in GST amount due to change in the rate, applicable on the date of the event, will have to be paid by customer.</li>
+            <li>Security Deposit will have to be paid along with Hall charges.</li>
+            <li>Security Deposit shall be claimed by customer on production of the original official receipt within one month after the function is over.</li>
+            <li>Hall charges are subject to change without any prior notice and the concerned customer has to bear the upward revision in charges, if applicable.</li>
+            <li>In case of cancellation of booking, deductions shall be made at the following:
+                <ul>
+                    <li>50% of the charges provided, the hall is rebooked by some other party.</li>
+                    <li>10% of the charges if the function is cancelled due to death in the family.</li>
+                </ul>
+                In any other cases no refund will be allowed.
+            </li>
+            <li>Serving of non-vegetarian food and/or hard drink is strictly prohibited.</li>
+            <li>Use of Band within the premises is strictly prohibited.</li>
+            <li>Bursting of crackers will be allowed beyond 100 metres of the periphery of the premises. Deposit shall be forfeited if the above rule is violated.</li>
+            <li>Photo Studio/Umbrella and halogen stand are not allowed inside the hall.</li>
+            <li>Flowers are not allowed in Hall Carpet Area.</li>
+        </ol>
+        
+        <p><strong>For Mukesh Patel Auditorium -</strong></p>
+        <ol>
+            <li>Each session if for a period not exceeding 3 hours</li>
+            <li>Full day is for a period not exceeding 6 hours and shall, in any case not last beyond 6 PM on the day.</li>
+            <li>Service of Ushers: The services of Ushers shall be provided by the auditorium and the party booking the auditorium will have to pay Rs.4000/- (Rupees Four Thousand only) per session (three hours and for ten persons) for the services rendered before the commencement of the show and the cheque should be drawn in favour of "THE FORT AND COLABA WELFARE SOCIETY".</li>
+            <li>Police Bandobast: Police Bandobast is compulsory on the day of performance and will be made by the party booking the auditorium. For this purpose, the party should contact well in advance with an application, the Inspector of Police, Juhu Police Station, Vile Parle (West), Mumbai - 400 056, pay the necessary charges and obtain receipt of the same. This should be shown to the Auditorium Manager at the time of the programme.</li>
+            <li>Police Permission & Licenses: Permission from the police for the following must be obtained before the sale of tickets and the necessary certificate must be shown to the Auditorium Manager.
+                The contents of the performance or the drama to be performed must be got approved by the Commissioner of Police, Theatre Branch, Mumbai - 400 001. It is necessary to obtain the permission of the author before staging performance.</li>
+        </ol>
     </div>
 </body>
 </html>
@@ -197,6 +229,7 @@ export async function generateInquiry(props: inquiryType) {
     console.log(`PDF generated for customer ${props.customerName}: ${pdfPath}`);
 
     await browser.close();
+    return pdfPath;
   } catch (error) {
     console.log(error);
   }
