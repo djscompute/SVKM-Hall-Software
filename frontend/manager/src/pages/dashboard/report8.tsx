@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import axiosMasterInstance from "../../config/axiosMasterInstance";
+import axiosManagerInstance from "../../config/axiosManagerInstance";
 import { toast } from "react-toastify";
 import "chart.js/auto";
 import dayjs from "dayjs";
-import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
+import BasicDateTimePicker from "../../components/Calender/BasicTimePicker.tsx";
 import { EachHallType } from "../../../../../types/global.ts";
 import { useQuery } from "@tanstack/react-query";
 import { getFinancialYearEnd, getFinancialYearStart } from "../../utils/financialYearRange.tsx";
@@ -15,7 +15,7 @@ function Report8() {
     queryKey: ["allhalls"],
     queryFn: async () => {
       try {
-        const responsePromise = axiosMasterInstance.get("getAllHalls");
+        const responsePromise = axiosManagerInstance.get("getAllHalls");
         console.log("FETCHING");
         toast.promise(responsePromise, {
           pending: "Fetching halls...",
@@ -105,11 +105,6 @@ function Report8() {
     handleHumanReadable(date.from, date.to);
   }, [selectedDisplayPeriod, date.from, date.to]);
 
-  useEffect(()=>{
-    console.log("booking data",data);
-    
-  },[])
-
   const getData = async ({
     displayPeriod,
     fromDate,
@@ -153,7 +148,7 @@ function Report8() {
       console.log(request);
     }
 
-    const responsePromise = axiosMasterInstance.post(
+    const responsePromise = axiosManagerInstance.post(
       "dashboard/generateBookingInformationReport",
       request
     );
@@ -163,11 +158,6 @@ function Report8() {
     });
     const response = await responsePromise;
     console.log("data here ", response.data);
-    // console.log("got session is",data[0].Session);
-    
-    // const newresp=await axiosMasterInstance.post("/getSessionName",{sessionName:data[0].Session});
-    // console.log("session name",newresp.data);
-    
     setData(response.data);
   };
 
@@ -407,24 +397,18 @@ function Report8() {
                     <th className="px-4 py-2 text-center">Booking Amount</th>
                   )}
                   {responseHallCharges && (
-                    <th className="px-4 py-2 text-center">Security Deposit</th>
-                  )}
-                  {responseHallCharges && (
-                    <th className="px-4 py-2 text-center">GST</th>
-                  )}
-                  {responseHallCharges && (
                     <th className="px-4 py-2 text-center">Amount Paid</th>
                   )}
                   <th className="px-4 py-2 text-center">transaction type</th>
                   <th className="px-4 py-2 text-center">date</th>
-                  {/* <th className="px-4 py-2 text-center">transaction id</th> */}
+                  <th className="px-4 py-2 text-center">transaction id</th>
                   <th className="px-4 py-2 text-center">payee Name</th>
-                  {/* <th className="px-4 py-2 text-center">utr no.</th> */}
+                  <th className="px-4 py-2 text-center">utr no.</th>
                   <th className="px-4 py-2 text-center">cheque no.</th>
                   <th className="px-4 py-2 text-center">bank</th>
                 </tr>
               </thead>
-              <tbody>
+               <tbody>
                 {data.map((booking: any, index: number) => (
                   <tr key={index} className="bg-white border-b">
                     <td className="px-4 py-2 text-center">{booking.Date}</td>
@@ -432,9 +416,7 @@ function Report8() {
                       {booking["Hall Name"]}
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {/* {booking["Session"]} */}
-                      {booking["Session"].name}  {booking["Session"].time.from} -  {booking["Session"].time.to}
-                      
+                      {booking["Session"]}
                     </td>
                     <td className="px-4 py-2 text-center">
                       {booking["Additional Facility"]

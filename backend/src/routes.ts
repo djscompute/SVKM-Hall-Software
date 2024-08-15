@@ -312,49 +312,49 @@ export default function routes(app: Express) {
   app.post(
     "/dashboard/getHallWiseBookingsCount",
     validateCookie,
-    requireMasterRole,
+   
     getHallBookingsCountHandler
   )
   app.post(
     "/dashboard/getSessionWiseBookings",
     validateCookie,
-    requireMasterRole,
+    
     getSessionWiseBookingHandler
   )
   app.post(
     "/dashboard/getBookingTypeCounts",
     validateCookie,
-    requireMasterRole,
+    
     getBookingTypeCountsHandler
   )
   app.post(
     "/dashboard/getCollectionDetails",
     validateCookie,
-    requireMasterRole,
+    
     getCollectionDetailsHandler
   )
   app.post(
     "/dashboard/getMonthwiseCollectionDetails",
     validateCookie,
-    requireMasterRole,
+   
     getMonthwiseCollectionDetailsHandler
   )
   app.post(
     "/dashboard/getTotalInteraction",
     validateCookie,
-    requireMasterRole,
+    
     getInteractionCountHandler
   )
   app.post(
     "/dashboard/generateBookingInformationReport",
     validateCookie,
-    requireMasterRole,
+    
     getBookingInformationReportHandler
   )
   app.post(
     "/dashboard/generateAdditionalFeatureReport",
     validateCookie,
-    requireMasterRole,
+    
     getAdditionalFeatureReportHandler
   )
   {/********************* Dashboard Routes End *********************/}
