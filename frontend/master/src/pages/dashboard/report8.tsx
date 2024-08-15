@@ -105,6 +105,11 @@ function Report8() {
     handleHumanReadable(date.from, date.to);
   }, [selectedDisplayPeriod, date.from, date.to]);
 
+  useEffect(()=>{
+    console.log("booking data",data);
+    
+  },[])
+
   const getData = async ({
     displayPeriod,
     fromDate,
@@ -158,6 +163,11 @@ function Report8() {
     });
     const response = await responsePromise;
     console.log("data here ", response.data);
+    // console.log("got session is",data[0].Session);
+    
+    // const newresp=await axiosMasterInstance.post("/getSessionName",{sessionName:data[0].Session});
+    // console.log("session name",newresp.data);
+    
     setData(response.data);
   };
 
@@ -416,7 +426,9 @@ function Report8() {
                       {booking["Hall Name"]}
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {booking["Session"]}
+                      {/* {booking["Session"]} */}
+                      {booking["Session"].name}  {booking["Session"].time.from} -  {booking["Session"].time.to}
+                      
                     </td>
                     <td className="px-4 py-2 text-center">
                       {booking["Additional Facility"]

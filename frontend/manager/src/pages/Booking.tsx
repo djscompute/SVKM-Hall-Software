@@ -336,6 +336,8 @@ function Booking() {
           transaction: {
             ...data?.transaction,
             type: newTransaction,
+            // type: newTransactionType,
+            date: editedData?.transaction?.date || data?.transaction?.date,
           },
         }
       );
@@ -1604,6 +1606,8 @@ function Booking() {
             className="px-2 py-1 rounded-md border border-gray-400 my-2"
             onChange={(e) =>
               editTransactionType.mutate(e.target.value as transactionType)
+           
+
             }
           >
             <option value="" disabled>

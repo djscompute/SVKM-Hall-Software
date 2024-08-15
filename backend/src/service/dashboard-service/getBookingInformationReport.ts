@@ -2,6 +2,7 @@ import { start } from "repl";
 import { BookingModel, HallBookingType } from "../../models/booking.model";
 import { getHallNameById } from "../getHallName";
 import { getManagerNamesByHallId } from "../getManagerName";
+import { getSessionName, getSessionTime } from "../getSessionName";
 
 interface BookingInformationReportRequest {
   displayPeriod: string;
@@ -244,7 +245,12 @@ export async function getBookingInformationReport(
       bookings.map(async (booking) => ({
         Date: parseDateTime(booking.from).date,
         "Hall Name": await getHallNameById(booking.hallId),
-        Session: booking.session_id,
+        Session:{
+
+          "name":await getSessionName(booking.session_id),
+          "time":await getSessionTime(booking.session_id)
+        },
+
         "Additional Facility": booking.features
           .map((feature) => feature.heading)
           .join(", "),
