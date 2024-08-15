@@ -328,7 +328,12 @@ function Booking() {
   });
 
   const editTransactionType = useMutation({
+
+  
+
     mutationFn: async (newTransaction: transactionType) => {
+      const clearedFields = clearFieldsForTransactionType(newTransaction);
+
       const responsePromise = axiosManagerInstance.post(
         `/editBooking/${bookingId}`,
         {
@@ -336,8 +341,8 @@ function Booking() {
           transaction: {
             ...data?.transaction,
             type: newTransaction,
-            // type: newTransactionType,
-            date: editedData?.transaction?.date || data?.transaction?.date,
+            ...clearedFields
+            // date: editedData?.transaction?.date || data?.transaction?.date,
           },
         }
       );
@@ -348,12 +353,18 @@ function Booking() {
       });
       const response = await responsePromise;
       console.log(response.data);
+
+
+    
     },
     onSuccess: async () => {
       console.log("REVALIDATING");
       await queryClient.refetchQueries({
         queryKey: [`booking/${bookingId}`],
       });
+
+
+
     },
     onError: (error) => {
       console.log(error);
@@ -400,12 +411,16 @@ function Booking() {
     }
   }, [data]);
   const handleSave = async () => {
+    const clearedFields = clearFieldsForTransactionType(editedData?.transaction?.type || "");
+
     const dataToSend = {
       ...editedData,
+      ...clearedFields,
       features: Array.isArray(editedData?.features)
         ? editedData.features
         : [editedData?.features],
     };
+
 
     const responsePromise = axiosManagerInstance.post(
       `/editBooking/${bookingId}`,
@@ -429,7 +444,74 @@ function Booking() {
     if (addAdditional) {
       setAdditional(!addAdditional);
     }
+
+
+    // try {
+    //   // Assuming the mutation is triggered on saving
+    //   await editTransactionType.mutateAsync(dataToSend.transaction.type);
+  
+    //   // Here you could also clear other parts of editedData if needed
+    //   setEditedData((prev) => {
+    //     if (!prev) return undefined;
+    //     return {
+    //       ...prev,
+    //       features: [], // Assuming you want to clear features too
+    //       // Reset other fields if needed
+    //     };
+    //   });
+    // } catch (error) {
+    //   console.error("Failed to save data:", error);
+    // }
   };
+
+
+
+
+  const clearFieldsForTransactionType = (transactionType: string) => {
+    switch (transactionType) {
+      case 'cheque':
+        return {
+          transactionID: "",
+          utrNo: "",
+          upiId: "", 
+        };
+      case 'upi':
+        return {
+          chequeNo: "",
+          utrNo: "",
+          bank: "",
+          payeeName: "",
+        };
+      case 'neft/rtgs':
+        return {
+          chequeNo: "",
+          transactionID: "",
+          upiId: "", 
+          bank: "",
+          payeeName: "",
+        };
+      case 'svkminstitute':
+        return {
+          chequeNo: "",
+          utrNo: "",
+          transactionID: "",
+          upiId: "", // Add any other UPI related fields
+          bank: "",
+          payeeName: "",
+        };
+      default:
+        return {};
+    }
+  };
+  
+
+
+
+
+
+
+
+
   const handleBookingSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = event.target.value;
     const selectedBooking = allBookingsOfUser.find(
