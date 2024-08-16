@@ -30,6 +30,7 @@ function Booking() {
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
   const [selectedOption, setSelectedOption] = useState<string>("");
+  const [grandTotal, setGrandTotal] = useState(0);
   const [allBookingsOfUser, setAllBookingsOfUser] = useState<HallBookingType[]>(
     []
   );
@@ -105,7 +106,7 @@ function Booking() {
         `/editBooking/${bookingId}`,
         {
           ...editedData,
-          date:editedData?.transaction.date || dayjs().format("DD-MM-YYYY"),
+          date: editedData?.transaction.date || dayjs().format("DD-MM-YYYY"),
           status: "CONFIRMED" as bookingStatusType,
         }
       );
@@ -185,20 +186,19 @@ function Booking() {
         email: editedData?.user.email || data?.user.email || "",
         hallContact: "Email to be entered",
       })
-      .then(async (response) => {   
-        await axiosManagerInstance
-          .post(`/sendEmail`, {
-            to: editedData?.user.email || data?.user.email || "",
-            subject: `SVKM Hall Booking for ${dayjs(
-              editedData?.from || data?.from
-            ).format("DD-MM-YYYY")}`,
-            text: "Your booking has been confirmed. Please find the attachments below.",
-            filename: `${editedData?.user.username || data?.user.username}_${
-              editedData?.enquiryNumber || data?.enquiryNumber || ""
-            }_confirmation`,
-            path: "",
-          });
-        
+      .then(async (response) => {
+        await axiosManagerInstance.post(`/sendEmail`, {
+          to: editedData?.user.email || data?.user.email || "",
+          subject: `SVKM Hall Booking for ${dayjs(
+            editedData?.from || data?.from
+          ).format("DD-MM-YYYY")}`,
+          text: "Your booking has been confirmed. Please find the attachments below.",
+          filename: `${editedData?.user.username || data?.user.username}_${
+            editedData?.enquiryNumber || data?.enquiryNumber || ""
+          }_confirmation`,
+          path: "",
+        });
+
         console.log("Email sent successfully");
       })
       .catch((error) => {
@@ -320,9 +320,6 @@ function Booking() {
   });
 
   const editTransactionType = useMutation({
-
-  
-
     mutationFn: async (newTransaction: transactionType) => {
       const clearedFields = clearFieldsForTransactionType(newTransaction);
 
@@ -333,7 +330,7 @@ function Booking() {
           transaction: {
             ...data?.transaction,
             type: newTransaction,
-            ...clearedFields
+            ...clearedFields,
             // date: editedData?.transaction?.date || data?.transaction?.date,
           },
         }
@@ -345,18 +342,41 @@ function Booking() {
       });
       const response = await responsePromise;
       console.log(response.data);
-
-
-    
     },
     onSuccess: async () => {
       console.log("REVALIDATING");
       await queryClient.refetchQueries({
         queryKey: [`booking/${bookingId}`],
       });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
 
-
-
+  // Edit deposit when multiple payment
+  const editIsDepositApplicableInMultiple = useMutation({
+    mutationFn: async (newDeposit: boolean) => {
+      const responsePromise = axiosManagerInstance.post(
+        `/editBooking/${selectedBookingData?._id}`,
+        {
+          ...selectedBookingData,
+          isDeposit: newDeposit,
+        }
+      );
+      toast.promise(responsePromise, {
+        pending: "Updating...",
+        success: "Booking Status Edited!",
+        error: "Failed to Booking Hall. Please Reload and try again.",
+      });
+      const response = await responsePromise;
+      console.log(response.data);
+    },
+    onSuccess: async () => {
+      console.log("REVALIDATING");
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${selectedBookingData?._id}`],
+      });
     },
     onError: (error) => {
       console.log(error);
@@ -402,8 +422,11 @@ function Booking() {
       setEditedData(data);
     }
   }, [data]);
+
   const handleSave = async () => {
-    const clearedFields = clearFieldsForTransactionType(editedData?.transaction?.type || "");
+    const clearedFields = clearFieldsForTransactionType(
+      editedData?.transaction?.type || ""
+    );
 
     const dataToSend = {
       ...editedData,
@@ -412,7 +435,6 @@ function Booking() {
         ? editedData.features
         : [editedData?.features],
     };
-
 
     const responsePromise = axiosManagerInstance.post(
       `/editBooking/${bookingId}`,
@@ -437,11 +459,10 @@ function Booking() {
       setAdditional(!addAdditional);
     }
 
-
     // try {
     //   // Assuming the mutation is triggered on saving
     //   await editTransactionType.mutateAsync(dataToSend.transaction.type);
-  
+
     //   // Here you could also clear other parts of editedData if needed
     //   setEditedData((prev) => {
     //     if (!prev) return undefined;
@@ -456,33 +477,30 @@ function Booking() {
     // }
   };
 
-
-
-
   const clearFieldsForTransactionType = (transactionType: string) => {
     switch (transactionType) {
-      case 'cheque':
+      case "cheque":
         return {
           transactionID: "",
           utrNo: "",
-          upiId: "", 
+          upiId: "",
         };
-      case 'upi':
+      case "upi":
         return {
           chequeNo: "",
           utrNo: "",
           bank: "",
           payeeName: "",
         };
-      case 'neft/rtgs':
+      case "neft/rtgs":
         return {
           chequeNo: "",
           transactionID: "",
-          upiId: "", 
+          upiId: "",
           bank: "",
           payeeName: "",
         };
-      case 'svkminstitute':
+      case "svkminstitute":
         return {
           chequeNo: "",
           utrNo: "",
@@ -495,14 +513,6 @@ function Booking() {
         return {};
     }
   };
-  
-
-
-
-
-
-
-
 
   const handleBookingSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = event.target.value;
@@ -511,6 +521,45 @@ function Booking() {
     );
     setSelectedBookingData(selectedBooking || null);
   };
+
+  // Function to get booking name by ID
+  const getBookingName = (bookingId: string): string => {
+    const booking = allBookingsOfUser.find((b) => b._id === bookingId);
+    console.log("this is the booking fetched by it's ID", booking);
+    let date = dayjs(booking?.from).format("h:mm A, MMMM D, YYYY") || "-";
+    let bookingName = `${date} `;
+    return booking ? bookingName : "Unknown Booking";
+  };
+  //Use Effect for selected booking
+  useEffect(() => {
+    if (selectedBookings.length === 1) {
+      handleBookingSelect({
+        target: { value: selectedBookings[0] },
+      } as React.ChangeEvent<HTMLSelectElement>);
+    }
+  }, [selectedBookings]);
+  useEffect(() => {
+    const calculateTotalSelectedBookings = () => {
+      let total = 0;
+
+      // Iterate through the selectedBookings array
+      selectedBookings.forEach((selectedBookingId) => {
+        // Find the corresponding booking object in allUserBookings
+        const booking = allBookingsOfUser.find(
+          (booking) => booking._id === selectedBookingId
+        );
+
+        // If the booking is found, add its price to the total
+        if (booking) {
+          total += booking.price;
+        }
+      });
+
+      setGrandTotal(total);
+    };
+
+    calculateTotalSelectedBookings();
+  }, [selectedBookings, allBookingsOfUser]);
   const handleSelect = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = event.target.value;
     setSelectedOption(selected);
@@ -546,19 +595,33 @@ function Booking() {
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
-    if (checked) {
-      setSelectedBookings([...selectedBookings, value]);
-    } else {
-      setSelectedBookings(selectedBookings.filter((id) => id !== value));
-    }
+    setSelectedBookings((prevSelectedBookings) => {
+      let updatedBookings;
+      if (checked) {
+        updatedBookings = [...prevSelectedBookings, value];
+        console.log("Selected bookings after addition:", updatedBookings); // Log after updating
+      } else {
+        updatedBookings = prevSelectedBookings.filter((id) => id !== value);
+        console.log("Selected bookings after removal:", updatedBookings); // Log after updating
+      }
+      return updatedBookings;
+    });
   };
 
   const session = hallData?.sessions.find(
     (session) => session._id === data?.session_id
   );
 
+  const sessionForMultiple = hallData?.sessions.find(
+    (session) => session._id === selectedBookingData?.session_id
+  );
+
   const priceEntry = session?.price.find(
     (price) => price.categoryName === data?.booking_type
+  );
+  // When Payment Type is set to multiple
+  const multiplePriceEntry = sessionForMultiple?.price.find(
+    (price) => price.categoryName === selectedBookingData?.booking_type
   );
 
   const handleCancellation = async () => {
@@ -645,7 +708,7 @@ function Booking() {
           className="block text-gray-700 text-sm font-bold mb-2"
           htmlFor="options"
         >
-          Select Option
+          Select Booking Type
         </label>
         <select
           id="options"
@@ -946,9 +1009,12 @@ function Booking() {
                 onChange={handleBookingSelect}
                 className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
               >
+                <option value="" disabled>
+                  Select a booking
+                </option>
                 {selectedBookings.map((bookingId) => (
                   <option key={bookingId} value={bookingId}>
-                    {bookingId}
+                    {getBookingName(bookingId)}
                   </option>
                 ))}
               </select>
@@ -1034,6 +1100,230 @@ function Booking() {
               </div>
             ))
           )}
+          {/* Billing When  multiple Payment Selected */}
+          <span className=" text-lg font-medium">Billing</span>
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Total Hall Charges</span>
+            <span className="w-full text-right">
+              {(multiplePriceEntry?.price || 0) + totalFeatureCharges}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Hall Discount %</span>
+            <span className="w-full text-right">
+              {selectedBookingData?.baseDiscount || 0}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Hall Discount Amount</span>
+            <span className="w-full text-right">
+              {0.01 *
+                selectedBookingData!.baseDiscount *
+                ((multiplePriceEntry?.price || 0) + totalFeatureCharges)}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Hall Discounted Price</span>
+            <span className="w-full text-right">
+              {(multiplePriceEntry?.price || 0) +
+                totalFeatureCharges -
+                0.01 *
+                  selectedBookingData!.baseDiscount *
+                  ((multiplePriceEntry?.price || 0) + totalFeatureCharges)}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">CGST 9%</span>
+            <span className="w-full text-right">
+              {data?.booking_type == "SVKM INSTITUTE" ? (
+                <div>0</div>
+              ) : (
+                <div>
+                  {0.09 *
+                    ((multiplePriceEntry?.price || 0) +
+                      totalFeatureCharges -
+                      0.01 *
+                        selectedBookingData!.baseDiscount *
+                        ((multiplePriceEntry?.price || 0) +
+                          totalFeatureCharges))}
+                </div>
+              )}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">SGST 9%</span>
+            <span className="w-full text-right">
+              {data?.booking_type == "SVKM INSTITUTE" ? (
+                <div>0</div>
+              ) : (
+                <div>
+                  {0.09 *
+                    ((multiplePriceEntry?.price || 0) +
+                      totalFeatureCharges -
+                      0.01 *
+                        selectedBookingData!.baseDiscount *
+                        ((multiplePriceEntry?.price || 0) +
+                          totalFeatureCharges))}
+                </div>
+              )}
+            </span>
+          </div>
+          <span>
+            <label htmlFor="isDeposit">Security Deposit Applicable </label>
+            <select
+              id="isDeposit"
+              value={
+                selectedBookingData?.isDeposit === true ? "yes" : "no" || false
+              }
+              className="px-2 py-1 rounded-md border border-gray-400 my-1"
+              onChange={(e) => {
+                if (e.target.value === "yes") {
+                  editIsDepositApplicableInMultiple.mutate(true);
+                  setEditedData((prev) => {
+                    if (!prev) return undefined;
+                    return {
+                      ...prev,
+                      isDeposit: true,
+                    };
+                  });
+                }
+                if (e.target.value === "no") {
+                  editIsDepositApplicableInMultiple.mutate(false);
+                  setEditedData((prev) => {
+                    if (!prev) return undefined;
+                    return {
+                      ...prev,
+                      isDeposit: false,
+                    };
+                  });
+                }
+              }}
+            >
+              <option value="" disabled>
+                Select an option
+              </option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </span>
+
+          {
+            <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+              <span className="w-full text-left">Security Deposit Amount</span>
+              <span className="w-full text-right">
+                {selectedBookingData?.isDeposit === false ||
+                editedData?.isDeposit === false
+                  ? 0
+                  : editedData?.deposit ?? selectedBookingData?.deposit}
+              </span>
+            </div>
+          }
+
+          {
+            <>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Deposit Discount %</span>
+                <span className="w-full text-right">
+                  {selectedBookingData?.isDeposit === false ||
+                  editedData?.isDeposit === false
+                    ? 0
+                    : selectedBookingData?.depositDiscount || 0}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">
+                  Deposit Discount Amount
+                </span>
+                <span className="w-full text-right">
+                  {selectedBookingData?.isDeposit === false ||
+                  editedData?.isDeposit === false
+                    ? 0
+                    : selectedBookingData?.deposit
+                    ? 0.01 *
+                      selectedBookingData?.depositDiscount *
+                      selectedBookingData?.deposit
+                    : "-"}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">
+                  Deposit Discounted Price
+                </span>
+                <span className="w-full text-right">
+                  {selectedBookingData?.isDeposit === false ||
+                  editedData?.isDeposit === false
+                    ? 0
+                    : selectedBookingData?.deposit
+                    ? selectedBookingData?.deposit -
+                      0.01 *
+                        selectedBookingData?.depositDiscount *
+                        selectedBookingData?.deposit
+                    : "-"}
+                </span>
+              </div>
+            </>
+          }
+
+          {
+            <>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Total Payable Amount</span>
+                <span className="w-full text-right">
+                  <span className="w-full text-right">
+                    {selectedBookingData?.booking_type == "SVKM INSTITUTE" ? (
+                      <div>
+                        {selectedBookingData
+                          ? (multiplePriceEntry?.price || 0) +
+                            totalFeatureCharges -
+                            0.01 *
+                              data!.baseDiscount *
+                              ((multiplePriceEntry?.price || 0) +
+                                totalFeatureCharges) +
+                            (selectedBookingData.isDeposit
+                              ? selectedBookingData.deposit -
+                                0.01 *
+                                  selectedBookingData.depositDiscount *
+                                  selectedBookingData.deposit
+                              : 0)
+                          : 0}
+                      </div>
+                    ) : (
+                      <div>
+                        {selectedBookingData
+                          ? (multiplePriceEntry?.price || 0) +
+                            totalFeatureCharges -
+                            0.01 *
+                              selectedBookingData!.baseDiscount *
+                              ((multiplePriceEntry?.price || 0) +
+                                totalFeatureCharges) +
+                            0.18 *
+                              ((multiplePriceEntry?.price || 0) +
+                                totalFeatureCharges -
+                                0.01 *
+                                  selectedBookingData!.baseDiscount *
+                                  ((multiplePriceEntry?.price || 0) +
+                                    totalFeatureCharges)) +
+                            (selectedBookingData.isDeposit
+                              ? selectedBookingData.deposit -
+                                0.01 *
+                                  selectedBookingData.depositDiscount *
+                                  selectedBookingData.deposit
+                              : 0)
+                          : 0}
+                      </div>
+                    )}
+                  </span>
+                </span>
+              </div>
+            </>
+          }
+          <div className="flex mt-5 items-center w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Grand Total Amount</span>
+            <span className="w-full text-right">
+              <span className="w-full text-right">{grandTotal}</span>
+            </span>
+          </div>
         </>
       ) : (
         // Render single booking data
@@ -1285,389 +1575,401 @@ function Booking() {
               </div>
             ))
           )}
-        </>
-      )}
-
-      <span className=" text-lg font-medium">Billing</span>
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Total Hall Charges</span>
-        <span className="w-full text-right">
-          {editingMode
-            ? (priceEntry?.price || 0) + totalFeatureCharges
-            : (priceEntry?.price || 0) + totalFeatureCharges}
-        </span>
-      </div>
-
-      {editingMode ? (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Discount %</span>
-          <input
-            type="text"
-            value={editedData?.baseDiscount}
-            onChange={(e) => {
-              setEditedData((prev) => {
-                if (!prev) return undefined;
-                return {
-                  ...prev,
-                  baseDiscount: Number(e.target.value),
-                };
-              });
-            }}
-            placeholder="Enter Discount %"
-            className="px-2"
-            maxLength={2}
-          />
-        </div>
-      ) : (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Hall Discount %</span>
-          <span className="w-full text-right">{data?.baseDiscount || 0}</span>
-        </div>
-      )}
-
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Hall Discount Amount</span>
-        <span className="w-full text-right">
-          {editingMode
-            ? 0.01 *
-              editedData!.baseDiscount *
-              ((priceEntry?.price || 0) + totalFeatureCharges)
-            : 0.01 *
-              data!.baseDiscount *
-              ((priceEntry?.price || 0) + totalFeatureCharges)}
-        </span>
-      </div>
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">Hall Discounted Price</span>
-        <span className="w-full text-right">
-          {editingMode
-            ? (priceEntry?.price || 0) +
-              totalFeatureCharges -
-              0.01 *
-                editedData!.baseDiscount *
-                ((priceEntry?.price || 0) + totalFeatureCharges)
-            : (priceEntry?.price || 0) +
-              totalFeatureCharges -
-              0.01 *
-                data!.baseDiscount *
-                ((priceEntry?.price || 0) + totalFeatureCharges)}
-        </span>
-      </div>
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">CGST 9%</span>
-        <span className="w-full text-right">
-          {data?.booking_type == "SVKM INSTITUTE" ? (
-            <div>0</div>
-          ) : (
-            <div>
+          {/* Billing when Single Payment Selected*/}
+          <span className=" text-lg font-medium">Billing</span>
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Total Hall Charges</span>
+            <span className="w-full text-right">
               {editingMode
-                ? 0.09 *
-                  ((priceEntry?.price || 0) +
-                    totalFeatureCharges -
-                    0.01 *
-                      editedData!.baseDiscount *
-                      ((priceEntry?.price || 0) + totalFeatureCharges))
-                : 0.09 *
-                  ((priceEntry?.price || 0) +
-                    totalFeatureCharges -
-                    0.01 *
-                      data!.baseDiscount *
-                      ((priceEntry?.price || 0) + totalFeatureCharges))}
+                ? (priceEntry?.price || 0) + totalFeatureCharges
+                : (priceEntry?.price || 0) + totalFeatureCharges}
+            </span>
+          </div>
+
+          {editingMode ? (
+            <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+              <span className="w-full text-left">Discount %</span>
+              <input
+                type="text"
+                value={editedData?.baseDiscount}
+                onChange={(e) => {
+                  setEditedData((prev) => {
+                    if (!prev) return undefined;
+                    return {
+                      ...prev,
+                      baseDiscount: Number(e.target.value),
+                    };
+                  });
+                }}
+                placeholder="Enter Discount %"
+                className="px-2"
+                maxLength={2}
+              />
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+              <span className="w-full text-left">Hall Discount %</span>
+              <span className="w-full text-right">
+                {data?.baseDiscount || 0}
+              </span>
             </div>
           )}
-        </span>
-      </div>
-      <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-        <span className="w-full text-left">SGST 9%</span>
-        <span className="w-full text-right">
-          {data?.booking_type == "SVKM INSTITUTE" ? (
-            <div>0</div>
-          ) : (
-            <div>
+
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Hall Discount Amount</span>
+            <span className="w-full text-right">
               {editingMode
-                ? 0.09 *
-                  ((priceEntry?.price || 0) +
-                    totalFeatureCharges -
-                    0.01 *
-                      editedData!.baseDiscount *
-                      ((priceEntry?.price || 0) + totalFeatureCharges))
-                : 0.09 *
-                  ((priceEntry?.price || 0) +
-                    totalFeatureCharges -
-                    0.01 *
-                      data!.baseDiscount *
-                      ((priceEntry?.price || 0) + totalFeatureCharges))}
-            </div>
-          )}
-        </span>
-      </div>
-      <span>
-        <label htmlFor="isDeposit">Security Deposit Applicable </label>
-        <select
-          id="isDeposit"
-          value={data?.isDeposit === true ? "yes" : "no" || false}
-          className="px-2 py-1 rounded-md border border-gray-400 my-1"
-          onChange={(e) => {
-            if (e.target.value === "yes") {
-              editIsDepositApplicable.mutate(true);
-              setEditedData((prev) => {
-                if (!prev) return undefined;
-                return {
-                  ...prev,
-                  isDeposit: true,
-                };
-              });
-            }
-            if (e.target.value === "no") {
-              editIsDepositApplicable.mutate(false);
-              setEditedData((prev) => {
-                if (!prev) return undefined;
-                return {
-                  ...prev,
-                  isDeposit: false,
-                };
-              });
-            }
-          }}
-        >
-          <option value="" disabled>
-            Select an option
-          </option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
-      </span>
-
-      {editingMode ? (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">
-            Enter Security Deposit{" "}
-            {data?.isDeposit === false || editedData?.isDeposit === false
-              ? 0
-              : editedData?.deposit}
-          </span>
-          <input
-            type="text"
-            value={
-              data?.isDeposit === false || editedData?.isDeposit === false
-                ? 0
-                : editedData?.deposit
-            }
-            onChange={(e) => {
-              setEditedData((prev) => {
-                if (!prev) return undefined;
-                return {
-                  ...prev,
-                  deposit: Number(e.target.value),
-                };
-              });
-
-              // data?.deposit=editedData?.deposit
-            }}
-            placeholder="Enter Security Deposit"
-            className="px-2"
-            disabled={
-              data?.isDeposit === false || editedData?.isDeposit === false
-            }
-          />
-        </div>
-      ) : (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-          <span className="w-full text-left">Security Deposit Amount</span>
-          <span className="w-full text-right">
-            {data?.isDeposit === false || editedData?.isDeposit === false
-              ? 0
-              : editedData?.deposit ?? data?.deposit}
-          </span>
-        </div>
-      )}
-
-      {editingMode ? (
-        <>
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Deposit Discount %</span>
-            <input
-              type="text"
-              value={
-                data?.isDeposit === false || editedData?.isDeposit === false
-                  ? 0
-                  : editedData?.depositDiscount
-              }
-              onChange={(e) =>
-                setEditedData((prev) => {
-                  if (!prev) return undefined;
-                  return {
-                    ...prev,
-                    depositDiscount: Number(e.target.value),
-                  };
-                })
-              }
-              placeholder="Enter Security Deposit Discount %"
-              className="px-2"
-              disabled={
-                data?.isDeposit === false || editedData?.isDeposit === false
-              }
-            />
-          </div>
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Deposit Discount Amount</span>
-            <span className="w-full text-right">
-              {data?.isDeposit === false || editedData?.isDeposit === false
-                ? 0
-                : editedData?.deposit
-                ? 0.01 * editedData?.depositDiscount * editedData?.deposit
-                : "-"}
+                ? 0.01 *
+                  editedData!.baseDiscount *
+                  ((priceEntry?.price || 0) + totalFeatureCharges)
+                : 0.01 *
+                  data!.baseDiscount *
+                  ((priceEntry?.price || 0) + totalFeatureCharges)}
             </span>
           </div>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Deposit Discounted Price</span>
+            <span className="w-full text-left">Hall Discounted Price</span>
             <span className="w-full text-right">
-              {data?.isDeposit === false || editedData?.isDeposit === false
-                ? 0
-                : editedData?.deposit
-                ? editedData?.deposit -
-                  0.01 * editedData?.depositDiscount * editedData?.deposit
-                : "-"}
-            </span>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Deposit Discount %</span>
-            <span className="w-full text-right">
-              {data?.isDeposit === false || editedData?.isDeposit === false
-                ? 0
-                : data?.depositDiscount || 0}
+              {editingMode
+                ? (priceEntry?.price || 0) +
+                  totalFeatureCharges -
+                  0.01 *
+                    editedData!.baseDiscount *
+                    ((priceEntry?.price || 0) + totalFeatureCharges)
+                : (priceEntry?.price || 0) +
+                  totalFeatureCharges -
+                  0.01 *
+                    data!.baseDiscount *
+                    ((priceEntry?.price || 0) + totalFeatureCharges)}
             </span>
           </div>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Deposit Discount Amount</span>
+            <span className="w-full text-left">CGST 9%</span>
             <span className="w-full text-right">
-              {data?.isDeposit === false || editedData?.isDeposit === false
-                ? 0
-                : data?.deposit
-                ? 0.01 * data?.depositDiscount * data?.deposit
-                : "-"}
-            </span>
-          </div>
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Deposit Discounted Price</span>
-            <span className="w-full text-right">
-              {data?.isDeposit === false || editedData?.isDeposit === false
-                ? 0
-                : data?.deposit
-                ? data?.deposit - 0.01 * data?.depositDiscount * data?.deposit
-                : "-"}
-            </span>
-          </div>
-        </>
-      )}
-
-      {editedData ? (
-        <>
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Total Payable Amount</span>
-
-            <span className="w-full text-right">
-              {editedData?.booking_type == "SVKM INSTITUTE" ? (
-                <div>
-                  {editedData
-                    ? (priceEntry?.price || 0) +
-                      totalFeatureCharges -
-                      0.01 *
-                        editedData!.baseDiscount *
-                        ((priceEntry?.price || 0) + totalFeatureCharges) +
-                      (editedData.isDeposit
-                        ? editedData?.deposit -
-                          0.01 *
-                            editedData?.depositDiscount *
-                            editedData?.deposit
-                        : 0)
-                    : 0}
-                </div>
+              {data?.booking_type == "SVKM INSTITUTE" ? (
+                <div>0</div>
               ) : (
                 <div>
-                  {editedData
-                    ? (priceEntry?.price || 0) +
-                      totalFeatureCharges -
-                      0.01 *
-                        editedData!.baseDiscount *
-                        ((priceEntry?.price || 0) + totalFeatureCharges) +
-                      0.18 *
-                        ((priceEntry?.price || 0) +
-                          totalFeatureCharges -
-                          0.01 *
-                            editedData!.baseDiscount *
-                            ((priceEntry?.price || 0) + totalFeatureCharges)) +
-                      (editedData.isDeposit
-                        ? editedData?.deposit -
-                          0.01 *
-                            editedData?.depositDiscount *
-                            editedData?.deposit
-                        : 0)
-                    : 0}
+                  {editingMode
+                    ? 0.09 *
+                      ((priceEntry?.price || 0) +
+                        totalFeatureCharges -
+                        0.01 *
+                          editedData!.baseDiscount *
+                          ((priceEntry?.price || 0) + totalFeatureCharges))
+                    : 0.09 *
+                      ((priceEntry?.price || 0) +
+                        totalFeatureCharges -
+                        0.01 *
+                          data!.baseDiscount *
+                          ((priceEntry?.price || 0) + totalFeatureCharges))}
                 </div>
               )}
             </span>
           </div>
-        </>
-      ) : (
-        <>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Total Payable Amount</span>
+            <span className="w-full text-left">SGST 9%</span>
             <span className="w-full text-right">
+              {data?.booking_type == "SVKM INSTITUTE" ? (
+                <div>0</div>
+              ) : (
+                <div>
+                  {editingMode
+                    ? 0.09 *
+                      ((priceEntry?.price || 0) +
+                        totalFeatureCharges -
+                        0.01 *
+                          editedData!.baseDiscount *
+                          ((priceEntry?.price || 0) + totalFeatureCharges))
+                    : 0.09 *
+                      ((priceEntry?.price || 0) +
+                        totalFeatureCharges -
+                        0.01 *
+                          data!.baseDiscount *
+                          ((priceEntry?.price || 0) + totalFeatureCharges))}
+                </div>
+              )}
+            </span>
+          </div>
+          <span>
+            <label htmlFor="isDeposit">Security Deposit Applicable </label>
+            <select
+              id="isDeposit"
+              value={data?.isDeposit === true ? "yes" : "no" || false}
+              className="px-2 py-1 rounded-md border border-gray-400 my-1"
+              onChange={(e) => {
+                if (e.target.value === "yes") {
+                  editIsDepositApplicable.mutate(true);
+                  setEditedData((prev) => {
+                    if (!prev) return undefined;
+                    return {
+                      ...prev,
+                      isDeposit: true,
+                    };
+                  });
+                }
+                if (e.target.value === "no") {
+                  editIsDepositApplicable.mutate(false);
+                  setEditedData((prev) => {
+                    if (!prev) return undefined;
+                    return {
+                      ...prev,
+                      isDeposit: false,
+                    };
+                  });
+                }
+              }}
+            >
+              <option value="" disabled>
+                Select an option
+              </option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </span>
+
+          {editingMode ? (
+            <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+              <span className="w-full text-left">
+                Enter Security Deposit{" "}
+                {data?.isDeposit === false || editedData?.isDeposit === false
+                  ? 0
+                  : editedData?.deposit}
+              </span>
+              <input
+                type="text"
+                value={
+                  data?.isDeposit === false || editedData?.isDeposit === false
+                    ? 0
+                    : editedData?.deposit
+                }
+                onChange={(e) => {
+                  setEditedData((prev) => {
+                    if (!prev) return undefined;
+                    return {
+                      ...prev,
+                      deposit: Number(e.target.value),
+                    };
+                  });
+
+                  // data?.deposit=editedData?.deposit
+                }}
+                placeholder="Enter Security Deposit"
+                className="px-2"
+                disabled={
+                  data?.isDeposit === false || editedData?.isDeposit === false
+                }
+              />
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+              <span className="w-full text-left">Security Deposit Amount</span>
               <span className="w-full text-right">
-                {data?.booking_type == "SVKM INSTITUTE" ? (
-                  <div>
-                    {data
-                      ? (priceEntry?.price || 0) +
-                        totalFeatureCharges -
-                        0.01 *
-                          data!.baseDiscount *
-                          ((priceEntry?.price || 0) + totalFeatureCharges) +
-                        (data.isDeposit
-                          ? data.deposit -
-                            0.01 * data.depositDiscount * data.deposit
-                          : 0)
-                      : 0}
-                  </div>
-                ) : (
-                  <div>
-                    {data
-                      ? (priceEntry?.price || 0) +
-                        totalFeatureCharges -
-                        0.01 *
-                          data!.baseDiscount *
-                          ((priceEntry?.price || 0) + totalFeatureCharges) +
-                        0.18 *
-                          ((priceEntry?.price || 0) +
+                {data?.isDeposit === false || editedData?.isDeposit === false
+                  ? 0
+                  : editedData?.deposit ?? data?.deposit}
+              </span>
+            </div>
+          )}
+
+          {editingMode ? (
+            <>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Deposit Discount %</span>
+                <input
+                  type="text"
+                  value={
+                    data?.isDeposit === false || editedData?.isDeposit === false
+                      ? 0
+                      : editedData?.depositDiscount
+                  }
+                  onChange={(e) =>
+                    setEditedData((prev) => {
+                      if (!prev) return undefined;
+                      return {
+                        ...prev,
+                        depositDiscount: Number(e.target.value),
+                      };
+                    })
+                  }
+                  placeholder="Enter Security Deposit Discount %"
+                  className="px-2"
+                  disabled={
+                    data?.isDeposit === false || editedData?.isDeposit === false
+                  }
+                />
+              </div>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">
+                  Deposit Discount Amount
+                </span>
+                <span className="w-full text-right">
+                  {data?.isDeposit === false || editedData?.isDeposit === false
+                    ? 0
+                    : editedData?.deposit
+                    ? 0.01 * editedData?.depositDiscount * editedData?.deposit
+                    : "-"}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">
+                  Deposit Discounted Price
+                </span>
+                <span className="w-full text-right">
+                  {data?.isDeposit === false || editedData?.isDeposit === false
+                    ? 0
+                    : editedData?.deposit
+                    ? editedData?.deposit -
+                      0.01 * editedData?.depositDiscount * editedData?.deposit
+                    : "-"}
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Deposit Discount %</span>
+                <span className="w-full text-right">
+                  {data?.isDeposit === false || editedData?.isDeposit === false
+                    ? 0
+                    : data?.depositDiscount || 0}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">
+                  Deposit Discount Amount
+                </span>
+                <span className="w-full text-right">
+                  {data?.isDeposit === false || editedData?.isDeposit === false
+                    ? 0
+                    : data?.deposit
+                    ? 0.01 * data?.depositDiscount * data?.deposit
+                    : "-"}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">
+                  Deposit Discounted Price
+                </span>
+                <span className="w-full text-right">
+                  {data?.isDeposit === false || editedData?.isDeposit === false
+                    ? 0
+                    : data?.deposit
+                    ? data?.deposit -
+                      0.01 * data?.depositDiscount * data?.deposit
+                    : "-"}
+                </span>
+              </div>
+            </>
+          )}
+
+          {editedData ? (
+            <>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Total Payable Amount</span>
+
+                <span className="w-full text-right">
+                  {editedData?.booking_type == "SVKM INSTITUTE" ? (
+                    <div>
+                      {editedData
+                        ? (priceEntry?.price || 0) +
+                          totalFeatureCharges -
+                          0.01 *
+                            editedData!.baseDiscount *
+                            ((priceEntry?.price || 0) + totalFeatureCharges) +
+                          (editedData.isDeposit
+                            ? editedData?.deposit -
+                              0.01 *
+                                editedData?.depositDiscount *
+                                editedData?.deposit
+                            : 0)
+                        : 0}
+                    </div>
+                  ) : (
+                    <div>
+                      {editedData
+                        ? (priceEntry?.price || 0) +
+                          totalFeatureCharges -
+                          0.01 *
+                            editedData!.baseDiscount *
+                            ((priceEntry?.price || 0) + totalFeatureCharges) +
+                          0.18 *
+                            ((priceEntry?.price || 0) +
+                              totalFeatureCharges -
+                              0.01 *
+                                editedData!.baseDiscount *
+                                ((priceEntry?.price || 0) +
+                                  totalFeatureCharges)) +
+                          (editedData.isDeposit
+                            ? editedData?.deposit -
+                              0.01 *
+                                editedData?.depositDiscount *
+                                editedData?.deposit
+                            : 0)
+                        : 0}
+                    </div>
+                  )}
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Total Payable Amount</span>
+                <span className="w-full text-right">
+                  <span className="w-full text-right">
+                    {data?.booking_type == "SVKM INSTITUTE" ? (
+                      <div>
+                        {data
+                          ? (priceEntry?.price || 0) +
                             totalFeatureCharges -
                             0.01 *
                               data!.baseDiscount *
+                              ((priceEntry?.price || 0) + totalFeatureCharges) +
+                            (data.isDeposit
+                              ? data.deposit -
+                                0.01 * data.depositDiscount * data.deposit
+                              : 0)
+                          : 0}
+                      </div>
+                    ) : (
+                      <div>
+                        {data
+                          ? (priceEntry?.price || 0) +
+                            totalFeatureCharges -
+                            0.01 *
+                              data!.baseDiscount *
+                              ((priceEntry?.price || 0) + totalFeatureCharges) +
+                            0.18 *
                               ((priceEntry?.price || 0) +
-                                totalFeatureCharges)) +
-                        (data.isDeposit
-                          ? data.deposit -
-                            0.01 * data.depositDiscount * data.deposit
-                          : 0)
-                      : 0}
-                  </div>
-                )}
-              </span>
-            </span>
-          </div>
+                                totalFeatureCharges -
+                                0.01 *
+                                  data!.baseDiscount *
+                                  ((priceEntry?.price || 0) +
+                                    totalFeatureCharges)) +
+                            (data.isDeposit
+                              ? data.deposit -
+                                0.01 * data.depositDiscount * data.deposit
+                              : 0)
+                          : 0}
+                      </div>
+                    )}
+                  </span>
+                </span>
+              </div>
+            </>
+          )}
+          {editingMode || addAdditional ? (
+            <button
+              onClick={handleSave}
+              className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg mt-4"
+            >
+              Save Details
+            </button>
+          ) : (
+            <></>
+          )}
         </>
-      )}
-      {editingMode || addAdditional ? (
-        <button
-          onClick={handleSave}
-          className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg mt-4"
-        >
-          Save Details
-        </button>
-      ) : (
-        <></>
       )}
 
       <span className="text-lg font-medium">Transaction Details</span>
@@ -1680,8 +1982,6 @@ function Booking() {
             className="px-2 py-1 rounded-md border border-gray-400 my-2"
             onChange={(e) =>
               editTransactionType.mutate(e.target.value as transactionType)
-           
-
             }
           >
             <option value="" disabled>
