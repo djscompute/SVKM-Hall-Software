@@ -2,6 +2,7 @@ import { start } from "repl";
 import { BookingModel, HallBookingType } from "../../models/booking.model";
 import { getHallNameById } from "../getHallName";
 import { getManagerNamesByHallId } from "../getManagerName";
+import { getSessionName, getSessionTime } from "../getSessionName";
 
 interface BookingInformationReportRequest {
   displayPeriod: string;
@@ -11,6 +12,7 @@ interface BookingInformationReportRequest {
   displayCustomerCategory: string;
   displaySession: string;
   displayHallCharges: boolean;
+  displayTransactionType: string;
 }
 
 function parseDateTime(dateString: string) {
@@ -244,7 +246,12 @@ export async function getBookingInformationReport(
       bookings.map(async (booking) => ({
         Date: parseDateTime(booking.from).date,
         "Hall Name": await getHallNameById(booking.hallId),
-        Session: booking.session_id,
+        Session:{
+
+          "name":await getSessionName(booking.session_id),
+          "time":await getSessionTime(booking.session_id)
+        },
+
         "Additional Facility": booking.features
           .map((feature) => feature.heading)
           .join(", "),
@@ -259,6 +266,15 @@ export async function getBookingInformationReport(
         "Amount Paid": params.displayHallCharges
           ? calculateAmountPaid(booking)
           : "Cannot Display",
+        "Security Deposit":booking.deposit,
+        "GST": 0.18 * booking.price,
+        "transaction type": booking.transaction.type,
+        "date": booking.transaction.date,
+        "transaction id": booking.transaction.transactionID,
+        "payee Name": booking.transaction.payeeName,
+        "utr no": booking.transaction.utrNo,
+        "cheque no": booking.transaction.chequeNo,
+        "bank": booking.transaction.bank,
       }))
     );
 

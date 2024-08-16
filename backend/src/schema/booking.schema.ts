@@ -15,6 +15,7 @@ const booleanErrorHandler = (fieldName: string) => ({
 
 export const AddBookingZodSchema = z.object({
   body: z.object({
+    date: z.string().optional(),
     user: z.object({
       username: z.string(stringErrorHandler("name")),
       contact: z.string(stringErrorHandler("person")),

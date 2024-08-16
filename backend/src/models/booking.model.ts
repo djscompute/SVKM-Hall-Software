@@ -30,6 +30,7 @@ const HallAdditonalFeaturesSchema =
 
 const BookingSchema = new mongoose.Schema<HallBookingType>(
   {
+    date: {type:String},
     user: {
       type: CustomerSchema,
       required: true,

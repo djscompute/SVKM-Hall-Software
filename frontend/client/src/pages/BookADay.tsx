@@ -104,7 +104,7 @@ function BookADay() {
               ?.to as string
           }`,
           purpose: purpose,
-          enquiryNumber: enquiryNumber
+          enquiryNumber: enquiryNumber,
         })
         .then((response) => {
           console.log(response.data);
@@ -135,9 +135,9 @@ function BookADay() {
 
         const totalPayable =
           sessionPrice + additionalFacilities + securityDeposit;
-          const todayDate = dayjs().format("DD-MM-YYYY");
-          const dateOfEvent = dayjs(day).format("DD-MM-YYYY");
-        axiosClientInstance
+        const todayDate = dayjs().format("DD-MM-YYYY");
+        const dateOfEvent = dayjs(day).format("DD-MM-YYYY");
+        await axiosClientInstance
           .post(`/generateInquiry`, {
             date: todayDate, // Assuming 'day' is the date of booking
             customerName: name,
@@ -157,28 +157,25 @@ function BookADay() {
             additionalFacilities: additionalFacilities,
             hallDeposit: securityDeposit,
             totalPayable: totalPayable,
-            hallContact: "Email to be entered"
+            hallContact: "Email to be entered",
           })
           .then((response) => {
-            console.log(response.data);
-            return response.data;
-          })
-          .catch((error) => {
-            console.log(error);
-            throw error;
-          });
-
-        axiosClientInstance
-          .post(`/sendEmail`, {
-            to: email,
-            subject: `SVKM Hall Booking for ${day}`,
-            text: "Your enquiry for hall booking has been received. Please find the attachments below.",
-            filename: `${name}_${enquiryNumber}_inquiry`,
-            path: "",
-          })
-          .then((response) => {
-            console.log(response.data);
-            return response.data;
+            axiosClientInstance
+              .post(`/sendEmail`, {
+                to: email,
+                subject: `SVKM Hall Booking for ${day}`,
+                text: "Your enquiry for hall booking has been received. Please find the attachments below.",
+                filename: `${name}_${enquiryNumber}_inquiry`,
+                path: "",
+              })
+              .then((response) => {
+                console.log(response.data);
+                return response.data;
+              })
+              .catch((error) => {
+                console.log(error);
+                throw error;
+              });
           })
           .catch((error) => {
             console.log(error);

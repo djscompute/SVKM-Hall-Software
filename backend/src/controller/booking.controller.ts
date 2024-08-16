@@ -85,6 +85,7 @@ export async function addBookingHandler(req: Request, res: Response) {
 export async function editBookingHandler(req: Request, res: Response) {
   try {
     const {
+      date,
       user,
       features,
       status,
@@ -110,6 +111,7 @@ export async function editBookingHandler(req: Request, res: Response) {
     const updatedBooking = await BookingModel.findByIdAndUpdate(
       bookingId,
       {
+        date,
         user,
         features,
         status,
@@ -245,7 +247,7 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       hallContact 
     } = req.body;
 
-    generateInquiry({
+    const pdfPath = await generateInquiry({
       date,
       customerName,
       contactPerson,
@@ -261,8 +263,7 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       totalPayable,
       hallContact
     });
-
-    return res.status(200).json({ message: "Inquiry generated" });
+    res.json(pdfPath);
   } catch (error) {
     console.error("Error in generating inquiry:", error);
     res.status(500).json({ message: "Internal server error", error });
@@ -297,7 +298,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       hallContact 
     } = req.body;
     
-    generateConfirmation({
+    const pdfPath = generateConfirmation({
       date, 
       customerName, 
       contactPerson, 
@@ -322,8 +323,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       email,
       hallContact
     });
-
-    return res.status(200).json({ message: "Confirmation generated" });
+    res.json(pdfPath);
   } catch (error) {
     console.error("Error in generating confirmation:", error);
     res.status(500).json({ message: "Internal server error", error });
@@ -332,7 +332,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
 export async function sendEmailHandler(req: Request, res: Response) {
   try {    
     const { to, subject, text, filename, path } = req.body;
-    sendEmail({to, subject, text, filename, path});
+    await sendEmail({to, subject, text, filename, path});
     return res.status(200).json({message:"email sent"})
   } catch (error) {
     console.error("Error in sending email:", error);

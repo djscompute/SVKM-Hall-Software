@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 function Dashboard() {
-  const [activeSection, setActiveSection] = useState<string>();
+  const [activeSection, setActiveSection] = useState(null);
 
   return (
     <div className="flex flex-col items-center">
@@ -79,12 +79,6 @@ function Dashboard() {
             className="w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
           >
             Booking Information Report
-          </a>
-          <a
-            href="/dashboard/booking-confirmation-report"
-            className="w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
-          >
-            Booking Confirmation Report
           </a>
         </div>
       )}

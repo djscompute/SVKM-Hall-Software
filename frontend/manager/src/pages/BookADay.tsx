@@ -40,7 +40,7 @@ function BookADay() {
     [key: string]: EachHallAdditonalFeaturesType;
   }>({});
   const [price, setPrice] = useState<number>(0);
-  const [securityDeposit,setSecurityDeposit] = useState<number>(0);
+  const [securityDeposit, setSecurityDeposit] = useState<number>(0);
   const [isSame, setIsSame] = useState<boolean>(false);
   const [isDetailsConfirmed, setIsDetailsConfirmed] = useState<boolean>(false);
 
@@ -105,7 +105,7 @@ function BookADay() {
               ?.to as string
           }`,
           purpose: purpose,
-          enquiryNumber: enquiryNumber
+          enquiryNumber: enquiryNumber,
         })
         .then((response) => {
           console.log(response.data);
@@ -120,72 +120,6 @@ function BookADay() {
       if (data.error) {
         console.error(data.error);
       } else {
-        const additionalFacilities =
-        selectedCategory === "SVKM INSTITUTE"
-          ? 0
-          : Object.values(selectedFeatures).reduce(
-              (acc, feature) => acc + feature.price,
-              0
-            );
-
-      const sessionPrice =
-        HallData?.sessions
-          .find((ss) => ss._id === selectedSessionId)
-          ?.price.find((e) => e.categoryName === selectedCategory)?.price ||
-        0;
-
-      const totalPayable =
-        sessionPrice + additionalFacilities + securityDeposit;
-        const todayDate = dayjs().format("DD-MM-YYYY");
-        const dateOfEvent = dayjs(day).format("DD-MM-YYYY");
-      axiosManagerInstance
-        .post(`/generateInquiry`, {
-          date: todayDate, // Assuming 'day' is the date of booking
-          customerName: name,
-          contactPerson: person,
-          contactNo: mobileNumber,
-          enquiryNumber: enquiryNumber, // Generate a unique enquiry number
-          hallName: HallData?.name,
-          dateOfEvent: dateOfEvent,
-          slotTime: `${convert_IST_TimeString_To12HourFormat(
-            HallData?.sessions.find((ss) => ss._id === selectedSessionId)
-              ?.from!
-          )} - ${convert_IST_TimeString_To12HourFormat(
-            HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to!
-          )}`,
-          purposeOfBooking: purpose,
-          hallCharges: sessionPrice,
-          additionalFacilities: additionalFacilities,
-          hallDeposit: securityDeposit,
-          totalPayable: totalPayable,
-          hallContact: "Email to be entered"
-        })
-        .then((response) => {
-          console.log(response.data);
-          return response.data;
-        })
-        .catch((error) => {
-          console.log(error);
-          throw error;
-        });
-
-      axiosManagerInstance
-        .post(`/sendEmail`, {
-          to: email,
-          subject: `SVKM Hall Booking for ${day}`,
-          text: "Your enquiry for hall booking has been received. Please find the attachments below.",
-          filename: `${name}_${enquiryNumber}_inquiry`,
-          path: "",
-        })
-        .then((response) => {
-          console.log(response.data);
-          return response.data;
-        })
-        .catch((error) => {
-          console.log(error);
-          throw error;
-        });
-
         navigate("/bookingsuccessful", {
           state: {
             bookingDetails: {
@@ -217,7 +151,70 @@ function BookADay() {
               eventPurpose: purpose,
             },
           },
-        });
+        });       
+        const additionalFacilities =
+          selectedCategory === "SVKM INSTITUTE"
+            ? 0
+            : Object.values(selectedFeatures).reduce(
+                (acc, feature) => acc + feature.price,
+                0
+              );
+
+        const sessionPrice =
+          HallData?.sessions
+            .find((ss) => ss._id === selectedSessionId)
+            ?.price.find((e) => e.categoryName === selectedCategory)?.price ||
+          0;
+
+        const totalPayable =
+          sessionPrice + additionalFacilities + securityDeposit;
+        const todayDate = dayjs().format("DD-MM-YYYY");
+        const dateOfEvent = dayjs(day).format("DD-MM-YYYY");
+        await axiosManagerInstance
+          .post(`/generateInquiry`, {
+            date: todayDate, // Assuming 'day' is the date of booking
+            customerName: name,
+            contactPerson: person,
+            contactNo: mobileNumber,
+            enquiryNumber: enquiryNumber, // Generate a unique enquiry number
+            hallName: HallData?.name,
+            dateOfEvent: dateOfEvent,
+            slotTime: `${convert_IST_TimeString_To12HourFormat(
+              HallData?.sessions.find((ss) => ss._id === selectedSessionId)
+                ?.from!
+            )} - ${convert_IST_TimeString_To12HourFormat(
+              HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to!
+            )}`,
+            purposeOfBooking: purpose,
+            hallCharges: sessionPrice,
+            additionalFacilities: additionalFacilities,
+            hallDeposit: securityDeposit,
+            totalPayable: totalPayable,
+            hallContact: "Email to be entered",
+          })
+          .then(async (response) => {
+            axiosManagerInstance
+            .post(`/sendEmail`, {
+              to: email,
+              subject: `SVKM Hall Booking for ${day}`,
+              text: "Your enquiry for hall booking has been received. Please find the attachments below.",
+              filename: `${name}_${enquiryNumber}_inquiry`,
+              path: "",
+            })
+            .then((response) => {
+              console.log(response.data);
+              return response.data;
+            })
+            .catch((error) => {
+              console.log(error);
+              throw error;
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+            throw error;
+          });
+
       }
       await queryClient.refetchQueries({
         queryKey: ["bookaday", `${humanReadableDate}`],
@@ -328,7 +325,7 @@ function BookADay() {
           HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to
         }`,
         purpose: purpose,
-        bookingContact: "Email to be entered"
+        bookingContact: "Email to be entered",
       };
       console.log(bookingData);
       // Perform mutation
@@ -380,7 +377,7 @@ function BookADay() {
         Book {HallData?.name} for {humanReadableDate}
       </h1>
       <span className="text-center">
-      {selectedCategory == "SVKM INSTITUTE" ? (
+        {selectedCategory == "SVKM INSTITUTE" ? (
           <div>
             <b>Estimated Price :</b> ₹{price} + Security Deposit ₹
             {securityDeposit}
