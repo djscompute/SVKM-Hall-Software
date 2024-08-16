@@ -3,9 +3,11 @@ import dayjs from "dayjs";
 import axiosManagerInstance from "../config/axiosManagerInstance";
 import { toast } from "react-toastify";
 import {
+  CustomerType,
   EachHallType,
   HallBookingType,
   bookingStatusType,
+  bookingTransactionType,
   transactionType,
 } from "../../../../types/global";
 import { useParams } from "react-router-dom";
@@ -205,7 +207,28 @@ function Booking() {
         console.error("Error in generate confirmation or send email:", error);
       });
   };
+  // Function   to calculate final payable amount of each bookings for multiple payments
+  const calculateBookingPrice = (booking: { _id?: string; date?: string | undefined; user?: CustomerType; features: any; status?: bookingStatusType; price: any; transaction?: bookingTransactionType; baseDiscount: any; deposit: any; isDeposit: any; depositDiscount: any; hallId?: string; session_id?: string; booking_type: any; from?: string; to?: string; time?: { from: string; to: string; }; purpose?: string; cancellationReason?: string | undefined; enquiryNumber?: string | undefined; }) => {
+    const priceEntry = booking.price || 0;
+    alert("price is"+ priceEntry)
+    const totalFeatureCharges = booking.features.reduce((total: any, feature: { price: any; }) => total + feature.price, 0);
+    const basePrice = priceEntry + totalFeatureCharges;
+    const baseDiscount = 0;
+    
+    let totalPrice = basePrice - baseDiscount;
 
+    if (booking.booking_type !== "SVKM INSTITUTE") {
+      // Add 18% tax for non-SVKM bookings
+      totalPrice += 0.18 * totalPrice;
+    }
+
+    if (booking.isDeposit) {
+      const depositAmount = booking.deposit - 0.01 * booking.depositDiscount * booking.deposit;
+      totalPrice += depositAmount;
+    }
+
+    return totalPrice;
+  };
   // Helper function to get additional payment details
   const getAdditionalPaymentDetails = () => {
     const transactionType =
@@ -542,16 +565,10 @@ function Booking() {
     const calculateTotalSelectedBookings = () => {
       let total = 0;
 
-      // Iterate through the selectedBookings array
-      selectedBookings.forEach((selectedBookingId) => {
-        // Find the corresponding booking object in allUserBookings
-        const booking = allBookingsOfUser.find(
-          (booking) => booking._id === selectedBookingId
-        );
-
-        // If the booking is found, add its price to the total
+      selectedBookings.forEach(selectedBookingId => {
+        const booking = allBookingsOfUser.find(booking => booking._id === selectedBookingId);
         if (booking) {
-          total += booking.price;
+          total += calculateBookingPrice(booking);
         }
       });
 
@@ -1049,7 +1066,7 @@ function Booking() {
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Hall Charges</span>
             <span className="w-full text-right">
-              {selectedBookingData.price || "-"}
+              {multiplePriceEntry?.price || "-"}
             </span>
           </div>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
@@ -1321,7 +1338,7 @@ function Booking() {
           <div className="flex mt-5 items-center w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Grand Total Amount</span>
             <span className="w-full text-right">
-              <span className="w-full text-right">{grandTotal}</span>
+              <span className="w-full text-right"> {grandTotal.toFixed(2)}</span>
             </span>
           </div>
         </>
