@@ -202,12 +202,14 @@ function Report5() {
       <span className=" text-xl font-medium mt-5">Month Wise Collections</span>
       <div className="flex gap-2">
         <BasicDateTimePicker
+         id="fromDate"
           timeModifier={(time) => {
             setQueryFilter((prev) => ({ ...prev, from: time }));
           }}
           timePickerName="from"
         />
         <BasicDateTimePicker
+         id="toDate"
           timeModifier={(time) => {
             setQueryFilter((prev) => ({ ...prev, to: time }));
           }}
