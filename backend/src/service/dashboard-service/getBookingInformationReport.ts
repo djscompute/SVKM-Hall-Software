@@ -21,8 +21,10 @@ function parseDateTime(dateString: string) {
   if (matchResult === null) {
     throw new Error("Invalid date format");
   }
-  const [, datePart, timePart] = matchResult;
-  return { date: datePart, time: timePart };
+  const [, datePart] = matchResult;
+
+  const [year, month, day] = datePart.split("-");
+  return { date: `${day}-${month}-${year}`, time: matchResult[2] };
 }
 
 const calculateAmountPaid = (data: any): number => {
@@ -244,7 +246,8 @@ export async function getBookingInformationReport(
     }
     const formattedBookings = await Promise.all(
       bookings.map(async (booking) => ({
-        Date: parseDateTime(booking.from).date,
+        confirmationDate: booking.date,
+        eventDate: parseDateTime(booking.from).date,
         "Hall Name": await getHallNameById(booking.hallId),
         Session:{
 
