@@ -142,6 +142,7 @@ export const ConfirmationSchema = z.object({
     hallName: z.string(),
     dateOfEvent: z.string(),
     slotTime: z.string(),
+    sessionType: z.string(),
     purposeOfBooking: z.string(),
     hallCharges: z.number(),
     additionalFacilities: z.number(),
