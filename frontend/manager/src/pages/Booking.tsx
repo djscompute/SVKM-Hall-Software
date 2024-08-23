@@ -159,6 +159,7 @@ function Booking() {
         slotTime: `${convert_IST_TimeString_To12HourFormat(
           startTime
         )} - ${convert_IST_TimeString_To12HourFormat(endTime)}`,
+        sessionType: session?.name,
         purposeOfBooking: editedData?.purpose || data?.purpose || "",
         hallCharges: priceEntry?.price || 0,
         additionalFacilities: totalFeatureCharges,
@@ -2032,7 +2033,7 @@ function Booking() {
                   };
                 })
               }
-              placeholder="Enter Date of Transaction"
+              placeholder="DD-MM-YYYY"
               className="px-2"
             />
           </div>

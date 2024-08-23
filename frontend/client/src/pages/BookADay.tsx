@@ -163,7 +163,7 @@ function BookADay() {
             axiosClientInstance
               .post(`/sendEmail`, {
                 to: email,
-                subject: `SVKM Hall Booking for ${day}`,
+                subject: `SVKM Hall Booking for ${dayjs(day).format("DD-MM-YYYY")}`,
                 text: "Your enquiry for hall booking has been received. Please find the attachments below.",
                 filename: `${name}_${enquiryNumber}_inquiry`,
                 path: "",
