@@ -15,13 +15,13 @@ function parseDateTime(dateString: string) {
 
 export async function getHallReport(fromDate: Date, toDate: Date, hallName: string) {
     try {
-        // Fetch hall details by name
+        
         const hall = await HallModel.findOne({ name: hallName }).exec();
         if (!hall) {
             throw new Error("Hall not found");
         }
 
-        // Fetch all confirmed bookings for the selected hall within the specified date range
+       
         const bookings = await BookingModel.find({
             hallId: hall._id,
             from: { $gte: fromDate },
@@ -29,7 +29,7 @@ export async function getHallReport(fromDate: Date, toDate: Date, hallName: stri
             status: "CONFIRMED"
         }).populate("session_id").exec();
 
-        // Format the bookings data
+       
         const formattedBookings = await Promise.all(bookings.map(async booking => ({
             "Date": parseDateTime(booking.from).date,
             "From": parseDateTime(booking.from).time,
@@ -44,7 +44,7 @@ export async function getHallReport(fromDate: Date, toDate: Date, hallName: stri
             "Contact Details": booking.user.mobile
         })));
 
-        // Return all hall details including bookings
+       
         return {
             "Hall Name": hall.name,
             "Location": hall.location,
