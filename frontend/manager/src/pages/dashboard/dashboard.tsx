@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 function Dashboard() {
-  const [activeSection, setActiveSection] = useState(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   return (
     <div className="flex flex-col items-center">

@@ -110,6 +110,7 @@ function Booking() {
           ...editedData,
           date: editedData?.transaction.date || dayjs().format("DD-MM-YYYY"),
           status: "CONFIRMED" as bookingStatusType,
+          cancellationReason : ""
         }
       );
       toast.promise(responsePromise, {
@@ -643,8 +644,8 @@ function Booking() {
   );
 
   const handleCancellation = async () => {
-    editBookingStatus.mutate("CANCELLED");
     setShowCancellationReason(false);
+    editBookingStatus.mutate("CANCELLED");
   };
 
   const handleAllEdit = () => {
@@ -2226,7 +2227,7 @@ function Booking() {
         <></>
       )}
 
-      {data?.cancellationReason && (
+      {data?.cancellationReason && data?.status == "CANCELLED" && (
         <div className="w-full flex justify-between my-2 bg-red-400 rounded-sm px-2 py-1 border text-white">
           <span className="text-lg font-medium">Cancellation Reason</span>
           <span>{data?.cancellationReason}</span>
@@ -2247,6 +2248,7 @@ function Booking() {
             </button>
             <button
               onClick={() => {
+                setShowCancellationReason(false);
                 editBookingStatus.mutate("ENQUIRY" as bookingStatusType);
               }}
               className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
@@ -2256,6 +2258,7 @@ function Booking() {
             {/* Confirmed button with saving the edits */}
             <button
               onClick={async () => {
+                setShowCancellationReason(false);
                 if (!confirmExists() && paymentDetails()) {
                   await confirmAndSaveBooking.mutateAsync();
                   generateConfirmationAndEmail();
