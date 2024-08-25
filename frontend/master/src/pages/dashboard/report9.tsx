@@ -328,14 +328,13 @@ function Report9() {
             }}
           >
             <option value="All">All</option>
-            {selectedHall != "All" &&
-              hallData
-                .find((hall) => hall.name === selectedHall)
-                ?.sessions.map((session) => (
-                  <option key={session.name} value={session._id}>
-                    {session.name}
-                  </option>
-                ))}
+            {hallData
+              .find((hall) => hall.name === selectedHall)
+              ?.sessions.map((session) => (
+                <option key={session.name} value={session._id}>
+                  {session.name}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -403,6 +402,7 @@ function Report9() {
         <div className={`flex flex-col items-center justify-center gap-2 `}>
           <div className="flex gap-2">
             <BasicDateTimePicker
+              id="fromDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, from: formattedTime }));
@@ -410,6 +410,7 @@ function Report9() {
               timePickerName="from"
             />
             <BasicDateTimePicker
+              id="toDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, to: formattedTime }));
@@ -540,73 +541,87 @@ function Report9() {
                 </tr>
               </thead>
               <tbody>
-                {data.map((booking: any, index: number) => (
-                  <tr key={index} className="bg-white border-b">
-                    <td className="px-4 py-2 text-center">
-                      {booking.confirmationDate}
-                    </td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {booking.eventDate}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["Hall Name"]}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["Session"]}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["Additional Facility"]
-                        ? booking["Additional Facility"]
-                        : "None"}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["Manager Name"]}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["Customer Category"]}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["Customer Name"]}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["Contact Person"]}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["Contact No."]}
-                    </td>
-                    {responseHallCharges && (
+                {data.map((booking: any, index: number) => {
+                  const hall = hallData.find(
+                    (hall) => hall.name === booking["Hall Name"]
+                  );
+
+                  const session = hall?.sessions.find(
+                    (session) => session._id === booking["Session"]
+                  );
+
+                  const sessionName = session?.name;
+                  const sessionFromTime = session?.from;
+                  const sessionToTime = session?.to;
+
+                  return (
+                    <tr key={index} className="bg-white border-b">
                       <td className="px-4 py-2 text-center">
-                        {booking["Booking Amount"]}
+                        {booking.confirmationDate}
                       </td>
-                    )}
-                    {responseHallCharges && (
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking.eventDate}
+                      </td>
                       <td className="px-4 py-2 text-center">
-                        {booking["Amount Paid"]}
+                        {booking["Hall Name"]}
                       </td>
-                    )}
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.type}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.date}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.transactionID}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.payeeName}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.utrNo}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.chequeNo}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {booking["transaction"]?.bank}
-                    </td>
-                  </tr>
-                ))}
+                      <td className="px-4 py-2 text-center">
+                        {sessionName || "N/A"} {sessionFromTime} - {sessionToTime}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["Additional Facility"]
+                          ? booking["Additional Facility"]
+                          : "None"}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["Manager Name"]}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["Customer Category"]}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["Customer Name"]}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["Contact Person"]}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["Contact No."]}
+                      </td>
+                      {responseHallCharges && (
+                        <td className="px-4 py-2 text-center">
+                          {booking["Booking Amount"]}
+                        </td>
+                      )}
+                      {responseHallCharges && (
+                        <td className="px-4 py-2 text-center">
+                          {booking["Amount Paid"]}
+                        </td>
+                      )}
+                      <td className="px-4 py-2 text-center">
+                        {booking["transaction"]?.type}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["transaction"]?.date}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["transaction"]?.transactionID}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["transaction"]?.payeeName}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["transaction"]?.utrNo}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["transaction"]?.chequeNo}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {booking["transaction"]?.bank}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
               {responseHallCharges && (
                 <tfoot>
