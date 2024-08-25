@@ -1616,13 +1616,13 @@ function Booking() {
                     if (!prev) return undefined;
                     return {
                       ...prev,
-                      baseDiscount: Number(e.target.value),
+                      baseDiscount: Number.isNaN(Number(e.target.value)) ? 0 : ((Number(e.target.value) > 100) ? 100 : Number(e.target.value)),
                     };
                   });
                 }}
                 placeholder="Enter Discount %"
                 className="px-2"
-                maxLength={2}
+                maxLength={3}
               />
             </div>
           ) : (
@@ -1807,7 +1807,7 @@ function Booking() {
                       if (!prev) return undefined;
                       return {
                         ...prev,
-                        depositDiscount: Number(e.target.value),
+                        depositDiscount: Number.isNaN(Number(e.target.value)) ? 0 : ((Number(e.target.value) > 100) ? 100 : Number(e.target.value)),
                       };
                     })
                   }
@@ -1816,6 +1816,7 @@ function Booking() {
                   disabled={
                     data?.isDeposit === false || editedData?.isDeposit === false
                   }
+                  maxLength={3}
                 />
               </div>
               <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
