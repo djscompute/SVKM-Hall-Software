@@ -352,6 +352,19 @@ function BookADay() {
     }
   };
 
+
+  
+  HallData?.sessions?.sort((a,b)=>{
+    const getNumber = (name:String) => {
+      if (!name) {
+        return Infinity; // Or another value to handle undefined or null names
+      }
+      // Extract numeric prefix before the dot, or return Infinity if no numeric prefix
+      const match = name.match(/^(\d+)/);
+      return match ? parseInt(match[1], 10) : Infinity;
+  }
+  return getNumber(a.name) - getNumber(b.name);
+});
   useEffect(() => {
     let totalPrice = 0;
     if (selectedCategory?.toLowerCase() !== "svkm institute") {

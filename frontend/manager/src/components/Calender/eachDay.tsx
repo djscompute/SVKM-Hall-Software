@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import {
   EachHallSessionType,
+  EachHallType,
   HallBookingType,
   bookingStatusType,
 } from "../../../../../types/global";
@@ -14,7 +15,7 @@ type Props = {
   i: number;
   hallId: string;
   currentDate: Date;
-  HallSessionsArray: EachHallSessionType[];
+  HallSessionsArray: EachHallType;
   allBookingData: HallBookingType[];
   selectedMobileDate: number;
   setSelectedMobileDate: React.Dispatch<React.SetStateAction<number>>;
@@ -56,13 +57,13 @@ function EachDay({
   };
 
   // sort sessions in acsending order
-  HallSessionsArray.sort((a, b) => {
-    let fromA = a.from.toLowerCase();
-    let fromB = b.from.toLowerCase();
-    if (fromA < fromB) return -1;
-    if (fromA > fromB) return 1;
-    return 0;
-  });
+  // HallSessionsArray.sort((a, b) => {
+  //   let fromA = a.from.toLowerCase();
+  //   let fromB = b.from.toLowerCase();
+  //   if (fromA < fromB) return -1;
+  //   if (fromA > fromB) return 1;
+  //   return 0;
+  // });
 
   // filter only the bookings of this current Day
   allBookingData = allBookingData?.filter((obj) =>
@@ -100,7 +101,7 @@ function EachDay({
     );
 
     // Iterate through HallSessionsArray
-    HallSessionsArray.forEach((session) => {
+    HallSessionsArray.sessions.forEach((session) => {
       // Check if the session is active and its ID doesn't exist in finalArr
       if (session.active && !existingSessionIds.has(session._id)) {
         // Add a new entry with empty subarray
@@ -120,6 +121,23 @@ function EachDay({
       session.subarray.some((booking) => booking.status === "CONFIRMED")
     );
   }
+  HallSessionsArray.sessions.sort((a,b)=>{
+    const getNumber = (name:String) => {
+      if (!name) {
+        return Infinity; // Or another value to handle undefined or null names
+      }
+      // Extract numeric prefix before the dot, or return Infinity if no numeric prefix
+      const match = name.match(/^(\d+)/);
+      return match ? parseInt(match[1], 10) : Infinity;
+  }
+  return getNumber(a.name) - getNumber(b.name);
+});
+
+
+
+
+
+
 
   return (
     <div
@@ -179,7 +197,7 @@ function EachDay({
         <span className="my-auto mx-auto">---</span>
       )} */}
 
-      {HallSessionsArray.map((session) =>
+      {HallSessionsArray.sessions.map((session) =>
         session.active ? (
           <>
             <span className="overflow-x-auto font-medium pt-2 px-1 text-center bg-gray-300 w-[-webkit-fill-available]">
