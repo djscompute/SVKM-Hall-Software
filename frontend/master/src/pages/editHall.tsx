@@ -3,7 +3,7 @@ import AboutHall from "../components/editHall/AboutHall";
 import HallCapacity from "../components/editHall/HallCapacity";
 import HallAdditionalFeatures from "../components/editHall/HallAdditionalFeatures";
 import ImageCarousel from "../components/editHall/ImageCarousel";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EachHallType } from "../types/Hall.types";
 import "../styles/hallInfo.css";
 import HallSessions from "../components/editHall/HallSessions";
@@ -17,13 +17,12 @@ import HallPricing from "../components/editHall/HallPricing";
 
 export default function EditHall() {
   let { id: HallID } = useParams();
-
   const [hallData, setHallData] = useState<EachHallType | undefined>(undefined);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const { data: databaseHallData } = useQuery({
-    queryKey: [`allhalls','hall-${HallID}`],
+    queryKey: [`allhalls`, `hall-${HallID}`],
     queryFn: async () => {
-      // try {
       console.log("FETCHING");
       const responsePromise = axiosMasterInstance.get(`getHall/${HallID}`);
       toast.promise(responsePromise, {
@@ -35,7 +34,7 @@ export default function EditHall() {
       setHallData(response.data);
       return response.data as EachHallType;
     },
-    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
+    staleTime: 5 * 60 * 1000, 
   });
 
   const editHallMutation = useMutation({
@@ -58,11 +57,20 @@ export default function EditHall() {
       await queryClient.refetchQueries({
         queryKey: [`allhalls`],
       });
+      setIsEditing(false); 
     },
     onError: (error) => {
       console.log(error);
     },
   });
+
+  useEffect(() => {
+    if (JSON.stringify(databaseHallData) !== JSON.stringify(hallData)) {
+      setIsEditing(true);
+    } else {
+      setIsEditing(false);
+    }
+  }, [hallData, databaseHallData]);
 
   return (
     <div className="flex flex-col items-center gap-5 sm:gap-10 px-3 sm:px-10 md:px-16 lg:px-28 pt-10">
@@ -80,20 +88,21 @@ export default function EditHall() {
               }}
             />
           </div>
-          {JSON.stringify(databaseHallData) !== JSON.stringify(hallData) && (
+          {isEditing && (
             <div className="w-full flex flex-col items-center gap-3 fixed z-20 top-0 bg-white px-3 py-2 border-gray-400 rounded-md shadow-md">
               <p>Confirm the changes you just made</p>
               <div className="flex gap-5">
                 <button
-                  className=" bg-green-500 p-1 px-2 rounded-md text-xl font-semibold text-white"
+                  className="bg-green-500 p-1 px-2 rounded-md text-xl font-semibold text-white"
                   onClick={() => editHallMutation.mutate()}
                 >
                   Confirm
                 </button>
                 <button
-                  className=" bg-red-500 p-1 px-2 rounded-md text-xl font-semibold text-white"
+                  className="bg-red-500 p-1 px-2 rounded-md text-xl font-semibold text-white"
                   onClick={() => {
                     setHallData(databaseHallData);
+                    setIsEditing(false)
                   }}
                 >
                   Discard
@@ -107,7 +116,7 @@ export default function EditHall() {
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }
           />
-          <hr className=" bg-gray-300 h-[1.5px] w-full" />
+          <hr className="bg-gray-300 h-[1.5px] w-full" />
           <AboutHall
             data={hallData}
             about={hallData.about}
@@ -122,8 +131,6 @@ export default function EditHall() {
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }
           />
-
-
           <HallSessions
             sessions={hallData.sessions}
             setHallData={
