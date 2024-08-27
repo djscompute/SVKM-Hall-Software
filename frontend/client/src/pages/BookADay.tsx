@@ -572,7 +572,7 @@ function BookADay() {
             checked={isDetailsConfirmed}
             onChange={(e) => setIsDetailsConfirmed(e.target.checked)}
           />
-          <label htmlFor="confirmDetails">
+          <label htmlFor="confirmDetails" className="font-bold">
             Re-check all the entered details (important that the email and
             mobile details entered are correct)
           </label>
