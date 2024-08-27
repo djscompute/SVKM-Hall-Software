@@ -10,7 +10,7 @@ import {
   getFinancialYearEnd,
   getFinancialYearStart,
 } from "../../utils/financialYearRange.tsx";
-
+import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat.ts";
 function Report9() {
   const [hallData, setHallData] = useState<EachHallType[]>([]);
 
@@ -402,7 +402,6 @@ function Report9() {
         <div className={`flex flex-col items-center justify-center gap-2 `}>
           <div className="flex gap-2">
             <BasicDateTimePicker
-              id="fromDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, from: formattedTime }));
@@ -410,7 +409,6 @@ function Report9() {
               timePickerName="from"
             />
             <BasicDateTimePicker
-              id="toDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, to: formattedTime }));
@@ -566,7 +564,7 @@ function Report9() {
                         {booking["Hall Name"]}
                       </td>
                       <td className="px-4 py-2 text-center">
-                        {sessionName || "N/A"} {sessionFromTime} - {sessionToTime}
+                        {sessionName || "N/A"} {convert_IST_TimeString_To12HourFormat(sessionFromTime || "")} - {convert_IST_TimeString_To12HourFormat(sessionToTime || "")}
                       </td>
                       <td className="px-4 py-2 text-center">
                         {booking["Additional Facility"]

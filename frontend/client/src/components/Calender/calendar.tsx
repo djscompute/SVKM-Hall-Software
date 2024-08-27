@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EachHallType, bookingStatusType } from "../../types/Hall.types";
 import EachDay from "./eachDay";
 import EachMobileDay from "./eachMobileDay";
@@ -22,6 +22,8 @@ type Props = {
 //calendar
 const Calendar = ({ hallId, HallData }: Props) => {
   dayjs.extend(utc);
+console.log("session",HallData);
+
   const [currentDate, setCurrentDate] = useState(
     dayjs().startOf("month").toDate()
   );
@@ -48,7 +50,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
           hallId: hallId,
         },
       });
-      console.log(response.data);
+      console.log("res",response.data);
       if (response.data.message == "No bookings found for the specified range.")
         return [];
       // sort based of from
@@ -157,7 +159,8 @@ const Calendar = ({ hallId, HallData }: Props) => {
               i={i + 1}
               hallId={hallId}
               currentDate={currentDate}
-              HallSessionsArray={HallData.sessions}
+              HallSessionsArray={HallData}
+
               selectedMobileDate={selectedMobileDate}
               setSelectedMobileDate={setSelectedMobileDate}
               allBookingData={allBookingData}
@@ -178,7 +181,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
             i={selectedMobileDate}
             hallId={hallId}
             currentDate={currentDate}
-            HallSessionsArray={HallData.sessions}
+            HallSessionsArray={HallData}
             selectedMobileDate={selectedMobileDate}
             setSelectedMobileDate={setSelectedMobileDate}
             allBookingData={allBookingData}

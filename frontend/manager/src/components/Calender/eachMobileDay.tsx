@@ -1,8 +1,9 @@
 import dayjs from "dayjs";
-import { EachHallSessionType, HallBookingType } from "../../../../../types/global";
+import { EachHallSessionType, EachHallType, HallBookingType } from "../../../../../types/global";
 import { bookingStatusType } from "../../types/Hall.types";
 import isBetween from "dayjs/plugin/isBetween"; // Import the timezone plugin
 import { convert_IST_DateTimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat";
+import { useEffect } from "react";
 
 dayjs.extend(isBetween);
 
@@ -10,7 +11,7 @@ type Props = {
 	i: number;
 	hallId: string;
 	currentDate: Date;
-	HallSessionsArray: EachHallSessionType[];
+	HallSessionsArray: EachHallType;
 	allBookingData: HallBookingType[];
 	selectedMobileDate: number;
 	setSelectedMobileDate: React.Dispatch<React.SetStateAction<number>>;
@@ -29,19 +30,25 @@ function EachMobileDay({
 	const myDayJSObject = dayjs(currentDate).add(i - 1, "day");
 
 	// sort sessions in acsending order
-	HallSessionsArray.sort((a, b) => {
-		let fromA = a.from.toLowerCase();
-		let fromB = b.from.toLowerCase();
-		if (fromA < fromB) return -1;
-		if (fromA > fromB) return 1;
-		return 0;
+	HallSessionsArray.sessions.sort((a,b)=>{
+		const getNumber = (name:String) => {
+		  if (!name) {
+			return Infinity; // Or another value to handle undefined or null names
+		  }
+		  // Extract numeric prefix before the dot, or return Infinity if no numeric prefix
+		  const match = name.match(/^(\d+)/);
+		  return match ? parseInt(match[1], 10) : Infinity;
+	  }
+	  return getNumber(a.name) - getNumber(b.name);
 	});
+	
+	
 
 	// filter only the bookings of this current Day
 	allBookingData = allBookingData?.filter((obj) => dayjs(obj.from).isSame(myDayJSObject, "day"));
 
 	// convert "08:00:00" to "${aaj-ka-din}T"08:00:00""
-	const completeDateSessions = HallSessionsArray.map((element) => {
+	const completeDateSessions = HallSessionsArray.sessions.map((element) => {
 		return {
 			...element,
 			from: `${myDayJSObject.format("YYYY-MM-DD")}T${element.from}`,
@@ -74,6 +81,7 @@ function EachMobileDay({
 			finalArr.push(eachSession);
 		}
 	});
+
 	const getSlotColour = (status: bookingStatusType) => {
 		switch (status) {
 			case "ENQUIRY":

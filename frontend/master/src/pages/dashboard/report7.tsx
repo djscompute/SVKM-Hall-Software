@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
 import { EachHallType } from "../../../../../types/global.ts";
 import { useQuery } from "@tanstack/react-query";
-
+import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat.ts";
 function Report7() {
   const [hallData, setHallData] = useState<EachHallType[]>([]);
   const [selectedAdditionalFeatures, setSelectedAdditionalFeatures] = useState<
@@ -333,8 +333,8 @@ function Report7() {
                 <tr key={index} className="bg-white border-b">
                   <td className="px-4 py-2">{booking.Date}</td>
                   <td className="px-4 py-2">{booking.Session}</td>
-                  <td className="px-4 py-2">{booking.From}</td>
-                  <td className="px-4 py-2">{booking.To}</td>
+                  <td className="px-4 py-2">{convert_IST_TimeString_To12HourFormat(booking.From)}</td>
+                  <td className="px-4 py-2">{convert_IST_TimeString_To12HourFormat(booking.To)}</td>
                   <td className="px-4 py-2">{booking["Hall Name"]}</td>
                   <td className="px-4 py-2">
                     {booking["Additional Facility Name"]}
