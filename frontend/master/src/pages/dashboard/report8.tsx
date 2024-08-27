@@ -332,8 +332,8 @@ function Report8() {
           }}
         >
           <option value="">Display Hall Charges</option>
-          <option value="true">True</option>
-          <option value="false">False</option>
+          <option value="true">YES</option>
+          <option value="false">NO</option>
         </select>
       </div>
       </div>
