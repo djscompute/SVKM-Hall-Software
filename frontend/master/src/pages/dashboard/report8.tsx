@@ -176,17 +176,50 @@ function Report8() {
   const downloadCsv = () => {
     if (!data) return;
     const csvRows = [];
-    const headers = Object.keys(data[0]);
+    
+    // Create headers
+    const headers = [
+      "Confirmation Date", "Event Date", "Hall Name", "Session Name", "Session Time",
+      "Additional Facility", "Manager Name", "Customer Category", "Customer Name",
+      "Contact Person", "Contact No.", "Booking Amount", "Security Deposit", "GST",
+      "Amount Paid", "Transaction Type", "Date", "Payee Name", "Cheque No.", "Bank"
+    ];
     csvRows.push(headers.join(","));
-
+  
+    // Flatten and format data
     for (const row of data) {
-      const values = headers.map((header) => {
-        const escaped = ("" + row[header]).replace(/"/g, '\\"');
+      const values = [
+        row.confirmationDate || "-",
+        row.eventDate,
+        row["Hall Name"],
+        row["Session"].name,
+        `${row["Session"].time.from} - ${row["Session"].time.to}`,
+        row["Additional Facility"] || "None",
+        row["Manager Name"],
+        row["Customer Category"],
+        row["Customer Name"],
+        row["Contact Person"],
+        row["Contact No."],
+        row["Booking Amount"],
+        row["Security Deposit"],
+        row["GST"],
+        row["Amount Paid"],
+        row["transaction type"],
+        row["date"],
+        row["payee Name"],
+        row["cheque no"],
+        row["bank"]
+      ];
+      
+      // Escape and quote each value
+      const escapedValues = values.map(value => {
+        const escaped = ("" + value).replace(/"/g, '""');
         return `"${escaped}"`;
       });
-      csvRows.push(values.join(","));
+      
+      csvRows.push(escapedValues.join(","));
     }
-
+  
     const csvString = csvRows.join("\n");
     const blob = new Blob([csvString], { type: "text/csv" });
     const url = URL.createObjectURL(blob);

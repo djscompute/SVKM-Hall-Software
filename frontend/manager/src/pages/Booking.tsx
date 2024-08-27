@@ -108,7 +108,7 @@ function Booking() {
         `/editBooking/${bookingId}`,
         {
           ...editedData,
-          date: editedData?.transaction.date || dayjs().format("DD-MM-YYYY"),
+          date: dayjs().format("DD-MM-YYYY"),
           status: "CONFIRMED" as bookingStatusType,
         }
       );
