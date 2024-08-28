@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
 import { EachHallType } from "../../../../../types/global.ts";
 import { useQuery } from "@tanstack/react-query";
+import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat.ts";
 import {
   getFinancialYearEnd,
   getFinancialYearStart,
@@ -43,6 +44,8 @@ function Report8() {
   const [responseHallCharges, setresponseHallCharges] = useState<boolean>();
   const [selectedDisplayPeriod, setSelectedDisplayPeriod] =
     useState<string>("Select");
+  const [selectedBookingStatus, setSelectedBookingStatus] =
+    useState<string>("All");
 
   const [date, setDate] = useState<{
     from: string;
@@ -120,6 +123,7 @@ function Report8() {
     displayCustomerCategory,
     displaySession,
     displayHallCharges,
+    displayBookingStatus,
   }: {
     displayPeriod: string;
     fromDate: string;
@@ -128,6 +132,7 @@ function Report8() {
     displayCustomerCategory: string;
     displaySession: string;
     displayHallCharges: boolean;
+    displayBookingStatus: string;
   }) => {
     if (!displayPeriod) return;
     setresponseHallCharges(displayHallCharges);
@@ -142,6 +147,7 @@ function Report8() {
         displayCustomerCategory: displayCustomerCategory,
         displaySession: displaySession,
         displayHallCharges: displayHallCharges,
+        displayBookingStatus: displayBookingStatus,
       };
       console.log(request);
     } else {
@@ -151,6 +157,7 @@ function Report8() {
         displayCustomerCategory: displayCustomerCategory,
         displaySession: displaySession,
         displayHallCharges: displayHallCharges,
+        displayBookingStatus: displayBookingStatus,
       };
       console.log(request);
     }
@@ -176,17 +183,50 @@ function Report8() {
   const downloadCsv = () => {
     if (!data) return;
     const csvRows = [];
-    const headers = Object.keys(data[0]);
+    
+    // Create headers
+    const headers = [
+      "Confirmation Date", "Event Date", "Hall Name", "Session Name", "Session Time",
+      "Additional Facility", "Manager Name", "Customer Category", "Customer Name",
+      "Contact Person", "Contact No.", "Booking Amount", "Security Deposit", "GST",
+      "Amount Paid", "Transaction Type", "Date", "Payee Name", "Cheque No.", "Bank"
+    ];
     csvRows.push(headers.join(","));
-
+  
+    // Flatten and format data
     for (const row of data) {
-      const values = headers.map((header) => {
-        const escaped = ("" + row[header]).replace(/"/g, '\\"');
+      const values = [
+        row.confirmationDate || "-",
+        row.eventDate,
+        row["Hall Name"],
+        row["Session"].name,
+        `${row["Session"].time.from} - ${row["Session"].time.to}`,
+        row["Additional Facility"] || "None",
+        row["Manager Name"],
+        row["Customer Category"],
+        row["Customer Name"],
+        row["Contact Person"],
+        row["Contact No."],
+        row["Booking Amount"],
+        row["Security Deposit"],
+        row["GST"],
+        row["Amount Paid"],
+        row["transaction type"],
+        row["date"],
+        row["payee Name"],
+        row["cheque no"],
+        row["bank"]
+      ];
+      
+      // Escape and quote each value
+      const escapedValues = values.map(value => {
+        const escaped = ("" + value).replace(/"/g, '""');
         return `"${escaped}"`;
       });
-      csvRows.push(values.join(","));
+      
+      csvRows.push(escapedValues.join(","));
     }
-
+  
     const csvString = csvRows.join("\n");
     const blob = new Blob([csvString], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -197,6 +237,7 @@ function Report8() {
     link.click();
     document.body.removeChild(link);
   };
+ 
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
@@ -205,117 +246,136 @@ function Report8() {
       </span>
       {/* SELECT DISPLAY PERIOD */}
       <div>
-      <div className="mt-4 flex items-center gap-4 justify-between">
-        <label htmlFor="hall-charges-select" className="font-medium text-nowrap">
-          Select Display Period
-        </label>
-        <select
-          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
-          onChange={(e) => setSelectedDisplayPeriod(e.target.value)}
-        >
-          <option value="Select">Select Display Period</option>
-          <option value="Today">Today</option>
-          <option value="Tomorrow">Tomorrow</option>
-          <option value="Week">This week</option>
-          <option value="Month">Current Month</option>
-          <option value="Year">Current Year</option>
-          <option value="Fin-Year">Financial Year</option>
-        </select>
-      </div>
-      {/* SELECT HALL */}
-      <div className="mt-4 flex items-center gap-4 justify-between">
-        <label htmlFor="hall-select" className="font-medium text-nowrap">
-          Select Hall:
-        </label>
-        <select
-          id="hall-select"
-          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
-          onChange={(e) => {
-            if (e.target.value == "All") {
-              setSelectedHallId("All");
-            } else {
-              const selectedHallName = e.target.value;
-              const selectedHallId = hallData.find(
-                (hall) => hall.name === selectedHallName
-              )?._id;
-              setSelectedHall(selectedHallName);
-              if (selectedHallId) {
-                setSelectedHallId(selectedHallId);
+        <div className="mt-4 flex items-center gap-4 justify-between">
+          <label
+            htmlFor="hall-charges-select"
+            className="font-medium text-nowrap"
+          >
+            Select Display Period
+          </label>
+          <select
+            className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
+            onChange={(e) => setSelectedDisplayPeriod(e.target.value)}
+          >
+            <option value="Select">Select Display Period</option>
+            <option value="Today">Today</option>
+            <option value="Tomorrow">Tomorrow</option>
+            <option value="Week">This week</option>
+            <option value="Month">Current Month</option>
+            <option value="Year">Current Year</option>
+            <option value="Fin-Year">Financial Year</option>
+          </select>
+        </div>
+        {/* SELECT HALL */}
+        <div className="mt-4 flex items-center gap-4 justify-between">
+          <label htmlFor="hall-select" className="font-medium text-nowrap">
+            Select Hall:
+          </label>
+          <select
+            id="hall-select"
+            className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
+            onChange={(e) => {
+              if (e.target.value == "All") {
+                setSelectedHallId("All");
+              } else {
+                const selectedHallName = e.target.value;
+                const selectedHallId = hallData.find(
+                  (hall) => hall.name === selectedHallName
+                )?._id;
+                setSelectedHall(selectedHallName);
+                if (selectedHallId) {
+                  setSelectedHallId(selectedHallId);
+                }
               }
-            }
-          }}
-        >
-          <option value="All">All</option>
-          {hallData &&
-            hallData.map((hall) => (
-              <option key={hall._id} value={hall.name}>
-                {hall.name}
-              </option>
-            ))}
-        </select>
-      </div>
+            }}
+          >
+            <option value="All">All</option>
+            {hallData &&
+              hallData.map((hall) => (
+                <option key={hall._id} value={hall.name}>
+                  {hall.name}
+                </option>
+              ))}
+          </select>
+        </div>
 
-      {/* SELECT SESSION */}
-      <div className="mt-4 flex items-center gap-4 justify-between">
-        <label htmlFor="session-select" className="font-medium text-nowrap">
-          Select Session:
-        </label>
-        <select
-          id="session-select"
-          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
-          onChange={(e) => {
-            setSelectedSession(e.target.value);
-          }}
-        >
-          <option value="All">All</option>
-          {hallData
-            .find((hall) => hall.name === selectedHall)
-            ?.sessions.map((session) => (
-              <option key={session.name} value={session._id}>
-                {session.name}
-              </option>
-            ))}
-        </select>
-      </div>
+        {/* SELECT SESSION */}
+        <div className="mt-4 flex items-center gap-4 justify-between">
+          <label htmlFor="session-select" className="font-medium text-nowrap">
+            Select Session:
+          </label>
+          <select
+            id="session-select"
+            className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
+            onChange={(e) => {
+              setSelectedSession(e.target.value);
+            }}
+          >
+            <option value="All">All</option>
+            {hallData
+              .find((hall) => hall.name === selectedHall)
+              ?.sessions.map((session) => (
+                <option key={session.name} value={session._id}>
+                  {session.name}
+                </option>
+              ))}
+          </select>
+        </div>
 
-      {/* SELECT CATEGORY */}
-      <div className="mt-4 flex items-center gap-4 justify-between">
-        <label htmlFor="category-select" className="font-medium text-nowrap">
-          Select Category:
-        </label>
-        <select
-          id="category-select"
-          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
-          onChange={(e) => {
-            setSelectedCategory(e.target.value);
-          }}
-        >
-          <option value="">Select Category</option>
-          <option value="All">All</option>
-          {selectedSession === "All"
-            ? hallData
-                .find((hall) => hall.name === selectedHall)
-                ?.sessions[0]?.price.map((category) => (
-                  <option
-                    key={category.categoryName}
-                    value={category.categoryName}
-                  >
-                    {category.categoryName}
-                  </option>
-                ))
-            : hallData
-                .find((hall) => hall.name === selectedHall)
-                ?.sessions.find((session) => session._id === selectedSession)
-                ?.price.map((category) => (
-                  <option
-                    key={category.categoryName}
-                    value={category.categoryName}
-                  >
-                    {category.categoryName}
-                  </option>
-                ))}
-        </select>
-      </div>
+        {/* SELECT CATEGORY */}
+        <div className="mt-4 flex items-center gap-4 justify-between">
+          <label htmlFor="category-select" className="font-medium text-nowrap">
+            Select Category:
+          </label>
+          <select
+            id="category-select"
+            className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+            }}
+          >
+            <option value="">Select Category</option>
+            <option value="All">All</option>
+            {selectedSession === "All"
+              ? hallData
+                  .find((hall) => hall.name === selectedHall)
+                  ?.sessions[0]?.price.map((category) => (
+                    <option
+                      key={category.categoryName}
+                      value={category.categoryName}
+                    >
+                      {category.categoryName}
+                    </option>
+                  ))
+              : hallData
+                  .find((hall) => hall.name === selectedHall)
+                  ?.sessions.find((session) => session._id === selectedSession)
+                  ?.price.map((category) => (
+                    <option
+                      key={category.categoryName}
+                      value={category.categoryName}
+                    >
+                      {category.categoryName}
+                    </option>
+                  ))}
+          </select>
+        </div>
+        {/* SELECT BOOKING STATUS */}
+        <div className="my-4">
+          <label htmlFor="category-select" className="font-medium text-nowrap">
+            Select Booking Status:
+          </label>
+          <select
+            className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center"
+            onChange={(e) => setSelectedBookingStatus(e.target.value)}
+          >
+            <option value="All">All Statuses</option>
+            <option value="CONFIRMED">Confirmed</option>
+            <option value="ENQUIRY">Enquiry</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
+
 
       {/* SELECT HALL CHARGES */}
       <div className="mt-4 flex items-center gap-4 justify-between">
@@ -336,6 +396,7 @@ function Report8() {
           <option value="false">NO</option>
         </select>
       </div>
+
       </div>
       <hr className=" bg-gray-300 h-[1.5px] w-[50%] my-2" />
       {/* SELECT TIME PERIOD */}
@@ -385,6 +446,7 @@ function Report8() {
               displayCustomerCategory: selectedCategory,
               displaySession: selectedSession,
               displayHallCharges: hallCharges,
+              displayBookingStatus: selectedBookingStatus,
             });
           }
         }}
@@ -402,7 +464,14 @@ function Report8() {
             </span>
             <div className=" flex flex-row items-center gap-3 mb-3">
               <span className="font-medium ">
-                {data?.length} entries found{" "}
+                {
+                  data?.filter(
+                    (booking: any) =>
+                      selectedBookingStatus === "All" ||
+                      booking["Booking Status"] === selectedBookingStatus
+                  ).length
+                }{" "}
+                entries found{" "}
               </span>
               <button
                 onClick={downloadCsv}
@@ -430,109 +499,170 @@ function Report8() {
             <table className="">
               <thead className="bg-gray-800 text-white">
                 <tr>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Confirmation Date</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Event Date</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Hall Name</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Session</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Additional Facility</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Manager Name</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Customer Category</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Customer Name</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Contact Person</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">Contact No.</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Confirmation Date
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Event Date
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Hall Name
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Session
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Additional Facility
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Manager Name
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Customer Category
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Customer Name
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Contact Person
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Contact No.
+                  </th>
                   {responseHallCharges && (
-                    <th className="px-4 py-2 text-center whitespace-nowrap">Booking Amount</th>
+                    <th className="px-4 py-2 text-center whitespace-nowrap">
+                      Booking Amount
+                    </th>
                   )}
                   {responseHallCharges && (
-                    <th className="px-4 py-2 text-center whitespace-nowrap">Security Deposit</th>
+                    <th className="px-4 py-2 text-center whitespace-nowrap">
+                      Security Deposit
+                    </th>
                   )}
                   {responseHallCharges && (
-                    <th className="px-4 py-2 text-center whitespace-nowrap">GST</th>
+                    <th className="px-4 py-2 text-center whitespace-nowrap">
+                      GST
+                    </th>
                   )}
                   {responseHallCharges && (
-                    <th className="px-4 py-2 text-center whitespace-nowrap">Amount Paid</th>
+                    <th className="px-4 py-2 text-center whitespace-nowrap">
+                      Amount Paid
+                    </th>
                   )}
-                  <th className="px-4 py-2 text-center whitespace-nowrap">transaction type</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">date</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    transaction type
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    date
+                  </th>
                   {/* <th className="px-4 py-2 text-center whitespace-nowrap">transaction id</th> */}
-                  <th className="px-4 py-2 text-center whitespace-nowrap">payee Name</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    payee Name
+                  </th>
                   {/* <th className="px-4 py-2 text-center whitespace-nowrap">utr no.</th> */}
-                  <th className="px-4 py-2 text-center whitespace-nowrap">cheque no.</th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">bank</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    cheque no.
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    bank
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Booking Status
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {data.map((booking: any, index: number) => (
-                  <tr key={index} className="bg-white border-b">
-                    <td className="px-4 py-2 text-center whitespace-nowrap">{booking.confirmationDate?booking.confirmationDate: "-"}</td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">{booking.eventDate}</td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {booking["Hall Name"]}
-                    </td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {/* {booking["Session"]} */}
-                      {booking["Session"].name} {booking["Session"].time.from} -{" "}
-                      {booking["Session"].time.to}
-                    </td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {booking["Additional Facility"]
-                        ? booking["Additional Facility"]
-                        : "None"}
-                    </td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {booking["Manager Name"]}
-                    </td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {booking["Customer Category"]}
-                    </td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {booking["Customer Name"]}
-                    </td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {booking["Contact Person"]}
-                    </td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {booking["Contact No."]}
-                    </td>
-                    {responseHallCharges && (
+                {data
+                  .filter(
+                    (booking: any) =>
+                      selectedBookingStatus === "All" ||
+                      booking["Booking Status"] === selectedBookingStatus
+                  )
+                  .map((booking: any, index: number) => (
+                    <tr key={index} className="bg-white border-b">
+
                       <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["Booking Amount"]}
+                        {booking.confirmationDate
+                          ? booking.confirmationDate
+                          : "-"}
                       </td>
-                    )}
-                    {responseHallCharges && (
                       <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["Security Deposit"]}
+                        {booking.eventDate}
                       </td>
-                    )}
-                    {responseHallCharges && (
                       <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["GST"]}
+                        {booking["Hall Name"]}
                       </td>
-                    )}
-                    {responseHallCharges && (
                       <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["Amount Paid"]}
+                        {/* {booking["Session"]} */}
+                        {booking["Session"].name} {booking["Session"].time.from}{" "}
+                        - {booking["Session"].time.to}
                       </td>
-                    )}
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {booking["transaction type"]}
-                    </td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">{booking["date"]}</td>
-                    {/* <td className="px-4 py-2 text-center whitespace-nowrap">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["Additional Facility"]
+                          ? booking["Additional Facility"]
+                          : "None"}
+                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["Manager Name"]}
+                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["Customer Category"]}
+                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["Customer Name"]}
+                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["Contact Person"]}
+                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["Contact No."]}
+                      </td>
+                      {responseHallCharges && (
+                        <td className="px-4 py-2 text-center whitespace-nowrap">
+                          {booking["Booking Amount"]}
+                        </td>
+                      )}
+                      {responseHallCharges && (
+                        <td className="px-4 py-2 text-center whitespace-nowrap">
+                          {booking["Security Deposit"]}
+                        </td>
+                      )}
+                      {responseHallCharges && (
+                        <td className="px-4 py-2 text-center whitespace-nowrap">
+                          {booking["GST"]}
+                        </td>
+                      )}
+                      {responseHallCharges && (
+                        <td className="px-4 py-2 text-center whitespace-nowrap">
+                          {booking["Amount Paid"]}
+                        </td>
+                      )}
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["transaction type"]}
+                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["date"]}
+                      </td>
+                      {/* <td className="px-4 py-2 text-center whitespace-nowrap">
                       {booking["transaction id"]}
                     </td> */}
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {booking["payee Name"]}
-                    </td>
-                    {/* <td className="px-4 py-2 text-center whitespace-nowrap">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["payee Name"]}
+                      </td>
+                      {/* <td className="px-4 py-2 text-center whitespace-nowrap">
                       {booking["utr no"]}
                     </td> */}
-                    <td className="px-4 py-2 text-center whitespace-nowrap">
-                      {booking["cheque no"]}
-                    </td>
-                    <td className="px-4 py-2 text-center whitespace-nowrap">{booking["bank"]}</td>
-                  </tr>
-                ))}
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["cheque no"]}
+                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["bank"]}
+                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["Booking Status"]}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
