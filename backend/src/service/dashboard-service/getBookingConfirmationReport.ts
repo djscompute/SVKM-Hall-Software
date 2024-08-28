@@ -35,26 +35,19 @@ interface BookingConfirmationReportRequest {
   displayHallCharges: boolean;
 }
 
+let gst: number;
 const calculateAmountPaid = (data: any): number => {
-  const calculateTotalFeatureCharges = (features: any) => {
-    if (Array.isArray(features)) {
-      return features.reduce((acc, feature) => acc + (feature.price || 0), 0);
-    }
-    return 0;
-  };
-  const basePrice =
-    (data?.price || 0) + calculateTotalFeatureCharges(data?.features);
+  const basePrice = data?.price || 0;
   const discountedPrice =
     basePrice - 0.01 * (data?.baseDiscount || 0) * basePrice;
-  const gst =
-    data?.booking_type === "SVKM INSTITUTE" ? 0 : 0.18 * discountedPrice;
+  gst = data?.booking_type === "SVKM INSTITUTE" ? 0 : 0.18 * discountedPrice;
   const depositAmount = data?.isDeposit
     ? (data?.deposit || 0) -
       0.01 * (data?.depositDiscount || 0) * (data?.deposit || 0)
     : 0;
-  console.log(`price1 of ${data.from}`, discountedPrice);
-  console.log(`price2 of ${data.from}`, gst);
-  console.log(`price3 of ${data.from}`, depositAmount);
+  // console.log(`price1 of ${data.from}`, discountedPrice);
+  // console.log(`price2 of ${data.from}`, gst);
+  // console.log(`price3 of ${data.from}`, depositAmount);
   return discountedPrice + gst + depositAmount;
 };
 
@@ -217,6 +210,10 @@ export async function getBookingConfirmationReport(
         "Amount Paid": params.displayHallCharges
           ? calculateAmountPaid(booking)
           : "Cannot Display",
+        "Security Deposit": params.displayHallCharges
+          ? booking.deposit
+          : "Cannot Display",
+        GST: params.displayHallCharges ? gst : "Cannot Display",
         transaction: booking.transaction,
       }))
     );
