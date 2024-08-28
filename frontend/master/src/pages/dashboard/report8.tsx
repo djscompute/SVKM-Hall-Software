@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
 import { EachHallType } from "../../../../../types/global.ts";
 import { useQuery } from "@tanstack/react-query";
+import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat.ts";
 import {
   getFinancialYearEnd,
   getFinancialYearStart,
@@ -182,17 +183,50 @@ function Report8() {
   const downloadCsv = () => {
     if (!data) return;
     const csvRows = [];
-    const headers = Object.keys(data[0]);
+    
+    // Create headers
+    const headers = [
+      "Confirmation Date", "Event Date", "Hall Name", "Session Name", "Session Time",
+      "Additional Facility", "Manager Name", "Customer Category", "Customer Name",
+      "Contact Person", "Contact No.", "Booking Amount", "Security Deposit", "GST",
+      "Amount Paid", "Transaction Type", "Date", "Payee Name", "Cheque No.", "Bank"
+    ];
     csvRows.push(headers.join(","));
-
+  
+    // Flatten and format data
     for (const row of data) {
-      const values = headers.map((header) => {
-        const escaped = ("" + row[header]).replace(/"/g, '\\"');
+      const values = [
+        row.confirmationDate || "-",
+        row.eventDate,
+        row["Hall Name"],
+        row["Session"].name,
+        `${row["Session"].time.from} - ${row["Session"].time.to}`,
+        row["Additional Facility"] || "None",
+        row["Manager Name"],
+        row["Customer Category"],
+        row["Customer Name"],
+        row["Contact Person"],
+        row["Contact No."],
+        row["Booking Amount"],
+        row["Security Deposit"],
+        row["GST"],
+        row["Amount Paid"],
+        row["transaction type"],
+        row["date"],
+        row["payee Name"],
+        row["cheque no"],
+        row["bank"]
+      ];
+      
+      // Escape and quote each value
+      const escapedValues = values.map(value => {
+        const escaped = ("" + value).replace(/"/g, '""');
         return `"${escaped}"`;
       });
-      csvRows.push(values.join(","));
+      
+      csvRows.push(escapedValues.join(","));
     }
-
+  
     const csvString = csvRows.join("\n");
     const blob = new Blob([csvString], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -547,6 +581,7 @@ function Report8() {
                   )
                   .map((booking: any, index: number) => (
                     <tr key={index} className="bg-white border-b">
+
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking.confirmationDate
                           ? booking.confirmationDate
