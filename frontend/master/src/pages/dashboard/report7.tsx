@@ -145,16 +145,71 @@ function Report7() {
     console.log(response.data);
     setData(response.data);
   };
-
+  interface TransactionData {
+    type?: string;
+    date?: string;
+    transactionID?: string;
+    payeeName?: string;
+    utrNo?: string;
+    chequeNo?: string;
+    bank?: string;
+  }
+  interface BookingData {
+    "Manager Name": string;
+    "Customer Category": string;
+    "Customer Name": string;
+    "Contact Person": string;
+    "Contact No.": string;
+    "Booking Amount": string;
+    "Amount Paid": string;
+    transaction?: TransactionData;
+    [key: string]: any; // For any additional fields
+  }
+  interface FlattenedBookingData extends Omit<BookingData, "transaction"> {
+    "transaction type"?: string;
+    "transaction date"?: string;
+    "transaction id"?: string;
+    "payee Name"?: string;
+    "utr no."?: string;
+    "cheque no."?: string;
+    bank?: string;
+  }
   const downloadCsv = () => {
     if (!data) return;
-    const csvRows = [];
-    const headers = Object.keys(data[0]);
-    csvRows.push(headers.join(","));
 
-    for (const row of data) {
+    const flattenedData: FlattenedBookingData[] = data.map(
+      (row: BookingData) => {
+        const flatRow: FlattenedBookingData = { ...row };
+        if (row.transaction) {
+          flatRow["transaction type"] = row.transaction.type || "";
+          flatRow["transaction date"] = row.transaction.date || "";
+          flatRow["transaction id"] = row.transaction.transactionID || "";
+          flatRow["payee Name"] = row.transaction.payeeName || "";
+          flatRow["utr no."] = row.transaction.utrNo || "";
+          flatRow["cheque no."] = row.transaction.chequeNo || "";
+          flatRow["bank"] = row.transaction.bank || "";
+        }
+        delete (flatRow as any).transaction;
+        return flatRow;
+      }
+    );
+
+    const totalAmountPaid = flattenedData.reduce(
+      (sum, row) => sum + (Number(row["Amount Paid"]) || 0),
+      0
+    );
+
+    flattenedData.push({
+      "Manager Name": "Total",
+      "Amount Paid": totalAmountPaid.toFixed(2),
+    } as FlattenedBookingData);
+
+    const headers = Object.keys(flattenedData[0]);
+    const csvRows = [headers.join(",")];
+
+    for (const row of flattenedData) {
       const values = headers.map((header) => {
-        const escaped = ("" + row[header]).replace(/"/g, '\\"');
+        const escaped = ("" + (row[header] || "")).replace(/"/g, '\\"');
         return `"${escaped}"`;
       });
       csvRows.push(values.join(","));
@@ -165,11 +220,13 @@ function Report7() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${selectedHall} Additional Feature Reports ${humanReadable.fromHuman}-${humanReadable.toHuman} .csv`;
+    link.download = `${selectedHall} Booking Confirmation Reports ${humanReadable.fromHuman}-${humanReadable.toHuman}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
+  
+  
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
@@ -312,42 +369,94 @@ function Report7() {
               </svg>
             </button>
           </div>
-          <table className="min-w-full table-auto">
+          <div className=" w-full overflow-x-auto">
+          <table className="">
             <thead className="bg-gray-800 text-white">
               <tr>
-                <th className="px-4 py-2">Date</th>
-                <th className="px-4 py-2">Session</th>
-                <th className="px-4 py-2">From</th>
-                <th className="px-4 py-2">To</th>
-                <th className="px-4 py-2">Hall Name</th>
-                <th className="px-4 py-2">Facility</th>
-                <th className="px-4 py-2">Manager</th>
-                <th className="px-4 py-2">Category</th>
-                <th className="px-4 py-2">Customer Name</th>
-                <th className="px-4 py-2">Contact Person</th>
-                <th className="px-4 py-2">Contact Details</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">
+                  Confirmation Date
+                </th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">
+                  Event Date
+                </th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Session</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">From</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">To</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Hall Name</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Facility</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Manager</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Category</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Customer Name</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Contact Person</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Contact Details</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Booking Amount</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Security Deposit</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">GST</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Amount Paid</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">
+                  transaction type
+                </th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">
+                  date
+                </th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">
+                  payee Name
+                </th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">
+                  cheque no.
+                </th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">
+                  bank
+                </th>
               </tr>
             </thead>
             <tbody>
               {data.map((booking: any, index: number) => (
                 <tr key={index} className="bg-white border-b">
-                  <td className="px-4 py-2">{booking.Date}</td>
-                  <td className="px-4 py-2">{booking.Session}</td>
-                  <td className="px-4 py-2">{convert_IST_TimeString_To12HourFormat(booking.From)}</td>
-                  <td className="px-4 py-2">{convert_IST_TimeString_To12HourFormat(booking.To)}</td>
-                  <td className="px-4 py-2">{booking["Hall Name"]}</td>
-                  <td className="px-4 py-2">
-                    {booking["Additional Facility Name"]}
+
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking.confirmationDate ? booking.confirmationDate : "-"}
                   </td>
-                  <td className="px-4 py-2">{booking["Manager Name"]}</td>
-                  <td className="px-4 py-2">{booking["Customer Category"]}</td>
-                  <td className="px-4 py-2">{booking["Customer Name"]}</td>
-                  <td className="px-4 py-2">{booking["Contact Person"]}</td>
-                  <td className="px-4 py-2">{booking["Contact Details"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking.eventDate}
+                  </td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking.Session}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking.From}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking.To}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Hall Name"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking["Additional Facility"]}
+                  </td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Manager Name"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Customer Category"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Customer Name"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Contact Person"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Contact Details"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Booking Amount"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Security Deposit"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking.GST}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Amount Paid"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking["transaction type"]}
+                  </td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking["date"]}
+                  </td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking["payee Name"]}
+                  </td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking["cheque no"]}
+                  </td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking["bank"]}
+
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>
