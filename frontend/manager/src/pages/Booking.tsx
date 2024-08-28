@@ -29,6 +29,7 @@ function Booking() {
   const [editingMode, setEditingMode] = useState(false);
   const [addAdditional, setAdditional] = useState(false);
   const [editedData, setEditedData] = useState<HallBookingType>();
+  const [multipleTransactionData, setMultipleTransactionData] = useState<bookingTransactionType>();
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
   const [selectedOption, setSelectedOption] = useState<string>("");
@@ -132,6 +133,39 @@ function Booking() {
     },
   });
 
+  // Mututation for confirm and save booking of Multiple payments
+  const confirmAndSaveMultipleBooking = useMutation({
+    mutationFn: async () => {
+      const responsePromise = axiosManagerInstance.post(
+        `/multipleBookings`, 
+        {
+          booking_ids: selectedBookings,
+          // date: multipleTransactionData?.date || dayjs().format("DD-MM-YYYY"),
+          // status: "CONFIRMED" as bookingStatusType,
+          transaction: multipleTransactionData,
+          totalPayable: grandTotal
+        }
+      );
+      toast.promise(responsePromise, {
+        pending: "Updating and Confirming Multiple Bookings...",
+        success: "Multiple Bookings Confirmed and Updated Successfully!",
+        error: "Failed to Confirm and Update Multiple Bookings. Please try again.",
+      });
+      const response = await responsePromise;
+      return response.data;
+    },
+    onSuccess: async () => {
+      setEditingMode(false);
+      await queryClient.refetchQueries({
+        queryKey: [`booking/${bookingId}`], // This may need adjustment if you are dealing with multiple bookings
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+  
+
   const generateConfirmationAndEmail = async () => {
     console.log("generating confirmation");
     const hallDeposit =
@@ -212,7 +246,6 @@ function Booking() {
   // Function   to calculate final payable amount of each bookings for multiple payments
   const calculateBookingPrice = (booking: { _id?: string; date?: string | undefined; user?: CustomerType; features: any; status?: bookingStatusType; price: any; transaction?: bookingTransactionType; baseDiscount: any; deposit: any; isDeposit: any; depositDiscount: any; hallId?: string; session_id?: string; booking_type: any; from?: string; to?: string; time?: { from: string; to: string; }; purpose?: string; cancellationReason?: string | undefined; enquiryNumber?: string | undefined; }) => {
     const priceEntry = booking.price || 0;
-    alert("price is"+ priceEntry)
     const totalFeatureCharges = booking.features.reduce((total: any, feature: { price: any; }) => total + feature.price, 0);
     const basePrice = priceEntry + totalFeatureCharges;
     const baseDiscount = 0;
@@ -378,6 +411,20 @@ function Booking() {
       console.log(error);
     },
   });
+
+  // Update Transaction Data in multiple
+  const updateMultipleTransactionData = (field: keyof bookingTransactionType, value: string) => {
+    setMultipleTransactionData((prevData) => {
+      console.log("this is multiple transaction data" , multipleTransactionData)
+      if (!prevData) {
+        // If prevData is undefined, create a new object with the updated field
+        return { [field]: value } as bookingTransactionType;
+      }
+      // If prevData exists, spread it and update the field
+      return { ...prevData, [field]: value };
+    });
+  };
+
 
   // Edit deposit when multiple payment
   const editIsDepositApplicableInMultiple = useMutation({
@@ -604,7 +651,22 @@ function Booking() {
         if (!response.data.exists) {
           toast.success(
             "This booking payment is not associated with other bookings "
-          );
+          );          
+        }
+        else{
+          toast.error(
+            "This booking payment is already associated with other bookings as a payment "
+          ); 
+          console.log("All the bookings in multiple",response.data)
+          if (
+            response.data &&
+            response.data.multipleBooking &&
+            response.data.multipleBooking.booking_ids
+          ) {
+            setSelectedBookings(response.data.multipleBooking.booking_ids);
+          } else {
+            console.error("booking_ids not found in response data");
+          }
         }
       } catch (error) {
         toast.error("Failed to check booking status. Please try again.");
@@ -734,10 +796,7 @@ function Booking() {
           value={selectedOption}
           onChange={handleSelect}
           className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-        >
-          <option value="" disabled>
-            Select an option
-          </option>
+        > 
           <option value="single">Single</option>
           <option value="multiple">Multiple</option>
         </select>
@@ -1343,6 +1402,227 @@ function Booking() {
               <span className="w-full text-right"> {grandTotal.toFixed(2)}</span>
             </span>
           </div>
+          {/* Transaction Details for Multiple */}
+          <span className="text-lg font-medium">Transaction Details</span>
+      {editingMode ? (
+        <span>
+          <label htmlFor="transaction">Choose a Transaction Type </label>
+          <select
+            id="transaction"
+            value={selectedBookingData?.transaction?.type || ""}
+            className="px-2 py-1 rounded-md border border-gray-400 my-2"
+            onChange={(e) =>{
+              editTransactionType.mutate(e.target.value as transactionType);
+              updateMultipleTransactionData('type', e.target.value)
+
+            }}
+            
+          >
+            <option value="" disabled>
+              Select an option
+            </option>
+            <option value="cheque">Cheque</option>
+            <option value="upi">UPI</option>
+            <option value="neft/rtgs">NEFT/RTGS</option>
+            <option value="svkminstitute">SVKM Institute</option>
+          </select>
+        </span>
+      ) : (
+        <></>
+      )}
+      {["cheque", "upi", "neft/rtgs"].includes(selectedBookingData?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Date</span>
+            <input
+              type="text"
+              value={multipleTransactionData?.date}
+              onChange={(e) => updateMultipleTransactionData('date', e.target.value)}
+              placeholder="DD-MM-YYYY"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Date</span>
+            <span className="w-full text-right">
+              {selectedBookingData?.transaction?.date || "-"}
+            </span>
+          </div>
+        ))}
+      {["upi"].includes(selectedBookingData?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Transaction ID</span>
+            <input
+              type="text"
+              value={multipleTransactionData?.transactionID || ''}
+              onChange={(e) => updateMultipleTransactionData('transactionID', e.target.value)}
+              placeholder="Enter Transaction ID"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Transaction ID</span>
+            <span className="w-full text-right">
+              {selectedBookingData?.transaction?.transactionID || "-"}
+            </span>
+          </div>
+        ))}
+      {["neft/rtgs"].includes(selectedBookingData?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">UTR No.</span>
+            <input
+              type="text"
+              value={multipleTransactionData?.utrNo || ''}
+              onChange={(e) => updateMultipleTransactionData('utrNo', e.target.value)}
+              placeholder="Enter UTR Number"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">UTR No.</span>
+            <span className="w-full text-right">
+              {selectedBookingData?.transaction?.utrNo || "-"}
+            </span>
+          </div>
+        ))}
+      {["cheque"].includes(selectedBookingData?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Cheque No.</span>
+            <input
+              type="text"
+              value={multipleTransactionData?.chequeNo || ''}
+                onChange={(e) => updateMultipleTransactionData('chequeNo', e.target.value)}
+              placeholder="Enter Cheque Number"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Cheque No.</span>
+            <span className="w-full text-right">
+              {selectedBookingData?.transaction?.chequeNo || "-"}
+            </span>
+          </div>
+        ))}
+      {["cheque"].includes(selectedBookingData?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Bank</span>
+            <input
+              type="text"
+              value={multipleTransactionData?.bank || ''}
+                onChange={(e) => updateMultipleTransactionData('bank', e.target.value)}
+              placeholder="Enter Bank Name"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Bank</span>
+            <span className="w-full text-right">
+              {selectedBookingData?.transaction?.bank || "-"}
+            </span>
+          </div>
+        ))}
+
+      {["cheque"].includes(selectedBookingData?.transaction?.type || "") &&
+        (editingMode ? (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Payee Name</span>
+            <input
+              type="text"
+              value={multipleTransactionData?.payeeName || ''}
+              onChange={(e) => updateMultipleTransactionData('payeeName', e.target.value)}
+              placeholder="Enter Payee Name"
+              className="px-2"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Payee Name</span>
+            <span className="w-full text-right">
+              {selectedBookingData?.transaction?.payeeName || "-"}
+            </span>
+          </div>
+        ))}
+
+      {showCancellationReason ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600 my-5">
+          <span className="w-full text-left">Cancellation Reason</span>
+          <input
+            type="text"
+            value={cancellationReason}
+            onChange={(e) => setCancellationReason(e.target.value)}
+            placeholder="Enter Cancellation Reason"
+            className="px-2"
+          />
+          <button
+            onClick={async () => {
+              await handleSaveCancellationReason();
+              handleCancellation();
+            }}
+            className="bg-green-500 px-4 text-white py-1 rounded-lg"
+          >
+            Confirm Cancellation
+          </button>
+        </div>
+      ) : (
+        <></>
+      )}
+
+      {selectedBookingData?.cancellationReason && selectedBookingData?.status == "CANCELLED" && (
+        <div className="w-full flex justify-between my-2 bg-red-400 rounded-sm px-2 py-1 border text-white">
+          <span className="text-lg font-medium">Cancellation Reason</span>
+          <span>{selectedBookingData?.cancellationReason}</span>
+        </div>
+      )}
+
+      {editingMode ? (
+        <>
+          <h1 className="text-lg font-medium">Set Booking Status</h1>
+          <span className="space-x-4 space-y-4">
+            {/* <button
+              onClick={() => {
+                setShowCancellationReason(true);
+              }}
+              className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
+            >
+              Cancelled
+            </button>
+            <button
+              onClick={() => {
+                setShowCancellationReason(false);
+                editBookingStatus.mutate("ENQUIRY" as bookingStatusType);
+              }}
+              className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+            >
+              Enquiry
+            </button> */}
+            {/* Confirmed button with saving the edits */}
+            <button
+              onClick={async () => {
+                setShowCancellationReason(false);
+                if (!confirmExists() ) {
+                  await confirmAndSaveMultipleBooking.mutateAsync();
+                  generateConfirmationAndEmail();
+                }
+              }}
+              className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
+            >
+              Confirmed
+            </button>
+          </span>
+        </>
+      ) : (
+        <></>
+      )}
+
         </>
       ) : (
         // Render single booking data
@@ -1979,6 +2259,47 @@ function Booking() {
               </div>
             </>
           )}
+           <div className="flex mt-5 items-center w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Grand Total Amount</span>
+            <span className="w-full text-right">
+              <span className="w-full text-right"> {data?.booking_type == "SVKM INSTITUTE" ? (
+                      <div>
+                        {data
+                          ? (priceEntry?.price || 0) +
+                            totalFeatureCharges -
+                            0.01 *
+                              data!.baseDiscount *
+                              ((priceEntry?.price || 0) + totalFeatureCharges) +
+                            (data.isDeposit
+                              ? data.deposit -
+                                0.01 * data.depositDiscount * data.deposit
+                              : 0)
+                          : 0}
+                      </div>
+                    ) : (
+                      <div>
+                        {data
+                          ? (priceEntry?.price || 0) +
+                            totalFeatureCharges -
+                            0.01 *
+                              data!.baseDiscount *
+                              ((priceEntry?.price || 0) + totalFeatureCharges) +
+                            0.18 *
+                              ((priceEntry?.price || 0) +
+                                totalFeatureCharges -
+                                0.01 *
+                                  data!.baseDiscount *
+                                  ((priceEntry?.price || 0) +
+                                    totalFeatureCharges)) +
+                            (data.isDeposit
+                              ? data.deposit -
+                                0.01 * data.depositDiscount * data.deposit
+                              : 0)
+                          : 0}
+                      </div>
+                    )}</span>
+            </span>
+          </div>
           {editingMode || addAdditional ? (
             <button
               onClick={handleSave}
@@ -1989,10 +2310,9 @@ function Booking() {
           ) : (
             <></>
           )}
-        </>
-      )}
 
-      <span className="text-lg font-medium">Transaction Details</span>
+          {/* Transaction details for Single */}
+          <span className="text-lg font-medium">Transaction Details</span>
       {editingMode ? (
         <span>
           <label htmlFor="transaction">Choose a Transaction Type </label>
@@ -2274,6 +2594,10 @@ function Booking() {
       ) : (
         <></>
       )}
+
+        </>
+      )}
+
 
       {/* {!showCancellationReason && (
         <button
