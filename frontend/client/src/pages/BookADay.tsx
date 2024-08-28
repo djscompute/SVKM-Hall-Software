@@ -119,6 +119,38 @@ function BookADay() {
       if (data.error) {
         console.error(data.error);
       } else {
+        navigate("/bookingsuccessful", {
+          state: {
+            bookingDetails: {
+              username: name,
+              contact: person,
+              email: email,
+              mobile: mobileNumber,
+              hallName: HallData?.name,
+              sessionType: selectedSessionId,
+              sessionName: HallData?.sessions.find(
+                (ecssn) => ecssn._id == selectedSessionId
+              )?.name,
+              paymentType: selectedCategory,
+              estimatedPrice: price,
+              securityDeposit: securityDeposit,
+              additionalFeatures: selectedFeatures,
+              date: humanReadableDate,
+              startTime: `${day}T${
+                HallData?.sessions.find(
+                  (ecssn) => ecssn._id == selectedSessionId
+                )?.from
+              }`,
+              endTime: `${day}T${
+                HallData?.sessions.find(
+                  (ecssn) => ecssn._id == selectedSessionId
+                )?.to
+              }`,
+              status: "ENQUIRY",
+              eventPurpose: purpose,
+            },
+          },
+        });
         const additionalFacilities =
           selectedCategory === "SVKM INSTITUTE"
             ? 0
@@ -137,7 +169,7 @@ function BookADay() {
           sessionPrice + additionalFacilities + securityDeposit;
         const todayDate = dayjs().format("DD-MM-YYYY");
         const dateOfEvent = dayjs(day).format("DD-MM-YYYY");
-        await axiosClientInstance
+        const pdfPath = await axiosClientInstance
           .post(`/generateInquiry`, {
             date: todayDate, // Assuming 'day' is the date of booking
             customerName: name,
@@ -181,39 +213,6 @@ function BookADay() {
             console.log(error);
             throw error;
           });
-
-        navigate("/bookingsuccessful", {
-          state: {
-            bookingDetails: {
-              username: name,
-              contact: person,
-              email: email,
-              mobile: mobileNumber,
-              hallName: HallData?.name,
-              sessionType: selectedSessionId,
-              sessionName: HallData?.sessions.find(
-                (ecssn) => ecssn._id == selectedSessionId
-              )?.name,
-              paymentType: selectedCategory,
-              estimatedPrice: price,
-              securityDeposit: securityDeposit,
-              additionalFeatures: selectedFeatures,
-              date: humanReadableDate,
-              startTime: `${day}T${
-                HallData?.sessions.find(
-                  (ecssn) => ecssn._id == selectedSessionId
-                )?.from
-              }`,
-              endTime: `${day}T${
-                HallData?.sessions.find(
-                  (ecssn) => ecssn._id == selectedSessionId
-                )?.to
-              }`,
-              status: "ENQUIRY",
-              eventPurpose: purpose,
-            },
-          },
-        });
       }
       await queryClient.refetchQueries({
         queryKey: ["bookaday", `${humanReadableDate}`],
@@ -352,6 +351,19 @@ function BookADay() {
     }
   };
 
+
+  
+  HallData?.sessions?.sort((a,b)=>{
+    const getNumber = (name:String) => {
+      if (!name) {
+        return Infinity; // Or another value to handle undefined or null names
+      }
+      // Extract numeric prefix before the dot, or return Infinity if no numeric prefix
+      const match = name.match(/^(\d+)/);
+      return match ? parseInt(match[1], 10) : Infinity;
+  }
+  return getNumber(a.name) - getNumber(b.name);
+});
   useEffect(() => {
     let totalPrice = 0;
     if (selectedCategory?.toLowerCase() !== "svkm institute") {
@@ -572,7 +584,7 @@ function BookADay() {
             checked={isDetailsConfirmed}
             onChange={(e) => setIsDetailsConfirmed(e.target.checked)}
           />
-          <label htmlFor="confirmDetails">
+          <label htmlFor="confirmDetails" className="font-bold">
             Re-check all the entered details (important that the email and
             mobile details entered are correct)
           </label>

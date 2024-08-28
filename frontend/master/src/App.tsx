@@ -24,6 +24,7 @@ import Report8 from "./pages/dashboard/report8";
 import Constants from "./pages/Constants";
 import DeleteHall from "./pages/deleteHall";
 import Report9 from "./pages/dashboard/report9";
+import Report10 from "./pages/dashboard/report10";
 export const queryClient = new QueryClient();
 
 export default function App() {
@@ -167,6 +168,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Report9 />
+            </ProtectedRoute>
+          }
+        />
+         <Route
+          path="/dashboard/hall-information-report"
+          element={
+            <ProtectedRoute>
+              <Report10 />
             </ProtectedRoute>
           }
         />

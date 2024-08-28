@@ -10,7 +10,7 @@ import {
   getFinancialYearEnd,
   getFinancialYearStart,
 } from "../../utils/financialYearRange.tsx";
-
+import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat.ts";
 function Report9() {
   const [hallData, setHallData] = useState<EachHallType[]>([]);
 
@@ -600,9 +600,10 @@ function Report9() {
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Hall Name"]}
                       </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {sessionName || "N/A"} {sessionFromTime} -{" "}
-                        {sessionToTime}
+
+                      <td className="px-4 py-2 text-center">
+                        {sessionName || "N/A"} {convert_IST_TimeString_To12HourFormat(sessionFromTime || "")} - {convert_IST_TimeString_To12HourFormat(sessionToTime || "")}
+
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Additional Facility"]

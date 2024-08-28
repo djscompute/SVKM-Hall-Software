@@ -86,6 +86,13 @@ function Dashboard() {
           >
             Booking Confirmation Report
           </a>
+
+          <a
+            href="/dashboard/hall-information-report"
+            className="w-1/4 bg-gray-200 text-center font-medium py-2 rounded-md border border-gray-300 cursor-pointer"
+          >
+            Hall Information Report
+          </a>
         </div>
       )}
     </div>

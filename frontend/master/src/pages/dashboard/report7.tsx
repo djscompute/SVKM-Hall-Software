@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
 import { EachHallType } from "../../../../../types/global.ts";
 import { useQuery } from "@tanstack/react-query";
-
+import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat.ts";
 function Report7() {
   const [hallData, setHallData] = useState<EachHallType[]>([]);
   const [selectedAdditionalFeatures, setSelectedAdditionalFeatures] = useState<
@@ -413,6 +413,7 @@ function Report7() {
             <tbody>
               {data.map((booking: any, index: number) => (
                 <tr key={index} className="bg-white border-b">
+
                   <td className="px-4 py-2 text-center whitespace-nowrap">
                     {booking.confirmationDate ? booking.confirmationDate : "-"}
                   </td>
@@ -449,6 +450,7 @@ function Report7() {
                   </td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">
                     {booking["bank"]}
+
                   </td>
                 </tr>
               ))}

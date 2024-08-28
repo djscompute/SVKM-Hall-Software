@@ -1,4 +1,22 @@
 const puppeteer = require("puppeteer");
+import admin from "firebase-admin";
+import config from "config";
+import fs from "fs";
+
+// Initialize Firebase Admin SDK
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: config.get<string>("FIREBASE_PROJECT_ID"),
+      clientEmail: config.get<string>("FIREBASE_CLIENT_EMAIL"),
+      privateKey: config
+        .get<string>("FIREBASE_PRIVATE_KEY")
+        .replace(/\\n/g, "\n"), // Replace escaped newline characters
+    }),
+    storageBucket: config.get<string>("FIREBASE_STORAGE_BUCKET"),
+  });
+}
+const bucket = admin.storage().bucket();
 
 type confirmationType = {
   date: string;
@@ -256,12 +274,24 @@ export async function generateConfirmation(props: confirmationType): Promise<str
     const pdfPath = `./src/files/Customer_${sanitizedCustomerName}_${props.enquiryNumber}_confirmation.pdf`;
 
     await page.setContent(confirmation);
-    await page.pdf({ path: `${pdfPath}`, format: "A4" });
+    await page.pdf({ path: pdfPath, format: "A4" });
 
     console.log(`PDF generated for customer ${props.customerName}: ${pdfPath}`);
+    // Upload to Firebase Storage
+    const storageFile = bucket.file(
+      `Customer_${sanitizedCustomerName}_${props.enquiryNumber}_confirmation.pdf`
+    );
+    await storageFile.save(await fs.promises.readFile(pdfPath), {
+      metadata: { contentType: "application/pdf" },
+    });
+
+    // Make the file public and get the public URL
+    await storageFile.makePublic();
+    const publicUrl = storageFile.publicUrl();
+    console.log(publicUrl);
 
     await browser.close();
-    return pdfPath;
+    return publicUrl;
   } catch (error) {
     console.log(error);
     throw error;
