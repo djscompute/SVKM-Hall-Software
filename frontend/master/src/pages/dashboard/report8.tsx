@@ -376,28 +376,27 @@ function Report8() {
           </select>
         </div>
 
-        {/* SELECT HALL CHARGES */}
-        <div className="mt-4 flex items-center gap-4 justify-between">
-          <label
-            htmlFor="hall-charges-select"
-            className="font-medium text-nowrap"
-          >
-            Hall Charges:
-          </label>
-          <select
-            id="hall-charges-select"
-            className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
-            onChange={(e) => {
-              e.target.value === "true"
-                ? setHallCharges(true)
-                : setHallCharges(false);
-            }}
-          >
-            <option value="">Display Hall Charges</option>
-            <option value="true">True</option>
-            <option value="false">False</option>
-          </select>
-        </div>
+
+      {/* SELECT HALL CHARGES */}
+      <div className="mt-4 flex items-center gap-4 justify-between">
+        <label htmlFor="hall-charges-select" className="font-medium text-nowrap">
+          Hall Charges:
+        </label>
+        <select
+          id="hall-charges-select"
+          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
+          onChange={(e) => {
+            e.target.value === "true"
+              ? setHallCharges(true)
+              : setHallCharges(false);
+          }}
+        >
+          <option value="">Display Hall Charges</option>
+          <option value="true">YES</option>
+          <option value="false">NO</option>
+        </select>
+      </div>
+
       </div>
       <hr className=" bg-gray-300 h-[1.5px] w-[50%] my-2" />
       {/* SELECT TIME PERIOD */}
