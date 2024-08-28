@@ -39,7 +39,6 @@ function Booking() {
   const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
   const [selectedBookingData, setSelectedBookingData] =
     useState<HallBookingType | null>(null);
-
   // let totalFeatureCharges = 0;
   const [datas, setData] = useState({
     features: [{ heading: "", desc: "", price: 0 }],
@@ -101,7 +100,6 @@ function Booking() {
   console.log(allBookingData);
 
   // Seperate mutation for confirm and save booking
-
   const confirmAndSaveBooking = useMutation({
     mutationFn: async () => {
       const responsePromise = axiosManagerInstance.post(
@@ -134,89 +132,122 @@ function Booking() {
 
   const generateConfirmationAndEmail = async () => {
     console.log("generating confirmation");
+
     const hallDeposit =
       editedData?.isDeposit === false
         ? 0
         : editedData?.deposit ??
           (data?.isDeposit === false ? 0 : data?.deposit ?? 0);
+
     console.log(data?.from);
 
     const startTime = dayjs(editedData?.from || data?.from).format("HH:mm:ss");
     const endTime = dayjs(editedData?.to || data?.to).format("HH:mm:ss");
-    await axiosManagerInstance
-      .post(`/generateConfirmation`, {
-        date: dayjs().format("DD-MM-YYYY"), // Current date
-        customerName: editedData?.user.username || data?.user.username,
-        contactPerson: editedData?.user.contact || data?.user.contact,
-        contactNo: editedData?.user.mobile || data?.user.mobile,
-        enquiryNumber: editedData?.enquiryNumber || data?.enquiryNumber || "",
-        gstNo: editedData?.user.gstNo || data?.user.gstNo || "",
-        pan: editedData?.user.panNo || data?.user.panNo || "",
-        modeOfPayment:
-          editedData?.transaction?.type || data?.transaction?.type || "",
-        additionalPaymentDetails: getAdditionalPaymentDetails(),
-        hallName: hallData?.name || "",
-        dateOfEvent: dayjs(editedData?.from || data?.from).format("DD-MM-YYYY"),
-        slotTime: `${convert_IST_TimeString_To12HourFormat(
-          startTime
-        )} - ${convert_IST_TimeString_To12HourFormat(endTime)}`,
-        sessionType: session?.name,
-        purposeOfBooking: editedData?.purpose || data?.purpose || "",
-        hallCharges: priceEntry?.price || 0,
-        additionalFacilities: totalFeatureCharges,
-        discountPercent: editedData?.baseDiscount || data?.baseDiscount || 0,
-        sgst:
-          data?.booking_type === "SVKM INSTITUTE"
-            ? 0
-            : 0.09 *
-              ((priceEntry?.price || 0) +
-                totalFeatureCharges -
-                0.01 *
-                  (editedData?.baseDiscount || data?.baseDiscount || 0) *
-                  ((priceEntry?.price || 0) + totalFeatureCharges)),
-        cgst:
-          data?.booking_type === "SVKM INSTITUTE"
-            ? 0
-            : 0.09 *
-              ((priceEntry?.price || 0) +
-                totalFeatureCharges -
-                0.01 *
-                  (editedData?.baseDiscount || data?.baseDiscount || 0) *
-                  ((priceEntry?.price || 0) + totalFeatureCharges)),
-        hallDeposit: hallDeposit,
-        depositDiscount:
-          editedData?.depositDiscount || data?.depositDiscount || 0,
-        totalPayable: calculateTotalPayable(),
-        email: editedData?.user.email || data?.user.email || "",
-        hallContact: "Email to be entered",
-      })
-      .then(async (response) => {
-        await axiosManagerInstance.post(`/sendEmail`, {
-          to: editedData?.user.email || data?.user.email || "",
-          subject: `SVKM Hall Booking for ${dayjs(
-            editedData?.from || data?.from
-          ).format("DD-MM-YYYY")}`,
-          text: "Your booking has been confirmed. Please find the attachments below.",
-          filename: `${editedData?.user.username || data?.user.username}_${
-            editedData?.enquiryNumber || data?.enquiryNumber || ""
-          }_confirmation`,
-          path: "",
-        });
 
-        console.log("Email sent successfully");
-      })
-      .catch((error) => {
-        console.error("Error in generate confirmation or send email:", error);
+    try {
+      const response = await axiosManagerInstance.post(
+        `/generateConfirmation`,
+        {
+          date: dayjs().format("DD-MM-YYYY"), // Current date
+          customerName: editedData?.user.username || data?.user.username,
+          contactPerson: editedData?.user.contact || data?.user.contact,
+          contactNo: editedData?.user.mobile || data?.user.mobile,
+          enquiryNumber: editedData?.enquiryNumber || data?.enquiryNumber || "",
+          gstNo: editedData?.user.gstNo || data?.user.gstNo || "",
+          pan: editedData?.user.panNo || data?.user.panNo || "",
+          modeOfPayment:
+            editedData?.transaction?.type || data?.transaction?.type || "",
+          additionalPaymentDetails: getAdditionalPaymentDetails(),
+          hallName: hallData?.name || "",
+          dateOfEvent: dayjs(editedData?.from || data?.from).format(
+            "DD-MM-YYYY"
+          ),
+          slotTime: `${convert_IST_TimeString_To12HourFormat(
+            startTime
+          )} - ${convert_IST_TimeString_To12HourFormat(endTime)}`,
+          sessionType: session?.name,
+          purposeOfBooking: editedData?.purpose || data?.purpose || "",
+          hallCharges: priceEntry?.price || 0,
+          additionalFacilities: totalFeatureCharges,
+          discountPercent: editedData?.baseDiscount || data?.baseDiscount || 0,
+          sgst:
+            data?.booking_type === "SVKM INSTITUTE"
+              ? 0
+              : 0.09 *
+                ((priceEntry?.price || 0) +
+                  totalFeatureCharges -
+                  0.01 *
+                    (editedData?.baseDiscount || data?.baseDiscount || 0) *
+                    ((priceEntry?.price || 0) + totalFeatureCharges)),
+          cgst:
+            data?.booking_type === "SVKM INSTITUTE"
+              ? 0
+              : 0.09 *
+                ((priceEntry?.price || 0) +
+                  totalFeatureCharges -
+                  0.01 *
+                    (editedData?.baseDiscount || data?.baseDiscount || 0) *
+                    ((priceEntry?.price || 0) + totalFeatureCharges)),
+          hallDeposit: hallDeposit,
+          depositDiscount:
+            editedData?.depositDiscount || data?.depositDiscount || 0,
+          totalPayable: calculateTotalPayable(),
+          email: editedData?.user.email || data?.user.email || "",
+          hallContact: "Email to be entered",
+        }
+      );
+
+      const pdfUrl = response.data.pdfUrl; // Assuming the response has a pdfUrl field
+      await axiosManagerInstance.post(`/sendEmail`, {
+        to: editedData?.user.email || data?.user.email || "",
+        subject: `SVKM Hall Booking for ${dayjs(
+          editedData?.from || data?.from
+        ).format("DD-MM-YYYY")}`,
+        text: "Your booking has been confirmed. Please find the attachments below.",
+        filename: `${editedData?.user.username || data?.user.username}_${
+          editedData?.enquiryNumber || data?.enquiryNumber || ""
+        }_confirmation`,
+        path: pdfUrl, // Use the pdfUrl here if needed
       });
+      console.log("Email sent successfully");
+      return pdfUrl
+    } catch (error) {
+      console.error("Error in generate confirmation or send email:", error);
+    }
   };
+
   // Function   to calculate final payable amount of each bookings for multiple payments
-  const calculateBookingPrice = (booking: { _id?: string; date?: string | undefined; user?: CustomerType; features: any; status?: bookingStatusType; price: any; transaction?: bookingTransactionType; baseDiscount: any; deposit: any; isDeposit: any; depositDiscount: any; hallId?: string; session_id?: string; booking_type: any; from?: string; to?: string; time?: { from: string; to: string; }; purpose?: string; cancellationReason?: string | undefined; enquiryNumber?: string | undefined; }) => {
+  const calculateBookingPrice = (booking: {
+    _id?: string;
+    date?: string | undefined;
+    user?: CustomerType;
+    features: any;
+    status?: bookingStatusType;
+    price: any;
+    transaction?: bookingTransactionType;
+    baseDiscount: any;
+    deposit: any;
+    isDeposit: any;
+    depositDiscount: any;
+    hallId?: string;
+    session_id?: string;
+    booking_type: any;
+    from?: string;
+    to?: string;
+    time?: { from: string; to: string };
+    purpose?: string;
+    cancellationReason?: string | undefined;
+    enquiryNumber?: string | undefined;
+  }) => {
     const priceEntry = booking.price || 0;
-    alert("price is"+ priceEntry)
-    const totalFeatureCharges = booking.features.reduce((total: any, feature: { price: any; }) => total + feature.price, 0);
+    alert("price is" + priceEntry);
+    const totalFeatureCharges = booking.features.reduce(
+      (total: any, feature: { price: any }) => total + feature.price,
+      0
+    );
     const basePrice = priceEntry + totalFeatureCharges;
     const baseDiscount = 0;
-    
+
     let totalPrice = basePrice - baseDiscount;
 
     if (booking.booking_type !== "SVKM INSTITUTE") {
@@ -225,7 +256,8 @@ function Booking() {
     }
 
     if (booking.isDeposit) {
-      const depositAmount = booking.deposit - 0.01 * booking.depositDiscount * booking.deposit;
+      const depositAmount =
+        booking.deposit - 0.01 * booking.depositDiscount * booking.deposit;
       totalPrice += depositAmount;
     }
 
@@ -567,8 +599,10 @@ function Booking() {
     const calculateTotalSelectedBookings = () => {
       let total = 0;
 
-      selectedBookings.forEach(selectedBookingId => {
-        const booking = allBookingsOfUser.find(booking => booking._id === selectedBookingId);
+      selectedBookings.forEach((selectedBookingId) => {
+        const booking = allBookingsOfUser.find(
+          (booking) => booking._id === selectedBookingId
+        );
         if (booking) {
           total += calculateBookingPrice(booking);
         }
@@ -1340,7 +1374,10 @@ function Booking() {
           <div className="flex mt-5 items-center w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Grand Total Amount</span>
             <span className="w-full text-right">
-              <span className="w-full text-right"> {grandTotal.toFixed(2)}</span>
+              <span className="w-full text-right">
+                {" "}
+                {grandTotal.toFixed(2)}
+              </span>
             </span>
           </div>
         </>
@@ -1992,7 +2029,16 @@ function Booking() {
         </>
       )}
 
-      <span className="text-lg font-medium">Transaction Details</span>
+      {["cheque", "upi", "neft/rtgs"].includes(
+        data?.transaction?.type || ""
+      ) ? (
+        <span className="mt-4 text-lg font-medium">Transaction Details</span>
+      ) : (
+        <>
+          <span className="mt-4 text-lg font-medium">Transaction Details</span>
+          <span className="mt-2">Payment Method: SVKM Institute</span>
+        </>
+      )}
       {editingMode ? (
         <span>
           <label htmlFor="transaction">Choose a Transaction Type </label>
@@ -2274,7 +2320,26 @@ function Booking() {
       ) : (
         <></>
       )}
-
+      {data?.status === "CONFIRMED" && !editingMode && (
+        <span className="space-x-4 space-y-4">
+          <button
+            onClick={async () => {
+              if (paymentDetails()) {
+                generateConfirmationAndEmail();
+              }
+            }}
+            className="my-4 bg-green-600 px-4 text-white py-1 rounded-lg"
+          >
+            Resend Email
+          </button>
+          <button
+            onClick={async ()=>window.open(await generateConfirmationAndEmail())}
+            className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+          >
+            Download Confirmation
+          </button>
+        </span>
+      )}
       {/* {!showCancellationReason && (
         <button
           onClick={() => {
