@@ -350,8 +350,10 @@ function Report9() {
               setSelectedCategory(e.target.value);
             }}
           >
-            <option value="">Select Category</option>
+            <option value="">Select Customer Category</option>
             <option value="All">All</option>
+            <option value="SVKM INSTITUTE">SVKM INSTITUTE</option>
+            <option value="OTHER THAN SVKM INSTITUTE">OTHER THAN SVKM INSTITUTE</option>
             {selectedSession === "All"
               ? hallData
                   .find((hall) => hall.name === selectedHall)
