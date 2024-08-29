@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EachHallType } from "../../types/Hall.types";
 import EachDay from "./eachDay";
 import EachMobileDay from "./eachMobileDay";
@@ -49,7 +49,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
           hallId:hallId
         },
       });
-      console.log(response.data);
+      console.log("data is here ",response.data);
       if (response.data.message == "No bookings found for the specified range.")
         return [];
       // sort based of from
@@ -87,6 +87,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
         <p>LOADING</p>
       </>
     );
+  
 
   return (
     <div className=" flex justify-center items-center">
@@ -159,7 +160,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
               i={i + 1}
               hallId={hallId}
               currentDate={currentDate}
-              HallSessionsArray={HallData.sessions}
+              HallSessionsArray={HallData}
               selectedMobileDate={selectedMobileDate}
               setSelectedMobileDate={setSelectedMobileDate}
               allBookingData={allBookingData}
@@ -180,7 +181,7 @@ const Calendar = ({ hallId, HallData }: Props) => {
             i={selectedMobileDate}
             hallId={hallId}
             currentDate={currentDate}
-            HallSessionsArray={HallData.sessions}
+            HallSessionsArray={HallData}
             selectedMobileDate={selectedMobileDate}
             setSelectedMobileDate={setSelectedMobileDate}
             allBookingData={allBookingData}

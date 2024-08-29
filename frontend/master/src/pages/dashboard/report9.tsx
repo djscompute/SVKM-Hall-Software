@@ -10,7 +10,7 @@ import {
   getFinancialYearEnd,
   getFinancialYearStart,
 } from "../../utils/financialYearRange.tsx";
-
+import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat.ts";
 function Report9() {
   const [hallData, setHallData] = useState<EachHallType[]>([]);
 
@@ -164,11 +164,38 @@ function Report9() {
     setData(response.data);
   };
 
+  const calculateTotalBookingAmount = () => {
+    if (!data || !responseHallCharges) return 0;
+    return data.reduce(
+      (sum: number, booking: { [x: string]: any }) =>
+        sum + Number(booking["Booking Amount"] || 0),
+      0
+    );
+  };
+
   const calculateTotalAmountPaid = () => {
     if (!data || !responseHallCharges) return 0;
     return data.reduce(
       (sum: number, booking: { [x: string]: any }) =>
         sum + Number(booking["Amount Paid"] || 0),
+      0
+    );
+  };
+
+  const calculateTotalSecurityDeposit = () => {
+    if (!data || !responseHallCharges) return 0;
+    return data.reduce(
+      (sum: number, booking: { [x: string]: any }) =>
+        sum + Number(booking["Security Deposit"] || 0),
+      0
+    );
+  };
+
+  const calculateTotalGST = () => {
+    if (!data || !responseHallCharges) return 0;
+    return data.reduce(
+      (sum: number, booking: { [x: string]: any }) =>
+        sum + Number(booking["GST"] || 0),
       0
     );
   };
@@ -404,7 +431,6 @@ function Report9() {
         <div className={`flex flex-col items-center justify-center gap-2 `}>
           <div className="flex gap-2">
             <BasicDateTimePicker
-              id="fromDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, from: formattedTime }));
@@ -412,7 +438,6 @@ function Report9() {
               timePickerName="from"
             />
             <BasicDateTimePicker
-              id="toDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, to: formattedTime }));
@@ -516,6 +541,16 @@ function Report9() {
                   )}
                   {responseHallCharges && (
                     <th className="px-4 py-2 text-center whitespace-nowrap">
+                      Security Deposit
+                    </th>
+                  )}
+                  {responseHallCharges && (
+                    <th className="px-4 py-2 text-center whitespace-nowrap">
+                      GST
+                    </th>
+                  )}
+                  {responseHallCharges && (
+                    <th className="px-4 py-2 text-center whitespace-nowrap">
                       Amount Paid
                     </th>
                   )}
@@ -558,75 +593,124 @@ function Report9() {
 
                   return (
                     <tr key={index} className="bg-white border-b">
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking.confirmationDate}
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking.eventDate}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Hall Name"]}
                       </td>
+
                       <td className="px-4 py-2 text-center">
-                        {sessionName || "N/A"} {sessionFromTime} - {sessionToTime}
+                        {sessionName || "N/A"} {convert_IST_TimeString_To12HourFormat(sessionFromTime || "")} - {convert_IST_TimeString_To12HourFormat(sessionToTime || "")}
+
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Additional Facility"]
                           ? booking["Additional Facility"]
                           : "None"}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Manager Name"]}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Customer Category"]}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Customer Name"]}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Contact Person"]}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Contact No."]}
                       </td>
                       {responseHallCharges && (
-                        <td className="px-4 py-2 text-center">
+                        <td className="px-4 py-2 text-center whitespace-nowrap">
                           {booking["Booking Amount"]}
                         </td>
                       )}
                       {responseHallCharges && (
-                        <td className="px-4 py-2 text-center">
+                        <td className="px-4 py-2 text-center whitespace-nowrap">
+                          {booking["Security Deposit"]}
+                        </td>
+                      )}
+                      {responseHallCharges && (
+                        <td className="px-4 py-2 text-center whitespace-nowrap">
+                          {booking["GST"]}
+                        </td>
+                      )}
+                      {responseHallCharges && (
+                        <td className="px-4 py-2 text-center whitespace-nowrap">
                           {booking["Amount Paid"]}
                         </td>
                       )}
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["transaction"]?.type}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["transaction"]?.date}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["transaction"]?.transactionID}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["transaction"]?.payeeName}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["transaction"]?.utrNo}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["transaction"]?.chequeNo}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["transaction"]?.bank}
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
+
               {responseHallCharges && (
                 <tfoot>
+                  <tr className="bg-gray-200 font-bold">
+                    <td
+                      colSpan={responseHallCharges ? 10 : 9}
+                      className="px-4 py-2 text-right"
+                    >
+                      Total Booking Amount:
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {calculateTotalBookingAmount().toFixed(2)}
+                    </td>
+                    <td colSpan={16}></td>
+                  </tr>
+                  <tr className="bg-gray-200 font-bold">
+                    <td
+                      colSpan={responseHallCharges ? 10 : 9}
+                      className="px-4 py-2 text-right"
+                    >
+                      Total Security Deposit:
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {calculateTotalSecurityDeposit().toFixed(2)}
+                    </td>
+                    <td colSpan={16}></td>
+                  </tr>
+                  <tr className="bg-gray-200 font-bold">
+                    <td
+                      colSpan={responseHallCharges ? 10 : 9}
+                      className="px-4 py-2 text-right"
+                    >
+                      Total GST:
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {calculateTotalGST().toFixed(2)}
+                    </td>
+                    <td colSpan={16}></td>
+                  </tr>
                   <tr className="bg-gray-200 font-bold">
                     <td
                       colSpan={responseHallCharges ? 10 : 9}
@@ -637,7 +721,7 @@ function Report9() {
                     <td className="px-4 py-2 text-center">
                       {calculateTotalAmountPaid().toFixed(2)}
                     </td>
-                    <td colSpan={8}></td>
+                    <td colSpan={16}></td>
                   </tr>
                 </tfoot>
               )}

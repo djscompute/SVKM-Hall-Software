@@ -9,6 +9,7 @@ import { getBookingInformationReport } from "../service/dashboard-service/getBoo
 import { getMonthwiseCollectionDetails } from "../service/dashboard-service/getMonthwiseCollectionDetails";
 import { getAllHallNamesAndIds, getSessionsWithCategoriesByHallName } from "../service/getHallConfig";
 import { getBookingConfirmationReport } from "../service/dashboard-service/getBookingConfirmationReport";
+import { getHallReport } from "../service/dashboard-service/getHallInformationReport";
 
 // Handler for fetching HallName and bookingCount=CONFIRMED within a time frame
 export async function getHallBookingsCountHandler(req: Request, res: Response) {
@@ -85,7 +86,7 @@ export async function getInteractionCountHandler(req: Request, res: Response) {
 // Handler for generating the booking information report 
 export async function getBookingInformationReportHandler(req: Request, res: Response) {
   try {
-    const { displayPeriod, fromDate, toDate, displayHall, displayCustomerCategory, displaySession, displayHallCharges,displayTransactionType}: {
+    const { displayPeriod, fromDate, toDate, displayHall, displayCustomerCategory, displaySession, displayHallCharges,displayTransactionType,displayBookingStatus}: {
       displayPeriod: string;
       fromDate?: string;
       toDate?: string;
@@ -94,9 +95,10 @@ export async function getBookingInformationReportHandler(req: Request, res: Resp
       displaySession: string;
       displayHallCharges: boolean;
       displayTransactionType: string;
+      displayBookingStatus:string;
     } = req.body;
 
-    const reportRows = await getBookingInformationReport({ displayPeriod, fromDate, toDate, displayHall, displayCustomerCategory, displaySession, displayHallCharges,displayTransactionType });
+    const reportRows = await getBookingInformationReport({ displayPeriod, fromDate, toDate, displayHall, displayCustomerCategory, displaySession, displayHallCharges,displayTransactionType,displayBookingStatus });
     res.status(200).json(reportRows);
   } catch (error) {
     console.log("Error fetching report data !!", error);
@@ -131,6 +133,37 @@ export async function getAdditionalFeatureReportHandler(req: Request, res: Respo
     res.status(200).json(reportRow);
   } catch (error) {
     console.log("Error fetching report data !!", error)
+    res.status(500).json({ error: (error as Error).message || "Internal server error" });
+  }
+}
+
+//Handler for generating the hall information report
+export async function getHallInformationReportHandler(req: Request, res: Response) {
+  try {
+    const {
+      fromDate,
+      toDate,
+      hallName,
+      includeBookings = false,
+      includeSessions = false,
+      includeAdditionalFeatures = true,
+    }: {
+      fromDate?: string;
+      toDate?: string;
+      hallName: string;
+      includeBookings?: boolean;
+      includeSessions?: boolean;
+      includeAdditionalFeatures?: boolean;
+    } = req.body;
+
+    const from = fromDate ? new Date(fromDate) : undefined;
+    const to = toDate ? new Date(toDate) : undefined;
+
+    const hallInfoReport = await getHallReport(from || new Date(), to || new Date(), hallName);
+
+    res.status(200).json(hallInfoReport);
+  } catch (error) {
+    console.error("Error fetching hall information report:", error);
     res.status(500).json({ error: (error as Error).message || "Internal server error" });
   }
 }

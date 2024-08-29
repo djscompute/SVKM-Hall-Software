@@ -36,6 +36,8 @@ function BookADay() {
     sessionType: "",
     bookingType: "",
   });
+
+  
   const [selectedFeatures, setSelectedFeatures] = useState<{
     [key: string]: EachHallAdditonalFeaturesType;
   }>({});
@@ -65,6 +67,7 @@ function BookADay() {
     },
     staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
+  // console.log("hall data sessions",HallData?.sessions);
 
   useEffect(() => {
     if (selectedCategory?.toLowerCase() === "svkm institute") {
@@ -353,7 +356,17 @@ function BookADay() {
       setPerson(name);
     }
   };
-
+  HallData?.sessions?.sort((a,b)=>{
+    const getNumber = (name:String) => {
+      if (!name) {
+        return Infinity; // Or another value to handle undefined or null names
+      }
+      // Extract numeric prefix before the dot, or return Infinity if no numeric prefix
+      const match = name.match(/^(\d+)/);
+      return match ? parseInt(match[1], 10) : Infinity;
+  }
+  return getNumber(a.name) - getNumber(b.name);
+});
   useEffect(() => {
     let totalPrice = 0;
     if (selectedCategory?.toLowerCase() !== "svkm institute") {
@@ -572,7 +585,7 @@ function BookADay() {
             checked={isDetailsConfirmed}
             onChange={(e) => setIsDetailsConfirmed(e.target.checked)}
           />
-          <label htmlFor="confirmDetails">
+          <label htmlFor="confirmDetails" className="font-bold">
             Re-check all the entered details (important that the email and
             mobile details entered are correct)
           </label>

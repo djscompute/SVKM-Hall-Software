@@ -1,5 +1,23 @@
 const puppeteer = require("puppeteer");
+import admin from "firebase-admin";
+import config from "config";
+import fs from "fs";
 
+// Initialize Firebase Admin SDK
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: config.get<string>("FIREBASE_PROJECT_ID"),
+      clientEmail: config.get<string>("FIREBASE_CLIENT_EMAIL"),
+      privateKey: config
+        .get<string>("FIREBASE_PRIVATE_KEY")
+        .replace(/\\n/g, "\n"), // Replace escaped newline characters
+    }),
+    storageBucket: config.get<string>("FIREBASE_STORAGE_BUCKET"),
+  });
+}
+
+const bucket = admin.storage().bucket();
 type inquiryType = {
   date: string;
   customerName: string;
@@ -18,81 +36,139 @@ type inquiryType = {
 };
 
 function formatIndianCurrency(num: number): string {
-  const formatted = new Intl.NumberFormat('en-IN', {
+  const formatted = new Intl.NumberFormat("en-IN", {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   }).format(num);
   return formatted;
 }
 
-
 function numberToWordsIndian(price: number): string {
-    const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
-    const dblDigit = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
-    const tensPlace = ["", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
-  
-    const handle_tens = (dgt: number, prevDgt: number): string => {
-      return dgt === 0 ? "" : " " + (dgt === 1 ? dblDigit[prevDgt] : tensPlace[dgt]);
-    };
-  
-    const handle_utlc = (dgt: number, nxtDgt: number, denom: string): string => {
-      return (dgt !== 0 && nxtDgt !== 1 ? " " + sglDigit[dgt] : "") + (nxtDgt !== 0 || dgt > 0 ? " " + denom : "");
-    };
-  
-    let str = "";
-    let digitIdx = 0;
-    let digit = 0;
-    let nxtDigit = 0;
-    let words: string[] = [];
-  
-    const priceStr = Math.floor(price).toString(); // Handle only the integer part
-  
-    if (parseInt(priceStr) > 0 && priceStr.length <= 10) {
-      for (digitIdx = priceStr.length - 1; digitIdx >= 0; digitIdx--) {
-        digit = parseInt(priceStr[digitIdx]);
-        nxtDigit = digitIdx > 0 ? parseInt(priceStr[digitIdx - 1]) : 0;
-        switch (priceStr.length - digitIdx - 1) {
-          case 0:
-            words.push(handle_utlc(digit, nxtDigit, ""));
-            break;
-          case 1:
-            words.push(handle_tens(digit, parseInt(priceStr[digitIdx + 1])));
-            break;
-          case 2:
-            words.push(digit !== 0 ? " " + sglDigit[digit] + " Hundred" + (parseInt(priceStr[digitIdx + 1]) !== 0 || parseInt(priceStr[digitIdx + 2]) !== 0 ? " and" : "") : "");
-            break;
-          case 3:
-            words.push(handle_utlc(digit, nxtDigit, "Thousand"));
-            break;
-          case 4:
-            words.push(handle_tens(digit, parseInt(priceStr[digitIdx + 1])));
-            break;
-          case 5:
-            words.push(handle_utlc(digit, nxtDigit, "Lakh"));
-            break;
-          case 6:
-            words.push(handle_tens(digit, parseInt(priceStr[digitIdx + 1])));
-            break;
-          case 7:
-            words.push(handle_utlc(digit, nxtDigit, "Crore"));
-            break;
-          case 8:
-            words.push(handle_tens(digit, parseInt(priceStr[digitIdx + 1])));
-            break;
-          case 9:
-            words.push(digit !== 0 ? " " + sglDigit[digit] + " Hundred" + (parseInt(priceStr[digitIdx + 1]) !== 0 || parseInt(priceStr[digitIdx + 2]) !== 0 ? " and" : " Crore") : "");
-            break;
-        }
+  const sglDigit = [
+    "Zero",
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eight",
+    "Nine",
+  ];
+  const dblDigit = [
+    "Ten",
+    "Eleven",
+    "Twelve",
+    "Thirteen",
+    "Fourteen",
+    "Fifteen",
+    "Sixteen",
+    "Seventeen",
+    "Eighteen",
+    "Nineteen",
+  ];
+  const tensPlace = [
+    "",
+    "Ten",
+    "Twenty",
+    "Thirty",
+    "Forty",
+    "Fifty",
+    "Sixty",
+    "Seventy",
+    "Eighty",
+    "Ninety",
+  ];
+
+  const handle_tens = (dgt: number, prevDgt: number): string => {
+    return dgt === 0
+      ? ""
+      : " " + (dgt === 1 ? dblDigit[prevDgt] : tensPlace[dgt]);
+  };
+
+  const handle_utlc = (dgt: number, nxtDgt: number, denom: string): string => {
+    return (
+      (dgt !== 0 && nxtDgt !== 1 ? " " + sglDigit[dgt] : "") +
+      (nxtDgt !== 0 || dgt > 0 ? " " + denom : "")
+    );
+  };
+
+  let str = "";
+  let digitIdx = 0;
+  let digit = 0;
+  let nxtDigit = 0;
+  let words: string[] = [];
+
+  const priceStr = Math.floor(price).toString(); // Handle only the integer part
+
+  if (parseInt(priceStr) > 0 && priceStr.length <= 10) {
+    for (digitIdx = priceStr.length - 1; digitIdx >= 0; digitIdx--) {
+      digit = parseInt(priceStr[digitIdx]);
+      nxtDigit = digitIdx > 0 ? parseInt(priceStr[digitIdx - 1]) : 0;
+      switch (priceStr.length - digitIdx - 1) {
+        case 0:
+          words.push(handle_utlc(digit, nxtDigit, ""));
+          break;
+        case 1:
+          words.push(handle_tens(digit, parseInt(priceStr[digitIdx + 1])));
+          break;
+        case 2:
+          words.push(
+            digit !== 0
+              ? " " +
+                  sglDigit[digit] +
+                  " Hundred" +
+                  (parseInt(priceStr[digitIdx + 1]) !== 0 ||
+                  parseInt(priceStr[digitIdx + 2]) !== 0
+                    ? " and"
+                    : "")
+              : ""
+          );
+          break;
+        case 3:
+          words.push(handle_utlc(digit, nxtDigit, "Thousand"));
+          break;
+        case 4:
+          words.push(handle_tens(digit, parseInt(priceStr[digitIdx + 1])));
+          break;
+        case 5:
+          words.push(handle_utlc(digit, nxtDigit, "Lakh"));
+          break;
+        case 6:
+          words.push(handle_tens(digit, parseInt(priceStr[digitIdx + 1])));
+          break;
+        case 7:
+          words.push(handle_utlc(digit, nxtDigit, "Crore"));
+          break;
+        case 8:
+          words.push(handle_tens(digit, parseInt(priceStr[digitIdx + 1])));
+          break;
+        case 9:
+          words.push(
+            digit !== 0
+              ? " " +
+                  sglDigit[digit] +
+                  " Hundred" +
+                  (parseInt(priceStr[digitIdx + 1]) !== 0 ||
+                  parseInt(priceStr[digitIdx + 2]) !== 0
+                    ? " and"
+                    : " Crore")
+              : ""
+          );
+          break;
       }
-      str = words.reverse().join("");
     }
-  
-    // Handle decimal part
-    const [integerPart, decimalPart] = price.toFixed(2).split('.');
-    const decimalWords = parseInt(decimalPart) > 0 ? `and ${parseInt(decimalPart)} Paise` : '';
-  
-    return `${str.trim()} Rupees ${decimalWords}`.trim();
+    str = words.reverse().join("");
   }
+
+  // Handle decimal part
+  const [integerPart, decimalPart] = price.toFixed(2).split(".");
+  const decimalWords =
+    parseInt(decimalPart) > 0 ? `and ${parseInt(decimalPart)} Paise` : "";
+
+  return `${str.trim()} Rupees ${decimalWords}`.trim();
+}
 
 const inquiryHtmlTemplate = (props: inquiryType) => `
 <html lang="en">
@@ -144,7 +220,9 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
             </tr>
             <tr>
                 <td><strong>Sub Total *</strong></td>
-                <td><strong>${formatIndianCurrency(props.hallCharges + props.additionalFacilities)}</strong></td>
+                <td><strong>${formatIndianCurrency(
+                  props.hallCharges + props.additionalFacilities
+                )}</strong></td>
             </tr>
             <tr>
                 <td>Security Deposit</td>
@@ -152,7 +230,9 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
             </tr>
             <tr>
                 <td><strong>Total</strong></td>
-                <td><strong>${formatIndianCurrency(props.totalPayable)}</strong></td>
+                <td><strong>${formatIndianCurrency(
+                  props.totalPayable
+                )}</strong></td>
             </tr>
         </table>
         
@@ -172,7 +252,9 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
         <p>SVKM PAN: AABTS8228H</p>
         <p>SVKM GSTIN: 27AABTS8228H1Z8</p>
         
-        <p>For booking confirmation and payment, please contact ${props.hallContact} at ${props.hallName}.</p>
+        <p>For booking confirmation and payment, please contact ${
+          props.hallContact
+        } at ${props.hallName}.</p>
     </div>
     <div class="page-break"></div>
     <div class="content terms-conditions">
@@ -220,7 +302,7 @@ export async function generateInquiry(props: inquiryType) {
     const page = await browser.newPage();
 
     const inquiry = inquiryHtmlTemplate(props);
-    const sanitizedCustomerName = props.customerName.replace(/\s+/g, '_');
+    const sanitizedCustomerName = props.customerName.replace(/\s+/g, "_");
     const pdfPath = `./src/files/Customer_${sanitizedCustomerName}_${props.enquiryNumber}_inquiry.pdf`;
 
     await page.setContent(inquiry);
@@ -228,8 +310,20 @@ export async function generateInquiry(props: inquiryType) {
 
     console.log(`PDF generated for customer ${props.customerName}: ${pdfPath}`);
 
+    // Upload to Firebase Storage
+    const storageFile = bucket.file(
+      `Customer_${sanitizedCustomerName}_${props.enquiryNumber}_inquiry.pdf`
+    );
+    await storageFile.save(await fs.promises.readFile(pdfPath), {
+      metadata: { contentType: "application/pdf" },
+    });
+
+    // Make the file public and get the public URL
+    await storageFile.makePublic();
+    const publicUrl = storageFile.publicUrl();
+    console.log(publicUrl);
     await browser.close();
-    return pdfPath;
+    return publicUrl;
   } catch (error) {
     console.log(error);
   }
