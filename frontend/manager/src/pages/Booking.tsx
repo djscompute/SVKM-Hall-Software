@@ -275,7 +275,7 @@ function Booking() {
   }) => {
     const priceEntry = booking.price || 0;
 
-    alert("price is" + priceEntry);
+    // alert("price is" + priceEntry);
     const totalFeatureCharges = booking.features.reduce(
       (total: any, feature: { price: any }) => total + feature.price,
       0
@@ -633,8 +633,8 @@ function Booking() {
   const getBookingName = (bookingId: string): string => {
     const booking = allBookingsOfUser.find((b) => b._id === bookingId);
     console.log("this is the booking fetched by it's ID", booking);
-    let date = dayjs(booking?.from).format("h:mm A, MMMM D, YYYY") || "-";
-    let bookingName = `${date} `;
+    const date = dayjs(booking?.from).format("h:mm A, MMMM D, YYYY") || "-";
+    const bookingName = `${date} `;
     return booking ? bookingName : "Unknown Booking";
   };
   //Use Effect for selected booking
@@ -806,7 +806,7 @@ function Booking() {
 
   const confirmExists = () => {
     // Iterate through each booking in the array
-    for (let booking of allBookingData) {
+    for (const booking of allBookingData) {
       // Check if the status of the current booking is "CONFIRMED"
       if (booking.status === "CONFIRMED") {
         toast.error("There is already a confirmed hall in this session");
@@ -1708,6 +1708,7 @@ function Booking() {
             <span className="w-full text-left">Purpose of the Event</span>
             <span className="w-full text-right">{data?.purpose || "-"}</span>
           </div>
+   </>)}
 
           {/* Additional Features */}
           <span className=" text-lg font-medium m-1">Additional Features</span>
@@ -2677,6 +2678,7 @@ function Booking() {
         </button>
       )} */}
     </div>
+    
   );
 }
 

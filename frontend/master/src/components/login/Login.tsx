@@ -52,7 +52,7 @@ const Login: React.FC = () => {
         ) : (
           <div className="flex flex-col border-2 border-gray-300 bg-gray-200 px-4 py-5 rounded-md w-[50vh] gap-3">
             <h1 className="text-3xl font-bold flex justify-center">
-              Svkm Admin Login
+              Svkm Master Login
             </h1>
             <div className="flex flex-col">
               <label>Email:</label>
