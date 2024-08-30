@@ -134,14 +134,22 @@ function Booking() {
   // Mututation for confirm and save booking of Multiple payments
   const confirmAndSaveMultipleBooking = useMutation({
     mutationFn: async () => {
+  
+      console.log( "json to",{
+        booking_ids: selectedBookings,
+        // date: multipleTransactionData?.date || dayjs().format("DD-MM-YYYY"),
+        transaction: multipleTransactionData,
+        totalPayable: grandTotal,
+        status: "CONFIRMED" ,
+      })
       const responsePromise = axiosManagerInstance.post(
         `/multipleBookings`, 
         {
           booking_ids: selectedBookings,
           // date: multipleTransactionData?.date || dayjs().format("DD-MM-YYYY"),
-          // status: "CONFIRMED" as bookingStatusType,
           transaction: multipleTransactionData,
-          totalPayable: grandTotal
+          totalPayable: grandTotal,
+          status: "CONFIRMED" ,
         }
       );
       toast.promise(responsePromise, {
@@ -627,6 +635,14 @@ function Booking() {
       (booking) => booking._id === selected
     );
     setSelectedBookingData(selectedBooking || null);
+    const calculateTotalFeatureCharges = (features: any) => {
+      if (Array.isArray(features)) {
+        return features.reduce((acc, feature) => acc + (feature.price || 0), 0);
+      }
+      return 0; // Default if `features` is not an array
+    };
+    setTotalFeatureCharges(calculateTotalFeatureCharges(selectedBooking?.features));
+    console.log(selectedBooking,"This is a selected booking")
   };
 
   // Function to get booking name by ID
@@ -1452,7 +1468,7 @@ function Booking() {
             value={selectedBookingData?.transaction?.type || ""}
             className="px-2 py-1 rounded-md border border-gray-400 my-2"
             onChange={(e) =>{
-              editTransactionType.mutate(e.target.value as transactionType);
+            
               updateMultipleTransactionData('type', e.target.value)
 
             }}
@@ -1650,7 +1666,7 @@ function Booking() {
                 setShowCancellationReason(false);
                 if (!confirmExists() ) {
                   await confirmAndSaveMultipleBooking.mutateAsync();
-                  generateConfirmationAndEmail();
+                  // generateConfirmationAndEmail();
                 }
               }}
               className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
@@ -1708,7 +1724,7 @@ function Booking() {
             <span className="w-full text-left">Purpose of the Event</span>
             <span className="w-full text-right">{data?.purpose || "-"}</span>
           </div>
-   </>)}
+
 
           {/* Additional Features */}
           <span className=" text-lg font-medium m-1">Additional Features</span>
@@ -2677,6 +2693,7 @@ function Booking() {
           Handle Cancellation
         </button>
       )} */}
+         </>)}
     </div>
     
   );
