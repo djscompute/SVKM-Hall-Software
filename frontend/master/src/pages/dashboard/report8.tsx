@@ -325,7 +325,7 @@ function Report8() {
         {/* SELECT CATEGORY */}
         <div className="mt-4 flex items-center gap-4 justify-between">
           <label htmlFor="category-select" className="font-medium text-nowrap">
-            Select Category:
+            Select Customer Category:
           </label>
           <select
             id="category-select"
@@ -334,8 +334,10 @@ function Report8() {
               setSelectedCategory(e.target.value);
             }}
           >
-            <option value="">Select Category</option>
+          
             <option value="All">All</option>
+            <option value="SVKM INSTITUTE">SVKM INSTITUTE</option>
+            <option value="OTHER THAN SVKM INSTITUTE">OTHER THAN SVKM INSTITUTE</option>
             {selectedSession === "All"
               ? hallData
                   .find((hall) => hall.name === selectedHall)
@@ -411,6 +413,7 @@ function Report8() {
                 From:
               </label>
               <BasicDateTimePicker
+                id="fromDate"
                 timeModifier={(time) => {
                   setDate((prev) => ({ ...prev, from: time }));
                 }}
@@ -425,6 +428,7 @@ function Report8() {
                 To:
               </label>
               <BasicDateTimePicker
+                id="toDate"
                 timeModifier={(time) => {
                   setDate((prev) => ({ ...prev, to: time }));
                 }}
