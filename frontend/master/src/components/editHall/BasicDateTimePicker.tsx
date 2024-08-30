@@ -6,6 +6,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 // import { useState } from "react";
 
 type Props = {
+  id:string;
   timePickerName: string;
   timeModifier: (newDateTimeString: string) => void;
 };

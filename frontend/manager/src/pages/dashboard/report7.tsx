@@ -128,7 +128,7 @@ function Report7() {
       hallName: hallName,
       additionalFeatures: additionalFeatures,
     });
-    const responsePromise = axiosMasterInstance.post(
+    const responsePromise = axiosManagerInstance.post(
       "dashboard/generateAdditionalFeatureReport",
       {
         fromDate: from,
