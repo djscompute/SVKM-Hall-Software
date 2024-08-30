@@ -189,7 +189,7 @@ function Report8() {
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
       <span className="text-xl font-medium mt-5">
-        Booking Information Report
+        Event Information Report
       </span>
       {/* SELECT DISPLAY PERIOD */}
       <div className="mt-4">
@@ -302,8 +302,8 @@ function Report8() {
           }}
         >
           <option value="">Display Hall Charges</option>
-          <option value="true">True</option>
-          <option value="false">False</option>
+          <option value="true">YES</option>
+          <option value="false">NO</option>
         </select>
       </div>
 

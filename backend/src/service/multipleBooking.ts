@@ -1,4 +1,5 @@
 import { MultipleBookingModel, IMultipleBooking } from "../models/multipleBooking.model";
+import { BookingModel } from "../models/booking.model";
 
 export async function createMultipleBooking(bookingData: IMultipleBooking) {
   try {
@@ -26,6 +27,18 @@ export async function checkBookingInMultiple(id: string): Promise<IMultipleBooki
   try {
     const multipleBooking = await MultipleBookingModel.findOne({ booking_ids: id });
     return multipleBooking;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Function to update the booking statuses of all the bookings 
+export async function updateBookingsStatus(bookingIds: string[],status: string) {
+  try {
+    await BookingModel.updateMany(
+      { _id: { $in: bookingIds } },
+      { $set: { status: status} }
+    );
   } catch (error) {
     throw error;
   }

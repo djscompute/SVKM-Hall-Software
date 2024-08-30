@@ -23,6 +23,7 @@ export const MultipleBookingSchema = z.object({
       invalid_type_error: "Total payable must be a number.",
       required_error: "Total payable is required.",
     }),
+    status: z.enum(["CONFIRMED", "TENTATIVE", "CANCELLED", "ENQUIRY"]),
   }),
 });
 

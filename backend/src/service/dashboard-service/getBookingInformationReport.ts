@@ -13,6 +13,7 @@ interface BookingInformationReportRequest {
   displaySession: string;
   displayHallCharges: boolean;
   displayTransactionType: string;
+  displayBookingStatus:string;
 }
 
 function parseDateTime(dateString: string) {
@@ -21,8 +22,10 @@ function parseDateTime(dateString: string) {
   if (matchResult === null) {
     throw new Error("Invalid date format");
   }
-  const [, datePart, timePart] = matchResult;
-  return { date: datePart, time: timePart };
+  const [, datePart] = matchResult;
+
+  const [year, month, day] = datePart.split("-");
+  return { date: `${day}-${month}-${year}`, time: matchResult[2] };
 }
 
 const calculateAmountPaid = (data: any): number => {
@@ -55,7 +58,7 @@ export async function getBookingInformationReport(
         const findQuery: any = {
           from: { $gte: params.fromDate },
           to: { $lte: params.toDate },
-          status: "CONFIRMED",
+          // status: "CONFIRMED",
         };
         const bookingsInRange = await BookingModel.find(findQuery).exec();
         bookings.push(...bookingsInRange);
@@ -74,7 +77,7 @@ export async function getBookingInformationReport(
         const findQueryToday = {
           from: { $gte: startOfDay },
           to: { $lte: endOfDay },
-          status: "CONFIRMED",
+          // status: "CONFIRMED",
         };
         const bookingsToday = await BookingModel.find(findQueryToday).exec();
         bookings.push(...bookingsToday);
@@ -96,7 +99,7 @@ export async function getBookingInformationReport(
         const findQueryTomorrow = {
           from: { $gte: startOfTomorrow },
           to: { $lte: endOfTomorrow },
-          status: "CONFIRMED",
+          // status: "CONFIRMED",
         };
         const bookingsTomorrow = await BookingModel.find(
           findQueryTomorrow
@@ -120,7 +123,7 @@ export async function getBookingInformationReport(
         const findQueryThisWeek = {
           from: { $gte: startOfWeek },
           to: { $lte: endOfWeek },
-          status: "CONFIRMED",
+          // status: "CONFIRMED",
         };
         const bookingsThisWeek = await BookingModel.find(
           findQueryThisWeek
@@ -145,7 +148,7 @@ export async function getBookingInformationReport(
         const findQueryThisMonth = {
           from: { $gte: startOfMonth },
           to: { $lte: endOfMonth },
-          status: "CONFIRMED",
+          // status: "CONFIRMED",
         };
         const bookingsThisMonth = await BookingModel.find(
           findQueryThisMonth
@@ -166,7 +169,7 @@ export async function getBookingInformationReport(
         const findQueryThisYear = {
           from: { $gte: startOfYear },
           to: { $lte: endOfYear },
-          status: "CONFIRMED",
+          // status: "CONFIRMED",
         };
         const bookingsThisYear = await BookingModel.find(
           findQueryThisYear
@@ -214,7 +217,7 @@ export async function getBookingInformationReport(
         const findQueryThisFinYear = {
           from: { $gte: startOfFinYear },
           to: { $lte: endOfFinYear },
-          status: "CONFIRMED",
+          // status: "CONFIRMED",
         };
 
         const bookingsThisFinYear = await BookingModel.find(
@@ -242,9 +245,15 @@ export async function getBookingInformationReport(
         (booking) => booking.session_id === params.displaySession
       );
     }
+    if (params.displayBookingStatus.toLowerCase() !== 'all') {
+      bookings = bookings.filter(
+        (booking) => booking.status === params.displayBookingStatus.toUpperCase()
+      );
+    }
     const formattedBookings = await Promise.all(
       bookings.map(async (booking) => ({
-        Date: parseDateTime(booking.from).date,
+        confirmationDate: booking.date,
+        eventDate: parseDateTime(booking.from).date,
         "Hall Name": await getHallNameById(booking.hallId),
         Session:{
 
@@ -275,6 +284,7 @@ export async function getBookingInformationReport(
         "utr no": booking.transaction.utrNo,
         "cheque no": booking.transaction.chequeNo,
         "bank": booking.transaction.bank,
+        "Booking Status":booking.status,
       }))
     );
 

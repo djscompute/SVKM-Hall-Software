@@ -285,6 +285,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       hallName, 
       dateOfEvent, 
       slotTime, 
+      sessionType,
       purposeOfBooking, 
       hallCharges, 
       additionalFacilities, 
@@ -298,7 +299,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       hallContact 
     } = req.body;
     
-    const pdfPath = generateConfirmation({
+    const pdfUrl = await generateConfirmation({
       date, 
       customerName, 
       contactPerson, 
@@ -311,6 +312,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       hallName, 
       dateOfEvent, 
       slotTime, 
+      sessionType,
       purposeOfBooking, 
       hallCharges, 
       additionalFacilities, 
@@ -323,7 +325,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       email,
       hallContact
     });
-    res.json(pdfPath);
+    res.json({ pdfUrl });
   } catch (error) {
     console.error("Error in generating confirmation:", error);
     res.status(500).json({ message: "Internal server error", error });

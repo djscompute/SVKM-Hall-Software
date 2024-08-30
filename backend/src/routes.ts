@@ -75,6 +75,7 @@ import {
   getBookingTypeCountsHandler, 
   getCollectionDetailsHandler,
   getHallBookingsCountHandler, 
+  getHallInformationReportHandler, 
   getInteractionCountHandler,
   getMonthwiseCollectionDetailsHandler,
   getSessionWiseBookingHandler,
@@ -363,6 +364,13 @@ export default function routes(app: Express) {
     validateCookie,
     
     getAdditionalFeatureReportHandler
+  )
+
+  app.post(
+    "/dashboard/generateHallInformationReport",
+    validateCookie,
+    
+    getHallInformationReportHandler
   )
   {/********************* Dashboard Routes End *********************/}
 
