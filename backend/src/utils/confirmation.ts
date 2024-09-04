@@ -42,7 +42,8 @@ type confirmationType = {
   depositDiscount: number;
   totalPayable: number;
   email: string;
-  hallContact: string
+  managerEmail: string;
+  managerName: string;
 };
 
 function formatIndianCurrency(num: number): string {
@@ -223,7 +224,7 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
         <p>SVKM PAN: AABTS8228H</p>
         <p>SVKM GSTIN: 27AABTS8228H1Z8</p>
         
-        <p>Invoice & Receipt of payment will be emailed at your email ID ${props.email}. For hard copy please contact ${props.hallContact} at ${props.hallName}.</p>
+        <p>Invoice & Receipt of payment will be emailed at your email ID ${props.email}. For hard copy please contact ${props.managerName} at ${props.managerEmail}.</p>
     </div>
     <div class="page-break"></div>
 <div class="content terms-conditions">

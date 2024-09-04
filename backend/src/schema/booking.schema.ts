@@ -153,7 +153,8 @@ export const ConfirmationSchema = z.object({
     depositDiscount: z.number().min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     totalPayable: z.number(),
     email: z.string().email(), // Ensuring a valid email format
-    hallContact: z.string(),
+    managerEmail: z.string(),
+    managerName: z.string(),
   }),
 });
 export const getBookingsByHallZodSchema = z.object({

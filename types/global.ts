@@ -91,7 +91,9 @@ export type HallBookingType = {
   };
   purpose: string; //purpose for which the hall is being booked by the user (event type)
   cancellationReason?: string; // reason for cancellation
-  enquiryNumber?: string
+  enquiryNumber?: string;
+  managerEmail?: string,
+  managerName?: string,
 };
 
 // ================================================

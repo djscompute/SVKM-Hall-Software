@@ -103,7 +103,9 @@ export async function editBookingHandler(req: Request, res: Response) {
       time,
       purpose,
       cancellationReason,
-      enquiryNumber
+      enquiryNumber,
+      managerEmail,
+      managerName
     } = req.body as HallBookingType; // Ensure this matches your schema type
 
     const bookingId: string = req.params.id;
@@ -129,7 +131,9 @@ export async function editBookingHandler(req: Request, res: Response) {
         time,
         purpose,
         cancellationReason,
-        enquiryNumber
+        enquiryNumber,
+        managerEmail,
+        managerName,
       },
       { new: true }
     );
@@ -296,7 +300,8 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       depositDiscount, 
       totalPayable,
       email,
-      hallContact 
+      managerEmail,
+      managerName 
     } = req.body;
     
     const pdfUrl = await generateConfirmation({
@@ -323,7 +328,8 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       depositDiscount, 
       totalPayable,
       email,
-      hallContact
+      managerEmail,
+      managerName 
     });
     res.json({ pdfUrl });
   } catch (error) {
