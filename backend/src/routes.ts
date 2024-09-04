@@ -17,6 +17,7 @@ import {
   getAdminHandler,
   getAdmins,
   getHallsforAdminHandler,
+  getManagerByHallId,
   loginAdminHandler,
   logoutAdminHandler,
   updateAdminByIdHandler,
@@ -383,7 +384,15 @@ export default function routes(app: Express) {
     '/getSessionAndCategoryByHall',
     getSessionsWithCategoriesByHallNameHandler
   )
+
+  app.get(
+    '/getManagerByHallId',
+    validateRequest(getBookingByIdZodSchema),
+    getManagerByHallId,
+  )
   {/********************* Helper Routes End*********************/}
+
+  {/********************* Email Routes Begin *********************/}
 
   app.post(
     "/generateInquiry",
@@ -402,4 +411,6 @@ export default function routes(app: Express) {
     validateRequest(EmailZodSchema),
     sendEmailHandler,
   )
+  {/********************* Email Routes End *********************/}
+
 }

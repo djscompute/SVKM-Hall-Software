@@ -13,6 +13,7 @@ import { queryClient } from "../App";
 import { isValidEmail } from "../utils/validateEmail";
 import { isValidMobile } from "../utils/validateMobile";
 import { AxiosError } from "axios";
+import { adminType } from "../../../../types/global";
 
 function BookADay() {
   const navigate = useNavigate();
@@ -64,6 +65,32 @@ function BookADay() {
     },
     staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
+  
+  const { data: managerData } = useQuery({
+    queryKey: ["manager", HallData?._id],
+    queryFn: async () => {
+      if (!HallData?._id) {
+        throw new Error("Hall ID is not available");
+      }
+      try {
+        const responsePromise = axiosClientInstance.get(`getManagerByHallId`, {
+          params: { _id: HallData._id }
+        });
+        toast.promise(responsePromise, {
+          pending: "Fetching manager...",
+          error: "Failed to fetch Manager. Please try again.",
+        });
+        const response = await responsePromise;
+        console.log("The emails of managers are ",response.data);
+        return response.data.admin as adminType; // Adjust the type accordingly
+      } catch (error) {
+        throw error;
+      }
+    },
+    enabled: !!HallData?._id, // Query will be enabled only if HallData._id is available
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
+  });
+
 
   useEffect(() => {
     if (selectedCategory?.toLowerCase() === "svkm institute") {
@@ -189,7 +216,7 @@ function BookADay() {
             additionalFacilities: additionalFacilities,
             hallDeposit: securityDeposit,
             totalPayable: totalPayable,
-            hallContact: "Email to be entered",
+            hallContact: managerData?.email,
           })
           .then((response) => {
             axiosClientInstance
