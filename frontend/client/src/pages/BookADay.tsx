@@ -204,6 +204,7 @@ function BookADay() {
             contactNo: mobileNumber,
             enquiryNumber: enquiryNumber, // Generate a unique enquiry number
             hallName: HallData?.name,
+            hallLocation: `${HallData?.location.desc1},${HallData?.location.desc2}`,
             dateOfEvent: dateOfEvent,
             slotTime: `${convert_IST_TimeString_To12HourFormat(
               HallData?.sessions.find((ss) => ss._id === selectedSessionId)
@@ -211,6 +212,9 @@ function BookADay() {
             )} - ${convert_IST_TimeString_To12HourFormat(
               HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to!
             )}`,
+            sessionName: `${HallData?.sessions.find(
+              (ss) => ss._id === selectedSessionId
+            )?.name!}`,
             purposeOfBooking: purpose,
             hallCharges: sessionPrice,
             additionalFacilities: additionalFacilities,

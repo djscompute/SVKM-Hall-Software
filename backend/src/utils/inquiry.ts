@@ -25,8 +25,10 @@ type inquiryType = {
   contactNo: string;
   enquiryNumber: string;
   hallName: string;
+  hallLocation: string;
   dateOfEvent: string;
   slotTime: string;
+  sessionName: string;
   purposeOfBooking: string;
   hallCharges: number;
   additionalFacilities: number;
@@ -201,8 +203,10 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
         <p><strong>Inquiry Number:</strong> ${props.enquiryNumber}</p>
         
         <p><strong>Hall Name:</strong> ${props.hallName}</p>
+        <p><strong>Hall Location:</strong> ${props.hallLocation}</p>
         <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
         <p><strong>Slot Time:</strong> ${props.slotTime}</p>
+        <p><strong>Session:</strong> ${props.sessionName}</p>
         <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
         
         <table>

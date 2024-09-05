@@ -68,6 +68,7 @@ function Booking() {
             `getHall/${response.data.hallId}`
           );
           setHallData(result.data);
+          console.log("Hall data is ", result.data);
         }
         const updatedData: HallBookingType = {
           ...response.data,
@@ -75,8 +76,8 @@ function Booking() {
             ? response.data.managerEmail
             : user?.email,
           managerName: response.data.managerName
-          ? response.data.managerName
-          : "",
+            ? response.data.managerName
+            : "",
         };
         return updatedData as HallBookingType;
       } catch (error) {
@@ -210,6 +211,7 @@ function Booking() {
             editedData?.transaction?.type || data?.transaction?.type || "",
           additionalPaymentDetails: getAdditionalPaymentDetails(),
           hallName: hallData?.name || "",
+          hallLocation: `${hallData?.location.desc1},${hallData?.location.desc2}`,
           dateOfEvent: dayjs(editedData?.from || data?.from).format(
             "DD-MM-YYYY"
           ),
@@ -244,9 +246,8 @@ function Booking() {
             editedData?.depositDiscount || data?.depositDiscount || 0,
           totalPayable: calculateTotalPayable(),
           email: editedData?.user.email || data?.user.email || "",
-          managerEmail: editedData?.managerEmail || data?.managerEmail ,
-          managerName: editedData?.managerName || data?.managerName ,
-          
+          managerEmail: editedData?.managerEmail || data?.managerEmail,
+          managerName: editedData?.managerName || data?.managerName,
         }
       );
 
@@ -1172,8 +1173,8 @@ function Booking() {
       {/* When payment menthod is set to  multiple */}
       {/* Manager Email */}
       <span className=" text-lg font-medium">Manager Details</span>
-            {/* Manager Phone Number */}
-            {editingMode ? (
+      {/* Manager Phone Number */}
+      {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">Manager Name</span>
           <input
@@ -1223,7 +1224,6 @@ function Booking() {
           <span className="w-full text-right">{data?.managerEmail}</span>
         </div>
       )}
-
 
       {selectedBookingData ? (
         <>
@@ -2469,14 +2469,14 @@ function Booking() {
             <span className="mt-4 text-lg font-medium">
               Transaction Details
             </span>
-          ) : (
+          ) : ["svkminstitute"].includes(data?.transaction?.type || "") ? (
             <>
               <span className="mt-4 text-lg font-medium">
                 Transaction Details
               </span>
               <span className="mt-2">Payment Method: SVKM Institute</span>
             </>
-          )}
+          ) : null}
 
           {editingMode ? (
             <span>

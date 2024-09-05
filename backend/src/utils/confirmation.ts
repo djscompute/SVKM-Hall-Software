@@ -29,6 +29,7 @@ type confirmationType = {
   modeOfPayment: string;
   additionalPaymentDetails: string;
   hallName: string;
+  hallLocation: string;
   dateOfEvent: string;
   slotTime: string;
   sessionType: string;
@@ -129,11 +130,11 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hall Booking Confirmation</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; }
+        body { font-family: Arial, sans-serif; font-size: 11px; }
         .header { text-align: center; }
         .content { margin: 20px; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th, td { border: 1px solid black; padding: 5px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th, td { border: 1px solid black; padding: 5px; font-size: 11px; }
         .terms-conditions { font-size: 16px; }
         .page-break { page-break-before: always; }
     </style>
@@ -157,6 +158,7 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
         <p><strong>Additional payment details:</strong> ${props.additionalPaymentDetails}</p>
         
         <p><strong>Hall Name:</strong> ${props.hallName}</p>
+        <p><strong>Hall Address:</strong> ${props.hallLocation}</p>
         <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
         <p><strong>Slot Time:</strong> ${props.sessionType} ${props.slotTime}</p>
         <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
