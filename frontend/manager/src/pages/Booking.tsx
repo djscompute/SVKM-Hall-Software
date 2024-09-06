@@ -34,6 +34,7 @@ function Booking() {
   const [cancellationReason, setCancellationReason] = useState("");
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [grandTotal, setGrandTotal] = useState(0);
+  const [isBookingInMultiple,setIsBookingInMultiple] =  useState(false);
   const [allBookingsOfUser, setAllBookingsOfUser] = useState<HallBookingType[]>(
     []
   );
@@ -290,9 +291,10 @@ function Booking() {
     );
 
     const basePrice = priceEntry + totalFeatureCharges;
-    const baseDiscount = 0;
-
-    let totalPrice = basePrice - baseDiscount;
+    const baseDiscount = booking.baseDiscount;
+    const discount =
+    0.01 * (booking.baseDiscount || 0) * basePrice;
+    let totalPrice = basePrice - discount;
 
     if (booking.booking_type !== "SVKM INSTITUTE") {
       // Add 18% tax for non-SVKM bookings
@@ -457,13 +459,30 @@ function Booking() {
 
   // Update Transaction Data in multiple
   const updateMultipleTransactionData = (field: keyof bookingTransactionType, value: string) => {
+    if (selectedBookingData) {  // Add a null check for selectedBookingData
+      if (field === "type") {
+        const transactionValue = value as transactionType;
+
+        if (!selectedBookingData.transaction || selectedBookingData.transaction.type !== value) {
+       
+          selectedBookingData.transaction = {
+            ...selectedBookingData.transaction,
+            type: transactionValue 
+          };
+          console.log("Transaction created/updated:", selectedBookingData);
+        } else {
+          console.log("Transaction already exists with the same type.");
+        }
+      }
+    } else {
+      console.error("selectedBookingData is null, cannot update transaction.");
+    }
+  
     setMultipleTransactionData((prevData) => {
       console.log("this is multiple transaction data" , multipleTransactionData)
       if (!prevData) {
-        // If prevData is undefined, create a new object with the updated field
         return { [field]: value } as bookingTransactionType;
       }
-      // If prevData exists, spread it and update the field
       return { ...prevData, [field]: value };
     });
   };
@@ -678,7 +697,7 @@ function Booking() {
     };
 
     calculateTotalSelectedBookings();
-  }, [selectedBookings, allBookingsOfUser]);
+  }, [selectedBookings, allBookingsOfUser,isBookingInMultiple]);
   const handleSelect = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = event.target.value;
     setSelectedOption(selected);
@@ -717,7 +736,16 @@ function Booking() {
             response.data.multipleBooking.booking_ids
           ) {
             setSelectedBookings(response.data.multipleBooking.booking_ids);
+            setSelectedBookingData(data || null);
+            const calculateTotalFeatureCharges = (features: any) => {
+              if (Array.isArray(features)) {
+                return features.reduce((acc, feature) => acc + (feature.price || 0), 0);
+              }
+              return 0; // Default if `features` is not an array
+            };
+            setTotalFeatureCharges(calculateTotalFeatureCharges(data?.features));
           } else {
+            setIsBookingInMultiple(false) 
             console.error("booking_ids not found in response data");
           }
         }
@@ -733,10 +761,10 @@ function Booking() {
       let updatedBookings;
       if (checked) {
         updatedBookings = [...prevSelectedBookings, value];
-        console.log("Selected bookings after addition:", updatedBookings); // Log after updating
+        console.log("Selected bookings after addition:", updatedBookings); 
       } else {
         updatedBookings = prevSelectedBookings.filter((id) => id !== value);
-        console.log("Selected bookings after removal:", updatedBookings); // Log after updating
+        console.log("Selected bookings after removal:", updatedBookings); 
       }
       return updatedBookings;
     });
@@ -1138,7 +1166,7 @@ function Booking() {
               <select
                 id="selected-bookings"
                 onChange={handleBookingSelect}
-                className="block w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                className="block  w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
               >
                 <option value="" disabled>
                   Select a booking
@@ -1158,7 +1186,7 @@ function Booking() {
 
       {selectedBookingData ? (
         <>
-          <span className=" text-lg font-medium">Slot</span>
+          <span className=" text-lg font-medium">Slots</span>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Hall Name</span>
             <span className="w-full text-right">{hallData?.name || "-"}</span>
@@ -1301,8 +1329,9 @@ function Booking() {
             </span>
           </div>
           <span>
-            <label htmlFor="isDeposit">Security Deposit Applicable </label>
-            <select
+          <span className=" text-lg font-medium">Security Deposit</span>
+
+            {/* <select
               id="isDeposit"
               value={
                 selectedBookingData?.isDeposit === true ? "yes" : "no" || false
@@ -1336,7 +1365,7 @@ function Booking() {
               </option>
               <option value="yes">Yes</option>
               <option value="no">No</option>
-            </select>
+            </select> */}
           </span>
 
           {
@@ -1459,7 +1488,16 @@ function Booking() {
             </span>
           </div>
           {/* Transaction Details for Multiple */}
-          <span className="text-lg font-medium">Transaction Details</span>
+          {["cheque", "upi", "neft/rtgs"].includes(
+        selectedBookingData?.transaction?.type || ""
+      ) ? (
+        <span className="mt-4 text-lg font-medium">Transaction Details</span>
+      ) : (
+        <>
+          <span className="mt-4 text-lg font-medium">Transaction Details</span>
+          <span className="mt-2">Payment Method: SVKM Institute</span>
+        </>
+      )}
       {editingMode ? (
         <span>
           <label htmlFor="transaction">Choose a Transaction Type </label>
@@ -1492,7 +1530,7 @@ function Booking() {
             <span className="w-full text-left">Date</span>
             <input
               type="text"
-              value={multipleTransactionData?.date}
+              value={multipleTransactionData?.date || selectedBookingData.transaction.date}
               onChange={(e) => updateMultipleTransactionData('date', e.target.value)}
               placeholder="DD-MM-YYYY"
               className="px-2"
@@ -1512,7 +1550,7 @@ function Booking() {
             <span className="w-full text-left">Transaction ID</span>
             <input
               type="text"
-              value={multipleTransactionData?.transactionID || ''}
+              value={multipleTransactionData?.transactionID || selectedBookingData.transaction.transactionID || ''}
               onChange={(e) => updateMultipleTransactionData('transactionID', e.target.value)}
               placeholder="Enter Transaction ID"
               className="px-2"
@@ -1532,7 +1570,7 @@ function Booking() {
             <span className="w-full text-left">UTR No.</span>
             <input
               type="text"
-              value={multipleTransactionData?.utrNo || ''}
+              value={multipleTransactionData?.utrNo || selectedBookingData.transaction.utrNo || ''}
               onChange={(e) => updateMultipleTransactionData('utrNo', e.target.value)}
               placeholder="Enter UTR Number"
               className="px-2"
@@ -1552,7 +1590,7 @@ function Booking() {
             <span className="w-full text-left">Cheque No.</span>
             <input
               type="text"
-              value={multipleTransactionData?.chequeNo || ''}
+              value={multipleTransactionData?.chequeNo || selectedBookingData.transaction.chequeNo || ''}
                 onChange={(e) => updateMultipleTransactionData('chequeNo', e.target.value)}
               placeholder="Enter Cheque Number"
               className="px-2"
@@ -1572,7 +1610,7 @@ function Booking() {
             <span className="w-full text-left">Bank</span>
             <input
               type="text"
-              value={multipleTransactionData?.bank || ''}
+              value={multipleTransactionData?.bank || selectedBookingData.transaction.bank || ''}
                 onChange={(e) => updateMultipleTransactionData('bank', e.target.value)}
               placeholder="Enter Bank Name"
               className="px-2"
@@ -1593,7 +1631,7 @@ function Booking() {
             <span className="w-full text-left">Payee Name</span>
             <input
               type="text"
-              value={multipleTransactionData?.payeeName || ''}
+              value={multipleTransactionData?.payeeName || selectedBookingData.transaction.payeeName || ''}
               onChange={(e) => updateMultipleTransactionData('payeeName', e.target.value)}
               placeholder="Enter Payee Name"
               className="px-2"
@@ -1664,14 +1702,14 @@ function Booking() {
             <button
               onClick={async () => {
                 setShowCancellationReason(false);
-                if (!confirmExists() ) {
+
                   await confirmAndSaveMultipleBooking.mutateAsync();
-                  // generateConfirmationAndEmail();
-                }
+                  generateConfirmationAndEmail();
+
               }}
               className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
             >
-              Confirmed
+              Confirm
             </button>
           </span>
         </>

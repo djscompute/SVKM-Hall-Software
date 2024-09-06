@@ -1,4 +1,4 @@
-import { MultipleBookingModel, IMultipleBooking } from "../models/multipleBooking.model";
+import { MultipleBookingModel, IMultipleBooking, ITransaction } from "../models/multipleBooking.model";
 import { BookingModel } from "../models/booking.model";
 
 export async function createMultipleBooking(bookingData: IMultipleBooking) {
@@ -33,11 +33,11 @@ export async function checkBookingInMultiple(id: string): Promise<IMultipleBooki
 }
 
 // Function to update the booking statuses of all the bookings 
-export async function updateBookingsStatus(bookingIds: string[],status: string) {
+export async function updateBookingsStatus(bookingIds: string[],status: string,transaction:ITransaction) {
   try {
     await BookingModel.updateMany(
       { _id: { $in: bookingIds } },
-      { $set: { status: status} }
+      { $set: { status: status,transaction:transaction} }
     );
   } catch (error) {
     throw error;
