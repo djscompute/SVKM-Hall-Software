@@ -377,6 +377,7 @@ function Report9() {
               setSelectedCategory(e.target.value);
             }}
           >
+            <option value="">Select Category</option>
             <option value="All">All</option>
             <option value="SVKM INSTITUTE">SVKM INSTITUTE</option>
             <option value="OTHER THAN SVKM INSTITUTE">OTHER THAN SVKM INSTITUTE</option>
@@ -430,6 +431,7 @@ function Report9() {
         <div className={`flex flex-col items-center justify-center gap-2 `}>
           <div className="flex gap-2">
             <BasicDateTimePicker
+               id="fromDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, from: formattedTime }));
@@ -437,6 +439,7 @@ function Report9() {
               timePickerName="from"
             />
             <BasicDateTimePicker
+             id="toDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, to: formattedTime }));

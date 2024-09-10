@@ -6,6 +6,10 @@ export async function addMultipleBookingHandler(req: Request, res: Response) {
   try {
     const bookingData: IMultipleBooking = req.body;
     const newBooking = await multipleBookingService.createMultipleBooking(bookingData);
+
+    // Update the status of all bookings to confirmed
+    await multipleBookingService.updateBookingsStatus(bookingData.booking_ids,bookingData.status,bookingData.transaction);
+
     res.status(201).json(newBooking);
   } catch (error) {
     res.status(400).json({ message: "Failed to create multiple booking" });

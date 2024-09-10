@@ -292,12 +292,14 @@ function Report7() {
       <div className="flex flex-col items-center justify-center gap-2">
         <div className="flex gap-2">
           <BasicDateTimePicker
+           id="fromDate"
             timeModifier={(time) => {
               setDate((prev) => ({ ...prev, from: time }));
             }}
             timePickerName="from"
           />
           <BasicDateTimePicker
+           id="toDate"
             timeModifier={(time) => {
               setDate((prev) => ({ ...prev, to: time }));
             }}

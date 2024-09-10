@@ -23,7 +23,12 @@ const MultipleBookingSchema = new mongoose.Schema({
   totalPayable: {
     type: Number,
     required: true
+  },
+  status: {
+    type: String,
+    required: true
   }
+
 }, { timestamps: true });  
 
 
@@ -44,4 +49,5 @@ export interface IMultipleBooking {
   booking_ids: string[];
   transaction: ITransaction;
   totalPayable: number;
+  status: string;
 }
