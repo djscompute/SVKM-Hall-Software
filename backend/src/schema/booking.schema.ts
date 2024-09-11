@@ -126,7 +126,8 @@ export const InquirySchema = z.object({
     additionalFacilities: z.number(),
     hallDeposit: z.number(),
     totalPayable: z.number(),
-    hallContact: z.string(),
+    managerEmail: z.string(),
+    managerName: z.string(),
   }),
 });
 

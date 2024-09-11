@@ -128,11 +128,12 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hall Booking Confirmation</title>
+    <title>Hall Booking Confirmation Cum Receipt</title>
     <style>
         body { font-family: Arial, sans-serif; font-size: 11px; }
         .header { text-align: center; }
         .content { margin: 20px; }
+        .nogap {line-height: 5px; margin: 20px 0px}
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th, td { border: 1px solid black; padding: 5px; font-size: 11px; }
         .terms-conditions { font-size: 16px; }
@@ -142,34 +143,42 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
 <body>
     <div class="header">
         <img src="https://static.wixstatic.com/media/2d8aca_ab298473c57c4d32b13b1544c84d5ac9~mv2.png/v1/fill/w_196,h_236,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/svkm%20logo.png" alt="SVKM Logo" width="100">
+        <h1>SHRI VILE PARLE KELVANI MANDAL</h1>
+        <h2>Hall Booking Confirmation Cum Receipt</h2>
     </div>
     <div class="content">
-        <p><strong>Date:</strong> ${props.date}</p>
-        <p><strong>Customer Name:</strong> ${props.customerName}</p>
-        <p><strong>Contact Person:</strong> ${props.contactPerson}</p>
-        <p><strong>Contact No:</strong> ${props.contactNo}</p>
-        <p><strong>Enquiry Number:</strong> ${props.enquiryNumber}</p>
-        <p><strong>GST No:</strong> ${props.gstNo}</p>
-        <p><strong>PAN:</strong> ${props.pan}</p>
-        
+        <div class="nogap">
+          <p><strong>Date:</strong> ${props.date}</p>
+          <p><strong>Customer Name:</strong> ${props.customerName}</p>
+          <p><strong>Contact Person:</strong> ${props.contactPerson}</p>
+          <p><strong>Contact No:</strong> ${props.contactNo}</p>
+          <p><strong>Enquiry Number:</strong> ${props.enquiryNumber}</p>
+          <p><strong>GST No:</strong> ${props.gstNo}</p>
+          <p><strong>PAN:</strong> ${props.pan}</p>
+        </div>
+
         <p>Thank you for payment towards your hall booking as per below details.</p>
         
-        <p><strong>Mode of payment:</strong> ${props.modeOfPayment}</p>
-        <p><strong>Additional payment details:</strong> ${props.additionalPaymentDetails}</p>
-        
-        <p><strong>Hall Name:</strong> ${props.hallName}</p>
-        <p><strong>Hall Address:</strong> ${props.hallLocation}</p>
-        <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
-        <p><strong>Slot Time:</strong> ${props.sessionType} ${props.slotTime}</p>
-        <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
-        
+        <div class="nogap">
+          <p><strong>Mode of payment:</strong> ${props.modeOfPayment}</p>
+        </div>
+
+  <div class="nogap">
+    <p><strong>Additional payment details:</strong> ${props.additionalPaymentDetails}</p>
+    <p><strong>Hall Name:</strong> ${props.hallName}</p>
+    <p style="margin:-3px 0px;"><strong>Hall Address:</strong> <span style="line-height: 12px;">${props.hallLocation}</span></p>
+    <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
+    <p><strong>Slot Time:</strong> ${props.sessionType} ${props.slotTime}</p>
+    <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
+  </div>
+
         <table>
             <tr>
                 <th>Description</th>
                 <th>Amt (INR)</th>
             </tr>
             <tr>
-                <td>Hall Charges</td>
+                <td>Hall Charges (SAC:997212)</td>
                 <td>${formatIndianCurrency(props.hallCharges)}</td>
             </tr>
             <tr>
@@ -215,18 +224,32 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
         
         <p>Demand Draft / Account Payee Cheque to be drawn in favour of <strong>"SVKM HALL."</strong></p>
         
-        <h4>For Online payment, details as under</h4>
-        <p>Account Name: SVKM HALL</p>
-        <p>Bank name: ICICI BANK</p>
-        <p>Branch: Juhu Vile Parle</p>
-        <p>NEFT/ IFSC code: ICIC0000366</p>
-        <p>Account No. : 036601009123</p>
-        <p>Account Type: Saving</p>
+       <div style="display: flex; justify-content: space-between; align-items: flex-end; margin: -10px 0px;">
+            <div class="nogap">
+                <h4>For Online payment, details as under</h4>
+                <p>Account Name: SVKM HALL</p>
+                <p>Bank name: ICICI BANK</p>
+                <p>Branch: Juhu Vile Parle</p>
+                <p>NEFT/ IFSC code: ICIC0000366</p>
+                <p>Account No. : 036601009123</p>
+                <p>Account Type: Saving</p>
+            </div>
+            <div style="text-align: right; margin-right:30px">
+                <p><strong>For SVKM Halls</strong></p>
+                <br><br>
+                <p>____________________</p>
+                <p>Authorised Signatory</p>
+            </div>
+        </div>
+
+        <div class="nogap">
+            <p><strong>SVKM PAN: AABTS8228H</strong></p>
+            <p><strong>SVKM GSTIN: 27AABTS8228H1Z8</strong></p>
+        </div>
+
+        <p><strong>For GST invoice with IRN please contact ${props.managerName} at ${props.managerEmail} within one month.</strong></p>
         
-        <p>SVKM PAN: AABTS8228H</p>
-        <p>SVKM GSTIN: 27AABTS8228H1Z8</p>
-        
-        <p>Invoice & Receipt of payment will be emailed at your email ID ${props.email}. For hard copy please contact ${props.managerName} at ${props.managerEmail}.</p>
+        <p style="text-align: right; margin-top: 20px;"><strong>P.T.O</strong></p>
     </div>
     <div class="page-break"></div>
 <div class="content terms-conditions">

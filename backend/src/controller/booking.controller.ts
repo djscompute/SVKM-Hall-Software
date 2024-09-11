@@ -250,7 +250,8 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       additionalFacilities, 
       hallDeposit, 
       totalPayable,
-      hallContact 
+      managerEmail,
+      managerName, 
     } = req.body;
 
     const pdfPath = await generateInquiry({
@@ -269,7 +270,8 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       additionalFacilities,
       hallDeposit,
       totalPayable,
-      hallContact
+      managerEmail,
+      managerName
     });
     res.json(pdfPath);
   } catch (error) {

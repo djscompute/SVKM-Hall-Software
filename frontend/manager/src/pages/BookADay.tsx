@@ -223,7 +223,8 @@ function BookADay() {
             additionalFacilities: additionalFacilities,
             hallDeposit: securityDeposit,
             totalPayable: totalPayable,
-            hallContact: managerData?.email,
+            managerEmail: managerData?.email,
+            managerName: managerData?.username,
           })
           .then(async (response) => {
             axiosManagerInstance
