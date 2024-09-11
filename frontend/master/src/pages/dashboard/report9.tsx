@@ -368,7 +368,7 @@ function Report9() {
         {/* SELECT CATEGORY */}
         <div className="my-4 flex items-center gap-4 justify-between">
           <label htmlFor="category" className="font-medium text-nowrap">
-            Select Category:
+            Select Customer Category:
           </label>
           <select
             id="category"
@@ -379,6 +379,8 @@ function Report9() {
           >
             <option value="">Select Category</option>
             <option value="All">All</option>
+            <option value="SVKM INSTITUTE">SVKM INSTITUTE</option>
+            <option value="OTHER THAN SVKM INSTITUTE">OTHER THAN SVKM INSTITUTE</option>
             {selectedSession === "All"
               ? hallData
                   .find((hall) => hall.name === selectedHall)
@@ -429,6 +431,7 @@ function Report9() {
         <div className={`flex flex-col items-center justify-center gap-2 `}>
           <div className="flex gap-2">
             <BasicDateTimePicker
+               id="fromDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, from: formattedTime }));
@@ -436,6 +439,7 @@ function Report9() {
               timePickerName="from"
             />
             <BasicDateTimePicker
+             id="toDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, to: formattedTime }));
