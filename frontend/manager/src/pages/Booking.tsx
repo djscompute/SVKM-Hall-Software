@@ -861,6 +861,42 @@ function Booking() {
     return false;
   };
 
+  const detailsExists = () => {
+    let hasErrors = false;
+    if(!(editedData?.user.username))
+    {
+      hasErrors = true;
+      toast.error("Enter the username")
+    }
+    if(!(editedData?.user.mobile))
+    {
+      hasErrors = true;
+      toast.error("Enter the Mobile Number")
+    }
+    if(!(editedData?.user.contact))
+    {
+      hasErrors = true;
+      toast.error("Enter the Contact Person")
+    }
+    if(!(editedData?.user.email))
+    {
+      hasErrors = true;
+      toast.error("Enter the Email")
+    }
+    if(!(editedData?.managerEmail))
+    {
+      hasErrors = true;
+      toast.error("Enter the Manager Email")
+    }
+    if(!(editedData?.managerName))
+    {
+      hasErrors = true;
+      toast.error("Enter the Manager Name")
+    }
+
+    return !hasErrors;
+  };
+
   const confirmExists = () => {
     // Iterate through each booking in the array
     for (const booking of allBookingData) {
@@ -1014,7 +1050,7 @@ function Booking() {
                 };
               })
             }
-            placeholder="Enter GST Number"
+            placeholder="Enter Email"
             className="px-2"
           />
         </div>
@@ -2767,7 +2803,7 @@ function Booking() {
                 <button
                   onClick={async () => {
                     setShowCancellationReason(false);
-                    if (!confirmExists() && paymentDetails()) {
+                    if (!confirmExists() && paymentDetails() && detailsExists()) {
                       await confirmAndSaveBooking.mutateAsync();
                       generateConfirmationAndEmail();
                     }
@@ -2786,7 +2822,7 @@ function Booking() {
             <span className="space-x-4 space-y-4">
               <button
                 onClick={async () => {
-                  if (paymentDetails()) {
+                  if (paymentDetails() && detailsExists()) {
                     generateConfirmationAndEmail();
                   }
                 }}
