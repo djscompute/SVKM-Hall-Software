@@ -25,14 +25,17 @@ type inquiryType = {
   contactNo: string;
   enquiryNumber: string;
   hallName: string;
+  hallLocation: string;
   dateOfEvent: string;
   slotTime: string;
+  sessionName: string;
   purposeOfBooking: string;
   hallCharges: number;
   additionalFacilities: number;
   hallDeposit: number;
   totalPayable: number;
-  hallContact: string;
+  managerEmail: string;
+  managerName: string;
 };
 
 function formatIndianCurrency(num: number): string {
@@ -175,15 +178,28 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inquiry Estimate for Hall Booking</title>
+    <title>Inquiry Estimate for Hall Booking and Event Form</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; }
+        body { font-family: Arial, sans-serif; font-size: 14px; }
         .header { text-align: center; }
         .content { margin: 20px; }
-        table { width: 100%; border-collapse: collapse; }
+        .nogap {line-height: 5px; margin: 30px 0px}
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th, td { border: 1px solid black; padding: 5px; }
         .terms-conditions { font-size: 16px; }
         .page-break { page-break-before: always; }
+        .right-align { text-align: right; }
+        .flex-container { display: flex; justify-content: space-between; align-items: flex-start; }
+        .event-form { font-size: 10px; }
+        .event-form p{ font-size: 10px; }
+        .event-form h2 { text-align: center; }
+        .event-form table { width: 100%; border-collapse: collapse; font-size: 10px;}
+        .event-form th,td { border: 1px solid black; padding: 5px; }
+        .event-form input[type="text"] { width: 100%; border: none; border-bottom: 1px solid black; }
+        .no-border { border: none; }
+        .no-border td{ border: none; }
+        .underline { border-bottom: 1px solid black; }
+        .signature-line { border-top: 1px solid black; margin-top: 40px; width: 50%; }
     </style>
 </head>
 <body>
@@ -193,25 +209,40 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
         <h3>INQUIRY ESTIMATE FOR HALL BOOKING</h3>
     </div>
     <div class="content">
-        <p><strong>Date:</strong> ${props.date}</p>
+        <p class="right-align"><strong>Date:</strong> ${props.date}</p>
         
+        <div class="nogap">
         <p><strong>Customer Name:</strong> ${props.customerName}</p>
         <p><strong>Contact Person:</strong> ${props.contactPerson}</p>
         <p><strong>Contact No:</strong> ${props.contactNo}</p>
+        </div>
+
+        <div class="nogap">
         <p><strong>Inquiry Number:</strong> ${props.enquiryNumber}</p>
-        
-        <p><strong>Hall Name:</strong> ${props.hallName}</p>
-        <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
-        <p><strong>Slot Time:</strong> ${props.slotTime}</p>
-        <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
-        
+        </div>
+
+        <div class="nogap">
+        <div class="flex-container">
+            <div style="width: 70%">
+                <p><strong>Hall Name:</strong> ${props.hallName}</p>
+                <p style="margin:-3px 0px;"><strong>Hall Address:</strong> <span style="line-height: 16px;">${props.hallLocation}</span></p>
+                <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
+                <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
+                <p><strong>Session:</strong> ${props.sessionName}</p>
+            </div>
+            <div class="right-align;">
+                <p style="line-height: 16px;"><strong>Slot Time:</strong> ${props.slotTime}</p>
+            </div>
+        </div>
+        </div>
+
         <table>
             <tr>
                 <th>Description</th>
                 <th>Amt (INR)</th>
             </tr>
             <tr>
-                <td>Hall Charges</td>
+                <td>Hall Rent (SAC : 997212)</td>
                 <td>${formatIndianCurrency(props.hallCharges)}</td>
             </tr>
             <tr>
@@ -241,20 +272,26 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
         
         <p>Demand Draft / Account Payee Cheque to be drawn in favour of <strong>"SVKM HALL."</strong></p>
         
-        <h4>For Online payment, details as under</h4>
+        <div class="nogap">        
+        <h4>For Online payment, details as under (Pay only after confirmation with Manager)</h4>
         <p>Account Name: SVKM HALL</p>
         <p>Bank name: ICICI BANK</p>
         <p>Branch: Juhu Vile Parle</p>
         <p>NEFT/ IFSC code: ICIC0000366</p>
         <p>Account No. : 036601009123</p>
         <p>Account Type: Savings</p>
-        
+        </div>
+
+        <div class="nogap">
         <p>SVKM PAN: AABTS8228H</p>
         <p>SVKM GSTIN: 27AABTS8228H1Z8</p>
-        
-        <p>For booking confirmation and payment, please contact ${
-          props.hallContact
-        } at ${props.hallName}.</p>
+        </div>
+
+        <ul>
+          <li>For booking confirmation and payment, please contact ${props.managerName} at ${props.managerEmail}.</li>
+          <li>Hall availability is based on “First come, First served basis” against payment.</li>
+          <li>For booking by SVKM institutes, please contact with duly filled in Event form (available below).</li>
+        </ul>
     </div>
     <div class="page-break"></div>
     <div class="content terms-conditions">
@@ -291,6 +328,184 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
             <li>Police Permission & Licenses: Permission from the police for the following must be obtained before the sale of tickets and the necessary certificate must be shown to the Auditorium Manager.
                 The contents of the performance or the drama to be performed must be got approved by the Commissioner of Police, Theatre Branch, Mumbai - 400 001. It is necessary to obtain the permission of the author before staging performance.</li>
         </ol>
+    </div>
+    <div class="page-break"></div>
+    <div class="event-form">
+        <h2>EVENT FORM</h2>
+        <table class="no-border">
+            <tr>
+                <td>To:</td>
+                <td><input type="text"></td>
+                <td style="text-align: right;">Date:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td><strong>Sub: Event/Meeting Name:</strong></td>
+                <td colspan="3"><input type="text"></td>
+            </tr>
+            <tr>
+                <td><strong>Name of the organizing school & section/committee:</strong></td>
+                <td colspan="3"><input type="text"></td>
+            </tr>
+            <tr>
+                <td colspan="4">Please book/provide hall/facilities as per the details given as under:</td>
+            </tr>
+            <tr>
+                <td>Name of the Hall:</td>
+                <td colspan="3"><input type="text"></td>
+            </tr>
+            <tr>
+                <td>Event Date:</td>
+                <td colspan="3"><input type="text"></td>
+            </tr>
+            <tr>
+                <td>No. of participants:</td>
+                <td colspan="3"><input type="text"></td>
+            </tr>
+            <tr>
+                <td>Slot Time:</td>
+                <td colspan="3"><input type="text"></td>
+            </tr>
+        </table>
+
+        <p><strong>Facilities to be provided: (Please fill or tick the item):</strong></p>
+        <p><strong><u>For playing sound system, NOC from Juhu police stn. is required to be obtained</u></strong></p>
+
+        <table class="no-border">
+            <tr>
+                <td>1. Dias required for persons:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>2. No. of blank name plates required:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>3. No. of mike/speaker (small or big) req.:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>4. No. of screen required:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>5. No. of OHP/LCD/Laptop required:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>6. No. of Mementos Required:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>7. Podium:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>8. Photographer/Video (for no. of photos):</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>9. Distribution of Handout etc.:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>10. Registration table for person:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>11. Lamp/candle/matchbox:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>12. Size & Layout of the stage:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>13. No. of Plastic Chairs/Cushion Chairs:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>14. IT/Tech Requirement:</td>
+                <td><input type="text"></td>
+            </tr>
+            <tr>
+                <td>15. Any other (Pl. specify):</td>
+                <td><input type="text"></td>
+            </tr>
+        </table>
+
+        <p><strong>Catering services:</strong></p>
+        <p>Name of the Caterer: <input type="text" style="width: 70%;"></p>
+
+                <table>
+            <tr>
+                <th>Services</th>
+                <th>Qty.</th>
+                <th>Rate</th>
+                <th>T. Amt.</th>
+                <th>Time of Serving</th>
+                <th>Menu negotiated with caterer</th>
+            </tr>
+            <tr>
+                <td>a) Tea/Coffee with Biscuits</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>b) High Tea</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>c) Breakfast/snacks</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>d) Lunch</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>e) Water Bottles</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+
+        <table class="no-border">
+            <tr>
+                <td class="no-border" style="width: 50%;">
+                    <div class="signature-line">
+                        <p><strong>Requisition signed by faculty in charge with name</strong></p>
+                    </div>
+                </td>
+                <td class="no-border" style="width: 50%;">
+                    <div class="signature-line">
+                        <p><strong>HOD/Dean</strong></p>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="signature-line">
+            <p><strong>Director (Admin.) / Registrar/ Principal</strong></p>
+        </div>
     </div>
 </body>
 </html>

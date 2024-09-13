@@ -3,13 +3,18 @@ import logger from "../utils/logger";
 import createUser from "../service/createAdmin";
 import authenticateUser from "../service/authAdmin";
 import { signAccessToken, signRefreshToken } from "../utils/signToken";
-import {getUserDatabyEmail, getUserDatabyUsername, getUserDatabyId, getUsers} from "../service/getAdminData";
-import { updateUserById,deleteAdminById } from "../service/updateAdminData";
+import {
+  getUserDatabyEmail,
+  getUserDatabyUsername,
+  getUserDatabyId,
+  getUsers,
+} from "../service/getAdminData";
+import { updateUserById, deleteAdminById } from "../service/updateAdminData";
 import { createSession } from "../service/createSession";
 import { deleteSession } from "../service/deleteSession";
 import { AuthenticatedRequest } from "../types/requests";
 import { HallModel } from "../models/hall.model";
-import { adminType } from "../models/admin.model";
+import Admin, { adminType } from "../models/admin.model";
 
 export async function deleteAdminByIdHandler(req: Request, res: Response) {
   try {
@@ -17,71 +22,93 @@ export async function deleteAdminByIdHandler(req: Request, res: Response) {
 
     const deletedUser = await deleteAdminById(_id);
     if (!deletedUser) {
-      return res.status(404).json({ error: "Admin not found or already deleted" });
+      return res
+        .status(404)
+        .json({ error: "Admin not found or already deleted" });
     }
 
-    return res.status(200).json({ message: "Admin deleted successfully", deletedUser });
+    return res
+      .status(200)
+      .json({ message: "Admin deleted successfully", deletedUser });
   } catch (error: any) {
     console.error("Error deleting admin by id:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 }
 export async function updateAdminByIdHandler(req: Request, res: Response) {
-  console.log()
+  console.log();
   try {
     const { _id, ...updateData } = req.body;
 
     const existingUser = await getUserDatabyId(_id);
     if (!existingUser) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     if (updateData.email) {
       const existingUserByEmail = await getUserDatabyEmail(updateData.email);
-      if (existingUserByEmail._id && existingUserByEmail._id.toString() !== _id) {
-        return res.status(409).json({ error: 'Admin with this email already exists' });
+      if (
+        existingUserByEmail._id &&
+        existingUserByEmail._id.toString() !== _id
+      ) {
+        return res
+          .status(409)
+          .json({ error: "Admin with this email already exists" });
       }
     }
 
     if (updateData.username) {
-      const existingUserByUsername = await getUserDatabyUsername(updateData.username);
-      if (existingUserByUsername._id && existingUserByUsername._id.toString() !== _id) {
-        return res.status(409).json({ error: 'Admin with this username already exists' });
+      const existingUserByUsername = await getUserDatabyUsername(
+        updateData.username
+      );
+      if (
+        existingUserByUsername._id &&
+        existingUserByUsername._id.toString() !== _id
+      ) {
+        return res
+          .status(409)
+          .json({ error: "Admin with this username already exists" });
       }
     }
 
     const updatedUser = await updateUserById(_id, updateData);
 
     if (!updatedUser) {
-      return res.status(500).json({ error: 'Failed to update user' });
+      return res.status(500).json({ error: "Failed to update user" });
     }
 
     return res.status(200).json(updatedUser);
   } catch (error: any) {
-    console.error('Error updating user by id:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error("Error updating user by id:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
-
-
 
 export async function createAdminHandler(req: Request, res: Response) {
   try {
     const { email, username } = req.body;
 
-    const existingUserByEmail: Omit<adminType, "password"> = await getUserDatabyEmail(email);
+    const existingUserByEmail: Omit<adminType, "password"> =
+      await getUserDatabyEmail(email);
     if (!isOmittedAdminTypeEmpty(existingUserByEmail)) {
-      return res.status(409).json({ error: "Admin with this email already exists please try another email" });
+      return res
+        .status(409)
+        .json({
+          error:
+            "Admin with this email already exists please try another email",
+        });
     }
 
-    const existingUserByUsername: Omit<adminType, "password"> = await getUserDatabyUsername(username);
+    const existingUserByUsername: Omit<adminType, "password"> =
+      await getUserDatabyUsername(username);
     if (!isOmittedAdminTypeEmpty(existingUserByUsername)) {
-      return res.status(409).json({ error: "Admin with this username already exists" });
+      return res
+        .status(409)
+        .json({ error: "Admin with this username already exists" });
     }
 
     const userInstance = await createUser(req.body);
     res.status(200).json(userInstance);
-
   } catch (error: any) {
     logger.error(error);
     res.status(400).json({ name: error.name, message: error.message });
@@ -172,10 +199,9 @@ export async function getAdmins(req: Request, res: Response) {
   }
 }
 
-
 export async function getAdminByIdHandler(req: Request, res: Response) {
   try {
-    const userId = req.params.id; 
+    const userId = req.params.id;
 
     const user = await getUserDatabyId(userId);
 
@@ -249,4 +275,16 @@ export async function getHallsforAdminHandler(req: Request, res: Response) {
   }
 }
 
+export async function getManagerByHallId(req: Request, res: Response) {
+  try {
+    const { _id } = req.query;
 
+    const admins = await Admin.find({ managedHalls: _id }).exec();
+    const admin = admins[0];
+
+    return res.status(200).json({ admin: admin });
+  } catch (error: any) {
+    console.error("Error fetching manager by email:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}

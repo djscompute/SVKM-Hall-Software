@@ -103,7 +103,9 @@ export async function editBookingHandler(req: Request, res: Response) {
       time,
       purpose,
       cancellationReason,
-      enquiryNumber
+      enquiryNumber,
+      managerEmail,
+      managerName
     } = req.body as HallBookingType; // Ensure this matches your schema type
 
     const bookingId: string = req.params.id;
@@ -129,7 +131,9 @@ export async function editBookingHandler(req: Request, res: Response) {
         time,
         purpose,
         cancellationReason,
-        enquiryNumber
+        enquiryNumber,
+        managerEmail,
+        managerName,
       },
       { new: true }
     );
@@ -237,14 +241,17 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       contactNo, 
       enquiryNumber, 
       hallName, 
+      hallLocation,
       dateOfEvent, 
-      slotTime, 
+      slotTime,
+      sessionName, 
       purposeOfBooking, 
       hallCharges, 
       additionalFacilities, 
       hallDeposit, 
       totalPayable,
-      hallContact 
+      managerEmail,
+      managerName, 
     } = req.body;
 
     const pdfPath = await generateInquiry({
@@ -254,14 +261,17 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       contactNo,
       enquiryNumber,
       hallName,
+      hallLocation,
       dateOfEvent,
       slotTime,
+      sessionName,
       purposeOfBooking,
       hallCharges,
       additionalFacilities,
       hallDeposit,
       totalPayable,
-      hallContact
+      managerEmail,
+      managerName
     });
     res.json(pdfPath);
   } catch (error) {
@@ -283,6 +293,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       modeOfPayment, 
       additionalPaymentDetails, 
       hallName, 
+      hallLocation,
       dateOfEvent, 
       slotTime, 
       sessionType,
@@ -296,7 +307,8 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       depositDiscount, 
       totalPayable,
       email,
-      hallContact 
+      managerEmail,
+      managerName 
     } = req.body;
     
     const pdfUrl = await generateConfirmation({
@@ -310,6 +322,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       modeOfPayment, 
       additionalPaymentDetails, 
       hallName, 
+      hallLocation,
       dateOfEvent, 
       slotTime, 
       sessionType,
@@ -323,7 +336,8 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       depositDiscount, 
       totalPayable,
       email,
-      hallContact
+      managerEmail,
+      managerName 
     });
     res.json({ pdfUrl });
   } catch (error) {

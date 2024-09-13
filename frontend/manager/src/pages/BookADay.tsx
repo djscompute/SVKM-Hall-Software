@@ -13,6 +13,7 @@ import { queryClient } from "../App";
 import { isValidEmail } from "../utils/validateEmail";
 import { isValidMobile } from "../utils/validateMobile";
 import { AxiosError } from "axios";
+import { adminType } from "../../../../types/global";
 
 function BookADay() {
   const navigate = useNavigate();
@@ -37,7 +38,6 @@ function BookADay() {
     bookingType: "",
   });
 
-  
   const [selectedFeatures, setSelectedFeatures] = useState<{
     [key: string]: EachHallAdditonalFeaturesType;
   }>({});
@@ -67,6 +67,32 @@ function BookADay() {
     },
     staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
+
+  const { data: managerData } = useQuery({
+    queryKey: ["manager", HallData?._id],
+    queryFn: async () => {
+      if (!HallData?._id) {
+        throw new Error("Hall ID is not available");
+      }
+      try {
+        const responsePromise = axiosManagerInstance.get(`getManagerByHallId`, {
+          params: { _id: HallData._id },
+        });
+        toast.promise(responsePromise, {
+          pending: "Fetching manager...",
+          error: "Failed to fetch Manager. Please try again.",
+        });
+        const response = await responsePromise;
+        console.log("The emails of managers are ", response.data);
+        return response.data.admin as adminType; // Adjust the type accordingly
+      } catch (error) {
+        throw error;
+      }
+    },
+    enabled: !!HallData?._id, // Query will be enabled only if HallData._id is available
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
+  });
+
   // console.log("hall data sessions",HallData?.sessions);
 
   useEffect(() => {
@@ -154,7 +180,7 @@ function BookADay() {
               eventPurpose: purpose,
             },
           },
-        });       
+        });
         const additionalFacilities =
           selectedCategory === "SVKM INSTITUTE"
             ? 0
@@ -181,6 +207,7 @@ function BookADay() {
             contactNo: mobileNumber,
             enquiryNumber: enquiryNumber, // Generate a unique enquiry number
             hallName: HallData?.name,
+            hallLocation: `${HallData?.location.desc1},${HallData?.location.desc2}`,
             dateOfEvent: dateOfEvent,
             slotTime: `${convert_IST_TimeString_To12HourFormat(
               HallData?.sessions.find((ss) => ss._id === selectedSessionId)
@@ -188,36 +215,41 @@ function BookADay() {
             )} - ${convert_IST_TimeString_To12HourFormat(
               HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to!
             )}`,
+            sessionName: `${HallData?.sessions.find(
+              (ss) => ss._id === selectedSessionId
+            )?.name!}`,
             purposeOfBooking: purpose,
             hallCharges: sessionPrice,
             additionalFacilities: additionalFacilities,
             hallDeposit: securityDeposit,
             totalPayable: totalPayable,
-            hallContact: "Email to be entered",
+            managerEmail: managerData?.email,
+            managerName: managerData?.username,
           })
           .then(async (response) => {
             axiosManagerInstance
-            .post(`/sendEmail`, {
-              to: email,
-              subject: `SVKM Hall Booking for ${dayjs(day).format("DD-MM-YYYY")}`,
-              text: "Your enquiry for hall booking has been received. Please find the attachments below.",
-              filename: `${name}_${enquiryNumber}_inquiry`,
-              path: "",
-            })
-            .then((response) => {
-              console.log(response.data);
-              return response.data;
-            })
-            .catch((error) => {
-              console.log(error);
-              throw error;
-            });
+              .post(`/sendEmail`, {
+                to: email,
+                subject: `SVKM Hall Booking for ${dayjs(day).format(
+                  "DD-MM-YYYY"
+                )}`,
+                text: "Your enquiry for hall booking has been received. Please find the attachments below.",
+                filename: `${name}_${enquiryNumber}_inquiry`,
+                path: "",
+              })
+              .then((response) => {
+                console.log(response.data);
+                return response.data;
+              })
+              .catch((error) => {
+                console.log(error);
+                throw error;
+              });
           })
           .catch((error) => {
             console.log(error);
             throw error;
           });
-
       }
       await queryClient.refetchQueries({
         queryKey: ["bookaday", `${humanReadableDate}`],
@@ -356,17 +388,17 @@ function BookADay() {
       setPerson(name);
     }
   };
-  HallData?.sessions?.sort((a,b)=>{
-    const getNumber = (name:String) => {
+  HallData?.sessions?.sort((a, b) => {
+    const getNumber = (name: String) => {
       if (!name) {
         return Infinity; // Or another value to handle undefined or null names
       }
       // Extract numeric prefix before the dot, or return Infinity if no numeric prefix
       const match = name.match(/^(\d+)/);
       return match ? parseInt(match[1], 10) : Infinity;
-  }
-  return getNumber(a.name) - getNumber(b.name);
-});
+    };
+    return getNumber(a.name) - getNumber(b.name);
+  });
   useEffect(() => {
     let totalPrice = 0;
     if (selectedCategory?.toLowerCase() !== "svkm institute") {

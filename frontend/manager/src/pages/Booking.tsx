@@ -14,6 +14,7 @@ import { useParams } from "react-router-dom";
 import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
 import { useEffect, useState } from "react";
 import { queryClient } from "../App";
+import useAuthStore from "../store/authStore";
 
 const possibleBookingTypes: bookingStatusType[] = [
   "CONFIRMED",
@@ -29,7 +30,8 @@ function Booking() {
   const [editingMode, setEditingMode] = useState(false);
   const [addAdditional, setAdditional] = useState(false);
   const [editedData, setEditedData] = useState<HallBookingType>();
-  const [multipleTransactionData, setMultipleTransactionData] = useState<bookingTransactionType>();
+  const [multipleTransactionData, setMultipleTransactionData] =
+    useState<bookingTransactionType>();
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
   const [selectedOption, setSelectedOption] = useState<string>("");
@@ -46,6 +48,8 @@ function Booking() {
     features: [{ heading: "", desc: "", price: 0 }],
     booking_type: "",
   });
+
+  const [user] = useAuthStore((store) => [store.user]);
 
   const { data, error, isFetching } = useQuery({
     queryKey: [`booking/${bookingId}`],
@@ -65,8 +69,18 @@ function Booking() {
             `getHall/${response.data.hallId}`
           );
           setHallData(result.data);
+          console.log("Hall data is ", result.data);
         }
-        return response.data as HallBookingType;
+        const updatedData: HallBookingType = {
+          ...response.data,
+          managerEmail: response.data.managerEmail
+            ? response.data.managerEmail
+            : user?.email,
+          managerName: response.data.managerName
+            ? response.data.managerName
+            : "",
+        };
+        return updatedData as HallBookingType;
       } catch (error) {
         throw error;
       }
@@ -110,7 +124,7 @@ function Booking() {
           ...editedData,
           date: dayjs().format("DD-MM-YYYY"),
           status: "CONFIRMED" as bookingStatusType,
-          cancellationReason : ""
+          cancellationReason: "",
         }
       );
       toast.promise(responsePromise, {
@@ -135,28 +149,25 @@ function Booking() {
   // Mututation for confirm and save booking of Multiple payments
   const confirmAndSaveMultipleBooking = useMutation({
     mutationFn: async () => {
-  
-      console.log( "json to",{
+      console.log("json to", {
         booking_ids: selectedBookings,
         // date: multipleTransactionData?.date || dayjs().format("DD-MM-YYYY"),
         transaction: multipleTransactionData,
         totalPayable: grandTotal,
-        status: "CONFIRMED" ,
-      })
-      const responsePromise = axiosManagerInstance.post(
-        `/multipleBookings`, 
-        {
-          booking_ids: selectedBookings,
-          // date: multipleTransactionData?.date || dayjs().format("DD-MM-YYYY"),
-          transaction: multipleTransactionData,
-          totalPayable: grandTotal,
-          status: "CONFIRMED" ,
-        }
-      );
+        status: "CONFIRMED",
+      });
+      const responsePromise = axiosManagerInstance.post(`/multipleBookings`, {
+        booking_ids: selectedBookings,
+        // date: multipleTransactionData?.date || dayjs().format("DD-MM-YYYY"),
+        transaction: multipleTransactionData,
+        totalPayable: grandTotal,
+        status: "CONFIRMED",
+      });
       toast.promise(responsePromise, {
         pending: "Updating and Confirming Multiple Bookings...",
         success: "Multiple Bookings Confirmed and Updated Successfully!",
-        error: "Failed to Confirm and Update Multiple Bookings. Please try again.",
+        error:
+          "Failed to Confirm and Update Multiple Bookings. Please try again.",
       });
       const response = await responsePromise;
       return response.data;
@@ -171,7 +182,6 @@ function Booking() {
       console.log(error);
     },
   });
-  
 
   const generateConfirmationAndEmail = async () => {
     console.log("generating confirmation");
@@ -202,6 +212,7 @@ function Booking() {
             editedData?.transaction?.type || data?.transaction?.type || "",
           additionalPaymentDetails: getAdditionalPaymentDetails(),
           hallName: hallData?.name || "",
+          hallLocation: `${hallData?.location.desc1},${hallData?.location.desc2}`,
           dateOfEvent: dayjs(editedData?.from || data?.from).format(
             "DD-MM-YYYY"
           ),
@@ -236,7 +247,8 @@ function Booking() {
             editedData?.depositDiscount || data?.depositDiscount || 0,
           totalPayable: calculateTotalPayable(),
           email: editedData?.user.email || data?.user.email || "",
-          hallContact: "Email to be entered",
+          managerEmail: editedData?.managerEmail || data?.managerEmail,
+          managerName: editedData?.managerName || data?.managerName,
         }
       );
 
@@ -253,7 +265,7 @@ function Booking() {
         path: pdfUrl, // Use the pdfUrl here if needed
       });
       console.log("Email sent successfully");
-      return pdfUrl
+      return pdfUrl;
     } catch (error) {
       console.error("Error in generate confirmation or send email:", error);
     }
@@ -479,14 +491,13 @@ function Booking() {
     }
   
     setMultipleTransactionData((prevData) => {
-      console.log("this is multiple transaction data" , multipleTransactionData)
+      console.log("this is multiple transaction data", multipleTransactionData);
       if (!prevData) {
         return { [field]: value } as bookingTransactionType;
       }
       return { ...prevData, [field]: value };
     });
   };
-
 
   // Edit deposit when multiple payment
   const editIsDepositApplicableInMultiple = useMutation({
@@ -546,6 +557,7 @@ function Booking() {
   });
 
   const handleEdit = () => {
+    console.log("updated data is", data);
     setEditingMode(true);
     if (!editedData) {
       setEditedData(data);
@@ -660,8 +672,10 @@ function Booking() {
       }
       return 0; // Default if `features` is not an array
     };
-    setTotalFeatureCharges(calculateTotalFeatureCharges(selectedBooking?.features));
-    console.log(selectedBooking,"This is a selected booking")
+    setTotalFeatureCharges(
+      calculateTotalFeatureCharges(selectedBooking?.features)
+    );
+    console.log(selectedBooking, "This is a selected booking");
   };
 
   // Function to get booking name by ID
@@ -723,13 +737,12 @@ function Booking() {
         if (!response.data.exists) {
           toast.success(
             "This booking payment is not associated with other bookings "
-          );          
-        }
-        else{
+          );
+        } else {
           toast.error(
             "This booking payment is already associated with other bookings as a payment "
-          ); 
-          console.log("All the bookings in multiple",response.data)
+          );
+          console.log("All the bookings in multiple", response.data);
           if (
             response.data &&
             response.data.multipleBooking &&
@@ -846,6 +859,42 @@ function Booking() {
     }
     toast.error("Please enter the payment details");
     return false;
+  };
+
+  const detailsExists = () => {
+    let hasErrors = false;
+    if(!(editedData?.user.username))
+    {
+      hasErrors = true;
+      toast.error("Enter the username")
+    }
+    if(!(editedData?.user.mobile))
+    {
+      hasErrors = true;
+      toast.error("Enter the Mobile Number")
+    }
+    if(!(editedData?.user.contact))
+    {
+      hasErrors = true;
+      toast.error("Enter the Contact Person")
+    }
+    if(!(editedData?.user.email))
+    {
+      hasErrors = true;
+      toast.error("Enter the Email")
+    }
+    if(!(editedData?.managerEmail))
+    {
+      hasErrors = true;
+      toast.error("Enter the Manager Email")
+    }
+    if(!(editedData?.managerName))
+    {
+      hasErrors = true;
+      toast.error("Enter the Manager Name")
+    }
+
+    return !hasErrors;
   };
 
   const confirmExists = () => {
@@ -1001,7 +1050,7 @@ function Booking() {
                 };
               })
             }
-            placeholder="Enter GST Number"
+            placeholder="Enter Email"
             className="px-2"
           />
         </div>
@@ -1183,6 +1232,59 @@ function Booking() {
       )}
 
       {/* When payment menthod is set to  multiple */}
+      {/* Manager Email */}
+      <span className=" text-lg font-medium">Manager Details</span>
+      {/* Manager Phone Number */}
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Manager Name</span>
+          <input
+            type="text"
+            value={editedData?.managerName}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  managerName: e.target.value,
+                };
+              })
+            }
+            placeholder="Manager Contact Number"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Manager Name</span>
+          <span className="w-full text-right">{data?.managerName}</span>
+        </div>
+      )}
+      {editingMode ? (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Manager Email</span>
+          <input
+            type="email"
+            value={editedData?.managerEmail}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  managerEmail: e.target.value,
+                };
+              })
+            }
+            placeholder="Manager Email"
+            className="px-2"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span className="w-full text-left">Manager Email</span>
+          <span className="w-full text-right">{data?.managerEmail}</span>
+        </div>
+      )}
 
       {selectedBookingData ? (
         <>
@@ -1646,42 +1748,43 @@ function Booking() {
           </div>
         ))}
 
-      {showCancellationReason ? (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600 my-5">
-          <span className="w-full text-left">Cancellation Reason</span>
-          <input
-            type="text"
-            value={cancellationReason}
-            onChange={(e) => setCancellationReason(e.target.value)}
-            placeholder="Enter Cancellation Reason"
-            className="px-2"
-          />
-          <button
-            onClick={async () => {
-              await handleSaveCancellationReason();
-              handleCancellation();
-            }}
-            className="bg-green-500 px-4 text-white py-1 rounded-lg"
-          >
-            Confirm Cancellation
-          </button>
-        </div>
-      ) : (
-        <></>
-      )}
+          {showCancellationReason ? (
+            <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600 my-5">
+              <span className="w-full text-left">Cancellation Reason</span>
+              <input
+                type="text"
+                value={cancellationReason}
+                onChange={(e) => setCancellationReason(e.target.value)}
+                placeholder="Enter Cancellation Reason"
+                className="px-2"
+              />
+              <button
+                onClick={async () => {
+                  await handleSaveCancellationReason();
+                  handleCancellation();
+                }}
+                className="bg-green-500 px-4 text-white py-1 rounded-lg"
+              >
+                Confirm Cancellation
+              </button>
+            </div>
+          ) : (
+            <></>
+          )}
 
-      {selectedBookingData?.cancellationReason && selectedBookingData?.status == "CANCELLED" && (
-        <div className="w-full flex justify-between my-2 bg-red-400 rounded-sm px-2 py-1 border text-white">
-          <span className="text-lg font-medium">Cancellation Reason</span>
-          <span>{selectedBookingData?.cancellationReason}</span>
-        </div>
-      )}
+          {selectedBookingData?.cancellationReason &&
+            selectedBookingData?.status == "CANCELLED" && (
+              <div className="w-full flex justify-between my-2 bg-red-400 rounded-sm px-2 py-1 border text-white">
+                <span className="text-lg font-medium">Cancellation Reason</span>
+                <span>{selectedBookingData?.cancellationReason}</span>
+              </div>
+            )}
 
-      {editingMode ? (
-        <>
-          <h1 className="text-lg font-medium">Set Booking Status</h1>
-          <span className="space-x-4 space-y-4">
-            {/* <button
+          {editingMode ? (
+            <>
+              <h1 className="text-lg font-medium">Set Booking Status</h1>
+              <span className="space-x-4 space-y-4">
+                {/* <button
               onClick={() => {
                 setShowCancellationReason(true);
               }}
@@ -1762,7 +1865,6 @@ function Booking() {
             <span className="w-full text-left">Purpose of the Event</span>
             <span className="w-full text-right">{data?.purpose || "-"}</span>
           </div>
-
 
           {/* Additional Features */}
           <span className=" text-lg font-medium m-1">Additional Features</span>
@@ -1991,7 +2093,11 @@ function Booking() {
                     if (!prev) return undefined;
                     return {
                       ...prev,
-                      baseDiscount: Number.isNaN(Number(e.target.value)) ? 0 : ((Number(e.target.value) > 100) ? 100 : Number(e.target.value)),
+                      baseDiscount: Number.isNaN(Number(e.target.value))
+                        ? 0
+                        : Number(e.target.value) > 100
+                        ? 100
+                        : Number(e.target.value),
                     };
                   });
                 }}
@@ -2182,7 +2288,11 @@ function Booking() {
                       if (!prev) return undefined;
                       return {
                         ...prev,
-                        depositDiscount: Number.isNaN(Number(e.target.value)) ? 0 : ((Number(e.target.value) > 100) ? 100 : Number(e.target.value)),
+                        depositDiscount: Number.isNaN(Number(e.target.value))
+                          ? 0
+                          : Number(e.target.value) > 100
+                          ? 100
+                          : Number(e.target.value),
                       };
                     })
                   }
@@ -2354,45 +2464,48 @@ function Booking() {
               </div>
             </>
           )}
-           <div className="flex mt-5 items-center w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <div className="flex mt-5 items-center w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Grand Total Amount</span>
             <span className="w-full text-right">
-              <span className="w-full text-right"> {data?.booking_type == "SVKM INSTITUTE" ? (
-                      <div>
-                        {data
-                          ? (priceEntry?.price || 0) +
+              <span className="w-full text-right">
+                {" "}
+                {data?.booking_type == "SVKM INSTITUTE" ? (
+                  <div>
+                    {data
+                      ? (priceEntry?.price || 0) +
+                        totalFeatureCharges -
+                        0.01 *
+                          data!.baseDiscount *
+                          ((priceEntry?.price || 0) + totalFeatureCharges) +
+                        (data.isDeposit
+                          ? data.deposit -
+                            0.01 * data.depositDiscount * data.deposit
+                          : 0)
+                      : 0}
+                  </div>
+                ) : (
+                  <div>
+                    {data
+                      ? (priceEntry?.price || 0) +
+                        totalFeatureCharges -
+                        0.01 *
+                          data!.baseDiscount *
+                          ((priceEntry?.price || 0) + totalFeatureCharges) +
+                        0.18 *
+                          ((priceEntry?.price || 0) +
                             totalFeatureCharges -
                             0.01 *
                               data!.baseDiscount *
-                              ((priceEntry?.price || 0) + totalFeatureCharges) +
-                            (data.isDeposit
-                              ? data.deposit -
-                                0.01 * data.depositDiscount * data.deposit
-                              : 0)
-                          : 0}
-                      </div>
-                    ) : (
-                      <div>
-                        {data
-                          ? (priceEntry?.price || 0) +
-                            totalFeatureCharges -
-                            0.01 *
-                              data!.baseDiscount *
-                              ((priceEntry?.price || 0) + totalFeatureCharges) +
-                            0.18 *
                               ((priceEntry?.price || 0) +
-                                totalFeatureCharges -
-                                0.01 *
-                                  data!.baseDiscount *
-                                  ((priceEntry?.price || 0) +
-                                    totalFeatureCharges)) +
-                            (data.isDeposit
-                              ? data.deposit -
-                                0.01 * data.depositDiscount * data.deposit
-                              : 0)
-                          : 0}
-                      </div>
-                    )}</span>
+                                totalFeatureCharges)) +
+                        (data.isDeposit
+                          ? data.deposit -
+                            0.01 * data.depositDiscount * data.deposit
+                          : 0)
+                      : 0}
+                  </div>
+                )}
+              </span>
             </span>
           </div>
           {editingMode || addAdditional ? (
@@ -2406,322 +2519,329 @@ function Booking() {
             <></>
           )}
 
-
-      {["cheque", "upi", "neft/rtgs"].includes(
-        data?.transaction?.type || ""
-      ) ? (
-        <span className="mt-4 text-lg font-medium">Transaction Details</span>
-      ) : (
-        <>
-          <span className="mt-4 text-lg font-medium">Transaction Details</span>
-          <span className="mt-2">Payment Method: SVKM Institute</span>
-        </>
-      )}
-
-      {editingMode ? (
-        <span>
-          <label htmlFor="transaction">Choose a Transaction Type </label>
-          <select
-            id="transaction"
-            value={data?.transaction?.type || ""}
-            className="px-2 py-1 rounded-md border border-gray-400 my-2"
-            onChange={(e) =>
-              editTransactionType.mutate(e.target.value as transactionType)
-            }
-          >
-            <option value="" disabled>
-              Select an option
-            </option>
-            <option value="cheque">Cheque</option>
-            <option value="upi">UPI</option>
-            <option value="neft/rtgs">NEFT/RTGS</option>
-            <option value="svkminstitute">SVKM Institute</option>
-          </select>
-        </span>
-      ) : (
-        <></>
-      )}
-      {["cheque", "upi", "neft/rtgs"].includes(data?.transaction?.type || "") &&
-        (editingMode ? (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Date</span>
-            <input
-              type="text"
-              value={editedData?.transaction?.date}
-              onChange={(e) =>
-                setEditedData((prev) => {
-                  if (!prev) return undefined;
-                  return {
-                    ...prev,
-                    transaction: {
-                      ...prev.transaction,
-                      date: e.target.value,
-                    },
-                  };
-                })
-              }
-              placeholder="DD-MM-YYYY"
-              className="px-2"
-            />
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Date</span>
-            <span className="w-full text-right">
-              {data?.transaction?.date || "-"}
+          {["cheque", "upi", "neft/rtgs"].includes(
+            data?.transaction?.type || ""
+          ) ? (
+            <span className="mt-4 text-lg font-medium">
+              Transaction Details
             </span>
-          </div>
-        ))}
-      {["upi"].includes(data?.transaction?.type || "") &&
-        (editingMode ? (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Transaction ID</span>
-            <input
-              type="text"
-              value={editedData?.transaction?.transactionID}
-              onChange={(e) =>
-                setEditedData((prev) => {
-                  if (!prev) return undefined;
-                  return {
-                    ...prev,
-                    transaction: {
-                      ...prev.transaction,
-                      transactionID: e.target.value,
-                    },
-                  };
-                })
-              }
-              placeholder="Enter Transaction ID"
-              className="px-2"
-            />
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Transaction ID</span>
-            <span className="w-full text-right">
-              {data?.transaction?.transactionID || "-"}
-            </span>
-          </div>
-        ))}
-      {["neft/rtgs"].includes(data?.transaction?.type || "") &&
-        (editingMode ? (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">UTR No.</span>
-            <input
-              type="text"
-              value={editedData?.transaction?.utrNo}
-              onChange={(e) =>
-                setEditedData((prev) => {
-                  if (!prev) return undefined;
-                  return {
-                    ...prev,
-                    transaction: {
-                      ...prev.transaction,
-                      utrNo: e.target.value,
-                    },
-                  };
-                })
-              }
-              placeholder="Enter UTR Number"
-              className="px-2"
-            />
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">UTR No.</span>
-            <span className="w-full text-right">
-              {data?.transaction?.utrNo || "-"}
-            </span>
-          </div>
-        ))}
-      {["cheque"].includes(data?.transaction?.type || "") &&
-        (editingMode ? (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Cheque No.</span>
-            <input
-              type="text"
-              value={editedData?.transaction?.chequeNo}
-              onChange={(e) =>
-                setEditedData((prev) => {
-                  if (!prev) return undefined;
-                  return {
-                    ...prev,
-                    transaction: {
-                      ...prev.transaction,
-                      chequeNo: e.target.value,
-                    },
-                  };
-                })
-              }
-              placeholder="Enter Cheque Number"
-              className="px-2"
-            />
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Cheque No.</span>
-            <span className="w-full text-right">
-              {data?.transaction?.chequeNo || "-"}
-            </span>
-          </div>
-        ))}
-      {["cheque"].includes(data?.transaction?.type || "") &&
-        (editingMode ? (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Bank</span>
-            <input
-              type="text"
-              value={editedData?.transaction?.bank}
-              onChange={(e) =>
-                setEditedData((prev) => {
-                  if (!prev) return undefined;
-                  return {
-                    ...prev,
-                    transaction: {
-                      ...prev.transaction,
-                      bank: e.target.value,
-                    },
-                  };
-                })
-              }
-              placeholder="Enter Bank Name"
-              className="px-2"
-            />
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Bank</span>
-            <span className="w-full text-right">
-              {data?.transaction?.bank || "-"}
-            </span>
-          </div>
-        ))}
+          ) : ["svkminstitute"].includes(data?.transaction?.type || "") ? (
+            <>
+              <span className="mt-4 text-lg font-medium">
+                Transaction Details
+              </span>
+              <span className="mt-2">Payment Method: SVKM Institute</span>
+            </>
+          ) : null}
 
-      {["cheque"].includes(data?.transaction?.type || "") &&
-        (editingMode ? (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Payee Name</span>
-            <input
-              type="text"
-              value={editedData?.transaction?.payeeName}
-              onChange={(e) =>
-                setEditedData((prev) => {
-                  if (!prev) return undefined;
-                  return {
-                    ...prev,
-                    transaction: {
-                      ...prev.transaction,
-                      payeeName: e.target.value,
-                    },
-                  };
-                })
-              }
-              placeholder="Enter Payee Name"
-              className="px-2"
-            />
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">Payee Name</span>
-            <span className="w-full text-right">
-              {data?.transaction?.payeeName || "-"}
-            </span>
-          </div>
-        ))}
-
-      {showCancellationReason ? (
-        <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600 my-5">
-          <span className="w-full text-left">Cancellation Reason</span>
-          <input
-            type="text"
-            value={cancellationReason}
-            onChange={(e) => setCancellationReason(e.target.value)}
-            placeholder="Enter Cancellation Reason"
-            className="px-2"
-          />
-          <button
-            onClick={async () => {
-              await handleSaveCancellationReason();
-              handleCancellation();
-            }}
-            className="bg-green-500 px-4 text-white py-1 rounded-lg"
-          >
-            Confirm Cancellation
-          </button>
-        </div>
-      ) : (
-        <></>
-      )}
-
-      {data?.cancellationReason && data?.status == "CANCELLED" && (
-        <div className="w-full flex justify-between my-2 bg-red-400 rounded-sm px-2 py-1 border text-white">
-          <span className="text-lg font-medium">Cancellation Reason</span>
-          <span>{data?.cancellationReason}</span>
-        </div>
-      )}
-
-      {editingMode ? (
-        <>
-          <h1 className="text-lg font-medium">Set Booking Status</h1>
-          <span className="space-x-4 space-y-4">
-            <button
-              onClick={() => {
-                setShowCancellationReason(true);
-              }}
-              className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
-            >
-              Cancelled
-            </button>
-            <button
-              onClick={() => {
-                setShowCancellationReason(false);
-                editBookingStatus.mutate("ENQUIRY" as bookingStatusType);
-              }}
-              className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
-            >
-              Enquiry
-            </button>
-            {/* Confirmed button with saving the edits */}
-            <button
-              onClick={async () => {
-                setShowCancellationReason(false);
-                if (!confirmExists() && paymentDetails()) {
-                  await confirmAndSaveBooking.mutateAsync();
-                  generateConfirmationAndEmail();
+          {editingMode ? (
+            <span>
+              <label htmlFor="transaction">Choose a Transaction Type </label>
+              <select
+                id="transaction"
+                value={data?.transaction?.type || ""}
+                className="px-2 py-1 rounded-md border border-gray-400 my-2"
+                onChange={(e) =>
+                  editTransactionType.mutate(e.target.value as transactionType)
                 }
-              }}
-              className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
-            >
-              Confirmed
-            </button>
-          </span>
-        </>
-      ) : (
-        <></>
-      )}
+              >
+                <option value="" disabled>
+                  Select an option
+                </option>
+                <option value="cheque">Cheque</option>
+                <option value="upi">UPI</option>
+                <option value="neft/rtgs">NEFT/RTGS</option>
+                <option value="svkminstitute">SVKM Institute</option>
+              </select>
+            </span>
+          ) : (
+            <></>
+          )}
+          {["cheque", "upi", "neft/rtgs"].includes(
+            data?.transaction?.type || ""
+          ) &&
+            (editingMode ? (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Date</span>
+                <input
+                  type="text"
+                  value={editedData?.transaction?.date}
+                  onChange={(e) =>
+                    setEditedData((prev) => {
+                      if (!prev) return undefined;
+                      return {
+                        ...prev,
+                        transaction: {
+                          ...prev.transaction,
+                          date: e.target.value,
+                        },
+                      };
+                    })
+                  }
+                  placeholder="DD-MM-YYYY"
+                  className="px-2"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Date</span>
+                <span className="w-full text-right">
+                  {data?.transaction?.date || "-"}
+                </span>
+              </div>
+            ))}
+          {["upi"].includes(data?.transaction?.type || "") &&
+            (editingMode ? (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Transaction ID</span>
+                <input
+                  type="text"
+                  value={editedData?.transaction?.transactionID}
+                  onChange={(e) =>
+                    setEditedData((prev) => {
+                      if (!prev) return undefined;
+                      return {
+                        ...prev,
+                        transaction: {
+                          ...prev.transaction,
+                          transactionID: e.target.value,
+                        },
+                      };
+                    })
+                  }
+                  placeholder="Enter Transaction ID"
+                  className="px-2"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Transaction ID</span>
+                <span className="w-full text-right">
+                  {data?.transaction?.transactionID || "-"}
+                </span>
+              </div>
+            ))}
+          {["neft/rtgs"].includes(data?.transaction?.type || "") &&
+            (editingMode ? (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">UTR No.</span>
+                <input
+                  type="text"
+                  value={editedData?.transaction?.utrNo}
+                  onChange={(e) =>
+                    setEditedData((prev) => {
+                      if (!prev) return undefined;
+                      return {
+                        ...prev,
+                        transaction: {
+                          ...prev.transaction,
+                          utrNo: e.target.value,
+                        },
+                      };
+                    })
+                  }
+                  placeholder="Enter UTR Number"
+                  className="px-2"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">UTR No.</span>
+                <span className="w-full text-right">
+                  {data?.transaction?.utrNo || "-"}
+                </span>
+              </div>
+            ))}
+          {["cheque"].includes(data?.transaction?.type || "") &&
+            (editingMode ? (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Cheque No.</span>
+                <input
+                  type="text"
+                  value={editedData?.transaction?.chequeNo}
+                  onChange={(e) =>
+                    setEditedData((prev) => {
+                      if (!prev) return undefined;
+                      return {
+                        ...prev,
+                        transaction: {
+                          ...prev.transaction,
+                          chequeNo: e.target.value,
+                        },
+                      };
+                    })
+                  }
+                  placeholder="Enter Cheque Number"
+                  className="px-2"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Cheque No.</span>
+                <span className="w-full text-right">
+                  {data?.transaction?.chequeNo || "-"}
+                </span>
+              </div>
+            ))}
+          {["cheque"].includes(data?.transaction?.type || "") &&
+            (editingMode ? (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Bank</span>
+                <input
+                  type="text"
+                  value={editedData?.transaction?.bank}
+                  onChange={(e) =>
+                    setEditedData((prev) => {
+                      if (!prev) return undefined;
+                      return {
+                        ...prev,
+                        transaction: {
+                          ...prev.transaction,
+                          bank: e.target.value,
+                        },
+                      };
+                    })
+                  }
+                  placeholder="Enter Bank Name"
+                  className="px-2"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Bank</span>
+                <span className="w-full text-right">
+                  {data?.transaction?.bank || "-"}
+                </span>
+              </div>
+            ))}
 
-      {data?.status === "CONFIRMED" && !editingMode && (
-        <span className="space-x-4 space-y-4">
-          <button
-            onClick={async () => {
-              if (paymentDetails()) {
-                generateConfirmationAndEmail();
-              }
-            }}
-            className="my-4 bg-green-600 px-4 text-white py-1 rounded-lg"
-          >
-            Resend Email
-          </button>
-          <button
-            onClick={async ()=>window.open(await generateConfirmationAndEmail())}
-            className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
-          >
-            Download Confirmation
-          </button>
-        </span>
-      )}
+          {["cheque"].includes(data?.transaction?.type || "") &&
+            (editingMode ? (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Payee Name</span>
+                <input
+                  type="text"
+                  value={editedData?.transaction?.payeeName}
+                  onChange={(e) =>
+                    setEditedData((prev) => {
+                      if (!prev) return undefined;
+                      return {
+                        ...prev,
+                        transaction: {
+                          ...prev.transaction,
+                          payeeName: e.target.value,
+                        },
+                      };
+                    })
+                  }
+                  placeholder="Enter Payee Name"
+                  className="px-2"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+                <span className="w-full text-left">Payee Name</span>
+                <span className="w-full text-right">
+                  {data?.transaction?.payeeName || "-"}
+                </span>
+              </div>
+            ))}
 
-      {/* {!showCancellationReason && (
+          {showCancellationReason ? (
+            <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600 my-5">
+              <span className="w-full text-left">Cancellation Reason</span>
+              <input
+                type="text"
+                value={cancellationReason}
+                onChange={(e) => setCancellationReason(e.target.value)}
+                placeholder="Enter Cancellation Reason"
+                className="px-2"
+              />
+              <button
+                onClick={async () => {
+                  await handleSaveCancellationReason();
+                  handleCancellation();
+                }}
+                className="bg-green-500 px-4 text-white py-1 rounded-lg"
+              >
+                Confirm Cancellation
+              </button>
+            </div>
+          ) : (
+            <></>
+          )}
+
+          {data?.cancellationReason && data?.status == "CANCELLED" && (
+            <div className="w-full flex justify-between my-2 bg-red-400 rounded-sm px-2 py-1 border text-white">
+              <span className="text-lg font-medium">Cancellation Reason</span>
+              <span>{data?.cancellationReason}</span>
+            </div>
+          )}
+
+          {editingMode ? (
+            <>
+              <h1 className="text-lg font-medium">Set Booking Status</h1>
+              <span className="space-x-4 space-y-4">
+                <button
+                  onClick={() => {
+                    setShowCancellationReason(true);
+                  }}
+                  className="mb-2 bg-red-600 px-4 text-white py-1 rounded-lg"
+                >
+                  Cancelled
+                </button>
+                <button
+                  onClick={() => {
+                    setShowCancellationReason(false);
+                    editBookingStatus.mutate("ENQUIRY" as bookingStatusType);
+                  }}
+                  className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+                >
+                  Enquiry
+                </button>
+                {/* Confirmed button with saving the edits */}
+                <button
+                  onClick={async () => {
+                    setShowCancellationReason(false);
+                    if (!confirmExists() && paymentDetails() && detailsExists()) {
+                      await confirmAndSaveBooking.mutateAsync();
+                      generateConfirmationAndEmail();
+                    }
+                  }}
+                  className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
+                >
+                  Confirmed
+                </button>
+              </span>
+            </>
+          ) : (
+            <></>
+          )}
+
+          {data?.status === "CONFIRMED" && !editingMode && (
+            <span className="space-x-4 space-y-4">
+              <button
+                onClick={async () => {
+                  if (paymentDetails() && detailsExists()) {
+                    generateConfirmationAndEmail();
+                  }
+                }}
+                className="my-4 bg-green-600 px-4 text-white py-1 rounded-lg"
+              >
+                Resend Email
+              </button>
+              <button
+                onClick={async () =>
+                  window.open(await generateConfirmationAndEmail())
+                }
+                className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+              >
+                Download Confirmation
+              </button>
+            </span>
+          )}
+
+          {/* {!showCancellationReason && (
         <button
           onClick={() => {
             setShowCancellationReason(true);
@@ -2731,9 +2851,9 @@ function Booking() {
           Handle Cancellation
         </button>
       )} */}
-         </>)}
+        </>
+      )}
     </div>
-    
   );
 }
 
