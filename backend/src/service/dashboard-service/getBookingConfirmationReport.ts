@@ -36,12 +36,13 @@ interface BookingConfirmationReportRequest {
 }
 
 let gst: number;
+let depositAmount: number;
 const calculateAmountPaid = (data: any): number => {
   const basePrice = data?.price || 0;
   const discountedPrice =
     basePrice - 0.01 * (data?.baseDiscount || 0) * basePrice;
   gst = data?.booking_type === "SVKM INSTITUTE" ? 0 : 0.18 * discountedPrice;
-  const depositAmount = data?.isDeposit
+  depositAmount = data?.isDeposit
     ? (data?.deposit || 0) -
       0.01 * (data?.depositDiscount || 0) * (data?.deposit || 0)
     : 0;
@@ -211,7 +212,7 @@ export async function getBookingConfirmationReport(
           ? calculateAmountPaid(booking)
           : "Cannot Display",
         "Security Deposit": params.displayHallCharges
-          ? booking.deposit
+          ? depositAmount
           : "Cannot Display",
         GST: params.displayHallCharges ? gst : "Cannot Display",
         transaction: booking.transaction,
