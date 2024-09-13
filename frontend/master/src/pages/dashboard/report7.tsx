@@ -423,8 +423,8 @@ function Report7() {
                     {booking.eventDate}
                   </td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking.Session}</td>
-                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking.From}</td>
-                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking.To}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{convert_IST_TimeString_To12HourFormat(booking.From)}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{convert_IST_TimeString_To12HourFormat(booking.To)}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Hall Name"]}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">
                     {booking["Additional Facility"]}
