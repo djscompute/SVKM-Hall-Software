@@ -614,6 +614,7 @@ function Report8() {
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {/* {booking["Session"]} */}
+
                         {/* {booking["Session"].name} {booking["Session"].time.from}{" "}
                         - {booking["Session"].time.to} */}
                         {booking["Session"] ? (
@@ -631,6 +632,7 @@ function Report8() {
                         ) : (
                           "Session not available"
                         )}
+
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Additional Facility"]

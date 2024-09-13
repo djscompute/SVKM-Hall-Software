@@ -117,14 +117,17 @@ export const InquirySchema = z.object({
     contactNo: z.string(),
     enquiryNumber: z.string(),
     hallName: z.string(),
+    hallLocation: z.string(),
     dateOfEvent: z.string(),
     slotTime: z.string(),
+    sessionName: z.string(),
     purposeOfBooking: z.string(),
     hallCharges: z.number(),
     additionalFacilities: z.number(),
     hallDeposit: z.number(),
     totalPayable: z.number(),
-    hallContact: z.string(),
+    managerEmail: z.string(),
+    managerName: z.string(),
   }),
 });
 
@@ -140,6 +143,7 @@ export const ConfirmationSchema = z.object({
     modeOfPayment: z.string(),
     additionalPaymentDetails: z.string().optional(),
     hallName: z.string(),
+    hallLocation: z.string(),
     dateOfEvent: z.string(),
     slotTime: z.string(),
     sessionType: z.string(),
@@ -153,7 +157,8 @@ export const ConfirmationSchema = z.object({
     depositDiscount: z.number().min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     totalPayable: z.number(),
     email: z.string().email(), // Ensuring a valid email format
-    hallContact: z.string(),
+    managerEmail: z.string(),
+    managerName: z.string(),
   }),
 });
 export const getBookingsByHallZodSchema = z.object({
