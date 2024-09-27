@@ -270,6 +270,93 @@ function Booking() {
       console.error("Error in generate confirmation or send email:", error);
     }
   };
+  const generateCancellationAndEmail = async () => {
+    console.log("generating cancellation");
+
+    const hallDeposit =
+      editedData?.isDeposit === false
+        ? 0
+        : editedData?.deposit ??
+          (data?.isDeposit === false ? 0 : data?.deposit ?? 0);
+
+    console.log(data?.from);
+
+    const startTime = dayjs(editedData?.from || data?.from).format("HH:mm:ss");
+    const endTime = dayjs(editedData?.to || data?.to).format("HH:mm:ss");
+
+    try {
+      const response = await axiosManagerInstance.post(
+        `/generateCancellation`,
+        {
+          date: dayjs().format("DD-MM-YYYY"), // Current date
+          customerName: editedData?.user.username || data?.user.username,
+          contactPerson: editedData?.user.contact || data?.user.contact,
+          contactNo: editedData?.user.mobile || data?.user.mobile,
+          enquiryNumber: editedData?.enquiryNumber || data?.enquiryNumber || "",
+          gstNo: editedData?.user.gstNo || data?.user.gstNo || "",
+          pan: editedData?.user.panNo || data?.user.panNo || "",
+          modeOfPayment:
+            editedData?.transaction?.type || data?.transaction?.type || "",
+          additionalPaymentDetails: getAdditionalPaymentDetails(),
+          hallName: hallData?.name || "",
+          hallLocation: `${hallData?.location.desc1},${hallData?.location.desc2}`,
+          dateOfEvent: dayjs(editedData?.from || data?.from).format(
+            "DD-MM-YYYY"
+          ),
+          slotTime: `${convert_IST_TimeString_To12HourFormat(
+            startTime
+          )} - ${convert_IST_TimeString_To12HourFormat(endTime)}`,
+          sessionType: session?.name,
+          purposeOfBooking: editedData?.purpose || data?.purpose || "",
+          hallCharges: priceEntry?.price || 0,
+          additionalFacilities: totalFeatureCharges,
+          discountPercent: editedData?.baseDiscount || data?.baseDiscount || 0,
+          sgst:
+            data?.booking_type === "SVKM INSTITUTE"
+              ? 0
+              : 0.09 *
+                ((priceEntry?.price || 0) +
+                  totalFeatureCharges -
+                  0.01 *
+                    (editedData?.baseDiscount || data?.baseDiscount || 0) *
+                    ((priceEntry?.price || 0) + totalFeatureCharges)),
+          cgst:
+            data?.booking_type === "SVKM INSTITUTE"
+              ? 0
+              : 0.09 *
+                ((priceEntry?.price || 0) +
+                  totalFeatureCharges -
+                  0.01 *
+                    (editedData?.baseDiscount || data?.baseDiscount || 0) *
+                    ((priceEntry?.price || 0) + totalFeatureCharges)),
+          hallDeposit: hallDeposit,
+          depositDiscount:
+            editedData?.depositDiscount || data?.depositDiscount || 0,
+          totalPayable: calculateTotalPayable(),
+          email: editedData?.user.email || data?.user.email || "",
+          managerEmail: editedData?.managerEmail || data?.managerEmail,
+          managerName: editedData?.managerName || data?.managerName,
+        }
+      );
+
+      const pdfUrl = response.data.pdfUrl; // Assuming the response has a pdfUrl field
+      await axiosManagerInstance.post(`/sendEmail`, {
+        to: editedData?.user.email || data?.user.email || "",
+        subject: `SVKM Hall Booking Cancellation for ${dayjs(
+          editedData?.from || data?.from
+        ).format("DD-MM-YYYY")}`,
+        text: "Your booking has been cancelled. Please find the attachments below.",
+        filename: `${editedData?.user.username || data?.user.username}_${
+          editedData?.enquiryNumber || data?.enquiryNumber || ""
+        }_cancellation`,
+        path: pdfUrl, // Use the pdfUrl here if needed
+      });
+      console.log("Email sent successfully");
+      return pdfUrl;
+    } catch (error) {
+      console.error("Error in generate cancellation or send email:", error);
+    }
+  };
 
   // Function   to calculate final payable amount of each bookings for multiple payments
   const calculateBookingPrice = (booking: {
@@ -1762,6 +1849,7 @@ function Booking() {
                 onClick={async () => {
                   await handleSaveCancellationReason();
                   handleCancellation();
+
                 }}
                 className="bg-green-500 px-4 text-white py-1 rounded-lg"
               >
@@ -1805,7 +1893,6 @@ function Booking() {
             <button
               onClick={async () => {
                 setShowCancellationReason(false);
-
                   await confirmAndSaveMultipleBooking.mutateAsync();
                   generateConfirmationAndEmail();
 
@@ -2760,6 +2847,7 @@ function Booking() {
               <button
                 onClick={async () => {
                   await handleSaveCancellationReason();
+                  generateCancellationAndEmail();
                   handleCancellation();
                 }}
                 className="bg-green-500 px-4 text-white py-1 rounded-lg"

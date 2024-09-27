@@ -59,6 +59,7 @@ import {
   getBookingsByUserandHallHandler,
   removeBookingHandler,
   sendEmailHandler,
+  generateCancellationHandler,
 } from "./controller/booking.controller";
 
 //Constants
@@ -88,6 +89,7 @@ import { MultipleBookingSchema, CheckBookingInMultipleSchema } from "./schema/mu
 import { addMultipleBookingHandler, getMultipleBookingHandler,  checkBookingInMultipleHandler } from "./controller/multipleBooking.controller";
 //try 
 import { getSessionName } from "./service/getSessionName";
+import { generateCancellation } from "./utils/cancellation";
 
 // const upload = multer({ dest: "uploads/" });
 const upload = multer({ storage: multer.memoryStorage() });
@@ -404,6 +406,12 @@ export default function routes(app: Express) {
     "/generateConfirmation",
     validateRequest(ConfirmationSchema),
     generateConfirmationHandler,
+  )
+
+  app.post(
+    "/generateCancellation",
+    validateRequest(ConfirmationSchema),
+    generateCancellationHandler,
   )
 
   app.post(
