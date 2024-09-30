@@ -423,7 +423,7 @@ function Report8() {
                 : setHallCharges(false);
             }}
           >
-            <option value="">Display Hall Charges</option>
+            {/* <option value="">Display Hall Charges</option> */}
             <option value="true">YES</option>
             <option value="false">NO</option>
           </select>
@@ -538,6 +538,9 @@ function Report8() {
                     Manager Name
                   </th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Remark
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
                     Customer Category
                   </th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">
@@ -641,6 +644,9 @@ function Report8() {
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Manager Name"]}
+                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["Remark"]}
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Customer Category"]}

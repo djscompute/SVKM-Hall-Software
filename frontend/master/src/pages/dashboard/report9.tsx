@@ -388,7 +388,7 @@ function Report9() {
               setHallCharges(e.target.value === "true");
             }}
           >
-            <option value="">Select</option>
+            {/* <option value="">Select</option> */}
             <option value="true">Yes</option>
             <option value="false">No</option>
           </select>
