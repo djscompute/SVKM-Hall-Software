@@ -1,5 +1,4 @@
 import { z } from "zod";
-import validator from "validator"; 
 
 const stringErrorHandler = (fieldName: string) => ({
   invalid_type_error: `${fieldName} can only be a string.`,
@@ -14,41 +13,17 @@ const booleanErrorHandler = (fieldName: string) => ({
   required_error: `${fieldName} cannot be empty.`,
 });
 
-
 export const AddBookingZodSchema = z.object({
   body: z.object({
     date: z.string().optional(),
     user: z.object({
-      username: z
-        .string(stringErrorHandler("name"))
-        .refine((val) => validator.isAlpha(val, "en-US", { ignore: " " }), {
-          message: "Username should contain only alphabetic characters",
-        }),
-      contact: z
-      .string(stringErrorHandler("name"))
-      .refine((val) => validator.isAlpha(val, "en-US", { ignore: " " }), {
-       message: "Username should contain only alphabetic characters",
-        }),
-        
-      email: z
-        .string(stringErrorHandler("email"))
-        .email()
-        .refine((val) => validator.isEmail(val), {
-          message: "Invalid email format",
-        }),
-      gstNo: z
-        .string(stringErrorHandler("gstNo"))
-        .optional()
-        .refine((val) => val !== undefined && validator.isAlphanumeric(val), {
-          message: "GST number must be alphanumeric",
-        }),
+      username: z.string(stringErrorHandler("name")),
+      contact: z.string(stringErrorHandler("person")),
+      email: z.string(stringErrorHandler("email")).email(),
+      gstNo: z.string(stringErrorHandler("gstNo")).optional(),
       panNo: z.string(stringErrorHandler("panNo")).optional(),
       address: z.string(stringErrorHandler("address")).optional(),
-      mobile: z
-        .string(stringErrorHandler("mobile"))
-        .refine((val) => validator.isMobilePhone(val, "en-IN"), {
-          message: "Invalid mobile number format",
-        }),
+      mobile: z.string(stringErrorHandler("mobile")),
       remark: z.string(stringErrorHandler("remark")).optional(),
     }),
     features: z.array(
@@ -72,27 +47,22 @@ export const AddBookingZodSchema = z.object({
         bank: z.string(stringErrorHandler("bank")).optional(),
       })
       .optional(),
-    baseDiscount: z
-      .number(numberErrorHandler("baseDiscount"))
-      .min(0, { message: "Discount can't be below 0" })
-      .max(100, { message: "Discount can't exceed 100" }),
+    baseDiscount: z.number(numberErrorHandler("baseDiscount")).min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     deposit: z.number(numberErrorHandler("deposit")),
     isDeposit: z.boolean(booleanErrorHandler("isDeposit")),
-    depositDiscount: z
-      .number(numberErrorHandler("depositDiscount"))
-      .min(0, { message: "Discount can't be below 0" })
-      .max(100, { message: "Discount can't exceed 100" }),
+    depositDiscount: z.number(numberErrorHandler("depositDiscount")).min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     hallId: z.string(stringErrorHandler("hallId")),
     session_id: z.string(stringErrorHandler("session_id")),
     booking_type: z.string(stringErrorHandler("booking_type")),
     from: z.string(stringErrorHandler("from")),
     to: z.string(stringErrorHandler("to")),
     purpose: z.string(stringErrorHandler("purpose")),
-    cancellationReason: z.string(stringErrorHandler("cancellationReason")).optional(),
+    cancellationReason: z
+      .string(stringErrorHandler("cancellationReason"))
+      .optional(),
     enquiryNumber: z.string(stringErrorHandler("enquiryNumber")).optional(),
   }),
 });
-
 
 export const RemoveBookingZodSchema = z.object({
   params: z.object({
@@ -101,9 +71,10 @@ export const RemoveBookingZodSchema = z.object({
       invalid_type_error: "Id should be a string value.",
     }),
   }),
+  // cancellationReason: z.string(),
 });
 
-// Schema for getting a session by {from, to}
+//Zod Schema for getting a session by {from, to}
 export const getBookingZodSchema = z.object({
   query: z.object({
     from: z.string().refine((from) => from.trim() !== "", {
@@ -115,25 +86,22 @@ export const getBookingZodSchema = z.object({
       path: ["to"],
     }),
     hallId: z.string({
-      required_error: "HallId cannot be empty",
+      required_error: " hallIdcannot be empty",
       invalid_type_error: "hallId should be a string value.",
     }),
   }),
 });
 
-// Schema for getting a session by ID
+//Zod schema for getting a session by ID
 export const getBookingByIdZodSchema = z.object({
   query: z.object({
     _id: z.string(),
   }),
 });
 
-// Schema for email sending
 export const EmailZodSchema = z.object({
   body: z.object({
-    to: z.string().refine((val) => validator.isEmail(val), {
-      message: "Invalid email address",
-    }),
+    to: z.string(),
     subject: z.string(),
     text: z.string(),
     filename: z.string(),
@@ -141,17 +109,12 @@ export const EmailZodSchema = z.object({
   }),
 });
 
-// Inquiry schema
 export const InquirySchema = z.object({
   body: z.object({
     date: z.string(),
     customerName: z.string(),
     contactPerson: z.string(),
-    contactNo: z
-      .string(stringErrorHandler("contactNo"))
-      .refine((val) => validator.isMobilePhone(val, "any"), {
-        message: "Invalid contact number",
-      }),
+    contactNo: z.string(),
     enquiryNumber: z.string(),
     hallName: z.string(),
     hallLocation: z.string(),
@@ -163,32 +126,19 @@ export const InquirySchema = z.object({
     additionalFacilities: z.number(),
     hallDeposit: z.number(),
     totalPayable: z.number(),
-    managerEmail: z
-      .string(stringErrorHandler("managerEmail"))
-      .refine((val) => validator.isEmail(val), {
-        message: "Invalid manager email",
-      }),
+    managerEmail: z.string(),
     managerName: z.string(),
   }),
 });
 
-// Confirmation schema
 export const ConfirmationSchema = z.object({
   body: z.object({
     date: z.string(),
     customerName: z.string(),
     contactPerson: z.string(),
-    contactNo: z
-      .string(stringErrorHandler("contactNo"))
-      .refine((val) => validator.isMobilePhone(val, "any"), {
-        message: "Invalid contact number",
-      }),
+    contactNo: z.string(),
     enquiryNumber: z.string(),
-    gstNo: z
-      .string(stringErrorHandler("gstNo"))
-      .refine((val) => validator.isAlphanumeric(val), {
-        message: "GST number must be alphanumeric",
-      }),
+    gstNo: z.string(),
     pan: z.string(),
     modeOfPayment: z.string(),
     additionalPaymentDetails: z.string().optional(),
@@ -200,44 +150,47 @@ export const ConfirmationSchema = z.object({
     purposeOfBooking: z.string(),
     hallCharges: z.number(),
     additionalFacilities: z.number(),
-    discountPercent: z
-      .number()
-      .min(0, { message: "Discount can't be below 0" })
-      .max(100, { message: "Discount can't exceed 100" }),
+    discountPercent: z.number().min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     sgst: z.number(),
     cgst: z.number(),
     hallDeposit: z.number(),
-    depositDiscount: z
-      .number()
-      .min(0, { message: "Discount can't be below 0" })
-      .max(100, { message: "Discount can't exceed 100" }),
+    depositDiscount: z.number().min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     totalPayable: z.number(),
-    email: z
-      .string(stringErrorHandler("email"))
-      .refine((val) => validator.isEmail(val), {
-        message: "Invalid email format",
-      }),
+    email: z.string().email(), // Ensuring a valid email format
     managerEmail: z.string(),
     managerName: z.string(),
   }),
 });
-
-// Schema for getting bookings by hall
 export const getBookingsByHallZodSchema = z.object({
   params: z.object({
     hallId: z.string({
-      required_error: "Hall ID is required",
       invalid_type_error: "Hall ID must be a string.",
+      required_error: "Hall ID is required.",
+    }),
+  }),
+});
+export const getBookingsByHallAndUserZodSchema = z.object({
+  params: z.object({
+    hallId: z.string({
+      invalid_type_error: "Hall ID must be a string.",
+      required_error: "Hall ID is required.",
     }),
   }),
 });
 
-// Schema for getting bookings by hall and user
-export const getBookingsByHallAndUserZodSchema = z.object({
-  params: z.object({
-    hallId: z.string({
-      required_error: "Hall ID is required",
-      invalid_type_error: "Hall ID must be a string.",
-    }),
-  }),
-});
+// THIS IS A FUNCITON TO CREATE UTC STANDARD TIME DATETIME STRING.
+// ZOD SUPPORTS ONLY UTC STANDARD TIME
+// function createDateTimeString(year:number, month:number, day:number, hour:number) {
+//   // hour is in 24 hours format
+//   const date = new Date(Date.UTC(year, month - 1, day, hour, 0, 0));
+//   const dateTimeString = date.toISOString();
+//   return dateTimeString;
+// }
+
+// // Example usage
+// const datetimeString = createDateTimeString(2024, 2, 22, 0);
+// console.log(datetimeString); // Output: "2020-01-01T00:00:00.000Z"
+
+// EXAMPLE
+// from : 2024-02-22T00:00:00.000Z
+// to :   2024-02-22T10:00:00.000Z
