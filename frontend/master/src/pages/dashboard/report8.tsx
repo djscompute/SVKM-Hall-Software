@@ -646,7 +646,7 @@ function Report8() {
                         {booking["Manager Name"]}
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["Remark"]}
+                        {booking["Remark"]} 
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Customer Category"]}

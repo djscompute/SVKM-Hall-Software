@@ -1,5 +1,5 @@
 import { start } from "repl";
-import { BookingModel, HallBookingType } from "../../models/booking.model";
+import { BookingModel, HallBookingType, CustomerSchema } from "../../models/booking.model";
 import { getHallNameById } from "../getHallName";
 import { getManagerNamesByHallId } from "../getManagerName";
 import { getSessionName, getSessionTime } from "../getSessionName";
@@ -265,6 +265,7 @@ export async function getBookingInformationReport(
           .map((feature) => feature.heading)
           .join(", "),
         "Manager Name": await getManagerNamesByHallId(booking.hallId),
+        "Remark": booking.user.remark,
         "Customer Category": booking.booking_type,
         "Customer Name": booking.user.username,
         "Contact Person": booking.user.contact,

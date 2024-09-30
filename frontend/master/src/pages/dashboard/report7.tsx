@@ -387,6 +387,7 @@ function Report7() {
                 <th className="px-4 py-2 text-center whitespace-nowrap">Hall Name</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Facility</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Manager</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Remark</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Category</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Customer Name</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Contact Person</th>
@@ -430,6 +431,7 @@ function Report7() {
                     {booking["Additional Facility"]}
                   </td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Manager Name"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Remark"]}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Customer Category"]}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Customer Name"]}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Contact Person"]}</td>

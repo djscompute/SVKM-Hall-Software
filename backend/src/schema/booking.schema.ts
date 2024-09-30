@@ -25,10 +25,11 @@ export const AddBookingZodSchema = z.object({
           message: "Username should contain only alphabetic characters",
         }),
       contact: z
-        .string(stringErrorHandler("contact"))
-        .refine((val) => validator.isMobilePhone(val, "any"), {
-          message: "Invalid contact number format",
+      .string(stringErrorHandler("name"))
+      .refine((val) => validator.isAlpha(val, "en-US", { ignore: " " }), {
+       message: "Username should contain only alphabetic characters",
         }),
+        
       email: z
         .string(stringErrorHandler("email"))
         .email()
