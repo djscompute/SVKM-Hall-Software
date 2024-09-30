@@ -388,7 +388,7 @@ function Report9() {
               setHallCharges(e.target.value === "true");
             }}
           >
-            <option value="">Select</option>
+            {/* <option value="">Select</option> */}
             <option value="true">Yes</option>
             <option value="false">No</option>
           </select>
@@ -468,6 +468,7 @@ function Report9() {
                   <th className="px-4 py-2 text-center whitespace-nowrap">Session</th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">Additional Facility</th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">Manager Name</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Remark</th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">Customer Category</th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">Customer Name</th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">Contact Person</th>
@@ -507,6 +508,7 @@ function Report9() {
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Additional Facility"] ? booking["Additional Facility"] : "None"}</td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Manager Name"]}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Remark"]}</td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Customer Category"]}</td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Customer Name"]}</td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Contact Person"]}</td>

@@ -605,22 +605,24 @@ function Booking() {
       setAdditional(!addAdditional);
     }
 
-    // try {
-    //   // Assuming the mutation is triggered on saving
-    //   await editTransactionType.mutateAsync(dataToSend.transaction.type);
+    try {
+      // Assuming the mutation is triggered on saving
+      if (dataToSend.transaction) {
+        await editTransactionType.mutateAsync(dataToSend.transaction.type);
+      }
 
-    //   // Here you could also clear other parts of editedData if needed
-    //   setEditedData((prev) => {
-    //     if (!prev) return undefined;
-    //     return {
-    //       ...prev,
-    //       features: [], // Assuming you want to clear features too
-    //       // Reset other fields if needed
-    //     };
-    //   });
-    // } catch (error) {
-    //   console.error("Failed to save data:", error);
-    // }
+      // Here you could also clear other parts of editedData if needed
+      setEditedData((prev) => {
+        if (!prev) return undefined;
+        return {
+          ...prev,
+          features: [], // Assuming you want to clear features too
+          // Reset other fields if needed
+        };
+      });
+    } catch (error) {
+      console.error("Failed to save data:", error);
+    }
   };
 
   const clearFieldsForTransactionType = (transactionType: string) => {

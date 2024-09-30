@@ -42,10 +42,13 @@ export default function Card({ hallData }: Props) {
           {hallData.name}
         </span>
         <span className=" text-[#9CA3AF] text-sm" >{hallData.about[0]}</span>
-        <div className="flex flex-row items-center justify-between w-full">
+        <div className="flex flex-row items-center gap-4 w-full">
           <button className="p-2 text-[#5AA7A0] text-sm sm:text-base font-medium rounded-lg border border-[#5AA7A0] hover:bg-[#5AA7A0] hover:text-white">
             Check Availability
           </button>
+          <Link to={`/halls/${hallData._id}#hall-pricing`} className="p-2 text-[#5AA7A0] text-sm sm:text-base font-medium rounded-lg border border-[#5AA7A0] hover:bg-[#5AA7A0] hover:text-white">
+            View Pricing
+          </Link>
         </div>
         <div className="mt-3 h-1 w-full bg-[#5AA7A0]"/>
       </div>

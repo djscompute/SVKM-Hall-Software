@@ -71,6 +71,7 @@ export async function getAdditionalFeatureReport(
         "Hall Name": hall.name,
         Session: await getSessionName(booking.session_id),
         "Manager Name": await getManagerNamesByHallId(booking.hallId),
+        "Remark": booking.user.remark,
         "Customer Category": booking.booking_type,
         "Customer Name": booking.user.username,
         "Contact Person": booking.user.contact,
