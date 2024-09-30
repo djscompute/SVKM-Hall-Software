@@ -205,6 +205,7 @@ function BookADay() {
             enquiryNumber: enquiryNumber, // Generate a unique enquiry number
             hallName: HallData?.name,
             hallLocation: `${HallData?.location.desc1},${HallData?.location.desc2}`,
+            hallRestrictions: HallData?.eventRestrictions,
             dateOfEvent: dateOfEvent,
             slotTime: `${convert_IST_TimeString_To12HourFormat(
               HallData?.sessions.find((ss) => ss._id === selectedSessionId)
