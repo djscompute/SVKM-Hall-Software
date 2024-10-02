@@ -90,6 +90,7 @@ export type HallBookingType = {
     to: string; // end time
   };
   purpose: string; //purpose for which the hall is being booked by the user (event type)
+  additionalInfo?: string; // additional info about the booking (mainly a phone number)
   cancellationReason?: string; // reason for cancellation
   enquiryNumber?: string;
   managerEmail?: string,

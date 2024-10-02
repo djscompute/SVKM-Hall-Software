@@ -30,6 +30,7 @@ type inquiryType = {
   slotTime: string;
   sessionName: string;
   purposeOfBooking: string;
+  additionalInfo?: string;
   hallCharges: number;
   additionalFacilities: number;
   hallDeposit: number;
@@ -228,6 +229,7 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
                 <p style="margin:-3px 0px;"><strong>Hall Address:</strong> <span style="line-height: 16px;">${props.hallLocation}</span></p>
                 <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
                 <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
+                <p><strong>Additional Information</strong> ${props.additionalInfo}</p>
                 <p><strong>Session:</strong> ${props.sessionName}</p>
             </div>
             <div class="right-align;">
