@@ -14,6 +14,7 @@ import { isValidEmail } from "../utils/validateEmail";
 import { isValidMobile } from "../utils/validateMobile";
 import { AxiosError } from "axios";
 import { adminType } from "../../../../types/global";
+// import { add } from "date-fns";
 
 function BookADay() {
   const navigate = useNavigate();
@@ -28,12 +29,14 @@ function BookADay() {
   //const [panCard, setPanCard] = useState("");
   //const [address, setAddress] = useState("");
   const [purpose, setPurpose] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
   const [errors, setErrors] = useState({
     name: "",
     person: "",
     email: "",
     mobileNumber: "",
     purpose: "",
+    additionalInfo: "",
     sessionType: "",
     bookingType: "",
   });
@@ -50,6 +53,7 @@ function BookADay() {
   const { data: HallData } = useQuery({
     queryKey: ["bookaday", `${humanReadableDate}`],
     queryFn: async () => {
+      // eslint-disable-next-line no-useless-catch
       try {
         const responsePromise = axiosClientInstance.get(`getHall/${id}`);
         toast.promise(responsePromise, {
@@ -72,6 +76,7 @@ function BookADay() {
       if (!HallData?._id) {
         throw new Error("Hall ID is not available");
       }
+      // eslint-disable-next-line no-useless-catch
       try {
         const responsePromise = axiosClientInstance.get(`getManagerByHallId`, {
           params: { _id: HallData._id }
@@ -131,6 +136,7 @@ function BookADay() {
               ?.to as string
           }`,
           purpose: purpose,
+          additionalInfo: additionalInfo,
           enquiryNumber: enquiryNumber,
         })
         .then((response) => {
@@ -175,6 +181,7 @@ function BookADay() {
               }`,
               status: "ENQUIRY",
               eventPurpose: purpose,
+              additionalInfo: additionalInfo,
             },
           },
         });
@@ -217,6 +224,7 @@ function BookADay() {
               (ss) => ss._id === selectedSessionId
             )?.name!}`,
             purposeOfBooking: purpose,
+            additionalInfo: additionalInfo,
             hallCharges: sessionPrice,
             additionalFacilities: additionalFacilities,
             hallDeposit: securityDeposit,
@@ -263,12 +271,13 @@ function BookADay() {
   });
 
   const handleSubmit = () => {
-    let newErrors = {
+    const newErrors = {
       name: "",
       person: "",
       email: "",
       mobileNumber: "",
       purpose: "",
+      additionalInfo: "",
       sessionType: "",
       bookingType: "",
     };
@@ -331,7 +340,7 @@ function BookADay() {
     }
     // Proceed with mutation
     if (isDetailsConfirmed) {
-      const enquiryNumber = "ENQ" + new Date().getTime();
+      // const enquiryNumber = "ENQ" + new Date().getTime();
       const bookingData = {
         user: {
           username: name,
@@ -356,6 +365,7 @@ function BookADay() {
           HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to
         }`,
         purpose: purpose,
+        additionalInfo: additionalInfo,
       };
       console.log(bookingData);
       // Perform mutation
@@ -387,7 +397,7 @@ function BookADay() {
 
   
   HallData?.sessions?.sort((a,b)=>{
-    const getNumber = (name:String) => {
+    const getNumber = (name:string) => {
       if (!name) {
         return Infinity; // Or another value to handle undefined or null names
       }
@@ -556,6 +566,27 @@ function BookADay() {
         {errors.mobileNumber && (
           <p className="text-red-500">{errors.mobileNumber}</p>
         )}
+
+        {/* additional field */}
+        <div>
+          <label htmlFor="person">
+            <b>Additional Information</b>
+          </label>
+          <p className=" text-xs text-orange-500 font-semibold">
+             You can add an additional phone number here
+            </p>
+          <br />
+          <input
+            className="p-2 border-gray-300 border rounded-md px-2 w-full"
+            type="text"
+            placeholder="Additional Information"  
+            value={additionalInfo}
+            onChange={(e) => setAdditionalInfo(e.target.value)}
+          />
+          
+        </div>
+
+
         {/* Purpose of Booking */}
         <div>
           <label htmlFor="person">

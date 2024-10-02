@@ -35,6 +35,7 @@ type confirmationType = {
   slotTime: string;
   sessionType: string;
   purposeOfBooking: string;
+  additionalInfo?: string;
   hallCharges: number;
   additionalFacilities: number;
   discountPercent: number;
@@ -169,6 +170,7 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
     <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
     <p><strong>Slot Time:</strong> ${props.sessionType} ${props.slotTime}</p>
     <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
+    <p><strong>Additional Information</strong> ${props.additionalInfo}</p>
   </div>
 
         <table>

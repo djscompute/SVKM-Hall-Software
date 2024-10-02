@@ -57,6 +57,7 @@ export const AddBookingZodSchema = z.object({
     from: z.string(stringErrorHandler("from")),
     to: z.string(stringErrorHandler("to")),
     purpose: z.string(stringErrorHandler("purpose")),
+    additionalInfo: z.string(stringErrorHandler("additionalInfo")).optional(),
     cancellationReason: z
       .string(stringErrorHandler("cancellationReason"))
       .optional(),
@@ -123,6 +124,7 @@ export const InquirySchema = z.object({
     slotTime: z.string(),
     sessionName: z.string(),
     purposeOfBooking: z.string(),
+    additionalInfo: z.string(),
     hallCharges: z.number(),
     additionalFacilities: z.number(),
     hallDeposit: z.number(),
@@ -150,6 +152,7 @@ export const ConfirmationSchema = z.object({
     slotTime: z.string(),
     sessionType: z.string(),
     purposeOfBooking: z.string(),
+    additionalInfo: z.string(),
     hallCharges: z.number(),
     additionalFacilities: z.number(),
     discountPercent: z.number().min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),

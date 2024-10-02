@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom"; 
 import { useQuery } from "@tanstack/react-query";
 import axiosClientInstance from "../config/axiosClientInstance.ts";
 import { EachHallType } from "../types/Hall.types.ts";
-import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat.tsx";
 import { toast } from "react-toastify";
 import Calendar from "../components/Calender/calendar.tsx";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,15 +15,16 @@ import HallPricing from "../components/hall/HallPricing.tsx";
 
 function Hall() {
   const { id } = useParams<{ id: string }>();
-
-  const { data, error, isFetching } = useQuery({
+  const location = useLocation(); 
+  
+  const { data, isFetching } = useQuery({
     queryKey: ["allhalls", `hall-${id}`],
     queryFn: async () => {
+      // eslint-disable-next-line no-useless-catch
       try {
         const responsePromise = axiosClientInstance.get(`getHall/${id}`);
         toast.promise(responsePromise, {
           pending: "Fetching hall...",
-          // success: "Hall fetched successfully!",
           error: "Failed to fetch Hall. Please try again.",
         });
         const response = await responsePromise;
@@ -33,38 +33,49 @@ function Hall() {
         throw error;
       }
     },
-    staleTime: 2 * 60 * 1000, // Data is considered fresh for 2 minutes
+    staleTime: 2 * 60 * 1000,
   });
 
-  const [isOpen, setIsOpen] = useState(false);
-  const toggleReadMore = () => setIsOpen(!isOpen);
+  
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.querySelector(location.hash);
+      if (element) {
+        const timeoutId = setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth" });
+        }, 100); 
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+        
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [location]);
 
-  const prevSlide = () => {
-    if (!data?.images) return;
-    const isFirstSlide = currentIndex === 0;
-    const newIndex = isFirstSlide ? data?.images.length - 1 : currentIndex - 1;
-    setCurrentIndex(newIndex);
-  };
+  // const [isOpen, setIsOpen] = useState(false);
+  // const toggleReadMore = () => setIsOpen(!isOpen);
 
-  const nextSlide = () => {
-    if (!data?.images) return;
-    const isLastSlide = currentIndex === data?.images.length - 1;
-    const newIndex = isLastSlide ? 0 : currentIndex + 1;
-    setCurrentIndex(newIndex);
-  };
+  // const [currentIndex, setCurrentIndex] = useState(0);
 
-  const goToSlide = (slideIndex: React.SetStateAction<number>) => {
-    setCurrentIndex(slideIndex);
-  };
+  // const prevSlide = () => {
+  //   if (!data?.images) return;
+  //   const isFirstSlide = currentIndex === 0;
+  //   const newIndex = isFirstSlide ? data?.images.length - 1 : currentIndex - 1;
+  //   setCurrentIndex(newIndex);
+  // };
+
+  // const nextSlide = () => {
+  //   if (!data?.images) return;
+  //   const isLastSlide = currentIndex === data?.images.length - 1;
+  //   const newIndex = isLastSlide ? 0 : currentIndex + 1;
+  //   setCurrentIndex(newIndex);
+  // };
+
+  // const goToSlide = (slideIndex: React.SetStateAction<number>) => {
+  //   setCurrentIndex(slideIndex);
+  // };
 
   if (isFetching) {
-    return (
-      <>
-        <div>Fetching Info</div>
-      </>
-    );
+    return <div>Fetching Info</div>;
   }
 
   return (
@@ -78,19 +89,13 @@ function Hall() {
               <ImageCarousel data={data} />
               <hr className=" bg-gray-300 h-[1.5px] w-full" />
               <HallLocation data={data} />
-
               <hr className=" bg-gray-300 h-[1.5px] w-full" />
-              {/* About Hall */}
               <AboutHall data={data} />
-
-              {/* Seating and capacity */}
               <HallCapacity data={data} />
               <hr className=" bg-gray-300 h-[1.5px] w-full" />
-
               <HallAdditionalFeatures data={data} />
               <hr className=" bg-gray-300 h-[1.5px] w-full" />
-
-              <HallPricing data={data} />
+              <HallPricing data={data} id="hall-pricing" />
             </div>
           ) : (
             <div>

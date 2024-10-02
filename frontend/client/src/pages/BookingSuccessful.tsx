@@ -162,6 +162,10 @@ const BookingSuccessful = () => {
                   <td className="w-1/2">{bookingDetails.mobile}</td>
                 </tr>
                 <tr className="border-b-2">
+                  <td className="font-medium py-2 w-1/2">Additional Information</td>
+                  <td className="w-1/2">{bookingDetails.additionalInfo}</td>
+                </tr>
+                <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">
                     Event Type (Purpose)
                   </td>

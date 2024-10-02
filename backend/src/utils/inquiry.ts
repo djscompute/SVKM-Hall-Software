@@ -31,6 +31,7 @@ type inquiryType = {
   slotTime: string;
   sessionName: string;
   purposeOfBooking: string;
+  additionalInfo?: string;
   hallCharges: number;
   additionalFacilities: number;
   hallDeposit: number;
