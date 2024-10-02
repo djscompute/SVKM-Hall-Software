@@ -1914,6 +1914,7 @@ function Booking() {
                 onClick={async () => {
                   if (await handleSaveCancellationReason()) {
                     handleCancellation();
+                    generateCancellationAndEmail();
                   }
                 }}
                 className="bg-green-500 px-4 text-white py-1 rounded-lg"
@@ -2914,8 +2915,8 @@ function Booking() {
               <button
                 onClick={async () => {
                   if (await handleSaveCancellationReason()) {
-                    generateCancellationAndEmail();
                     handleCancellation();
+                    generateCancellationAndEmail();
                   }
                 }}
                 className="bg-green-500 px-4 text-white py-1 rounded-lg"
