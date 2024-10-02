@@ -20,6 +20,8 @@ import Report5 from "./pages/dashboard/report5";
 import Report6 from "./pages/dashboard/report6";
 import Report7 from "./pages/dashboard/report7";
 import Report8 from "./pages/dashboard/report8";
+import Report9 from "./pages/dashboard/report9";
+import Report10 from "./pages/dashboard/report10";
 export const queryClient = new QueryClient();
 
 export default function App() {
@@ -114,6 +116,22 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Report8 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/booking-confirmation-report"
+          element={
+            <ProtectedRoute>
+              <Report9 />
+            </ProtectedRoute>
+          }
+        />
+         <Route
+          path="/dashboard/hall-information-report"
+          element={
+            <ProtectedRoute>
+              <Report10 />
             </ProtectedRoute>
           }
         />
