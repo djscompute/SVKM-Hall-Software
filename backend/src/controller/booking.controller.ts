@@ -377,6 +377,7 @@ export async function generateCancellationHandler(req: Request, res: Response) {
       slotTime, 
       sessionType,
       purposeOfBooking, 
+      additionalInfo,
       hallCharges, 
       additionalFacilities, 
       discountPercent,

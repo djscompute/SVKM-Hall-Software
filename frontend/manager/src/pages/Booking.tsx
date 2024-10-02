@@ -311,6 +311,7 @@ function Booking() {
           )} - ${convert_IST_TimeString_To12HourFormat(endTime)}`,
           sessionType: session?.name,
           purposeOfBooking: editedData?.purpose || data?.purpose || "",
+          additionalInfo: editedData?.additionalInfo || data?.additionalInfo || "",
           hallCharges: priceEntry?.price || 0,
           additionalFacilities: totalFeatureCharges,
           discountPercent: editedData?.baseDiscount || data?.baseDiscount || 0,
