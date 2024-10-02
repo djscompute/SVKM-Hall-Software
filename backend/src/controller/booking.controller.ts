@@ -4,6 +4,7 @@ import { getBookingZodSchema } from "../schema/booking.schema";
 import { sendEmail } from "../utils/email";
 import { generateConfirmation } from "../utils/confirmation";
 import { generateInquiry } from "../utils/inquiry";
+import { generateCancellation } from "../utils/cancellation";
 
 
 export async function addBookingHandler(req: Request, res: Response) {
@@ -246,6 +247,7 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       enquiryNumber, 
       hallName, 
       hallLocation,
+      hallRestrictions,
       dateOfEvent, 
       slotTime,
       sessionName, 
@@ -267,6 +269,7 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       enquiryNumber,
       hallName,
       hallLocation,
+      hallRestrictions,
       dateOfEvent,
       slotTime,
       sessionName,
@@ -300,6 +303,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       additionalPaymentDetails, 
       hallName, 
       hallLocation,
+      hallRestrictions,
       dateOfEvent, 
       slotTime, 
       sessionType,
@@ -330,11 +334,11 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       additionalPaymentDetails, 
       hallName, 
       hallLocation,
+      hallRestrictions,
       dateOfEvent, 
       slotTime, 
       sessionType,
       purposeOfBooking, 
-      additionalInfo,
       hallCharges, 
       additionalFacilities, 
       discountPercent,
@@ -353,6 +357,77 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
     res.status(500).json({ message: "Internal server error", error });
   }
 }
+
+export async function generateCancellationHandler(req: Request, res: Response) {
+  try {
+    const { 
+      date, 
+      customerName, 
+      contactPerson, 
+      contactNo, 
+      enquiryNumber, 
+      gstNo, 
+      pan, 
+      modeOfPayment, 
+      additionalPaymentDetails, 
+      hallName, 
+      hallLocation,
+      hallRestrictions,
+      dateOfEvent, 
+      slotTime, 
+      sessionType,
+      purposeOfBooking, 
+      additionalInfo,
+      hallCharges, 
+      additionalFacilities, 
+      discountPercent,
+      sgst, 
+      cgst, 
+      hallDeposit, 
+      depositDiscount, 
+      totalPayable,
+      email,
+      managerEmail,
+      managerName 
+    } = req.body;
+    
+    const pdfUrl = await generateCancellation({
+      date, 
+      customerName, 
+      contactPerson, 
+      contactNo, 
+      enquiryNumber, 
+      gstNo, 
+      pan, 
+      modeOfPayment, 
+      additionalPaymentDetails, 
+      hallName, 
+      hallLocation,
+      hallRestrictions,
+      dateOfEvent, 
+      slotTime, 
+      sessionType,
+      purposeOfBooking, 
+      hallCharges, 
+      additionalFacilities, 
+      discountPercent,
+      sgst, 
+      cgst, 
+      hallDeposit, 
+      depositDiscount, 
+      totalPayable,
+      email,
+      managerEmail,
+      managerName 
+    });
+    res.json({ pdfUrl });
+  } catch (error) {
+    console.error("Error in generating confirmation:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+}
+
+
 export async function sendEmailHandler(req: Request, res: Response) {
   try {    
     const { to, subject, text, filename, path } = req.body;

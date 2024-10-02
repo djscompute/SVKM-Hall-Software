@@ -18,7 +18,7 @@ if (!admin.apps.length) {
 }
 const bucket = admin.storage().bucket();
 
-type confirmationType = {
+type cancellationType = {
   date: string;
   customerName: string;
   contactPerson: string;
@@ -30,12 +30,11 @@ type confirmationType = {
   additionalPaymentDetails: string;
   hallName: string;
   hallLocation: string;
-  hallRestrictions: string;
+  hallRestrictions:string;
   dateOfEvent: string;
   slotTime: string;
   sessionType: string;
   purposeOfBooking: string;
-  additionalInfo?: string;
   hallCharges: number;
   additionalFacilities: number;
   discountPercent: number;
@@ -125,7 +124,7 @@ function numberToWordsIndian(price: number): string {
     return `${str.trim()} Rupees ${decimalWords}`.trim();
   }
 
-const confirmationHtmlTemplate = (props: confirmationType) => `
+const cancellationHtmlTemplate = (props: cancellationType) => `
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -146,7 +145,7 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
     <div class="header">
         <img src="https://static.wixstatic.com/media/2d8aca_ab298473c57c4d32b13b1544c84d5ac9~mv2.png/v1/fill/w_196,h_236,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/svkm%20logo.png" alt="SVKM Logo" width="100">
         <h1>SHRI VILE PARLE KELVANI MANDAL</h1>
-        <h2>Hall Booking Confirmation Cum Receipt</h2>
+        <h2 style="color:red"><u>Hall Booking Cancellation</u></h2>
     </div>
     <div class="content">
         <div class="nogap">
@@ -170,7 +169,6 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
     <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
     <p><strong>Slot Time:</strong> ${props.sessionType} ${props.slotTime}</p>
     <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
-    <p><strong>Additional Information</strong> ${props.additionalInfo}</p>
   </div>
 
         <table>
@@ -301,22 +299,22 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
 </html>
 `;
 
-export async function generateConfirmation(props: confirmationType): Promise<string> {
+export async function generateCancellation(props: cancellationType): Promise<string> {
   try {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
-    const confirmation = await confirmationHtmlTemplate(props);
+    const cancellation = await cancellationHtmlTemplate(props);
     const sanitizedCustomerName = props.customerName.replace(/\s+/g, '_');
-    const pdfPath = `./src/files/Customer_${sanitizedCustomerName}_${props.enquiryNumber}_confirmation.pdf`;
+    const pdfPath = `./src/files/Customer_${sanitizedCustomerName}_${props.enquiryNumber}_cancellation.pdf`;
 
-    await page.setContent(confirmation);
+    await page.setContent(cancellation);
     await page.pdf({ path: pdfPath, format: "A4" });
 
     console.log(`PDF generated for customer ${props.customerName}: ${pdfPath}`);
     // Upload to Firebase Storage
     const storageFile = bucket.file(
-      `Customer_${sanitizedCustomerName}_${props.enquiryNumber}_confirmation.pdf`
+      `Customer_${sanitizedCustomerName}_${props.enquiryNumber}_cancellation.pdf`
     );
     await storageFile.save(await fs.promises.readFile(pdfPath), {
       metadata: { contentType: "application/pdf" },

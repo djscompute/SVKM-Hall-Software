@@ -26,6 +26,7 @@ type inquiryType = {
   enquiryNumber: string;
   hallName: string;
   hallLocation: string;
+  hallRestrictions: string;
   dateOfEvent: string;
   slotTime: string;
   sessionName: string;
@@ -186,15 +187,16 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
         .content { margin: 20px; }
         .nogap {line-height: 5px; margin: 30px 0px}
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        table input[type="text"] {width: 80%}
         th, td { border: 1px solid black; padding: 5px; }
         .terms-conditions { font-size: 16px; }
         .page-break { page-break-before: always; }
         .right-align { text-align: right; }
         .flex-container { display: flex; justify-content: space-between; align-items: flex-start; }
-        .event-form { font-size: 10px; }
-        .event-form p{ font-size: 10px; }
+        .event-form { font-size: 12px; }
+        .event-form p{ font-size: 12px; }
         .event-form h2 { text-align: center; }
-        .event-form table { width: 100%; border-collapse: collapse; font-size: 10px;}
+        .event-form table { width: 100%; border-collapse: collapse; font-size: 12px;}
         .event-form th,td { border: 1px solid black; padding: 5px; }
         .event-form input[type="text"] { width: 100%; border: none; border-bottom: 1px solid black; }
         .no-border { border: none; }
@@ -210,9 +212,9 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
         <h3>INQUIRY ESTIMATE FOR HALL BOOKING</h3>
     </div>
     <div class="content">
-        <p class="right-align"><strong>Date:</strong> ${props.date}</p>
         
         <div class="nogap">
+        <p><strong>Date:</strong> ${props.date}</p>
         <p><strong>Customer Name:</strong> ${props.customerName}</p>
         <p><strong>Contact Person:</strong> ${props.contactPerson}</p>
         <p><strong>Contact No:</strong> ${props.contactNo}</p>
@@ -222,18 +224,14 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
         <p><strong>Inquiry Number:</strong> ${props.enquiryNumber}</p>
         </div>
 
-        <div class="nogap">
+        <div class="nogap" style="margin-top:-15px;">
         <div class="flex-container">
             <div style="width: 70%">
-                <p><strong>Hall Name:</strong> ${props.hallName}</p>
+              <p><strong>Hall Name:</strong> ${props.hallName} &nbsp <strong>Restrictions:</strong>${props.hallRestrictions}</p>
                 <p style="margin:-3px 0px;"><strong>Hall Address:</strong> <span style="line-height: 16px;">${props.hallLocation}</span></p>
                 <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
+                <p><strong>Session:</strong> ${props.sessionName} &nbsp&nbsp<strong>Slot Time: </strong>${props.slotTime}</p>
                 <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
-                <p><strong>Additional Information</strong> ${props.additionalInfo}</p>
-                <p><strong>Session:</strong> ${props.sessionName}</p>
-            </div>
-            <div class="right-align;">
-                <p style="line-height: 16px;"><strong>Slot Time:</strong> ${props.slotTime}</p>
             </div>
         </div>
         </div>
@@ -272,7 +270,7 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
         <p>Rupees ${numberToWordsIndian(props.totalPayable)} Only</p>
         <p>* GST is applicable as per prevailing rates.</p>
         
-        <p>Demand Draft / Account Payee Cheque to be drawn in favour of <strong>"SVKM HALL."</strong></p>
+        <p>Demand Draft / Account Payee Cheque to be drawn in favour of <strong>"SVKM HALL"</strong></p>
         
         <div class="nogap">        
         <h4>For Online payment, details as under (Pay only after confirmation with Manager)</h4>
@@ -292,7 +290,7 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
         <ul>
           <li>For booking confirmation and payment, please contact ${props.managerName} at ${props.managerEmail}.</li>
           <li>Hall availability is based on “First come, First served basis” against payment.</li>
-          <li>For booking by SVKM institutes, please contact with duly filled in Event form (available below).</li>
+          <li>For booking by SVKM institutes, please contact with duly filled in "Event form" (available below).</li>
         </ul>
     </div>
     <div class="page-break"></div>
@@ -323,12 +321,23 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
         
         <p><strong>For Mukesh Patel Auditorium -</strong></p>
         <ol>
-            <li>Each session if for a period not exceeding 3 hours</li>
+            <li>Each session is for a period not exceeding 3 hours</li>
             <li>Full day is for a period not exceeding 6 hours and shall, in any case not last beyond 6 PM on the day.</li>
             <li>Service of Ushers: The services of Ushers shall be provided by the auditorium and the party booking the auditorium will have to pay Rs.4000/- (Rupees Four Thousand only) per session (three hours and for ten persons) for the services rendered before the commencement of the show and the cheque should be drawn in favour of "THE FORT AND COLABA WELFARE SOCIETY".</li>
             <li>Police Bandobast: Police Bandobast is compulsory on the day of performance and will be made by the party booking the auditorium. For this purpose, the party should contact well in advance with an application, the Inspector of Police, Juhu Police Station, Vile Parle (West), Mumbai - 400 056, pay the necessary charges and obtain receipt of the same. This should be shown to the Auditorium Manager at the time of the programme.</li>
             <li>Police Permission & Licenses: Permission from the police for the following must be obtained before the sale of tickets and the necessary certificate must be shown to the Auditorium Manager.
                 The contents of the performance or the drama to be performed must be got approved by the Commissioner of Police, Theatre Branch, Mumbai - 400 001. It is necessary to obtain the permission of the author before staging performance.</li>
+        </ol>
+        <h4>Rules for MPSTME Seminar Halls Booking:</h4>
+        <ol>
+            <li>MPSTME Big Seminar Hall requires a minimum crowd of 300.</li>
+            <li>Requests for booking should be made at least one week in advance.</li>
+            <li>Food & Beverages are not allowed inside the halls.</li>
+            <li>Sound system is available in halls, no DJ sets or other related equipment to be connected.</li>
+            <li>All arrangements like table booking(Form Popular Decorator), standee arrangement, printing, stationary, coordination with canteen manager needs to be taken care by the organizer.</li>
+            <li>The college authorities (user) of the event booking team is responsible for maintaining decorum and cleanliness in the halls.</li>
+            <li>Any damage caused to the halls/property will be the responsibility of the user.</li>
+            <li>Booking of canteen space is not possible during college academics times due to rush.</li>
         </ol>
     </div>
     <div class="page-break"></div>
@@ -403,7 +412,7 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
                 <td><input type="text"></td>
             </tr>
             <tr>
-                <td>8. Photographer/Video (for no. of photos):</td>
+                <td style="width:30%">8. Photographer/Video (for no. of photos):</td>
                 <td><input type="text"></td>
             </tr>
             <tr>
@@ -492,22 +501,23 @@ const inquiryHtmlTemplate = (props: inquiryType) => `
 
         <table class="no-border">
             <tr>
-                <td class="no-border" style="width: 50%;">
+                <td class="no-border" style="width: 30%;">
                     <div class="signature-line">
                         <p><strong>Requisition signed by faculty in charge with name</strong></p>
                     </div>
                 </td>
-                <td class="no-border" style="width: 50%;">
+                <td class="no-border" style="width: 30%;">
                     <div class="signature-line">
                         <p><strong>HOD/Dean</strong></p>
                     </div>
                 </td>
+                <td class="no-border" style="width: 30%;">
+                    <div class="signature-line">
+                        <p><strong>Director (Admin.) / Registrar/ Principal</strong></p>
+                    </div>
+                </td>
             </tr>
         </table>
-
-        <div class="signature-line">
-            <p><strong>Director (Admin.) / Registrar/ Principal</strong></p>
-        </div>
     </div>
 </body>
 </html>
