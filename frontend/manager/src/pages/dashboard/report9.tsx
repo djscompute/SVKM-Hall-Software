@@ -147,7 +147,7 @@ function Report9() {
       };
     }
 
-    const responsePromise = axiosMasterInstance.post("dashboard/generateBookingConfirmationReport", request);
+    const responsePromise = axiosManagerInstance.post("dashboard/generateBookingConfirmationReport", request);
     toast.promise(responsePromise, {
       pending: "Fetching Report...",
       error: "Failed to fetch Report. Please contact maintainer.",
