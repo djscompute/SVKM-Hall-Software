@@ -221,6 +221,7 @@ function Booking() {
           )} - ${convert_IST_TimeString_To12HourFormat(endTime)}`,
           sessionType: session?.name,
           purposeOfBooking: editedData?.purpose || data?.purpose || "",
+          additionalInfo: editedData?.additionalInfo || data?.additionalInfo || "",
           hallCharges: priceEntry?.price || 0,
           additionalFacilities: totalFeatureCharges,
           discountPercent: editedData?.baseDiscount || data?.baseDiscount || 0,
@@ -1004,6 +1005,7 @@ function Booking() {
         </div>
       )}
 
+
       {editingMode ? (
         <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
           <span className="w-full text-left">Contact Person</span>
@@ -1331,6 +1333,12 @@ function Booking() {
             <span className="w-full text-left">Purpose of the Event</span>
             <span className="w-full text-right">
               {selectedBookingData.purpose || "-"}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Additional Information</span>
+            <span className="w-full text-right">
+              {selectedBookingData.additionalInfo || "-"}
             </span>
           </div>
           <span className=" text-lg font-medium m-1">Additional Features</span>
@@ -1866,6 +1874,10 @@ function Booking() {
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Purpose of the Event</span>
             <span className="w-full text-right">{data?.purpose || "-"}</span>
+          </div>
+          <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+            <span className="w-full text-left">Additional Information</span>
+            <span className="w-full text-right">{data?.additionalInfo || "-"}</span>
           </div>
 
           {/* Additional Features */}

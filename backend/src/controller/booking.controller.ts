@@ -25,6 +25,7 @@ export async function addBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
+      additionalInfo,
       enquiryNumber
     } = req.body as HallBookingType;
 
@@ -72,6 +73,7 @@ export async function addBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
+      additionalInfo,
       enquiryNumber
     });
     await newBooking.save();
@@ -102,6 +104,7 @@ export async function editBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
+      additionalInfo,
       cancellationReason,
       enquiryNumber,
       managerEmail,
@@ -130,6 +133,7 @@ export async function editBookingHandler(req: Request, res: Response) {
         to,
         time,
         purpose,
+        additionalInfo,
         cancellationReason,
         enquiryNumber,
         managerEmail,
@@ -246,6 +250,7 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       slotTime,
       sessionName, 
       purposeOfBooking, 
+      additionalInfo,
       hallCharges, 
       additionalFacilities, 
       hallDeposit, 
@@ -266,6 +271,7 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       slotTime,
       sessionName,
       purposeOfBooking,
+      additionalInfo, 
       hallCharges,
       additionalFacilities,
       hallDeposit,
@@ -298,6 +304,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       slotTime, 
       sessionType,
       purposeOfBooking, 
+      additionalInfo,
       hallCharges, 
       additionalFacilities, 
       discountPercent,
@@ -327,6 +334,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       slotTime, 
       sessionType,
       purposeOfBooking, 
+      additionalInfo,
       hallCharges, 
       additionalFacilities, 
       discountPercent,
