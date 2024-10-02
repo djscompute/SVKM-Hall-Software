@@ -1881,210 +1881,197 @@ function Booking() {
           </div>
 
           {/* Additional Features */}
-          <span className=" text-lg font-medium m-1">Additional Features</span>
+          <span className="text-lg font-medium m-1">Additional Features</span>
 
-          {!data?.features.length ? (
-            <>
-              <p className="text-lg font-medium m-2">
-                No Additional Features Selected
-              </p>
-              <button
-                // onClick={() => {
-                //   setAdditional(!addAdditional);
+{!data?.features.length ? (
+  <>
+    <p className="text-lg font-medium m-2">
+      No Additional Features Selected
+    </p>
+    <button
+      onClick={handleAllEdit}
+      className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg m-1"
+    >
+      Add Additional Features
+    </button>
 
-                // }}
-                onClick={handleAllEdit}
-                className=" mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg m-1"
-              >
-                Add Additonal Features
-              </button>
-
-              {addAdditional || editingMode ? (
-                <div className="flex flex-col w-full mb-2">
-                  <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-                    <span>Name</span>
-                    {editingMode || addAdditional ? (
-                      <input
-                        type="text"
-                        // value={editedData?.features[0]?.heading || ''}
-                        onChange={(e) =>
-                          setEditedData((prev) => {
-                            if (!prev) return undefined;
-                            return {
-                              ...prev,
-                              features: {
-                                ...prev.features,
-                                heading: e.target.value,
-                              },
-                            };
-                          })
-                        }
-                        placeholder="Enter Name"
-                        className="px-2"
-                      />
-                    ) : (
-                      <>{data?.features[0]?.heading || "-"}</>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-                    <span>Description</span>
-                    {/* {editingMode ? ( */}
-                    <input
-                      type="text"
-                      onChange={(e) =>
-                        setEditedData((prev) => {
-                          if (!prev) return undefined;
-                          return {
-                            ...prev,
-                            features: {
-                              ...prev.features,
-                              desc: e.target.value,
-                            },
-                          };
-                        })
-                      }
-                      placeholder="Enter Description"
-                      className="px-2"
-                    />
-                    {/* ) : ( */}
-                    {/* <span>{data?.features[0]?.desc || "-"}</span> */}
-                    {/* )} */}
-                  </div>
-                  <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-                    <span>Additional Feature Charges</span>
-                    {/* {editingMode ? ( */}
-                    <input
-                      type="number"
-                      // value={editedData?.features[2]?.price || ""}
-                      onChange={(e) =>
-                        setEditedData((prev) => {
-                          if (!prev) return undefined;
-
-                          return {
-                            ...prev,
-                            features: {
-                              ...prev.features,
-                              price: parseInt(e.target.value),
-                            },
-                          };
-                        })
-                      }
-                      placeholder="Enter Charges"
-                      className="px-2"
-                    />
-                    {/* ) : ( */}
-                    {/* <span>
-              {datas?.booking_type === 'SVKM Institute'
-                ? 0
-                : data?.features[2]?.price || '-'}
-            </span> */}
-                    {/* )} */}
-                  </div>
-                </div>
-              ) : (
-                // )
-
-                <></>
-              )}
-            </>
+    {addAdditional || editingMode ? (
+      <div className="flex flex-col w-full mb-2">
+        <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span>Name</span>
+          {editingMode || addAdditional ? (
+            <select
+              value={editedData?.features[0]?.heading || ''}
+              onChange={(e) =>
+                setEditedData((prev) => {
+                  if (!prev) return undefined;
+                  return {
+                    ...prev,
+                    features: [
+                      {
+                        ...prev.features[0],
+                        heading: e.target.value,
+                      },
+                    ],
+                  };
+                })
+              }
+              className="px-2"
+            >
+              <option value="" disabled>Select an option</option>
+              {hallData?.additionalFeatures?.map((feature, i) => (
+                <option key={i} value={feature.heading}>
+                  {feature.heading}
+                </option>
+              ))}
+            </select>
           ) : (
-            data?.features.map((eachFeature, index) => (
-              <div key={index} className="flex flex-col w-full mb-2">
-                <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-                  <span>Name</span>
-                  {editingMode || addAdditional ? (
-                    <input
-                      type="text"
-                      value={editedData?.features[index]?.heading}
-                      onChange={(e) =>
-                        setEditedData((prev) => {
-                          if (!prev) return undefined;
-                          return {
-                            ...prev,
-                            features: prev.features.map((feature, i) =>
-                              i === index
-                                ? { ...feature, heading: e.target.value }
-                                : feature
-                            ),
-                          };
-                        })
-                      }
-                      placeholder="Enter Name"
-                      className="px-2"
-                    />
-                  ) : (
-                    <span>{eachFeature.heading || "-"}</span>
-                  )}
-                </div>
-                <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-                  <span>Description</span>
-                  {editingMode || addAdditional ? (
-                    <input
-                      type="text"
-                      value={editedData?.features[index]?.desc}
-                      onChange={(e) =>
-                        setEditedData((prev) => {
-                          if (!prev) return undefined;
-                          return {
-                            ...prev,
-                            features: prev.features.map((feature, i) =>
-                              i === index
-                                ? { ...feature, desc: e.target.value }
-                                : feature
-                            ),
-                          };
-                        })
-                      }
-                      placeholder="Enter Description"
-                      className="px-2"
-                    />
-                  ) : (
-                    <span>{eachFeature.desc || "-"}</span>
-                  )}
-                </div>
-                <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-                  <span>Additional Feature Charges</span>
-                  {editingMode || addAdditional ? (
-                    <input
-                      type="number"
-                      value={editedData?.features[index]?.price || ""}
-                      onChange={(e) =>
-                        setEditedData((prev) => {
-                          if (!prev) return prev;
-                          const updatedFeatures = prev.features.map(
-                            (feature, i) =>
-                              i === index
-                                ? {
-                                    ...feature,
-                                    price: parseInt(e.target.value) || 0,
-                                  }
-                                : feature
-                          );
-                          const newTotalFeatureCharges = updatedFeatures.reduce(
-                            (acc, feature) => acc + (feature.price || 0),
-                            0
-                          );
-                          setTotalFeatureCharges(newTotalFeatureCharges);
-                          return {
-                            ...prev,
-                            features: updatedFeatures,
-                          };
-                        })
-                      }
-                      placeholder="Enter Charges"
-                      className="px-2"
-                    />
-                  ) : (
-                    <span>
-                      {data?.booking_type === "SVKM Institute"
-                        ? 0
-                        : eachFeature.price || "-"}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))
+            <>{data?.features[0]?.heading || "-"}</>
           )}
+        </div>
+        <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span>Description</span>
+          <input
+            type="text"
+            value={editedData?.features[0]?.desc || ""}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  features: [
+                    {
+                      ...prev.features[0],
+                      desc: e.target.value,
+                    },
+                  ],
+                };
+              })
+            }
+            placeholder="Enter Description"
+            className="px-2"
+          />
+        </div>
+        <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+          <span>Additional Feature Charges</span>
+          <input
+            type="number"
+            value={editedData?.features[0]?.price || ""}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  features: [
+                    {
+                      ...prev.features[0],
+                      price: parseInt(e.target.value) || 0,
+                    },
+                  ],
+                };
+              })
+            }
+            placeholder="Enter Charges"
+            className="px-2"
+          />
+        </div>
+      </div>
+    ) : (
+      <></>
+    )}
+  </>
+) : (
+  data?.features.map((eachFeature, index) => (
+    <div key={index} className="flex flex-col w-full mb-2">
+      <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span>Name</span>
+        {editingMode || addAdditional ? (
+          <select
+            value={editedData?.features[index]?.heading || ''}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  features: prev.features.map((feature, i) =>
+                    i === index ? { ...feature, heading: e.target.value } : feature
+                  ),
+                };
+              })
+            }
+            className="px-2"
+          >
+            <option value="" disabled>Select an option</option>
+            {hallData?.additionalFeatures?.map((feature, i) => (
+              <option key={i} value={feature.heading}>
+                {feature.heading}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <span>{eachFeature.heading || "-"}</span>
+        )}
+      </div>
+      <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span>Description</span>
+        {editingMode || addAdditional ? (
+          <input
+            type="text"
+            value={editedData?.features[index]?.desc || ""}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return undefined;
+                return {
+                  ...prev,
+                  features: prev.features.map((feature, i) =>
+                    i === index ? { ...feature, desc: e.target.value } : feature
+                  ),
+                };
+              })
+            }
+            placeholder="Enter Description"
+            className="px-2"
+          />
+        ) : (
+          <span>{eachFeature.desc || "-"}</span>
+        )}
+      </div>
+      <div className="flex items-center justify-between gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+        <span>Additional Feature Charges</span>
+        {editingMode || addAdditional ? (
+          <input
+            type="number"
+            value={editedData?.features[index]?.price || ""}
+            onChange={(e) =>
+              setEditedData((prev) => {
+                if (!prev) return prev;
+                const updatedFeatures = prev.features.map((feature, i) =>
+                  i === index ? { ...feature, price: parseInt(e.target.value) || 0 } : feature
+                );
+                const newTotalFeatureCharges = updatedFeatures.reduce(
+                  (acc, feature) => acc + (feature.price || 0),
+                  0
+                );
+                setTotalFeatureCharges(newTotalFeatureCharges);
+                return {
+                  ...prev,
+                  features: updatedFeatures,
+                };
+              })
+            }
+            placeholder="Enter Charges"
+            className="px-2"
+          />
+        ) : (
+          <span>
+            {data?.booking_type === "SVKM Institute" ? 0 : eachFeature.price || "-"}
+          </span>
+        )}
+      </div>
+    </div>
+  ))
+)}
+
           {/* Billing when Single Payment Selected*/}
           <span className=" text-lg font-medium">Billing</span>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
