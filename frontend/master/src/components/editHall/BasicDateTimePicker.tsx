@@ -4,6 +4,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { convertISO_To_IST } from "../../utils/ISO-IST";
 import { DatePicker } from "@mui/x-date-pickers";
 // import { useState } from "react";
+import dayjs from 'dayjs';
+
 
 type Props = {
   id:string;
@@ -52,6 +54,9 @@ export default function BasicDateTimePicker({
             className="w-full bg-gray-100"
             label={timePickerName}
             onChange={handleTimeChange}
+            minDate={dayjs('2024-01-01')}
+            maxDate={dayjs('2026-12-31')}
+            format="DD/MM/YYYY"
           />
         </DemoContainer>
       </LocalizationProvider>

@@ -16,7 +16,7 @@ const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 
 // CHANGE 1: Define start and end years as constants
 const START_YEAR = 2024;
-const END_YEAR = 2050;
+const END_YEAR = 2026;
 
 type Props = {
   hallId: string;
