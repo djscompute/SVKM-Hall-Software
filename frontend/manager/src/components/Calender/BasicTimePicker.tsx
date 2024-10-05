@@ -6,6 +6,8 @@ import { DatePicker } from "@mui/x-date-pickers";
 // import { useState } from "react";
 import dayjs from 'dayjs';
 
+const START_YEAR = new Date().getFullYear();
+const END_YEAR = START_YEAR + 2;
 
 type Props = {
   timePickerName: string;
@@ -53,8 +55,8 @@ export default function BasicDateTimePicker({
             className="w-full bg-gray-100"
             label={timePickerName}
             onChange={handleTimeChange}
-            minDate={dayjs('2024-01-01')}
-            maxDate={dayjs('2026-12-31')}
+            minDate={dayjs(`${START_YEAR}-01-01`)}
+            maxDate={dayjs(`${END_YEAR}-12-31`)}
             format="DD/MM/YYYY"
           />
         </DemoContainer>

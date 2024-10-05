@@ -15,8 +15,8 @@ import { DatePicker } from "@mui/x-date-pickers";
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 
 // CHANGE 1: Add constants for start and end years
-const START_YEAR = 2024;
-const END_YEAR = 2026;
+const START_YEAR = new Date().getFullYear();
+const END_YEAR = START_YEAR + 2;
 
 type Props = {
   hallId: string;
