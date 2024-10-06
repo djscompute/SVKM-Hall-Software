@@ -36,7 +36,7 @@ function Report9() {
   const [selectedHallId, setSelectedHallId] = useState<string>("All");
   const [selectedSession, setSelectedSession] = useState<string>("All");
   const [selectedCategory, setSelectedCategory] = useState<string>();
-  const [hallCharges, setHallCharges] = useState<boolean>(false);
+  const [hallCharges, setHallCharges] = useState<boolean>(true);
   const [responseHallCharges, setresponseHallCharges] = useState<boolean>();
   const [selectedDisplayPeriod, setSelectedDisplayPeriod] = useState<string>("Select");
 
