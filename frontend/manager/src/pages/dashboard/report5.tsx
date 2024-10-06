@@ -127,6 +127,8 @@ function Report5() {
   const [data, setData] = useState<any>();
   const now = dayjs();
 
+  const formatDate = (date: dayjs.Dayjs) => date.format("DD-MM-YYYY");
+
   const startOfWeek = now.startOf("week").format("YYYY-MM-DDT00:00:00");
   const endOfWeek = now.endOf("week").format("YYYY-MM-DDT23:59:59");
 
@@ -173,10 +175,10 @@ function Report5() {
     let humanReadableFrom = "";
     let humanReadableTo = "";
     if (from) {
-      humanReadableFrom = dayjs(from)?.format("MMMM D, YYYY");
+      humanReadableFrom = formatDate(dayjs(from));
     }
     if (to) {
-      humanReadableTo = dayjs(to)?.format("MMMM D, YYYY");
+      humanReadableTo = formatDate(dayjs(to));
     }
     console.log(humanReadableFrom, humanReadableTo);
     setHumanReadable({
