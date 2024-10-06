@@ -14,25 +14,32 @@ import { DatePicker } from "@mui/x-date-pickers";
 
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 
+
+const START_YEAR = new Date().getFullYear();
+const END_YEAR = START_YEAR + 2;
+
 type Props = {
   hallId: string;
   HallData: EachHallType;
 };
 
-//calendar
 const Calendar = ({ hallId, HallData }: Props) => {
   dayjs.extend(utc);
-console.log("session",HallData);
+  console.log("session",HallData);
 
-  const [currentDate, setCurrentDate] = useState(
-    dayjs().startOf("month").toDate()
+  const [currentDate, setCurrentDate] = useState(() => {
+    const now = dayjs();
+    return now.year() < START_YEAR ? dayjs(`${START_YEAR}-01-01`) : now;
+  });
+
+  const [selectedMobileDate, setSelectedMobileDate] = useState<number>(
+    currentDate.date()
   );
-  const [selectedMobileDate, setSelectedMobileDate] = useState<number>(1);
 
-  const startDate = dayjs(currentDate)
+  const startDate = currentDate
     .startOf("month")
     .format("YYYY-MM-DD[T]00:00:00");
-  const endDate = dayjs(currentDate)
+  const endDate = currentDate
     .endOf("month")
     .format("YYYY-MM-DD[T]23:59:59");
 
@@ -53,28 +60,26 @@ console.log("session",HallData);
       console.log("res",response.data);
       if (response.data.message == "No bookings found for the specified range.")
         return [];
-      // sort based of from
       response.data.sort((a: any, b: any) => dayjs(a.from).diff(dayjs(b.from)));
       return response.data;
     },
-    staleTime: 1 * 60 * 1000, // Data is considered fresh for 1 minutes
+    staleTime: 1 * 60 * 1000,
   });
 
-  const daysInMonth = dayjs(currentDate).daysInMonth();
+  const daysInMonth = currentDate.daysInMonth();
+  const firstDayOfMonth = currentDate.startOf("month").day();
 
-  const firstDayOfMonth = dayjs(currentDate).startOf("month").day();
-
+  // CHANGE 2: Update next month function to check against END_YEAR
   const onNextMonth = () => {
-    if(dayjs(currentDate).isAfter(dayjs().add(2,'y').subtract(1, 'month'))) return;
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-    );
+    const nextMonth = currentDate.add(1, 'month');
+    if (nextMonth.year() > END_YEAR) return;
+    setCurrentDate(nextMonth);
   };
 
   const onPreviousMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-    );
+    const previousMonth = currentDate.subtract(1, 'month');
+    if (previousMonth.year() < START_YEAR) return;
+    setCurrentDate(previousMonth);
   };
 
   const totalSlots = Math.ceil((firstDayOfMonth + daysInMonth) / 7) * 7;
@@ -88,24 +93,29 @@ console.log("session",HallData);
     );
 
   return (
-    <div className=" flex justify-center items-center">
+    <div className="flex justify-center items-center">
       <div className="flex flex-col justify-center w-full md:mx-10 h-full border-[3px] border-border-color rounded-lg shadow-custom p-4">
-        {/* Date  */}
         <LocalizationProvider dateAdapter={AdapterDayjs}>
+          {/* CHANGE 3: Update DatePicker to use END_YEAR */}
           <DatePicker
-            value={dayjs(currentDate)}
+            value={currentDate}
             onChange={(newState): any => {
-              console.log(newState);
-              setCurrentDate(dayjs(newState).startOf("month").toDate());
+              if (newState) {
+                setCurrentDate(newState);
+              }
             }}
             views={["year", "month"]}
-            maxDate={dayjs().add(2,'y')}
+            minDate={dayjs(`${START_YEAR}-01-01`)}
+            maxDate={dayjs(`${END_YEAR}-12-31`)}
           />
         </LocalizationProvider>
-        {/* Top heading */}
         <div className="flex justify-between items-center my-4 w-3/4 mx-auto">
           <svg
-            className=" cursor-pointer"
+            className={`cursor-pointer ${
+              currentDate.year() === START_YEAR && currentDate.month() === 0
+                ? 'opacity-50 cursor-not-allowed'
+                : ''
+            }`}
             onClick={onPreviousMonth}
             width="8"
             height="14"
@@ -116,13 +126,15 @@ console.log("session",HallData);
             <path d="M7.125 13.25L0.875 7L7.125 0.75" stroke="black" />
           </svg>
           <span className="text-lg cursor-pointer">
-            {currentDate.toLocaleDateString("default", {
-              month: "short",
-              year: "numeric",
-            })}
+            {currentDate.format("MMM YYYY")}
           </span>
+          {/* CHANGE 4: Update next month button to check against END_YEAR */}
           <svg
-            className=" cursor-pointer rotate-180"
+            className={`cursor-pointer rotate-180 ${
+              currentDate.year() === END_YEAR && currentDate.month() === 11
+                ? 'opacity-50 cursor-not-allowed'
+                : ''
+            }`}
             onClick={onNextMonth}
             width="8"
             height="14"
@@ -135,38 +147,33 @@ console.log("session",HallData);
         </div>
         <Legends />
 
-        {/* CALENDER GRId */}
         <div className="grid grid-cols-7 gap-[2px]">
-          {/* Week Days */}
           {weekDays.map((eachWeekDay, index) => (
             <div
               key={`days-${index}`}
-              className=" w-full m-auto text-center text-sm md:text-lg bg-gray-100"
+              className="w-full m-auto text-center text-sm md:text-lg bg-gray-100"
             >
               {eachWeekDay}
             </div>
           ))}
-          {/* leading spare days */}
           {Array.from({ length: firstDayOfMonth }, (_, i) => (
             <div
               key={`empty-${i}`}
               className="flex flex-col items-center h-full w-full bg-gray-100 rounded-md"
             ></div>
           ))}
-          {/* Legit Dates */}
           {Array.from({ length: daysInMonth }, (_, i) => (
             <EachDay
+              key={`day-${i}`}
               i={i + 1}
               hallId={hallId}
-              currentDate={currentDate}
+              currentDate={currentDate.toDate()}
               HallSessionsArray={HallData}
-
               selectedMobileDate={selectedMobileDate}
               setSelectedMobileDate={setSelectedMobileDate}
               allBookingData={allBookingData}
             />
           ))}
-          {/* trailing spare days */}
           {Array.from({ length: trailingDays }, (_, i) => (
             <div
               key={`empty-trail-${i}`}
@@ -175,12 +182,11 @@ console.log("session",HallData);
           ))}
         </div>
 
-        {/* SLOT FOR EACH DAY ON MOBILE VERSION */}
-        <div className=" block lg:hidden mt-10">
+        <div className="block lg:hidden mt-10">
           <EachMobileDay
             i={selectedMobileDate}
             hallId={hallId}
-            currentDate={currentDate}
+            currentDate={currentDate.toDate()}
             HallSessionsArray={HallData}
             selectedMobileDate={selectedMobileDate}
             setSelectedMobileDate={setSelectedMobileDate}

@@ -64,6 +64,7 @@ function Report9() {
   });
 
   const now = dayjs();
+  const formatDate = (date: dayjs.Dayjs) => date.format("DD-MM-YYYY");
 
   function formatToDDMMYYYY(dateTimeString: string) {
     const datePart = dateTimeString.split("T")[0];
@@ -75,27 +76,39 @@ function Report9() {
   const handleHumanReadable = (from: string, to: string) => {
     let humanReadableFrom = "";
     let humanReadableTo = "";
-    const now = dayjs();
-
-    if (selectedDisplayPeriod === "Today") {
-      humanReadableFrom = humanReadableTo = now.format("MMMM D, YYYY");
-    } else if (selectedDisplayPeriod === "Week") {
-      humanReadableFrom = now.startOf("week").format("MMMM D, YYYY");
-      humanReadableTo = now.endOf("week").format("MMMM D, YYYY");
-    } else if (selectedDisplayPeriod === "Month") {
-      humanReadableFrom = now.startOf("month").format("MMMM D, YYYY");
-      humanReadableTo = now.endOf("month").format("MMMM D, YYYY");
-    } else if (selectedDisplayPeriod === "Year") {
-      humanReadableFrom = now.startOf("year").format("MMMM D, YYYY");
-      humanReadableTo = now.endOf("year").format("MMMM D, YYYY");
-    } else if (selectedDisplayPeriod === "Fin-Year") {
-      humanReadableFrom = getFinancialYearStart().format("MMMM D, YYYY");
-      humanReadableTo = getFinancialYearEnd().format("MMMM D, YYYY");
-    } else {
-      humanReadableFrom = from ? dayjs(from).format("MMMM D, YYYY") : "";
-      humanReadableTo = to ? dayjs(to).format("MMMM D, YYYY") : "";
+  
+    switch (selectedDisplayPeriod) {
+      case "Today":
+        humanReadableFrom = humanReadableTo = formatDate(dayjs());
+        break;
+      case "Tomorrow":
+        humanReadableFrom = humanReadableTo = formatDate(dayjs().add(1, "day"));
+        break;
+      case "Week":
+        humanReadableFrom = formatDate(dayjs().startOf("week"));
+        humanReadableTo = formatDate(dayjs().endOf("week"));
+        break;
+      case "Month":
+        humanReadableFrom = formatDate(dayjs().startOf("month"));
+        humanReadableTo = formatDate(dayjs().endOf("month"));
+        break;
+      case "Year":
+        humanReadableFrom = formatDate(dayjs().startOf("year"));
+        humanReadableTo = formatDate(dayjs().endOf("year"));
+        break;
+      case "Fin-Year":
+        humanReadableFrom = formatDate(getFinancialYearStart());
+        humanReadableTo = formatDate(getFinancialYearEnd());
+        break;
+      default:
+        if (from) {
+          humanReadableFrom = formatDate(dayjs(from));
+        }
+        if (to) {
+          humanReadableTo = formatDate(dayjs(to));
+        }
     }
-
+  
     setHumanReadable({
       fromHuman: humanReadableFrom,
       toHuman: humanReadableTo,
