@@ -1,20 +1,27 @@
 import { useLocation } from "react-router-dom";
 import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
+import { EachHallAdditonalFeaturesType } from "../types/Hall.types";
 
 const BookingSuccessful = () => {
   const location = useLocation();
   const bookingDetails = location.state?.bookingDetails;
+
   const extractTime = (dateTimeString: string) => {
     return dateTimeString.split("T")[1].split(".")[0];
   };
-  const extractDate = (dateTimeString: string): string => {
-    // for date format (DD. MM. YYYY)
-    const date = new Date(dateTimeString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear().toString().slice(-2);
-    return `${day}-${month}-${year}`;
+
+  const extractDate = (dateTimeString: string) => {
+    const dateParts = dateTimeString.split("T")[0].split("-");
+    return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`; // Rearranged to DD-MM-YYYY
   };
+
+  // const convert_IST_TimeString_To12HourFormat = (timeString: string) => {
+  //   const [hours, minutes, seconds] = timeString.split(":");
+  //   const period = parseInt(hours) >= 12 ? 'PM' : 'AM';
+  //   const formattedHours = ((parseInt(hours) % 12) || 12).toString().padStart(2, '0');
+  //   return `${formattedHours}:${minutes}:${seconds} ${period}`;
+  // };
+
   const from = convert_IST_TimeString_To12HourFormat(
     extractTime(bookingDetails.startTime)
   );
@@ -22,22 +29,24 @@ const BookingSuccessful = () => {
     extractTime(bookingDetails.endTime)
   );
   const date = extractDate(bookingDetails.startTime);
-  
-  // Total price of all additional features
+
   const calculateAdditionalFeaturesTotal = (additionalFeatures: any) => {
     if (!additionalFeatures) return 0;
-    return Object.values(additionalFeatures).reduce((total: number, feature: any) => total + (feature.price || 0), 0);
+    return Object.values(additionalFeatures).reduce(
+      (total: number, feature: any) => total + (feature.price || 0),
+      0
+    );
   };
 
-  const additionalFeaturesTotal = calculateAdditionalFeaturesTotal(bookingDetails.additionalFeatures);
+  const additionalFeaturesTotal = calculateAdditionalFeaturesTotal(
+    bookingDetails.additionalFeatures
+  );
   let hallBaseCharges: number;
-  if (bookingDetails.booking_type === "SVKM INSTITUTE") {
+  if (bookingDetails.paymentType === "SVKM INSTITUTE") {
     hallBaseCharges = bookingDetails.estimatedPrice;
   } else {
     hallBaseCharges = bookingDetails.estimatedPrice - additionalFeaturesTotal;
   }
-
-  // const totalPayable = hallBaseCharges + bookingDetails.securityDeposit + additionalFeaturesTotal;
 
   console.log("HEREEE", bookingDetails);
 
@@ -47,7 +56,7 @@ const BookingSuccessful = () => {
         Enquiry Successful for {bookingDetails.hallName}
       </h1>
       <p className="text-center">
-        Thank you for your enquiry! For further details please check your inbox
+        Thank you for your enquiry! For further details please check your inbox.
       </p>
       {bookingDetails && (
         <>
@@ -77,7 +86,7 @@ const BookingSuccessful = () => {
                   </td>
                 </tr>
                 <tr className="border-b-2">
-                <td className="font-medium py-2 w-1/2">Hall Charges</td>
+                  <td className="font-medium py-2 w-1/2">Hall Charges</td>
                   <td className="w-1/2">₹{hallBaseCharges}</td>
                 </tr>
                 <tr className="border-b-2">
@@ -92,7 +101,7 @@ const BookingSuccessful = () => {
                               <span>{each.heading} </span>
                               <span>
                                 Charge: ₹
-                                {bookingDetails.booking_type === "SVKM INSTITUTE"
+                                {bookingDetails.paymentType === "SVKM INSTITUTE"
                                   ? 0
                                   : each.price}
                               </span>
@@ -106,12 +115,24 @@ const BookingSuccessful = () => {
                   <td className="font-medium py-2 w-1/2">Security Deposit</td>
                   <td className="w-1/2">₹{bookingDetails.securityDeposit}</td>
                 </tr>
+
                 <tr className="border-b-2">
-                <td className="font-medium py-2 w-1/2">Total Payable</td>
-                  {bookingDetails.booking_type=='SVKM INSTITUTE'?
-                  <td className="w-1/2">₹{hallBaseCharges+bookingDetails.securityDeposit} </td>
-                  :
-                  <td className="w-1/2">₹{hallBaseCharges+additionalFeaturesTotal} + GST (if applicable) + {bookingDetails.securityDeposit}</td>}
+                  <td className="font-medium py-2 w-1/2">Total Payable</td>
+                  {bookingDetails.paymentType == "SVKM INSTITUTE" ? (
+                    <td className="w-1/2">
+                      ₹{hallBaseCharges + bookingDetails.securityDeposit}{" "}
+                    </td>
+                  ) : (
+                    <td className="w-1/2">
+                      ₹{hallBaseCharges + additionalFeaturesTotal} + GST (if
+                      applicable) +{bookingDetails.securityDeposit}
+                    </td>
+                  )}
+                </tr>
+                <tr>
+                  <p className=" text-sm font-bold pt-1 text-red-400">
+                    *GST is applicable as per prevailing rates.
+                  </p>
                 </tr>
               </tbody>
             </table>
@@ -141,9 +162,7 @@ const BookingSuccessful = () => {
                   <td className="w-1/2">{bookingDetails.mobile}</td>
                 </tr>
                 <tr className="border-b-2">
-                  <td className="font-medium py-2 w-1/2">
-                    Additional Information
-                  </td>
+                  <td className="font-medium py-2 w-1/2">Additional Information</td>
                   <td className="w-1/2">{bookingDetails.additionalInfo}</td>
                 </tr>
                 <tr className="border-b-2">
