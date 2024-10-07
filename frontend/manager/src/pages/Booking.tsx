@@ -1341,10 +1341,20 @@ function Booking() {
                   value={booking._id}
                   checked={selectedBookings.includes(booking._id)}
                   onChange={handleCheckboxChange}
+                  disabled={booking.status === "CANCELLED"}
                 />
-                <label style={{ marginLeft: "5px" }}>
-                  {dayjs(booking.from).format("h:mm A, MMMM D, YYYY") || "-"}
-                </label>
+    <label
+      style={{
+        marginLeft: "5px",
+        color: booking.status === "CANCELLED" ? "#888" : "inherit",
+        filter: booking.status === "CANCELLED" ? "blur(1px)" : "none",
+      }}
+    >
+      {dayjs(booking.from).format("h:mm A, MMMM D, YYYY") || "-"}{" "}
+      {booking.status === "CANCELLED" && (
+        <span style={{ color: "red" }}>- Cancelled</span>
+      )}
+    </label>
               </div>
             ))}
           </div>
