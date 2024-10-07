@@ -2747,8 +2747,14 @@ function Booking() {
               <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
                 <span className="w-full text-left">Date</span>
                 <input
-                  type="text"
-                  value={editedData?.transaction?.date}
+                  type="date"
+                  value={
+                    editedData?.transaction?.date
+                      ? new Date(editedData.transaction.date).toISOString().split("T")[0]
+                      : "" // Fallback to an empty string for an uncontrolled input
+                  }
+                  max={new Date(new Date().setFullYear(new Date().getFullYear() + 2)).toISOString().split("T")[0]}
+                  min={new Date().toISOString().split("T")[0]}
                   onChange={(e) =>
                     setEditedData((prev) => {
                       if (!prev) return undefined;
@@ -2764,14 +2770,20 @@ function Booking() {
                   placeholder="DD-MM-YYYY"
                   className="px-2"
                 />
+
               </div>
             ) : (
               <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-                <span className="w-full text-left">Date</span>
-                <span className="w-full text-right">
-                  {data?.transaction?.date || "-"}
-                </span>
-              </div>
+  <span className="w-full text-left">Date</span>
+  <span className="w-full text-right">
+    {data?.transaction?.date
+      ? new Date(data.transaction.date)
+          .toLocaleDateString('en-GB')
+          .replace(/\//g, "-") // Replace slashes with hyphens
+      : "-"}
+  </span>
+</div>
+
             ))}
           {["upi"].includes(data?.transaction?.type || "") &&
             (editingMode ? (
