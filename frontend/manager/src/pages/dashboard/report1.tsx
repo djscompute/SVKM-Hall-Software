@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axiosManagerInstance from "../../config/axiosManagerInstance";
+import axiosMasterInstance from "../../config/axiosManagerInstance";
 import { toast } from "react-toastify";
 import { Bar, Pie } from "react-chartjs-2";
 import "chart.js/auto";
@@ -113,8 +113,6 @@ function Report1() {
   const [data, setData] = useState<any>();
   const now = dayjs();
 
-  const formatDate = (date: dayjs.Dayjs) => date.format("DD-MM-YYYY");
-
   const startOfWeek = now.startOf("week").format("YYYY-MM-DDT00:00:00");
   const endOfWeek = now.endOf("week").format("YYYY-MM-DDT23:59:59");
 
@@ -126,7 +124,7 @@ function Report1() {
 
   const getData = async ({ from, to }: { from: string; to: string }) => {
     if (!from || !to) return;
-    const responsePromise = axiosManagerInstance.post(
+    const responsePromise = axiosMasterInstance.post(
       "dashboard/getHallWiseBookingsCount",
       {
         fromDate: from,
@@ -159,10 +157,10 @@ function Report1() {
     let humanReadableFrom = "";
     let humanReadableTo = "";
     if (from) {
-      humanReadableFrom = formatDate(dayjs(from));
+      humanReadableFrom = dayjs(from)?.format("MMMM D, YYYY");
     }
     if (to) {
-      humanReadableTo = formatDate(dayjs(to));
+      humanReadableTo = dayjs(to)?.format("MMMM D, YYYY");
     }
     console.log(humanReadableFrom, humanReadableTo);
     setHumanReadable({
@@ -180,12 +178,14 @@ function Report1() {
       <span className=" text-xl font-medium mt-5">Hall Wise Bookings</span>
       <div className="flex gap-2">
         <BasicDateTimePicker
+         id="fromDate"
           timeModifier={(time) => {
             setQueryFilter((prev) => ({ ...prev, from: time }));
           }}
           timePickerName="from"
         />
         <BasicDateTimePicker
+         id="toDate"
           timeModifier={(time) => {
             setQueryFilter((prev) => ({ ...prev, to: time }));
           }}
