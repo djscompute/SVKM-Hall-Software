@@ -14,6 +14,7 @@ function Report9() {
   useQuery({
     queryKey: ["allhalls"],
     queryFn: async () => {
+      // eslint-disable-next-line no-useless-catch
       try {
         const responsePromise = axiosManagerInstance.get("getAllHalls");
         console.log("FETCHING");
@@ -63,7 +64,7 @@ function Report9() {
     toHuman: "",
   });
 
-  const now = dayjs();
+  // const now = dayjs();
   const formatDate = (date: dayjs.Dayjs) => date.format("DD-MM-YYYY");
 
   function formatToDDMMYYYY(dateTimeString: string) {
@@ -414,7 +415,7 @@ function Report9() {
         <div className={`flex flex-col items-center justify-center gap-2 `}>
           <div className="flex gap-2">
             <BasicDateTimePicker
-               id="fromDate"
+              id="fromDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, from: formattedTime }));
