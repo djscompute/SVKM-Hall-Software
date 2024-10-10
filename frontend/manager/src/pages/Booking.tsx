@@ -9,6 +9,7 @@ import {
   bookingStatusType,
   bookingTransactionType,
   transactionType,
+  EachHallSessionType,
 } from "../../../../types/global";
 import { useParams } from "react-router-dom";
 import { convert_IST_TimeString_To12HourFormat } from "../utils/convert_IST_TimeString_To12HourFormat";
@@ -387,9 +388,13 @@ function Booking() {
   }) => {
 
       // Find the session that matches the booking's session_id
-  const session = hallData?.sessions.find(
-    (session: { _id: string | undefined; }) => session._id === booking.session_id
-  );
+      const session = hallData?.sessions.find(
+        (session: EachHallSessionType) => session._id === booking.session_id
+      );
+      
+      
+      
+      
 
   // Find the price entry within the found session that matches the booking's booking_type
   const priceEntryForThisBooking = session?.price.find(
@@ -1058,7 +1063,7 @@ function Booking() {
   return (
     <div className="flex flex-col items-center my-10 w-11/12 sm:w-3/4 lg:w-1/2 mx-auto">
       <div className="w-64 mx-auto mt-5 mb-4">
-        <label
+        <label  
           className="block text-gray-700 text-sm font-bold mb-2"
           htmlFor="options"
         >
@@ -1385,7 +1390,6 @@ function Booking() {
         </>
       )}
 
-      {/* When payment menthod is set to  multiple */}
       {/* Manager Email */}
       <span className=" text-lg font-medium">Manager Details</span>
       {/* Manager Phone Number */}
@@ -1440,6 +1444,9 @@ function Booking() {
         </div>
       )}
 
+
+      {/* When payment menthod is set to  multiple */}
+
       {selectedBookingData ? (
         <>
           <span className=" text-lg font-medium">Slots</span>
@@ -1464,7 +1471,7 @@ function Booking() {
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Hall Charges</span>
             <span className="w-full text-right">
-              {multiplePriceEntry?.price || "-"}
+              {selectedBookingData?.price || "-"}
             </span>
           </div>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
@@ -1521,6 +1528,10 @@ function Booking() {
               </div>
             ))
           )}
+
+
+
+          
           {/* Billing When  multiple Payment Selected */}
           <span className=" text-lg font-medium">Billing</span>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
@@ -1557,7 +1568,7 @@ function Booking() {
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">CGST 9%</span>
             <span className="w-full text-right">
-              {data?.booking_type == "SVKM INSTITUTE" ? (
+              {selectedBookingData?.booking_type == "SVKM INSTITUTE" ? (
                 <div>0</div>
               ) : (
                 <div>
@@ -1575,7 +1586,7 @@ function Booking() {
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">SGST 9%</span>
             <span className="w-full text-right">
-              {data?.booking_type == "SVKM INSTITUTE" ? (
+              {selectedBookingData?.booking_type == "SVKM INSTITUTE" ? (
                 <div>0</div>
               ) : (
                 <div>
@@ -1699,7 +1710,7 @@ function Booking() {
                           ? (multiplePriceEntry?.price || 0) +
                             totalFeatureCharges -
                             0.01 *
-                              data!.baseDiscount *
+                              selectedBookingData!.baseDiscount *
                               ((multiplePriceEntry?.price || 0) +
                                 totalFeatureCharges) +
                             (selectedBookingData.isDeposit
@@ -2388,7 +2399,7 @@ function Booking() {
             <label htmlFor="isDeposit">Security Deposit Applicable </label>
             <select
               id="isDeposit"
-              value={data?.isDeposit === true ? "yes" : "no" || false}
+              value={data?.isDeposit ? "yes" : "no"}
               className="px-2 py-1 rounded-md border border-gray-400 my-1"
               onChange={(e) => {
                 if (e.target.value === "yes") {
