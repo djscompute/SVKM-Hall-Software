@@ -1408,7 +1408,7 @@ function Booking() {
                 };
               })
             }
-            placeholder="Manager Contact Number"
+            placeholder="Manager Name"
             className="px-2"
           />
         </div>
