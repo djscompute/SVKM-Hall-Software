@@ -153,8 +153,13 @@ function Report9() {
       error: "Failed to fetch Report. Please contact maintainer.",
     });
     const response = await responsePromise;
-    console.log("data here ", response.data);
-    setData(response.data);
+    const processedData = response.data.map((booking: BookingData) => ({
+      ...booking,
+      Remark: booking.Remark || "", // Convert null Remark values to an empty string
+    }));
+
+    console.log("Processed data:", processedData);
+    setData(processedData);
   };
 
   const calculateTotalBookingAmount = () => {
@@ -189,6 +194,7 @@ function Report9() {
 
   interface BookingData {
     "Manager Name": string;
+    "Remark": string;
     "Customer Category": string;
     "Customer Name": string;
     "Contact Person": string;
@@ -211,9 +217,10 @@ function Report9() {
 
   const downloadCsv = () => {
     if (!data) return;
-  
+
     const flattenedData: FlattenedBookingData[] = data.map((row: BookingData) => {
       const flatRow: FlattenedBookingData = { ...row };
+      // Add transaction data to flattened row
       if (row.transaction) {
         flatRow["transaction type"] = row.transaction.type || "";
         flatRow["transaction date"] = row.transaction.date || "";
@@ -223,27 +230,37 @@ function Report9() {
         flatRow["cheque no."] = row.transaction.chequeNo || "";
         flatRow["bank"] = row.transaction.bank || "";
       }
+
+      // Replace session ID with session name
+      const hall = hallData.find((hall) => hall.name === row["Hall Name"]);
+      const session = hall?.sessions.find((session) => session._id === row["Session"]);
+      if (session) {
+        flatRow["Session"] = `${session.name} ${convert_IST_TimeString_To12HourFormat(session.from)} - ${convert_IST_TimeString_To12HourFormat(session.to)}`;
+      } else {
+        flatRow["Session"] = "N/A";
+      }
+
       delete (flatRow as any).transaction;
       return flatRow;
     });
-  
+
     const totalAmountPaid = flattenedData.reduce((sum, row) => sum + (Number(row["Amount Paid"]) || 0), 0);
     const totalBookingAmount = flattenedData.reduce((sum, row) => sum + (Number(row["Booking Amount"]) || 0), 0);
     const totalSecurityDeposit = flattenedData.reduce((sum, row) => sum + (Number(row["Security Deposit"]) || 0), 0);
     const totalGST = flattenedData.reduce((sum, row) => sum + (Number(row["GST"]) || 0), 0);
-  
+
     // Add totals row
     flattenedData.push({
       "Manager Name": "Total",
       "Booking Amount": totalBookingAmount.toFixed(2),
       "Amount Paid": totalAmountPaid.toFixed(2),
       "Security Deposit": totalSecurityDeposit.toFixed(2),
-      "GST": totalGST.toFixed(2),
+      GST: totalGST.toFixed(2),
     } as FlattenedBookingData);
-  
+
     const headers = Object.keys(flattenedData[0]);
     const csvRows = [headers.join(",")];
-  
+
     for (const row of flattenedData) {
       const values = headers.map((header) => {
         const escaped = ("" + (row[header] || "")).replace(/"/g, '\\"');
@@ -251,7 +268,7 @@ function Report9() {
       });
       csvRows.push(values.join(","));
     }
-  
+
     const csvString = csvRows.join("\n");
     const blob = new Blob([csvString], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -262,7 +279,6 @@ function Report9() {
     link.click();
     document.body.removeChild(link);
   };
-  
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
@@ -401,7 +417,7 @@ function Report9() {
         <div className={`flex flex-col items-center justify-center gap-2 `}>
           <div className="flex gap-2">
             <BasicDateTimePicker
-               id="fromDate"
+              id="fromDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, from: formattedTime }));
@@ -409,7 +425,7 @@ function Report9() {
               timePickerName="from"
             />
             <BasicDateTimePicker
-             id="toDate"
+              id="toDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, to: formattedTime }));
@@ -529,6 +545,7 @@ function Report9() {
                 })}
                 <tr className="font-semibold">
                   <td className="px-4 py-2 text-center whitespace-nowrap">Total</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
