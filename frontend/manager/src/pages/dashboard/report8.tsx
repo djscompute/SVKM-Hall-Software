@@ -6,7 +6,6 @@ import dayjs from "dayjs";
 import BasicDateTimePicker from "../../components/Calender/BasicTimePicker.tsx";
 import { EachHallType } from "../../../../../types/global.ts";
 import { useQuery } from "@tanstack/react-query";
-import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat.ts";
 import {
   getFinancialYearEnd,
   getFinancialYearStart,
@@ -18,6 +17,7 @@ function Report8() {
   useQuery({
     queryKey: ["allhalls"],
     queryFn: async () => {
+      // eslint-disable-next-line no-useless-catch
       try {
         const responsePromise = axiosManagerInstance.get("getAllHalls");
         console.log("FETCHING");
@@ -70,7 +70,7 @@ function Report8() {
     toHuman: "",
   });
 
-  const now = dayjs();
+  // const now = dayjs();
 
   const formatDate = (date: dayjs.Dayjs) => date.format("DD-MM-YYYY");
 
