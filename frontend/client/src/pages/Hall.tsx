@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom"; 
+import { useParams, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axiosClientInstance from "../config/axiosClientInstance.ts";
 import { EachHallType } from "../types/Hall.types.ts";
@@ -15,8 +15,8 @@ import HallPricing from "../components/hall/HallPricing.tsx";
 
 function Hall() {
   const { id } = useParams<{ id: string }>();
-  const location = useLocation(); 
-  
+  const location = useLocation();
+
   const { data, isFetching } = useQuery({
     queryKey: ["allhalls", `hall-${id}`],
     queryFn: async () => {
@@ -36,46 +36,26 @@ function Hall() {
     staleTime: 2 * 60 * 1000,
   });
 
-  
   useEffect(() => {
-    if (location.hash) {
-      const element = document.querySelector(location.hash);
-      if (element) {
-        const timeoutId = setTimeout(() => {
+    
+    if (location.hash && !isFetching) {
+      const timeoutId = setTimeout(() => {
+        const element = document.querySelector(location.hash);
+        if (element) {
           element.scrollIntoView({ behavior: "smooth" });
-        }, 100); 
+        }
+      }, 500); 
 
-        
-        return () => clearTimeout(timeoutId);
-      }
+      return () => clearTimeout(timeoutId);
     }
-  }, [location]);
-
-  // const [isOpen, setIsOpen] = useState(false);
-  // const toggleReadMore = () => setIsOpen(!isOpen);
-
-  // const [currentIndex, setCurrentIndex] = useState(0);
-
-  // const prevSlide = () => {
-  //   if (!data?.images) return;
-  //   const isFirstSlide = currentIndex === 0;
-  //   const newIndex = isFirstSlide ? data?.images.length - 1 : currentIndex - 1;
-  //   setCurrentIndex(newIndex);
-  // };
-
-  // const nextSlide = () => {
-  //   if (!data?.images) return;
-  //   const isLastSlide = currentIndex === data?.images.length - 1;
-  //   const newIndex = isLastSlide ? 0 : currentIndex + 1;
-  //   setCurrentIndex(newIndex);
-  // };
-
-  // const goToSlide = (slideIndex: React.SetStateAction<number>) => {
-  //   setCurrentIndex(slideIndex);
-  // };
+  }, [location.hash, isFetching]);
 
   if (isFetching) {
-    return <div>Fetching Info</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Fetching Info...
+      </div>
+    );
   }
 
   return (
@@ -87,18 +67,20 @@ function Hall() {
               <h1 className="text-center text-5xl mt-10">{data.name}</h1>
               <Calendar hallId={id as string} HallData={data} />
               <ImageCarousel data={data} />
-              <hr className=" bg-gray-300 h-[1.5px] w-full" />
+              <hr className="bg-gray-300 h-[1.5px] w-full" />
               <HallLocation data={data} />
-              <hr className=" bg-gray-300 h-[1.5px] w-full" />
+              <hr className="bg-gray-300 h-[1.5px] w-full" />
               <AboutHall data={data} />
               <HallCapacity data={data} />
-              <hr className=" bg-gray-300 h-[1.5px] w-full" />
+              <hr className="bg-gray-300 h-[1.5px] w-full" />
               <HallAdditionalFeatures data={data} />
-              <hr className=" bg-gray-300 h-[1.5px] w-full" />
-              <HallPricing data={data} id="hall-pricing" />
+              <hr className="bg-gray-300 h-[1.5px] w-full" />
+              <div id="hall-pricing">
+                <HallPricing data={data} />
+              </div>
             </div>
           ) : (
-            <div>
+            <div className="flex justify-center items-center min-h-screen">
               <h1 className="text-3xl font-semibold my-5 text-center">
                 NO SUCH HALL EXISTS
               </h1>

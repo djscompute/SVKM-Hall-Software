@@ -1,14 +1,14 @@
 import { EachHallType } from "../../types/Hall.types";
 import { convertTo12Hour } from "../../utils/convert_IST_TimeString_To12HourFormat";
 
-function HallPricing({ data, id }: { data: EachHallType, id: string }) {
+function HallPricing({ data }: { data: EachHallType}) {
 
   console.log("value is", data.sessions);
   const dataWithActiveSessions = data.sessions.filter((data) => data.active === true);
   console.log("updated value ", dataWithActiveSessions);
 
   return (
-    <div id={id} className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-3 w-full">
       <h1 className="text-base sm:text-lg md:text-2xl font-medium">
         Pricing 
       </h1>
