@@ -85,6 +85,7 @@ export async function getAdditionalFeatureReport(
         "Additional Facility": booking.features
           .map((feature) => feature.heading)
           .join(", "),
+        "Description":booking.features.map((feature) => feature.desc).join(", "),
       }))
     );
     return formattedBookings;
