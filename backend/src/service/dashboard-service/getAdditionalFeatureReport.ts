@@ -64,6 +64,7 @@ export async function getAdditionalFeatureReport(
 
     const formattedBookings = await Promise.all(
       bookings.map(async (booking) => ({
+        bookingDate: formatDateToDDMMYYYY(booking.createdAt),
         confirmationDate: booking.date,
         eventDate: formatDateToDDMMYYYY(new Date(parseDateTime(booking.from).date)),
         From: parseDateTime(booking.from).time,
