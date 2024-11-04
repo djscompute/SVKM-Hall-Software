@@ -1,15 +1,32 @@
-MASTER credentials
+# Project Documentation
 
-admin1@gmail.com
-admin1
+## User Credentials
 
+### Master Account
+- **Email**: admin1@gmail.com  
+- **Password**: admin1
 
-MANAGER credentials
+### Manager Accounts
+1. **Email**: admin3@gmail.com  
+   - **Access**: Bhagubhai Hall
+   - **Password**: admin3
 
-admin3@gmail.com (has access to Bhagubhai Hall)
-admin3
+2. **Email**: managerdj@gmail.com  
+   - **Access**: DJ Seminar Hall
+   - **Password**: managerdj
 
-managerdj@gmail.com (has access to DJ Seminar Hall)
-managerdj
+> **Note**: Credentials can be changed. Feel free to use creative names for your accounts!
 
-THESE CAN BE CHANGED. BAADMAI ACHA NAMES DENE HAI.
+## Setup Instructions
+
+To get started with the project, follow these steps:
+
+1. **Initial Setup**:  
+   Run the following command to perform the initial setup and download necessary dependencies:
+   ```bash
+   ./setup.sh
+   
+2. **Initial Setup**:  
+   Run the following command to perform the initial setup and download necessary dependencies:
+   ```bash
+   ./start.sh
