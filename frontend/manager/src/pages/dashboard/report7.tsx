@@ -319,7 +319,9 @@ function Report7() {
           <table className="min-w-full table-auto">
             <thead className="bg-gray-800 text-white">
               <tr>
-                <th className="px-4 py-2">Date</th>
+                <th className="px-4 py-2">Booking Date</th>
+                <th className="px-4 py-2">Confirmation Date</th>
+                <th className="px-4 py-2">Event Date</th>
                 <th className="px-4 py-2">Session</th>
                 <th className="px-4 py-2">From</th>
                 <th className="px-4 py-2">To</th>
@@ -335,7 +337,9 @@ function Report7() {
             <tbody>
               {data.map((booking: any, index: number) => (
                 <tr key={index} className="bg-white border-b">
-                  <td className="px-4 py-2">{booking.Date}</td>
+                  <td className="px-4 py-2">{booking.bookingDate}</td>
+                  <td className="px-4 py-2">{booking.confirmationDate}</td>
+                  <td className="px-4 py-2">{booking.eventDate}</td>
                   <td className="px-4 py-2">{booking.Session}</td>
                   <td className="px-4 py-2">{booking.From}</td>
                   <td className="px-4 py-2">{booking.To}</td>

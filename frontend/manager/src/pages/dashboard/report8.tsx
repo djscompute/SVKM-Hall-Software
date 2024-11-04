@@ -194,6 +194,7 @@ function Report8() {
 
     // Create headers
     const headers = [
+      "Booking Date",
       "Confirmation Date",
       "Event Date",
       "Hall Name",
@@ -220,6 +221,7 @@ function Report8() {
     // Flatten and format data
     for (const row of data) {
       const values = [
+        row.bookingDate || "-",
         row.confirmationDate || "-",
         row.eventDate,
         row["Hall Name"],
@@ -529,6 +531,9 @@ function Report8() {
               <thead className="bg-gray-800 text-white">
                 <tr>
                   <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Booking Date
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
                     Confirmation Date
                   </th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">
@@ -613,6 +618,11 @@ function Report8() {
                   )
                   .map((booking: any, index: number) => (
                     <tr key={index} className="bg-white border-b">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking.bookingDate
+                          ? (booking.bookingDate)
+                          : "-"}
+                      </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking.confirmationDate
                           ? booking.confirmationDate
