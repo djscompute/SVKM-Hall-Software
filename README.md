@@ -13,3 +13,7 @@ managerdj@gmail.com (has access to DJ Seminar Hall)
 managerdj
 
 THESE CAN BE CHANGED. BAADMAI ACHA NAMES DENE HAI.
+
+in gitbash use 
+./start.sh for start 
+./setup for inital setup and download
