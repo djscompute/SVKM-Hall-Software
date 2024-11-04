@@ -194,6 +194,7 @@ function Report8() {
 
     // Create headers
     const headers = [
+      "Booking Date",
       "Confirmation Date",
       "Event Date",
       "Hall Name",
@@ -220,6 +221,7 @@ function Report8() {
     // Flatten and format data
     for (const row of data) {
       const values = [
+        row.bookingDate || "-",
         row.confirmationDate || "-",
         row.eventDate,
         row["Hall Name"],
