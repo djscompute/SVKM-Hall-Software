@@ -376,6 +376,9 @@ function Report7() {
             <thead className="bg-gray-800 text-white">
               <tr>
                 <th className="px-4 py-2 text-center whitespace-nowrap">
+                  Booking Date
+                </th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">
                   Confirmation Date
                 </th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">
@@ -386,6 +389,7 @@ function Report7() {
                 <th className="px-4 py-2 text-center whitespace-nowrap">To</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Hall Name</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Facility</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Description</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Manager</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Remark</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Category</th>
@@ -418,6 +422,9 @@ function Report7() {
                 <tr key={index} className="bg-white border-b">
 
                   <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking.bookingDate ? booking.bookingDate : "-"}
+                  </td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
                     {booking.confirmationDate ? booking.confirmationDate : "-"}
                   </td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">
@@ -429,6 +436,9 @@ function Report7() {
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Hall Name"]}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">
                     {booking["Additional Facility"]}
+                  </td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking["Description"]}
                   </td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Manager Name"]}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Remark"]}</td>

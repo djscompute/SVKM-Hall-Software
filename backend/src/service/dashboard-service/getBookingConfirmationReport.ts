@@ -193,6 +193,7 @@ export async function getBookingConfirmationReport(
 
     const formattedBookings = await Promise.all(
       bookings.map(async (booking) => ({
+        bookingDate: formatDateToDDMMYYYY(booking.createdAt),
         confirmationDate: booking.date,
         eventDate: parseDateTime(booking.from).date,
         "Hall Name": await getHallNameById(booking.hallId),
@@ -200,6 +201,7 @@ export async function getBookingConfirmationReport(
         "Additional Facility": booking.features
           .map((feature) => feature.heading)
           .join(", "),
+        
         "Manager Name": await getManagerNamesByHallId(booking.hallId),
         "Remark": booking.user.remark,
         "Customer Category": booking.booking_type,

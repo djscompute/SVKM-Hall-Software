@@ -14,6 +14,7 @@ function Report9() {
   useQuery({
     queryKey: ["allhalls"],
     queryFn: async () => {
+      // eslint-disable-next-line no-useless-catch
       try {
         const responsePromise = axiosManagerInstance.get("getAllHalls");
         console.log("FETCHING");
@@ -63,7 +64,7 @@ function Report9() {
     toHuman: "",
   });
 
-  const now = dayjs();
+  // const now = dayjs();
   const formatDate = (date: dayjs.Dayjs) => date.format("DD-MM-YYYY");
 
   function formatToDDMMYYYY(dateTimeString: string) {
@@ -414,7 +415,7 @@ function Report9() {
         <div className={`flex flex-col items-center justify-center gap-2 `}>
           <div className="flex gap-2">
             <BasicDateTimePicker
-               id="fromDate"
+              id="fromDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, from: formattedTime }));
@@ -475,6 +476,7 @@ function Report9() {
             <table className="">
               <thead className="bg-gray-800 text-white">
                 <tr>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Booking Date</th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">Confirmation Date</th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">Event Date</th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">Hall Name</th>
@@ -511,6 +513,7 @@ function Report9() {
 
                   return (
                     <tr key={index} className="bg-white border-b">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking.bookingDate}</td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">{booking.confirmationDate}</td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">{booking.eventDate}</td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Hall Name"]}</td>

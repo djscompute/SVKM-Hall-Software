@@ -6,7 +6,6 @@ import dayjs from "dayjs";
 import BasicDateTimePicker from "../../components/Calender/BasicTimePicker.tsx";
 import { EachHallType } from "../../../../../types/global.ts";
 import { useQuery } from "@tanstack/react-query";
-import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat.ts";
 import {
   getFinancialYearEnd,
   getFinancialYearStart,
@@ -18,6 +17,7 @@ function Report8() {
   useQuery({
     queryKey: ["allhalls"],
     queryFn: async () => {
+      // eslint-disable-next-line no-useless-catch
       try {
         const responsePromise = axiosManagerInstance.get("getAllHalls");
         console.log("FETCHING");
@@ -70,7 +70,7 @@ function Report8() {
     toHuman: "",
   });
 
-  const now = dayjs();
+  // const now = dayjs();
 
   const formatDate = (date: dayjs.Dayjs) => date.format("DD-MM-YYYY");
 
@@ -194,6 +194,7 @@ function Report8() {
 
     // Create headers
     const headers = [
+      "Booking Date",
       "Confirmation Date",
       "Event Date",
       "Hall Name",
@@ -220,6 +221,7 @@ function Report8() {
     // Flatten and format data
     for (const row of data) {
       const values = [
+        row.bookingDate || "-",
         row.confirmationDate || "-",
         row.eventDate,
         row["Hall Name"],
@@ -529,6 +531,9 @@ function Report8() {
               <thead className="bg-gray-800 text-white">
                 <tr>
                   <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Booking Date
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
                     Confirmation Date
                   </th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">
@@ -613,6 +618,11 @@ function Report8() {
                   )
                   .map((booking: any, index: number) => (
                     <tr key={index} className="bg-white border-b">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking.bookingDate
+                          ? (booking.bookingDate)
+                          : "-"}
+                      </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking.confirmationDate
                           ? booking.confirmationDate

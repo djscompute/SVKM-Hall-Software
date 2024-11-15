@@ -478,6 +478,7 @@ function Report9() {
             <table className="">
               <thead className="bg-gray-800 text-white">
                 <tr>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Booking Date</th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">Confirmation Date</th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">Event Date</th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">Hall Name</th>
@@ -514,6 +515,7 @@ function Report9() {
 
                   return (
                     <tr key={index} className="bg-white border-b">
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking.bookingDate}</td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">{booking.confirmationDate}</td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">{booking.eventDate}</td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Hall Name"]}</td>
