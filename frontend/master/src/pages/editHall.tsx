@@ -137,6 +137,19 @@ export default function EditHall() {
               className="px-3 py-1 rounded w-full h-auto border-2 border-black"
             />
           </div>
+          <div className="flex gap-3 items-center w-full">
+            <h1 className="w-1/5 ">Contact Name:</h1>
+            <textarea
+              name="contactName"
+              value={hallData.contactName}
+              onChange={(e) => {
+                setHallData((prev) => {
+                  if (prev) return { ...prev, contactName: e.target.value };
+                });
+              }}
+              className="px-3 py-1 rounded w-full h-auto border-2 border-black"
+            />
+          </div>
           <HallCapacity
             data={hallData}
             capacity={hallData.capacity}

@@ -43,6 +43,7 @@ const HallSchema = new mongoose.Schema<EachHallType>(
     location: { type: HallLocationSchema, required: true },
     about: { type: [String], required: true },
     contactEmail: { type: String, required: true },
+    contactName: { type: String, required: true },
     capacity: { type: String },
     additionalFeatures: {
       type: [HallAdditonalFeaturesSchema],

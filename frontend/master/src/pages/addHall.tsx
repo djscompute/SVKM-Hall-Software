@@ -32,6 +32,7 @@ function AddHall() {
       "BJ Hall Vile Parle has an inviting ambiance which makes everyone feel welcomed. The elegant décor of the venue makes it an ideal option for a grand wedding. Host your events at BJ Hall Mumbai to make them outstanding. Ticking all the right boxes, this one must certainly be on your cards.",
     ],
     contactEmail: "manager@gmail.com",
+    contactName: "Manager",
     capacity: "500 people",
     additionalFeatures: [
       {
@@ -140,6 +141,17 @@ function AddHall() {
           value={hallData.contactEmail}
           onChange={(e) =>
             setHallData((prev) => ({ ...prev, contactEmail: e.target.value }))
+          }
+          className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
+        />
+      </div>
+      <div className="flex gap-3 items-center w-full">
+        <h1 className="w-1/5 ">Contact Name:</h1>
+        <textarea
+          name="contactName"
+          value={hallData.contactName}
+          onChange={(e) =>
+            setHallData((prev) => ({ ...prev, contactName: e.target.value }))
           }
           className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
         />
