@@ -44,6 +44,7 @@ type confirmationType = {
   hallDeposit: number;
   depositDiscount: number;
   totalPayable: number;
+  grandTotal: number;
   email: string;
   managerEmail: string;
   managerName: string;
@@ -144,7 +145,7 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
 </head>
 <body>
     <div class="header">
-        <img src="https://static.wixstatic.com/media/2d8aca_ab298473c57c4d32b13b1544c84d5ac9~mv2.png/v1/fill/w_196,h_236,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/svkm%20logo.png" alt="SVKM Logo" width="100">
+        <img src="https://static.wixstatic.com/media/2d8aca_ab298473c57c4d32b13b1544c84d5ac9~mv2.png/v1/fill/w_196,h_236,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/svkm%20logo.png" alt="SVKM Logo" width="90" height="90">
         <h1>SHRI VILE PARLE KELVANI MANDAL</h1>
         <h2>Hall Booking Confirmation Cum Receipt</h2>
     </div>
@@ -170,7 +171,7 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
     <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
     <p><strong>Slot Time:</strong> ${props.sessionType} ${props.slotTime}</p>
     <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
-    <p><strong>Additional Information</strong> ${props.additionalInfo}</p>
+    <p><strong>Additional Information</strong> ${props.additionalInfo?props.additionalInfo:"-"}</p>
   </div>
 
         <table>
@@ -217,6 +218,10 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
             <tr>
                 <td><strong>Total Payable</strong></td>
                 <td><strong>${formatIndianCurrency(props.totalPayable)}</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Grand Total</strong></td>
+                <td><strong>${formatIndianCurrency(props.grandTotal)}</strong></td>
             </tr>
         </table>
         

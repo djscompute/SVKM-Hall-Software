@@ -317,6 +317,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       hallDeposit, 
       depositDiscount, 
       totalPayable,
+      grandTotal,
       email,
       managerEmail,
       managerName 
@@ -347,6 +348,7 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       hallDeposit, 
       depositDiscount, 
       totalPayable,
+      grandTotal,
       email,
       managerEmail,
       managerName 

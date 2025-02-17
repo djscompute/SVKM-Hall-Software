@@ -161,6 +161,7 @@ export const ConfirmationSchema = z.object({
     hallDeposit: z.number(),
     depositDiscount: z.number().min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     totalPayable: z.number(),
+    grandTotal: z.number(),
     email: z.string().email(), // Ensuring a valid email format
     managerEmail: z.string(),
     managerName: z.string(),
