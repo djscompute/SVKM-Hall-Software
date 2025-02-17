@@ -37,6 +37,8 @@ export interface EachHallType {
   person: string;
   location: EachHallLocationType; // location of the hall
   about: string[]; // description of the hall. can be buletins
+  contactEmail: string; 
+  contactName: string; 
   capacity: string; // obvio
   additionalFeatures?: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64

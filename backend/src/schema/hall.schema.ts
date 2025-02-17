@@ -33,6 +33,8 @@ export const AddHallZodSchema = z.object({
       iframe: z.string(stringErrorHandler("location.iframe")).optional(),
     }),
     about: z.array(z.string(stringErrorHandler("about"))),
+    contactEmail: z.string(stringErrorHandler("contactEmail")),
+    contactName: z.string(stringErrorHandler("contactName")),
     capacity: z.string(stringErrorHandler("capacity")),
     additionalFeatures: z.array(
       z.object({
