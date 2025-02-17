@@ -147,21 +147,150 @@ function Report7() {
     console.log(response.data);
     setData(response.data);
   };
+  const calculateTotalBookingAmount = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Booking Amount"] || 0), 0);
+  };
 
+  const calculateTotalAmountPaid = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Amount Paid"] || 0), 0);
+  };
+
+  const calculateTotalSecurityDeposit = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Security Deposit"] || 0), 0);
+  };
+
+  const calculateTotalGST = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["GST"] || 0), 0);
+  };
+  interface TransactionData {
+    type?: string;
+    date?: string;
+    transactionID?: string;
+    payeeName?: string;
+    utrNo?: string;
+    chequeNo?: string;
+    bank?: string;
+  }
+  interface BookingData {
+    "Manager Name": string;
+    "Customer Category": string;
+    "Customer Name": string;
+    "Contact Person": string;
+    "Contact No.": string;
+    "Booking Amount": string;
+    "Amount Paid": string;
+    transaction?: TransactionData;
+    [key: string]: any; // For any additional fields
+  }
+
+  interface FlattenedBookingData extends Omit<BookingData, "transaction"> {
+    "transaction type"?: string;
+    "transaction date"?: string;
+    "transaction id"?: string;
+    "payee Name"?: string;
+    "utr no."?: string;
+    "cheque no."?: string;
+    bank?: string;
+  }
+
+  // const downloadCsv = () => {
+  //   if (!data) return;
+  //   const flattenedData: FlattenedBookingData[] = data.map((row: BookingData) => {
+  //     const flatRow: FlattenedBookingData = { ...row };
+  //     if (row.transaction) {
+  //       flatRow["transaction type"] = row.transaction.type || "";
+  //       flatRow["transaction date"] = row.transaction.date || "";
+  //       flatRow["transaction id"] = row.transaction.transactionID || "";
+  //       flatRow["payee Name"] = row.transaction.payeeName || "";
+  //       flatRow["utr no."] = row.transaction.utrNo || "";
+  //       flatRow["cheque no."] = row.transaction.chequeNo || "";
+  //       flatRow["bank"] = row.transaction.bank || "";
+  //     }
+  //     delete (flatRow as any).transaction;
+  //     return flatRow;
+  //   });
+  //   const totalAmountPaid = flattenedData.reduce((sum, row) => sum + (Number(row["Amount Paid"]) || 0), 0);
+  //   const totalBookingAmount = flattenedData.reduce((sum, row) => sum + (Number(row["Booking Amount"]) || 0), 0);
+  //   const totalSecurityDeposit = flattenedData.reduce((sum, row) => sum + (Number(row["Security Deposit"]) || 0), 0);
+  //   const totalGST = flattenedData.reduce((sum, row) => sum + (Number(row["GST"]) || 0), 0);
+  
+  //   // Add totals row
+  //   flattenedData.push({
+  //     "Manager Name": "Total",
+  //     "Booking Amount": totalBookingAmount.toFixed(2),
+  //     "Amount Paid": totalAmountPaid.toFixed(2),
+  //     "Security Deposit": totalSecurityDeposit.toFixed(2),
+  //     "GST": totalGST.toFixed(2),
+  //   } as FlattenedBookingData);
+  //   const csvRows = [];
+  //   const headers = Object.keys(data[0]);
+  //   csvRows.push(headers.join(","));
+
+  //   for (const row of data) {
+  //     const values = headers.map((header) => {
+  //       const escaped = ("" + row[header]).replace(/"/g, '\\"');
+  //       return `"${escaped}"`;
+  //     });
+  //     csvRows.push(values.join(","));
+  //   }
+
+  //   const csvString = csvRows.join("\n");
+  //   const blob = new Blob([csvString], { type: "text/csv" });
+  //   const url = URL.createObjectURL(blob);
+  //   const link = document.createElement("a");
+  //   link.href = url;
+  //   link.download = `${selectedHall} Additional Feature Reports ${humanReadable.fromHuman}-${humanReadable.toHuman} .csv`;
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
   const downloadCsv = () => {
     if (!data) return;
-    const csvRows = [];
-    const headers = Object.keys(data[0]);
-    csvRows.push(headers.join(","));
-
-    for (const row of data) {
+  
+    const flattenedData: FlattenedBookingData[] = data.map((row: BookingData) => {
+      const flatRow: FlattenedBookingData = { ...row };
+      if (row.transaction) {
+        flatRow["transaction type"] = row.transaction.type || "";
+        flatRow["transaction date"] = row.transaction.date || "";
+        flatRow["transaction id"] = row.transaction.transactionID || "";
+        flatRow["payee Name"] = row.transaction.payeeName || "";
+        flatRow["utr no."] = row.transaction.utrNo || "";
+        flatRow["cheque no."] = row.transaction.chequeNo || "";
+        flatRow["bank"] = row.transaction.bank || "";
+      }
+      delete (flatRow as any).transaction;
+      return flatRow;
+    });
+  
+    const totalAmountPaid = flattenedData.reduce((sum, row) => sum + (Number(row["Amount Paid"]) || 0), 0);
+    const totalBookingAmount = flattenedData.reduce((sum, row) => sum + (Number(row["Booking Amount"]) || 0), 0);
+    const totalSecurityDeposit = flattenedData.reduce((sum, row) => sum + (Number(row["Security Deposit"]) || 0), 0);
+    const totalGST = flattenedData.reduce((sum, row) => sum + (Number(row["GST"]) || 0), 0);
+  
+    // Add totals row
+    flattenedData.push({
+      "Manager": "Total",
+      "Booking Amount": totalBookingAmount.toFixed(2),
+      "Amount Paid": totalAmountPaid.toFixed(2),
+      "Security Deposit": totalSecurityDeposit.toFixed(2),
+      "GST": totalGST.toFixed(2),
+    } as FlattenedBookingData);
+  
+    const headers = Object.keys(flattenedData[0]);
+    const csvRows = [headers.join(",")];
+  
+    for (const row of flattenedData) {
       const values = headers.map((header) => {
-        const escaped = ("" + row[header]).replace(/"/g, '\\"');
+        const escaped = ("" + (row[header] || "")).replace(/"/g, '\\"');
         return `"${escaped}"`;
       });
       csvRows.push(values.join(","));
     }
-
+  
     const csvString = csvRows.join("\n");
     const blob = new Blob([csvString], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -331,7 +460,11 @@ function Report7() {
                 <th className="px-4 py-2">Category</th>
                 <th className="px-4 py-2">Customer Name</th>
                 <th className="px-4 py-2">Contact Person</th>
-                <th className="px-4 py-2">Contact Details</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Contact No.</th>
+                  {selectedAdditionalFeatures && <th className="px-4 py-2 text-center whitespace-nowrap">Booking Amount</th>}
+                  {selectedAdditionalFeatures && <th className="px-4 py-2 text-center whitespace-nowrap">Security Deposit</th>}
+                  {selectedAdditionalFeatures && <th className="px-4 py-2 text-center whitespace-nowrap">GST</th>}
+                  {selectedAdditionalFeatures && <th className="px-4 py-2 text-center whitespace-nowrap">Amount Paid</th>}
               </tr>
             </thead>
             <tbody>
@@ -352,8 +485,34 @@ function Report7() {
                   <td className="px-4 py-2">{booking["Customer Name"]}</td>
                   <td className="px-4 py-2">{booking["Contact Person"]}</td>
                   <td className="px-4 py-2">{booking["Contact Details"]}</td>
+                  {selectedAdditionalFeatures && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Booking Amount"]}</td>}
+                      {selectedAdditionalFeatures && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Security Deposit"]}</td>}
+                      {selectedAdditionalFeatures && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["GST"]}</td>}
+                      {selectedAdditionalFeatures && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Amount Paid"]}</td>}
                 </tr>
               ))}
+              <tr className="font-semibold">
+                  <td className="px-4 py-2 text-center whitespace-nowrap">Total</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">Total</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalBookingAmount()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalSecurityDeposit()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalGST()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalAmountPaid()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap"></td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap"></td>
+                  {/* Add other cells as needed */}
+                </tr>
             </tbody>
           </table>
         </div>

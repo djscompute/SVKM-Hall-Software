@@ -554,6 +554,8 @@ function Report9() {
                   <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalBookingAmount()}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalSecurityDeposit()}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalGST()}</td>
