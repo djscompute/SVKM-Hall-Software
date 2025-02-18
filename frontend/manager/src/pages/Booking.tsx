@@ -88,7 +88,7 @@ function Booking() {
     },
     staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
-  console.log("The data is ", data);
+  // console.log("The data is ", data);
 
   const {
     data: allBookingData,
@@ -114,7 +114,7 @@ function Booking() {
     staleTime: 1 * 60 * 1000, // Data is considered fresh for 1 minutes
   });
 
-  console.log(allBookingData);
+  // console.log(allBookingData);
 
   // Seperate mutation for confirm and save booking
   const confirmAndSaveBooking = useMutation({
@@ -184,94 +184,125 @@ function Booking() {
     },
   });
 
-  const generateConfirmationAndEmail = async () => {
+  type BookingKeys = keyof HallBookingType;
+  type UserKeys = keyof CustomerType;
+  type TransactionKeys = keyof bookingTransactionType;
+  
+  const generateConfirmationAndEmail = async (booking?: HallBookingType, otherBookingEnquiryNumbers?: string[]) => {
     console.log("generating confirmation");
-
+    
+    // Type-safe helper functions
+    const getData = (key: BookingKeys) => {
+      if (booking) {
+        return booking[key];
+      }
+      return editedData?.[key] || data?.[key];
+    };
+  
+    const getUserData = (key: UserKeys) => {
+      if (booking) {
+        return booking.user[key];
+      }
+      return editedData?.user[key] || data?.user[key];
+    };
+  
+    const getTransactionData = (key: TransactionKeys) => {
+      return editedData?.transaction?.[key] || data?.transaction?.[key];
+    };
+  
+    // Ensure numeric values
+    const getNumericValue = (value: any, defaultValue: number = 0): number => {
+      const parsed = Number(value);
+      return isNaN(parsed) ? defaultValue : parsed;
+    };
+  
     const hallDeposit =
-      editedData?.isDeposit === false
+      (booking ? booking.isDeposit : editedData?.isDeposit) === false
         ? 0
-        : editedData?.deposit ??
-          (data?.isDeposit === false ? 0 : data?.deposit ?? 0);
-
-    console.log(data?.from);
-
-    const startTime = dayjs(editedData?.from || data?.from).format("HH:mm:ss");
-    const endTime = dayjs(editedData?.to || data?.to).format("HH:mm:ss");
-
+        : booking
+        ? getNumericValue(booking.deposit)
+        : getNumericValue(editedData?.deposit ?? (data?.isDeposit === false ? 0 : data?.deposit ?? 0));
+  
+    const fromDate = booking ? booking.from : (editedData?.from || data?.from);
+    const startTime = dayjs(fromDate).format("HH:mm:ss");
+    const endTime = dayjs(booking ? booking.to : (editedData?.to || data?.to)).format("HH:mm:ss");
+  
+    const baseDiscount = getNumericValue(getData('baseDiscount'));
+    const hallCharges = getNumericValue(priceEntry?.price);
+    const totalFeatureChargesNum = booking ? booking.features.reduce((acc, feature) => acc + feature.price, 0) : getNumericValue(totalFeatureCharges);  
     try {
-      const response = await axiosManagerInstance.post(
-        `/generateConfirmation`,
-        {
-          date: dayjs().format("DD-MM-YYYY"), // Current date
-          customerName: editedData?.user.username || data?.user.username,
-          contactPerson: editedData?.user.contact || data?.user.contact,
-          contactNo: editedData?.user.mobile || data?.user.mobile,
-          enquiryNumber: editedData?.enquiryNumber || data?.enquiryNumber || "",
-          gstNo: editedData?.user.gstNo || data?.user.gstNo || "",
-          pan: editedData?.user.panNo || data?.user.panNo || "",
-          modeOfPayment:
-            editedData?.transaction?.type || data?.transaction?.type || "",
-          additionalPaymentDetails: getAdditionalPaymentDetails(),
-          hallName: hallData?.name || "",
-          hallLocation: `${hallData?.location.desc1},${hallData?.location.desc2}`,
-          hallRestrictions: hallData?.eventRestrictions,
-          dateOfEvent: dayjs(editedData?.from || data?.from).format(
-            "DD-MM-YYYY"
-          ),
-          slotTime: `${convert_IST_TimeString_To12HourFormat(
-            startTime
-          )} - ${convert_IST_TimeString_To12HourFormat(endTime)}`,
-          sessionType: session?.name,
-          purposeOfBooking: editedData?.purpose || data?.purpose || "",
-          additionalInfo: editedData?.additionalInfo || data?.additionalInfo || "",
-          hallCharges: priceEntry?.price || 0,
-          additionalFacilities: totalFeatureCharges,
-          discountPercent: editedData?.baseDiscount || data?.baseDiscount || 0,
-          sgst:
-            data?.booking_type === "SVKM INSTITUTE"
-              ? 0
-              : 0.09 *
-                ((priceEntry?.price || 0) +
-                  totalFeatureCharges -
-                  0.01 *
-                    (editedData?.baseDiscount || data?.baseDiscount || 0) *
-                    ((priceEntry?.price || 0) + totalFeatureCharges)),
-          cgst:
-            data?.booking_type === "SVKM INSTITUTE"
-              ? 0
-              : 0.09 *
-                ((priceEntry?.price || 0) +
-                  totalFeatureCharges -
-                  0.01 *
-                    (editedData?.baseDiscount || data?.baseDiscount || 0) *
-                    ((priceEntry?.price || 0) + totalFeatureCharges)),
-          hallDeposit: hallDeposit,
-          depositDiscount:
-            editedData?.depositDiscount || data?.depositDiscount || 0,
-          totalPayable: calculateTotalPayable(),
-          email: editedData?.user.email || data?.user.email || "",
-          managerEmail: editedData?.managerEmail || data?.managerEmail,
-          managerName: editedData?.managerName || data?.managerName,
-        }
-      );
-
-      const pdfUrl = response.data.pdfUrl; // Assuming the response has a pdfUrl field
-      await axiosManagerInstance.post(`/sendEmail`, {
-        to: editedData?.user.email || data?.user.email || "",
-        subject: `SVKM Hall Booking for ${dayjs(
-          editedData?.from || data?.from
-        ).format("DD-MM-YYYY")}`,
+      const request = {
+        date: dayjs().format("DD-MM-YYYY"),
+        customerName: getUserData('username'),
+        contactPerson: getUserData('contact'),
+        contactNo: getUserData('mobile'),
+        enquiryNumber: booking ? `${getData('enquiryNumber')} (Attached with ${otherBookingEnquiryNumbers!.join(', ')})` : "",
+        gstNo: getUserData('gstNo') || "",
+        pan: getUserData('panNo') || "",
+        modeOfPayment: getTransactionData('type') || "",
+        additionalPaymentDetails: getAdditionalPaymentDetails(),
+        hallName: hallData?.name || "",
+        hallLocation: `${hallData?.location.desc1},${hallData?.location.desc2}`,
+        hallRestrictions: hallData?.eventRestrictions,
+        dateOfEvent: dayjs(fromDate).format("DD-MM-YYYY"),
+        slotTime: `${convert_IST_TimeString_To12HourFormat(startTime)} - ${convert_IST_TimeString_To12HourFormat(endTime)}`,
+        sessionType: session?.name,
+        purposeOfBooking: getData('purpose') || "",
+        additionalInfo: getData('additionalInfo') || "",
+        hallCharges: hallCharges,
+        additionalFacilities: totalFeatureChargesNum,
+        discountPercent: baseDiscount,
+        sgst: getData('booking_type') === "SVKM INSTITUTE"
+          ? 0
+          : 0.09 * (hallCharges + totalFeatureChargesNum - 
+              0.01 * baseDiscount * (hallCharges + totalFeatureChargesNum)),
+        cgst: getData('booking_type') === "SVKM INSTITUTE"
+          ? 0
+          : 0.09 * (hallCharges + totalFeatureChargesNum - 
+              0.01 * baseDiscount * (hallCharges + totalFeatureChargesNum)),
+        hallDeposit: hallDeposit,
+        depositDiscount: getNumericValue(getData('depositDiscount')),
+        totalPayable: booking ? calculateTotalPayableMultiple(booking) : (editedData ? calculateTotalPayableSingle(editedData) : calculateTotalPayableSingle(data!)),
+        grandTotal: booking? grandTotal : calculateGrandTotal(),
+        email: getUserData('email') || "",
+        managerEmail: editedData?.managerEmail || data?.managerEmail,
+        managerName: editedData?.managerName || data?.managerName,
+      };
+  
+      const response = await axiosManagerInstance.post('/generateConfirmation', request);
+      console.log(request);
+      const pdfUrl = response.data.pdfUrl;
+  
+      await axiosManagerInstance.post('/sendEmail', {
+        to: getUserData('email') || "",
+        subject: `SVKM Hall Booking for ${dayjs(fromDate).format("DD-MM-YYYY")}`,
         text: "Your booking has been confirmed. Please find the attachments below.",
-        filename: `${editedData?.user.username || data?.user.username}_${
-          editedData?.enquiryNumber || data?.enquiryNumber || ""
-        }_confirmation`,
-        path: pdfUrl, // Use the pdfUrl here if needed
+        filename: `${getUserData('username')}_${getData('enquiryNumber') || ""}_confirmation`,
+        path: pdfUrl,
       });
+  
       console.log("Email sent successfully");
       return pdfUrl;
     } catch (error) {
       console.error("Error in generate confirmation or send email:", error);
     }
+  };
+  const selectedBookingsArray = selectedBookings.map(
+    (selectedBookingId) =>
+      allBookingsOfUser.find((booking) => booking._id === selectedBookingId)
+  );
+  const generateConfirmationForMultiple = () => {
+    console.log(
+      "Selected bookings are ",
+      selectedBookingsArray
+    );
+    selectedBookingsArray.forEach((booking) => {
+      if (booking) {
+        const otherBookings = selectedBookingsArray.filter((b) => b!._id !== booking._id);
+        const otherBookingEnquiryNumbers = otherBookings.map((b) => b!.enquiryNumber).filter((enquiryNumber) => enquiryNumber !== undefined);
+        generateConfirmationAndEmail(booking, otherBookingEnquiryNumbers);
+      }
+    });
   };
   const generateCancellationAndEmail = async () => {
     console.log("generating cancellation");
@@ -337,7 +368,7 @@ function Booking() {
           hallDeposit: hallDeposit,
           depositDiscount:
             editedData?.depositDiscount || data?.depositDiscount || 0,
-          totalPayable: calculateTotalPayable(),
+          totalPayable: editedData ? calculateTotalPayableSingle(editedData) : calculateTotalPayableSingle(data!),
           email: editedData?.user.email || data?.user.email || "",
           managerEmail: editedData?.managerEmail || data?.managerEmail,
           managerName: editedData?.managerName || data?.managerName,
@@ -392,9 +423,6 @@ function Booking() {
         (session: EachHallSessionType) => session._id === booking.session_id
       );
       
-      
-      
-      
 
   // Find the price entry within the found session that matches the booking's booking_type
   const priceEntryForThisBooking = session?.price.find(
@@ -416,7 +444,7 @@ function Booking() {
     //   );
     // }
 
-    console.log("the booking object in multiple is this",booking)
+    // console.log("the booking object in multiple is this",booking)
 
     // alert("total hall charges are"+ price)
 
@@ -481,22 +509,133 @@ function Booking() {
     return "";
   };
 
-  // Helper function to calculate total payable amount
-  const calculateTotalPayable = () => {
-    const basePrice = (priceEntry?.price || 0) + totalFeatureCharges;
-    const discountedPrice =
-      basePrice -
-      0.01 * (editedData?.baseDiscount || data?.baseDiscount || 0) * basePrice;
-    const gst =
-      data?.booking_type === "SVKM INSTITUTE" ? 0 : 0.18 * discountedPrice;
-    const depositAmount =
-      editedData?.isDeposit || data?.isDeposit
-        ? (editedData?.deposit || data?.deposit || 0) -
-          0.01 *
-            (editedData?.depositDiscount || data?.depositDiscount || 0) *
-            (editedData?.deposit || data?.deposit || 0)
-        : 0;
-    return discountedPrice + gst + depositAmount;
+  
+  const calculateTotalPayableMultiple = (selectedBookingData: HallBookingType) => {
+    const totalFeatureCharges = selectedBookingData.features.reduce((acc, feature) => acc + feature.price, 0)
+    if (selectedBookingData?.booking_type == "SVKM INSTITUTE") {
+
+      // console.log(`${selectedBookingData.from} is ${selectedBookingData.booking_type} calculated as: 
+      //   Total Payable Amount = (${multiplePriceEntry?.price || 0} + ${totalFeatureCharges}) - 
+      //   (0.01 * ${selectedBookingData.baseDiscount} * (${multiplePriceEntry?.price || 0} + ${totalFeatureCharges})) + 
+      //   (${selectedBookingData.isDeposit ? (selectedBookingData.deposit - (0.01 * selectedBookingData.depositDiscount * selectedBookingData.deposit)) : 0})`);
+
+      return (
+        (multiplePriceEntry?.price || 0) +
+        totalFeatureCharges -
+        0.01 *
+          selectedBookingData!.baseDiscount *
+          ((multiplePriceEntry?.price || 0) + totalFeatureCharges) +
+        (selectedBookingData.isDeposit
+          ? selectedBookingData.deposit -
+            0.01 *
+              selectedBookingData.depositDiscount *
+              selectedBookingData.deposit
+          : 0)
+      );
+    } else {
+
+      // console.log(`${selectedBookingData.from} is ${selectedBookingData.booking_type} calculated as: 
+      //   Total Payable Amount (non-SVKM) = ((${multiplePriceEntry?.price || 0} + ${totalFeatureCharges}) - 
+      //   (0.01 * ${selectedBookingData.baseDiscount} * (${multiplePriceEntry?.price || 0} + ${totalFeatureCharges}))) + 
+      //   (0.18 * ((${multiplePriceEntry?.price || 0} + ${totalFeatureCharges}) - 
+      //   (0.01 * ${selectedBookingData.baseDiscount} * (${multiplePriceEntry?.price || 0} + ${totalFeatureCharges})))) + 
+      //   (${selectedBookingData.isDeposit ? (selectedBookingData.deposit - (0.01 * selectedBookingData.depositDiscount * selectedBookingData.deposit)) : 0})`);
+
+      return (
+        (multiplePriceEntry?.price || 0) +
+        totalFeatureCharges -
+        0.01 *
+          selectedBookingData!.baseDiscount *
+          ((multiplePriceEntry?.price || 0) + totalFeatureCharges) +
+        0.18 *
+          ((multiplePriceEntry?.price || 0) +
+            totalFeatureCharges -
+            0.01 *
+              selectedBookingData!.baseDiscount *
+              ((multiplePriceEntry?.price || 0) + totalFeatureCharges)) +
+        (selectedBookingData.isDeposit
+          ? selectedBookingData.deposit -
+            0.01 *
+              selectedBookingData.depositDiscount *
+              selectedBookingData.deposit
+          : 0)
+      );
+    }
+  };
+
+  const calculateTotalPayableSingle = (data: any) => {
+    if (data.booking_type == "SVKM INSTITUTE") {
+
+      // console.log(`${data.from} is ${data.booking_type} calculated as: 
+      //   Total Payable Amount = (${priceEntry?.price || 0} + ${totalFeatureCharges}) - 
+      //   (0.01 * ${data.baseDiscount} * (${priceEntry?.price || 0} + ${totalFeatureCharges})) + 
+      //   (${data.isDeposit ? (data.deposit - (0.01 * data.depositDiscount * data.deposit)) : 0})`);
+
+      return (
+        (priceEntry?.price || 0) +
+        totalFeatureCharges -
+        0.01 *
+          data.baseDiscount *
+          ((priceEntry?.price || 0) + totalFeatureCharges) +
+        (data.isDeposit
+          ? data.deposit -
+            0.01 *
+              data.depositDiscount *
+              data.deposit
+          : 0)
+      );
+    } else {
+
+      // console.log(`${data.from} is ${data.booking_type} calculated as: 
+      //   Total Payable Amount (non-SVKM) = ((${priceEntry?.price || 0} + ${totalFeatureCharges}) - 
+      //   (0.01 * ${data.baseDiscount} * (${priceEntry?.price || 0} + ${totalFeatureCharges}))) + 
+      //   (0.18 * ((${priceEntry?.price || 0} + ${totalFeatureCharges}) - 
+      //   (0.01 * ${data.baseDiscount} * (${priceEntry?.price || 0} + ${totalFeatureCharges})))) + 
+      //   (${data.isDeposit ? (data.deposit - (0.01 * data.depositDiscount * data.deposit)) : 0})`);
+
+      return (
+        (priceEntry?.price || 0) +
+        totalFeatureCharges -
+        0.01 *
+          data.baseDiscount *
+          ((priceEntry?.price || 0) + totalFeatureCharges) +
+        0.18 *
+          ((priceEntry?.price || 0) +
+            totalFeatureCharges -
+            0.01 *
+              data.baseDiscount *
+              ((priceEntry?.price || 0) + totalFeatureCharges)) +
+        (data.isDeposit
+          ? data.deposit -
+            0.01 *
+              data.depositDiscount *
+              data.deposit
+          : 0)
+      );
+    }
+  };
+
+  const calculateGrandTotal = () => {
+    if (data?.booking_type === "SVKM INSTITUTE") {
+      return (
+        (priceEntry?.price || 0) +
+        totalFeatureCharges -
+        0.01 * data!.baseDiscount * ((priceEntry?.price || 0) + totalFeatureCharges) +
+        (data.isDeposit
+          ? data.deposit - 0.01 * data.depositDiscount * data.deposit
+          : 0)
+      );
+    } else {
+      return (
+        (priceEntry?.price || 0) +
+        totalFeatureCharges -
+        0.01 * data!.baseDiscount * ((priceEntry?.price || 0) + totalFeatureCharges) +
+        0.18 * ((priceEntry?.price || 0) + totalFeatureCharges - 0.01 * data!.baseDiscount * ((priceEntry?.price || 0) + totalFeatureCharges)) +
+        (data?.isDeposit
+          ? data.deposit - 0.01 * data.depositDiscount * data.deposit
+          : 0)
+      );
+    }
   };
 
   // useEffect(() => {
@@ -818,13 +957,13 @@ function Booking() {
     setTotalFeatureCharges(
       calculateTotalFeatureCharges(selectedBooking?.features)
     );
-    console.log(selectedBooking, "This is a selected booking");
+    // console.log(selectedBooking, "This is a selected booking");
   };
 
   // Function to get booking name by ID
   const getBookingName = (bookingId: string): string => {
     const booking = allBookingsOfUser.find((b) => b._id === bookingId);
-    console.log("this is the booking fetched by it's ID", booking);
+    // console.log("this is the booking fetched by it's ID", booking);
     const date = dayjs(booking?.from).format("h:mm A, MMMM D, YYYY") || "-";
     const bookingName = `${date} `;
     return booking ? bookingName : "Unknown Booking";
@@ -1603,44 +1742,7 @@ function Booking() {
           </div>
           <span>
             <span className=" text-lg font-medium">Security Deposit</span>
-
-            {/* <select
-              id="isDeposit"
-              value={
-                selectedBookingData?.isDeposit === true ? "yes" : "no" || false
-              }
-              className="px-2 py-1 rounded-md border border-gray-400 my-1"
-              onChange={(e) => {
-                if (e.target.value === "yes") {
-                  editIsDepositApplicableInMultiple.mutate(true);
-                  setEditedData((prev) => {
-                    if (!prev) return undefined;
-                    return {
-                      ...prev,
-                      isDeposit: true,
-                    };
-                  });
-                }
-                if (e.target.value === "no") {
-                  editIsDepositApplicableInMultiple.mutate(false);
-                  setEditedData((prev) => {
-                    if (!prev) return undefined;
-                    return {
-                      ...prev,
-                      isDeposit: false,
-                    };
-                  });
-                }
-              }}
-            >
-              <option value="" disabled>
-                Select an option
-              </option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select> */}
           </span>
-
           {
             <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
               <span className="w-full text-left">Security Deposit Amount</span>
@@ -1703,50 +1805,7 @@ function Booking() {
               <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
                 <span className="w-full text-left">Total Payable Amount</span>
                 <span className="w-full text-right">
-                  <span className="w-full text-right">
-                    {selectedBookingData?.booking_type == "SVKM INSTITUTE" ? (
-                      <div>
-                        {selectedBookingData
-                          ? (multiplePriceEntry?.price || 0) +
-                            totalFeatureCharges -
-                            0.01 *
-                              selectedBookingData!.baseDiscount *
-                              ((multiplePriceEntry?.price || 0) +
-                                totalFeatureCharges) +
-                            (selectedBookingData.isDeposit
-                              ? selectedBookingData.deposit -
-                                0.01 *
-                                  selectedBookingData.depositDiscount *
-                                  selectedBookingData.deposit
-                              : 0)
-                          : 0}
-                      </div>
-                    ) : (
-                      <div>
-                        {selectedBookingData
-                          ? (multiplePriceEntry?.price || 0) +
-                            totalFeatureCharges -
-                            0.01 *
-                              selectedBookingData!.baseDiscount *
-                              ((multiplePriceEntry?.price || 0) +
-                                totalFeatureCharges) +
-                            0.18 *
-                              ((multiplePriceEntry?.price || 0) +
-                                totalFeatureCharges -
-                                0.01 *
-                                  selectedBookingData!.baseDiscount *
-                                  ((multiplePriceEntry?.price || 0) +
-                                    totalFeatureCharges)) +
-                            (selectedBookingData.isDeposit
-                              ? selectedBookingData.deposit -
-                                0.01 *
-                                  selectedBookingData.depositDiscount *
-                                  selectedBookingData.deposit
-                              : 0)
-                          : 0}
-                      </div>
-                    )}
-                  </span>
+                  {calculateTotalPayableMultiple(selectedBookingData)}
                 </span>
               </div>
             </>
@@ -2022,7 +2081,7 @@ function Booking() {
                   onClick={async () => {
                     setShowCancellationReason(false);
                     await confirmAndSaveMultipleBooking.mutateAsync();
-                    generateConfirmationAndEmail();
+                    generateConfirmationForMultiple();
                   }}
                   className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
                 >
@@ -2572,144 +2631,20 @@ function Booking() {
             </>
           )}
 
-          {editedData ? (
-            <>
-              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-                <span className="w-full text-left">Total Payable Amount</span>
-
-                <span className="w-full text-right">
-                  {editedData?.booking_type == "SVKM INSTITUTE" ? (
-                    <div>
-                      {editedData
-                        ? (priceEntry?.price || 0) +
-                          totalFeatureCharges -
-                          0.01 *
-                            editedData!.baseDiscount *
-                            ((priceEntry?.price || 0) + totalFeatureCharges) +
-                          (editedData.isDeposit
-                            ? editedData?.deposit -
-                              0.01 *
-                                editedData?.depositDiscount *
-                                editedData?.deposit
-                            : 0)
-                        : 0}
-                    </div>
-                  ) : (
-                    <div>
-                      {editedData
-                        ? (priceEntry?.price || 0) +
-                          totalFeatureCharges -
-                          0.01 *
-                            editedData!.baseDiscount *
-                            ((priceEntry?.price || 0) + totalFeatureCharges) +
-                          0.18 *
-                            ((priceEntry?.price || 0) +
-                              totalFeatureCharges -
-                              0.01 *
-                                editedData!.baseDiscount *
-                                ((priceEntry?.price || 0) +
-                                  totalFeatureCharges)) +
-                          (editedData.isDeposit
-                            ? editedData?.deposit -
-                              0.01 *
-                                editedData?.depositDiscount *
-                                editedData?.deposit
-                            : 0)
-                        : 0}
-                    </div>
-                  )}
-                </span>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-                <span className="w-full text-left">Total Payable Amount</span>
-                <span className="w-full text-right">
-                  <span className="w-full text-right">
-                    {data?.booking_type == "SVKM INSTITUTE" ? (
-                      <div>
-                        {data
-                          ? (priceEntry?.price || 0) +
-                            totalFeatureCharges -
-                            0.01 *
-                              data!.baseDiscount *
-                              ((priceEntry?.price || 0) + totalFeatureCharges) +
-                            (data.isDeposit
-                              ? data.deposit -
-                                0.01 * data.depositDiscount * data.deposit
-                              : 0)
-                          : 0}
-                      </div>
-                    ) : (
-                      <div>
-                        {data
-                          ? (priceEntry?.price || 0) +
-                            totalFeatureCharges -
-                            0.01 *
-                              data!.baseDiscount *
-                              ((priceEntry?.price || 0) + totalFeatureCharges) +
-                            0.18 *
-                              ((priceEntry?.price || 0) +
-                                totalFeatureCharges -
-                                0.01 *
-                                  data!.baseDiscount *
-                                  ((priceEntry?.price || 0) +
-                                    totalFeatureCharges)) +
-                            (data.isDeposit
-                              ? data.deposit -
-                                0.01 * data.depositDiscount * data.deposit
-                              : 0)
-                          : 0}
-                      </div>
-                    )}
-                  </span>
-                </span>
-              </div>
-            </>
-          )}
+<div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
+  <span className="w-full text-left">Total Payable Amount</span>
+  <span className="w-full text-right">
+    {editedData ? (
+      calculateTotalPayableSingle(editedData)
+    ) : (
+      calculateTotalPayableSingle(data!)
+    )}
+  </span>
+</div>
           <div className="flex mt-5 items-center w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
             <span className="w-full text-left">Grand Total Amount</span>
             <span className="w-full text-right">
-              <span className="w-full text-right">
-                {" "}
-                {data?.booking_type == "SVKM INSTITUTE" ? (
-                  <div>
-                    {data
-                      ? (priceEntry?.price || 0) +
-                        totalFeatureCharges -
-                        0.01 *
-                          data!.baseDiscount *
-                          ((priceEntry?.price || 0) + totalFeatureCharges) +
-                        (data.isDeposit
-                          ? data.deposit -
-                            0.01 * data.depositDiscount * data.deposit
-                          : 0)
-                      : 0}
-                  </div>
-                ) : (
-                  <div>
-                    {data
-                      ? (priceEntry?.price || 0) +
-                        totalFeatureCharges -
-                        0.01 *
-                          data!.baseDiscount *
-                          ((priceEntry?.price || 0) + totalFeatureCharges) +
-                        0.18 *
-                          ((priceEntry?.price || 0) +
-                            totalFeatureCharges -
-                            0.01 *
-                              data!.baseDiscount *
-                              ((priceEntry?.price || 0) +
-                                totalFeatureCharges)) +
-                        (data.isDeposit
-                          ? data.deposit -
-                            0.01 * data.depositDiscount * data.deposit
-                          : 0)
-                      : 0}
-                  </div>
-                )}
-              </span>
+              <span className="w-full text-right"> {calculateGrandTotal()}</span>
             </span>
           </div>
           {editingMode || addAdditional ? (

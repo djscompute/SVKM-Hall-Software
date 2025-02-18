@@ -42,7 +42,7 @@ const BookingSuccessful = () => {
     bookingDetails.additionalFeatures
   );
   let hallBaseCharges: number;
-  if (bookingDetails.paymentType === "SVKM INSTITUTE") {
+  if (bookingDetails.booking_type === "SVKM INSTITUTE") {
     hallBaseCharges = bookingDetails.estimatedPrice;
   } else {
     hallBaseCharges = bookingDetails.estimatedPrice - additionalFeaturesTotal;
@@ -101,7 +101,7 @@ const BookingSuccessful = () => {
                               <span>{each.heading} </span>
                               <span>
                                 Charge: ₹
-                                {bookingDetails.paymentType === "SVKM INSTITUTE"
+                                {bookingDetails.booking_type === "SVKM INSTITUTE"
                                   ? 0
                                   : each.price}
                               </span>
@@ -118,7 +118,7 @@ const BookingSuccessful = () => {
 
                 <tr className="border-b-2">
                   <td className="font-medium py-2 w-1/2">Total Payable</td>
-                  {bookingDetails.paymentType == "SVKM INSTITUTE" ? (
+                  {bookingDetails.booking_type == "SVKM INSTITUTE" ? (
                     <td className="w-1/2">
                       ₹{hallBaseCharges + bookingDetails.securityDeposit}{" "}
                     </td>
