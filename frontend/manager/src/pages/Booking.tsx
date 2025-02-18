@@ -198,6 +198,7 @@ function Booking() {
       if (booking) {
         return booking[key];
       }
+      console.log(editedData?.[key] || data?.[key])
       return editedData?.[key] || data?.[key];
     };
   
@@ -238,7 +239,7 @@ function Booking() {
         customerName: getUserData('username'),
         contactPerson: getUserData('contact'),
         contactNo: getUserData('mobile'),
-        enquiryNumber: booking ? `${getData('enquiryNumber')}` : "",
+        enquiryNumber:  getData('enquiryNumber'),
         gstNo: getUserData('gstNo') || "",
         pan: getUserData('panNo') || "",
         modeOfPayment: getTransactionData('type') || "",
@@ -262,6 +263,8 @@ function Booking() {
           ? 0
           : cgstRate * (hallCharges + totalFeatureChargesNum - 
               0.01 * baseDiscount * (hallCharges + totalFeatureChargesNum)),
+        cgstRate: cgstRate*100,
+        sgstRate: sgstRate*100,
         hallDeposit: hallDeposit,
         depositDiscount: getNumericValue(getData('depositDiscount')),
         totalPayable: booking ? calculateTotalPayableMultiple(booking) : (editedData ? calculateTotalPayableSingle(editedData) : calculateTotalPayableSingle(data!)),
@@ -365,10 +368,13 @@ function Booking() {
                   0.01 *
                     (editedData?.baseDiscount || data?.baseDiscount || 0) *
                     ((priceEntry?.price || 0) + totalFeatureCharges)),
+          cgstRate: cgstRate * 100,
+          sgstRate: sgstRate * 100,
           hallDeposit: hallDeposit,
           depositDiscount:
             editedData?.depositDiscount || data?.depositDiscount || 0,
           totalPayable: editedData ? calculateTotalPayableSingle(editedData) : calculateTotalPayableSingle(data!),
+          grandTotal: calculateGrandTotal(),
           email: editedData?.user.email || data?.user.email || "",
           managerEmail: editedData?.managerEmail || data?.managerEmail,
           managerName: editedData?.managerName || data?.managerName,

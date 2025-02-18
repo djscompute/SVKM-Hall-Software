@@ -40,9 +40,12 @@ type cancellationType = {
   discountPercent: number;
   sgst: number;
   cgst: number;
+  cgstRate: number;
+  sgstRate: number;
   hallDeposit: number;
   depositDiscount: number;
   totalPayable: number;
+  grandTotal: number;
   email: string;
   managerEmail: string;
   managerName: string;
@@ -143,7 +146,7 @@ const cancellationHtmlTemplate = (props: cancellationType) => `
 </head>
 <body>
     <div class="header">
-        <img src="https://static.wixstatic.com/media/2d8aca_ab298473c57c4d32b13b1544c84d5ac9~mv2.png/v1/fill/w_196,h_236,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/svkm%20logo.png" alt="SVKM Logo" width="100">
+        <img src="https://static.wixstatic.com/media/2d8aca_ab298473c57c4d32b13b1544c84d5ac9~mv2.png/v1/fill/w_196,h_236,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/svkm%20logo.png" alt="SVKM Logo" width="90" height="90">
         <h1>SHRI VILE PARLE KELVANI MANDAL</h1>
         <h2 style="color:red"><u>Hall Booking Cancellation</u></h2>
     </div>
@@ -197,11 +200,11 @@ const cancellationHtmlTemplate = (props: cancellationType) => `
                 <td><strong>${formatIndianCurrency((props.hallCharges + props.additionalFacilities) * (1 - props.discountPercent / 100))}</strong></td>
             </tr>
             <tr>
-                <td>SGST - 9 %</td>
+                <td>SGST - ${props.cgstRate}%</td>
                 <td>${formatIndianCurrency(props.sgst)}</td>
             </tr>
             <tr>
-                <td>CGST - 9 %</td>
+                <td>CGST - ${props.sgstRate}%</td>
                 <td>${formatIndianCurrency(props.cgst)}</td>
             </tr>
             <tr>
@@ -215,6 +218,10 @@ const cancellationHtmlTemplate = (props: cancellationType) => `
             <tr>
                 <td><strong>Total Payable</strong></td>
                 <td><strong>${formatIndianCurrency(props.totalPayable)}</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Grand Total</strong></td>
+                <td><strong>${formatIndianCurrency(props.grandTotal)}</strong></td>
             </tr>
         </table>
         

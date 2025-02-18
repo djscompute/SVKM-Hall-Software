@@ -41,6 +41,8 @@ type confirmationType = {
   discountPercent: number;
   sgst: number;
   cgst: number;
+  cgstRate: number;
+  sgstRate: number;
   hallDeposit: number;
   depositDiscount: number;
   totalPayable: number;
@@ -200,11 +202,11 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
                 <td><strong>${formatIndianCurrency((props.hallCharges + props.additionalFacilities) * (1 - props.discountPercent / 100))}</strong></td>
             </tr>
             <tr>
-                <td>SGST - 9 %</td>
+                <td>SGST - ${props.cgstRate}%</td>
                 <td>${formatIndianCurrency(props.sgst)}</td>
             </tr>
             <tr>
-                <td>CGST - 9 %</td>
+                <td>CGST - ${props.sgstRate}%</td>
                 <td>${formatIndianCurrency(props.cgst)}</td>
             </tr>
             <tr>

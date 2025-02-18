@@ -158,6 +158,8 @@ export const ConfirmationSchema = z.object({
     discountPercent: z.number().min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     sgst: z.number(),
     cgst: z.number(),
+    cgstRate: z.number(),
+    sgstRate: z.number(),
     hallDeposit: z.number(),
     depositDiscount: z.number().min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     totalPayable: z.number(),
