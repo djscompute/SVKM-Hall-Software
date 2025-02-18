@@ -190,7 +190,7 @@ function Booking() {
   type UserKeys = keyof CustomerType;
   type TransactionKeys = keyof bookingTransactionType;
   
-  const generateConfirmationAndEmail = async (booking?: HallBookingType, otherBookingEnquiryNumbers?: string[]) => {
+  const generateConfirmationAndEmail = async (booking?: HallBookingType) => {
     console.log("generating confirmation");
     
     // Type-safe helper functions
@@ -238,7 +238,7 @@ function Booking() {
         customerName: getUserData('username'),
         contactPerson: getUserData('contact'),
         contactNo: getUserData('mobile'),
-        enquiryNumber: booking ? `${getData('enquiryNumber')} (Attached with ${otherBookingEnquiryNumbers!.join(', ')})` : "",
+        enquiryNumber: booking ? `${getData('enquiryNumber')}` : "",
         gstNo: getUserData('gstNo') || "",
         pan: getUserData('panNo') || "",
         modeOfPayment: getTransactionData('type') || "",
@@ -300,9 +300,7 @@ function Booking() {
     );
     selectedBookingsArray.forEach((booking) => {
       if (booking) {
-        const otherBookings = selectedBookingsArray.filter((b) => b!._id !== booking._id);
-        const otherBookingEnquiryNumbers = otherBookings.map((b) => b!.enquiryNumber).filter((enquiryNumber) => enquiryNumber !== undefined);
-        generateConfirmationAndEmail(booking, otherBookingEnquiryNumbers);
+        generateConfirmationAndEmail(booking);
       }
     });
   };
