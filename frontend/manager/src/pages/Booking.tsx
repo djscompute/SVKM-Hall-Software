@@ -41,6 +41,8 @@ function Booking() {
   const [allBookingsOfUser, setAllBookingsOfUser] = useState<HallBookingType[]>(
     []
   );
+  const [cgstRate, setCgstRate] = useState(0.09); 
+  const [sgstRate, setSgstRate] = useState(0.09); 
   const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
   const [selectedBookingData, setSelectedBookingData] =
     useState<HallBookingType | null>(null);
@@ -254,11 +256,11 @@ function Booking() {
         discountPercent: baseDiscount,
         sgst: getData('booking_type') === "SVKM INSTITUTE"
           ? 0
-          : 0.09 * (hallCharges + totalFeatureChargesNum - 
+          : sgstRate * (hallCharges + totalFeatureChargesNum - 
               0.01 * baseDiscount * (hallCharges + totalFeatureChargesNum)),
         cgst: getData('booking_type') === "SVKM INSTITUTE"
           ? 0
-          : 0.09 * (hallCharges + totalFeatureChargesNum - 
+          : cgstRate * (hallCharges + totalFeatureChargesNum - 
               0.01 * baseDiscount * (hallCharges + totalFeatureChargesNum)),
         hallDeposit: hallDeposit,
         depositDiscount: getNumericValue(getData('depositDiscount')),
@@ -350,7 +352,7 @@ function Booking() {
           sgst:
             data?.booking_type === "SVKM INSTITUTE"
               ? 0
-              : 0.09 *
+              : sgstRate *
                 ((priceEntry?.price || 0) +
                   totalFeatureCharges -
                   0.01 *
@@ -359,7 +361,7 @@ function Booking() {
           cgst:
             data?.booking_type === "SVKM INSTITUTE"
               ? 0
-              : 0.09 *
+              : cgstRate *
                 ((priceEntry?.price || 0) +
                   totalFeatureCharges -
                   0.01 *
@@ -653,6 +655,26 @@ function Booking() {
   //     setTotalFeatureCharges(newTotalFeatureCharges);
   //   }
   // }, [editingMode, editedData, data]);
+
+  // for cgst and sgst constants
+  useEffect(() => {
+    const fetchConstants = async () => {
+      try {
+        const response = await axiosManagerInstance.get("getAllConstants");
+        const cgst = response.data.find((item: any) => item.constantName === "CGSTRate");
+        const sgst = response.data.find((item: any) => item.constantName === "SGSTRate");
+        
+        if (cgst) setCgstRate(cgst.value / 100);
+        if (sgst) setSgstRate(sgst.value / 100);
+      } catch (error) {
+        console.error("Error fetching GST rates:", error);
+        // Optionally show an error toast
+        toast.error("Failed to fetch GST rates. Using default values.");
+      }
+    };
+  
+    fetchConstants();
+  }, []);
 
   useEffect(() => {
     const calculateTotalFeatureCharges = (features: any) => {
@@ -1705,13 +1727,13 @@ function Booking() {
             </span>
           </div>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">CGST 9%</span>
+            <span className="w-full text-left">CGST {(cgstRate * 100)}%</span>
             <span className="w-full text-right">
               {selectedBookingData?.booking_type == "SVKM INSTITUTE" ? (
                 <div>0</div>
               ) : (
                 <div>
-                  {0.09 *
+                  {cgstRate *
                     ((multiplePriceEntry?.price || 0) +
                       totalFeatureCharges -
                       0.01 *
@@ -1723,13 +1745,13 @@ function Booking() {
             </span>
           </div>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">SGST 9%</span>
+            <span className="w-full text-left">SGST {(sgstRate * 100)}%</span>
             <span className="w-full text-right">
               {selectedBookingData?.booking_type == "SVKM INSTITUTE" ? (
                 <div>0</div>
               ) : (
                 <div>
-                  {0.09 *
+                  {sgstRate *
                     ((multiplePriceEntry?.price || 0) +
                       totalFeatureCharges -
                       0.01 *
@@ -2407,20 +2429,20 @@ function Booking() {
             </span>
           </div>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">CGST 9%</span>
+            <span className="w-full text-left">CGST {(cgstRate * 100)}%</span>
             <span className="w-full text-right">
               {data?.booking_type == "SVKM INSTITUTE" ? (
                 <div>0</div>
               ) : (
                 <div>
                   {editingMode
-                    ? 0.09 *
+                    ? cgstRate *
                       ((priceEntry?.price || 0) +
                         totalFeatureCharges -
                         0.01 *
                           editedData!.baseDiscount *
                           ((priceEntry?.price || 0) + totalFeatureCharges))
-                    : 0.09 *
+                    : cgstRate *
                       ((priceEntry?.price || 0) +
                         totalFeatureCharges -
                         0.01 *
@@ -2431,20 +2453,20 @@ function Booking() {
             </span>
           </div>
           <div className="flex items-center gap-3 w-full bg-blue-100 rounded-sm px-2 py-1 border border-blue-600">
-            <span className="w-full text-left">SGST 9%</span>
+            <span className="w-full text-left">SGST {(sgstRate* 100)}%</span>
             <span className="w-full text-right">
               {data?.booking_type == "SVKM INSTITUTE" ? (
                 <div>0</div>
               ) : (
                 <div>
                   {editingMode
-                    ? 0.09 *
+                    ? sgstRate *
                       ((priceEntry?.price || 0) +
                         totalFeatureCharges -
                         0.01 *
                           editedData!.baseDiscount *
                           ((priceEntry?.price || 0) + totalFeatureCharges))
-                    : 0.09 *
+                    : sgstRate *
                       ((priceEntry?.price || 0) +
                         totalFeatureCharges -
                         0.01 *
