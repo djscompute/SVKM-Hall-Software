@@ -719,10 +719,14 @@ function Booking() {
   const editBookingStatus = useMutation({
     mutationFn: async (newStatus: bookingStatusType) => {
       console.log(hallData);
+      const updatedDataWithTotalPayable = {
+        ...data,
+        totalPayable: calculateTotalPayableSingle(data),
+      };
       const responsePromise = axiosManagerInstance.post(
         `/editBooking/${bookingId}`,
         {
-          ...data,
+          ...updatedDataWithTotalPayable,
           status: newStatus,
           cancellationReason: showCancellationReason
             ? cancellationReason
@@ -901,11 +905,15 @@ function Booking() {
       features: Array.isArray(editedData?.features)
         ? editedData.features
         : [editedData?.features],
-    };
-
+      };
+      const updatedDataWithTotalPayable = {
+        ...dataToSend,
+        totalPayable: calculateTotalPayableSingle(dataToSend),
+      };
+      
     const responsePromise = axiosManagerInstance.post(
       `/editBooking/${bookingId}`,
-      dataToSend
+      updatedDataWithTotalPayable
     );
     console.log("new ", await responsePromise);
     console.log("new ", await responsePromise);
@@ -1147,9 +1155,14 @@ function Booking() {
       cancellationReason: cancellationReason,
     };
 
+    const updatedDataWithTotalPayable = {
+      ...updatedData,
+      totalPayable: calculateTotalPayableSingle(updatedData),
+    };
+
     const responsePromise = axiosManagerInstance.post(
       `/editBooking/${bookingId}`,
-      updatedData
+      updatedDataWithTotalPayable
     );
     toast.promise(responsePromise, {
       pending: "Saving Cancellation Reason...",

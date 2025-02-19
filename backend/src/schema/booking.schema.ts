@@ -62,6 +62,7 @@ export const AddBookingZodSchema = z.object({
       .string(stringErrorHandler("cancellationReason"))
       .optional(),
     enquiryNumber: z.string(stringErrorHandler("enquiryNumber")).optional(),
+    totalPayable: z.number(numberErrorHandler("totalPayable")).optional(),
   }),
 });
 

@@ -44,13 +44,24 @@ export async function updateBookingsStatus(bookingIds: string[],status: string,t
   }
 }
 
-// Function to remove booking from multiple booking
-export async function removeBookingFromMultiple(id: string) {
+// Function to remove booking from multiple booking and reduce total payable
+export async function removeBookingFromMultiple(id: string, totalPayable: number) {
   try {
-    await MultipleBookingModel.findOneAndDelete
-    ({ booking_ids: id });  
-  }
-  catch(error){
+    // remove booking from multiple booking
+    const multipleBooking = await MultipleBookingModel.findOneAndUpdate(
+      { booking_ids: id },
+      { $pull: { booking_ids: id } },
+      { new: true }
+    );
+    if (!multipleBooking) {
+      throw new Error('Multiple booking not found');
+    }
+    // reduce total payable
+    const result = await MultipleBookingModel.updateOne(
+      { _id: multipleBooking._id },
+      { $inc: { totalPayable: -totalPayable } }
+    );
+  } catch (error) {
     throw error;
   }
 }

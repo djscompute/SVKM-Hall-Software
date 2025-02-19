@@ -112,7 +112,7 @@ export async function editBookingHandler(req: Request, res: Response) {
       managerEmail,
       managerName
     } = req.body as HallBookingType; // Ensure this matches your schema type
-
+    const totalPayable = req.body.totalPayable;
     const bookingId: string = req.params.id;
 
     const updatedBooking = await BookingModel.findByIdAndUpdate(
@@ -146,7 +146,7 @@ export async function editBookingHandler(req: Request, res: Response) {
 
     // if booking is cancelled or status is enquiry, remove it from multiple booking
     if(status === 'CANCELLED' || status === 'ENQUIRY') {
-      await removeBookingFromMultiple(bookingId);
+      await removeBookingFromMultiple(bookingId,totalPayable);
     }
 
     if (!updatedBooking) {
