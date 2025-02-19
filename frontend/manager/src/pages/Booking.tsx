@@ -32,7 +32,15 @@ function Booking() {
   const [addAdditional, setAdditional] = useState(false);
   const [editedData, setEditedData] = useState<HallBookingType>();
   const [multipleTransactionData, setMultipleTransactionData] =
-    useState<bookingTransactionType>();
+    useState<bookingTransactionType>({
+      type: "svkminstitute",
+      date: "",
+      transactionID: "",
+      payeeName: "",
+      utrNo: "",
+      chequeNo: "",
+      bank: ""
+    });
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
   const [selectedOption, setSelectedOption] = useState<string>("");
