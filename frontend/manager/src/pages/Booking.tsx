@@ -54,6 +54,13 @@ function Booking() {
   const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
   const [selectedBookingData, setSelectedBookingData] =
     useState<HallBookingType | null>(null);
+  const [displayCount, setDisplayCount] = useState(6);
+  const handleShowMore = () => {
+    setDisplayCount(prev => prev + 6);
+  };
+  const handleShowLess = () => {
+    setDisplayCount(6);
+  };
   // let totalFeatureCharges = 0;
   const [datas, setData] = useState({
     features: [{ heading: "", desc: "", price: 0 }],
@@ -1500,54 +1507,96 @@ function Booking() {
         </div>
       )}
       {selectedOption === "multiple" && (
-        <>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "20px",
-              margin: "20px",
-            }}
-          >
-            {allBookingsOfUser.map((booking) => (
-              <div
-                key={booking._id}
-                style={{ display: "flex", alignItems: "center" }}
-              >
+        <div className="w-full max-w-4xl mx-auto mt-5">
+        {/* Grid for checkboxes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          {allBookingsOfUser.slice(0, displayCount).map((booking) => (
+            <div
+              key={booking._id}
+              className={`
+                flex items-center p-3 rounded-lg border
+                ${booking.status === 'CANCELLED' 
+                  ? 'bg-gray-50 border-gray-200' 
+                  : 'bg-white border-gray-300 hover:border-blue-500'
+                }
+                transition-colors duration-200
+              `}
+            >
+              <div className="flex items-center space-x-3 w-full">
                 <input
                   type="checkbox"
+                  id={`booking-${booking._id}`}
                   value={booking._id}
                   checked={selectedBookings.includes(booking._id)}
                   onChange={handleCheckboxChange}
                   disabled={booking.status === "CANCELLED"}
+                  className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 disabled:opacity-50"
                 />
-    <label
-      style={{
-        marginLeft: "5px",
-        color: booking.status === "CANCELLED" ? "#888" : "inherit",
-        filter: booking.status === "CANCELLED" ? "blur(1px)" : "none",
-      }}
-    >
-      {dayjs(booking.from).format("h:mm A, MMMM D, YYYY") || "-"}{" "}
-      {booking.status === "CANCELLED" && (
-        <span style={{ color: "red" }}>- Cancelled</span>
-      )}
-    </label>
+                <label
+                  htmlFor={`booking-${booking._id}`}
+                  className={`flex-1 text-sm ${
+                    booking.status === "CANCELLED" 
+                      ? "text-gray-400" 
+                      : "text-gray-700"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{dayjs(booking.from).format("MMM D, YYYY")}</span>
+                    <span className="text-xs font-medium">
+                      {dayjs(booking.from).format("h:mm A")}
+                    </span>
+                  </div>
+                  {booking.status === "CANCELLED" && (
+                    <div className="flex items-center mt-1 text-red-500 text-xs">
+                      {/* Simple X icon using Tailwind */}
+                      <span className="mr-1 font-medium">&times;</span>
+                      Cancelled
+                    </div>
+                  )}
+                </label>
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+  
+        {/* Show more/less button */}
+        {allBookingsOfUser.length > 6 && (
+          <div className="flex justify-center mb-6">
+            <button
+              onClick={displayCount < allBookingsOfUser.length ? handleShowMore : handleShowLess}
+              className="flex items-center px-4 py-2 text-sm text-blue-800 font-semibold hover:text-blue-900 transition-colors duration-200"
+            >
+              {displayCount < allBookingsOfUser.length ? (
+                <>
+                  Show More 
+                  {/* Down arrow using HTML entity */}
+                  <span className="ml-1 text-xs">&#9662;</span>
+                </>
+              ) : (
+                <>
+                  Show Less
+                  {/* Up arrow using HTML entity */}
+                  <span className="ml-1 text-xs">&#9652;</span>
+                </>
+              )}
+            </button>
           </div>
-          {selectedBookings.length > 0 && (
-            <div>
-              <label
-                className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="selected-bookings"
-              >
-                Selected Bookings:
-              </label>
+        )}
+  
+        {/* Selected bookings dropdown */}
+        {selectedBookings.length > 0 && (
+          <div className="mt-6">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="selected-bookings"
+            >
+              Selected Bookings ({selectedBookings.length})
+            </label>
+            <div className="relative">
               <select
                 id="selected-bookings"
                 onChange={handleBookingSelect}
-                className="block  w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="" disabled>
                   Select a booking
@@ -1558,9 +1607,14 @@ function Booking() {
                   </option>
                 ))}
               </select>
+              {/* Custom dropdown arrow */}
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <span className="text-xs">&#9662;</span>
+              </div>
             </div>
-          )}
-        </>
+          </div>
+        )}
+      </div>
       )}
 
       {/* Manager Email */}
