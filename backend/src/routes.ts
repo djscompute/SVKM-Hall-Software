@@ -286,13 +286,16 @@ export default function routes(app: Express) {
   ]);
 
   // Multiple Booking routes
+  // create  multiple bookings
   app.post("/multipleBookings", [
     validateRequest(MultipleBookingSchema),
     addMultipleBookingHandler
   ]);
 
+  // get  multiple booking by id
   app.get("/multipleBookings/:id", getMultipleBookingHandler);
 
+  // check if booking exists in multiple bookings
   app.get("/checkBookingInMultiple/:id", [
     validateRequest(CheckBookingInMultipleSchema),
     checkBookingInMultipleHandler

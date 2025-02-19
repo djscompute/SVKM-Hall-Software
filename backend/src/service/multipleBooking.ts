@@ -43,3 +43,14 @@ export async function updateBookingsStatus(bookingIds: string[],status: string,t
     throw error;
   }
 }
+
+// Function to remove booking from multiple booking
+export async function removeBookingFromMultiple(id: string) {
+  try {
+    await MultipleBookingModel.findOneAndDelete
+    ({ booking_ids: id });  
+  }
+  catch(error){
+    throw error;
+  }
+}

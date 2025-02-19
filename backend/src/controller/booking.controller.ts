@@ -5,6 +5,7 @@ import { sendEmail } from "../utils/email";
 import { generateConfirmation } from "../utils/confirmation";
 import { generateInquiry } from "../utils/inquiry";
 import { generateCancellation } from "../utils/cancellation";
+import { removeBookingFromMultiple } from "../service/multipleBooking";
 
 
 export async function addBookingHandler(req: Request, res: Response) {
@@ -142,6 +143,11 @@ export async function editBookingHandler(req: Request, res: Response) {
       },
       { new: true }
     );
+
+    // if booking is cancelled or status is enquiry, remove it from multiple booking
+    if(status === 'CANCELLED' || status === 'ENQUIRY') {
+      await removeBookingFromMultiple(bookingId);
+    }
 
     if (!updatedBooking) {
       return res
