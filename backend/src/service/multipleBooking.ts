@@ -53,14 +53,16 @@ export async function removeBookingFromMultiple(id: string, totalPayable: number
       { $pull: { booking_ids: id } },
       { new: true }
     );
+    // If booking is not found in any multiple booking
     if (!multipleBooking) {
-      throw new Error('Multiple booking not found');
+      return null;
     }
     // reduce total payable
-    const result = await MultipleBookingModel.updateOne(
+    await MultipleBookingModel.updateOne(
       { _id: multipleBooking._id },
       { $inc: { totalPayable: -totalPayable } }
     );
+    return multipleBooking;
   } catch (error) {
     throw error;
   }

@@ -1047,18 +1047,7 @@ function Booking() {
     const selected = event.target.value;
     setSelectedOption(selected);
     if (selected === "multiple") {
-      // Hit API route to fetch all bookings of same HALL Id and same user
-      try {
-        const allBookingResponsePromise = axiosManagerInstance.get(
-          `/getBookingByHallAndUser/${data?.user.mobile}/${hallData?._id}`
-        );
-        const response = await allBookingResponsePromise;
-        setAllBookingsOfUser(response.data);
-      } catch (error) {
-        toast.error(
-          "Failed to fetch other bookings of same hall for this user. Please try again."
-        );
-      }
+
       // Hitting API route to check if already is in  a multiple booking payment
       try {
         const multipleBookingResponsePromise = axiosManagerInstance.get(
@@ -1069,9 +1058,28 @@ function Booking() {
           toast.success(
             "This booking payment is not associated with other bookings "
           );
+          // don't do anything if booking is not in multiple and is not in enquiry which means already payment is not
+          if(data?.status != "ENQUIRY"){
+            setIsBookingInMultiple(false);
+            toast.error("This booking is not in enquiry state, cannot be added to multiple payment with other bookings.Change booking status to ENQUIRY to add to multiple payment");
+            return;
+          }
+          // Hit API route to fetch all bookings of same HALL Id and same user if the booking is not in multiple and is an enquiry booking, showing all other with enquiry as status
+          try {
+            const allBookingResponsePromise = axiosManagerInstance.get(
+              `/getBookingByHallAndUser/${data?.user.mobile}/${hallData?._id}`
+            );
+            const response = await allBookingResponsePromise;
+            const allEnquiryBookingsOfUser = response.data.filter((booking: HallBookingType) => booking.status == "ENQUIRY");
+            setAllBookingsOfUser(allEnquiryBookingsOfUser);
+          } catch (error) {
+            toast.error(
+              "Failed to fetch other bookings of same hall for this user. Please try again."
+            );
+          }
         } else {
           toast.error(
-            "This booking payment is already associated with other bookings as a payment "
+            "This booking payment is already associated with other bookings as a multiple payment, showing all other bookings in multiple with this "
           );
           console.log("All the bookings in multiple", response.data);
           if (
@@ -1079,6 +1087,13 @@ function Booking() {
             response.data.multipleBooking &&
             response.data.multipleBooking.booking_ids
           ) {
+            const allBookingResponsePromise = axiosManagerInstance.get(
+              `/getBookingByHallAndUser/${data?.user.mobile}/${hallData?._id}`
+            );
+            const allBookingResponse = await allBookingResponsePromise;
+            const allMultipleBookingsOfUser = allBookingResponse.data.filter((booking: HallBookingType) => response.data.multipleBooking.booking_ids.includes(booking._id));
+            setAllBookingsOfUser(allMultipleBookingsOfUser);
+            console.log("All the bookings in multiple", allBookingsOfUser);
             setSelectedBookings(response.data.multipleBooking.booking_ids);
             setSelectedBookingData(data || null);
             const calculateTotalFeatureCharges = (features: any) => {
@@ -1521,6 +1536,14 @@ function Booking() {
       )}
       {selectedOption === "multiple" && (
         <div className="w-full max-w-4xl mx-auto mt-5">
+        {/* If nothing in user bookings */}
+        {allBookingsOfUser.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">
+              No bookings with Enquiry status found for this hall.
+            </div>
+          ) : (
+
+        <>
         {/* Grid for checkboxes */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           {allBookingsOfUser.slice(0, displayCount).map((booking) => (
@@ -1626,6 +1649,8 @@ function Booking() {
               </div>
             </div>
           </div>
+        )}
+        </>
         )}
       </div>
       )}
