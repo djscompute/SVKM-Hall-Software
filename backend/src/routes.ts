@@ -167,7 +167,8 @@ export default function routes(app: Express) {
   ]);
   app.get("/getAllConstants", [
     validateCookie,
-    requireMasterRole,
+    // removed require master role as it is not required for this route
+    // requireMasterRole,
     getAllConstantsHandler,
   ]);
   app.post("/updateConstant" ,[
