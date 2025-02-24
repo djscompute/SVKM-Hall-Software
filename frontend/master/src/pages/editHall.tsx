@@ -34,7 +34,7 @@ export default function EditHall() {
       setHallData(response.data);
       return response.data as EachHallType;
     },
-    staleTime: 5 * 60 * 1000, 
+    staleTime: 5 * 60 * 1000,
   });
 
   const editHallMutation = useMutation({
@@ -57,7 +57,7 @@ export default function EditHall() {
       await queryClient.refetchQueries({
         queryKey: [`allhalls`],
       });
-      setIsEditing(false); 
+      setIsEditing(false);
     },
     onError: (error) => {
       console.log(error);
@@ -102,7 +102,7 @@ export default function EditHall() {
                   className="bg-red-500 p-1 px-2 rounded-md text-xl font-semibold text-white"
                   onClick={() => {
                     setHallData(databaseHallData);
-                    setIsEditing(false)
+                    setIsEditing(false);
                   }}
                 >
                   Discard
@@ -124,6 +124,32 @@ export default function EditHall() {
               setHallData as React.Dispatch<React.SetStateAction<EachHallType>>
             }
           />
+          <div className="flex gap-3 items-center w-full">
+            <h1 className="w-1/5 ">Contact Email:</h1>
+            <textarea
+              name="contactEmail"
+              value={hallData.contactEmail}
+              onChange={(e) => {
+                setHallData((prev) => {
+                  if (prev) return { ...prev, contactEmail: e.target.value };
+                });
+              }}
+              className="px-3 py-1 rounded w-full h-auto border-2 border-black"
+            />
+          </div>
+          <div className="flex gap-3 items-center w-full">
+            <h1 className="w-1/5 ">Contact Name:</h1>
+            <textarea
+              name="contactName"
+              value={hallData.contactName}
+              onChange={(e) => {
+                setHallData((prev) => {
+                  if (prev) return { ...prev, contactName: e.target.value };
+                });
+              }}
+              className="px-3 py-1 rounded w-full h-auto border-2 border-black"
+            />
+          </div>
           <HallCapacity
             data={hallData}
             capacity={hallData.capacity}

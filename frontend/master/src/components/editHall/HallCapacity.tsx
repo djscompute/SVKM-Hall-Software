@@ -54,7 +54,7 @@ export default function HallCapacity({ data, capacity, setHallData }: props) {
     <div className="about-hall w-[80%] md:w-[90%] lg:w-full py-5 px-7 rounded-md">
       <div className="flex justify-between">
         <h1 className="text-base sm:text-lg md:text-2xl font-medium">
-          Capacity
+          Features
         </h1>
         <div className="show-on-hover cursor-pointer opacity-100 hover:opacity-100">
           <FontAwesomeIcon

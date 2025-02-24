@@ -54,6 +54,8 @@ function Report7() {
 
   const now = dayjs();
 
+  const formatDate = (date: dayjs.Dayjs) => date.format("DD-MM-YYYY");
+
   const startOfWeek = now.startOf("week").format("YYYY-MM-DDT00:00:00");
   const endOfWeek = now.endOf("week").format("YYYY-MM-DDT23:59:59");
 
@@ -98,10 +100,10 @@ function Report7() {
     let humanReadableFrom = "";
     let humanReadableTo = "";
     if (from) {
-      humanReadableFrom = dayjs(from)?.format("MMMM D, YYYY");
+      humanReadableFrom = formatDate(dayjs(from));
     }
     if (to) {
-      humanReadableTo = dayjs(to)?.format("MMMM D, YYYY");
+      humanReadableTo = formatDate(dayjs(to));
     }
     console.log(humanReadableFrom, humanReadableTo);
     setHumanReadable({
@@ -145,21 +147,150 @@ function Report7() {
     console.log(response.data);
     setData(response.data);
   };
+  const calculateTotalBookingAmount = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Booking Amount"] || 0), 0);
+  };
 
+  const calculateTotalAmountPaid = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Amount Paid"] || 0), 0);
+  };
+
+  const calculateTotalSecurityDeposit = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Security Deposit"] || 0), 0);
+  };
+
+  const calculateTotalGST = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["GST"] || 0), 0);
+  };
+  interface TransactionData {
+    type?: string;
+    date?: string;
+    transactionID?: string;
+    payeeName?: string;
+    utrNo?: string;
+    chequeNo?: string;
+    bank?: string;
+  }
+  interface BookingData {
+    "Manager Name": string;
+    "Customer Category": string;
+    "Customer Name": string;
+    "Contact Person": string;
+    "Contact No.": string;
+    "Booking Amount": string;
+    "Amount Paid": string;
+    transaction?: TransactionData;
+    [key: string]: any; // For any additional fields
+  }
+
+  interface FlattenedBookingData extends Omit<BookingData, "transaction"> {
+    "transaction type"?: string;
+    "transaction date"?: string;
+    "transaction id"?: string;
+    "payee Name"?: string;
+    "utr no."?: string;
+    "cheque no."?: string;
+    bank?: string;
+  }
+
+  // const downloadCsv = () => {
+  //   if (!data) return;
+  //   const flattenedData: FlattenedBookingData[] = data.map((row: BookingData) => {
+  //     const flatRow: FlattenedBookingData = { ...row };
+  //     if (row.transaction) {
+  //       flatRow["transaction type"] = row.transaction.type || "";
+  //       flatRow["transaction date"] = row.transaction.date || "";
+  //       flatRow["transaction id"] = row.transaction.transactionID || "";
+  //       flatRow["payee Name"] = row.transaction.payeeName || "";
+  //       flatRow["utr no."] = row.transaction.utrNo || "";
+  //       flatRow["cheque no."] = row.transaction.chequeNo || "";
+  //       flatRow["bank"] = row.transaction.bank || "";
+  //     }
+  //     delete (flatRow as any).transaction;
+  //     return flatRow;
+  //   });
+  //   const totalAmountPaid = flattenedData.reduce((sum, row) => sum + (Number(row["Amount Paid"]) || 0), 0);
+  //   const totalBookingAmount = flattenedData.reduce((sum, row) => sum + (Number(row["Booking Amount"]) || 0), 0);
+  //   const totalSecurityDeposit = flattenedData.reduce((sum, row) => sum + (Number(row["Security Deposit"]) || 0), 0);
+  //   const totalGST = flattenedData.reduce((sum, row) => sum + (Number(row["GST"]) || 0), 0);
+  
+  //   // Add totals row
+  //   flattenedData.push({
+  //     "Manager Name": "Total",
+  //     "Booking Amount": totalBookingAmount.toFixed(2),
+  //     "Amount Paid": totalAmountPaid.toFixed(2),
+  //     "Security Deposit": totalSecurityDeposit.toFixed(2),
+  //     "GST": totalGST.toFixed(2),
+  //   } as FlattenedBookingData);
+  //   const csvRows = [];
+  //   const headers = Object.keys(data[0]);
+  //   csvRows.push(headers.join(","));
+
+  //   for (const row of data) {
+  //     const values = headers.map((header) => {
+  //       const escaped = ("" + row[header]).replace(/"/g, '\\"');
+  //       return `"${escaped}"`;
+  //     });
+  //     csvRows.push(values.join(","));
+  //   }
+
+  //   const csvString = csvRows.join("\n");
+  //   const blob = new Blob([csvString], { type: "text/csv" });
+  //   const url = URL.createObjectURL(blob);
+  //   const link = document.createElement("a");
+  //   link.href = url;
+  //   link.download = `${selectedHall} Additional Feature Reports ${humanReadable.fromHuman}-${humanReadable.toHuman} .csv`;
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
   const downloadCsv = () => {
     if (!data) return;
-    const csvRows = [];
-    const headers = Object.keys(data[0]);
-    csvRows.push(headers.join(","));
-
-    for (const row of data) {
+  
+    const flattenedData: FlattenedBookingData[] = data.map((row: BookingData) => {
+      const flatRow: FlattenedBookingData = { ...row };
+      if (row.transaction) {
+        flatRow["transaction type"] = row.transaction.type || "";
+        flatRow["transaction date"] = row.transaction.date || "";
+        flatRow["transaction id"] = row.transaction.transactionID || "";
+        flatRow["payee Name"] = row.transaction.payeeName || "";
+        flatRow["utr no."] = row.transaction.utrNo || "";
+        flatRow["cheque no."] = row.transaction.chequeNo || "";
+        flatRow["bank"] = row.transaction.bank || "";
+      }
+      delete (flatRow as any).transaction;
+      return flatRow;
+    });
+  
+    const totalAmountPaid = flattenedData.reduce((sum, row) => sum + (Number(row["Amount Paid"]) || 0), 0);
+    const totalBookingAmount = flattenedData.reduce((sum, row) => sum + (Number(row["Booking Amount"]) || 0), 0);
+    const totalSecurityDeposit = flattenedData.reduce((sum, row) => sum + (Number(row["Security Deposit"]) || 0), 0);
+    const totalGST = flattenedData.reduce((sum, row) => sum + (Number(row["GST"]) || 0), 0);
+  
+    // Add totals row
+    flattenedData.push({
+      "Manager": "Total",
+      "Booking Amount": totalBookingAmount.toFixed(2),
+      "Amount Paid": totalAmountPaid.toFixed(2),
+      "Security Deposit": totalSecurityDeposit.toFixed(2),
+      "GST": totalGST.toFixed(2),
+    } as FlattenedBookingData);
+  
+    const headers = Object.keys(flattenedData[0]);
+    const csvRows = [headers.join(",")];
+  
+    for (const row of flattenedData) {
       const values = headers.map((header) => {
-        const escaped = ("" + row[header]).replace(/"/g, '\\"');
+        const escaped = ("" + (row[header] || "")).replace(/"/g, '\\"');
         return `"${escaped}"`;
       });
       csvRows.push(values.join(","));
     }
-
+  
     const csvString = csvRows.join("\n");
     const blob = new Blob([csvString], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -235,12 +366,14 @@ function Report7() {
       <div className="flex flex-col items-center justify-center gap-2">
         <div className="flex gap-2">
           <BasicDateTimePicker
+            id="fromDate"
             timeModifier={(time) => {
               setDate((prev) => ({ ...prev, from: time }));
             }}
             timePickerName="from"
           />
           <BasicDateTimePicker
+            id="toDate"
             timeModifier={(time) => {
               setDate((prev) => ({ ...prev, to: time }));
             }}
@@ -315,7 +448,9 @@ function Report7() {
           <table className="min-w-full table-auto">
             <thead className="bg-gray-800 text-white">
               <tr>
-                <th className="px-4 py-2">Date</th>
+                <th className="px-4 py-2">Booking Date</th>
+                <th className="px-4 py-2">Confirmation Date</th>
+                <th className="px-4 py-2">Event Date</th>
                 <th className="px-4 py-2">Session</th>
                 <th className="px-4 py-2">From</th>
                 <th className="px-4 py-2">To</th>
@@ -325,13 +460,19 @@ function Report7() {
                 <th className="px-4 py-2">Category</th>
                 <th className="px-4 py-2">Customer Name</th>
                 <th className="px-4 py-2">Contact Person</th>
-                <th className="px-4 py-2">Contact Details</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Contact No.</th>
+                  {selectedAdditionalFeatures && <th className="px-4 py-2 text-center whitespace-nowrap">Booking Amount</th>}
+                  {selectedAdditionalFeatures && <th className="px-4 py-2 text-center whitespace-nowrap">Security Deposit</th>}
+                  {selectedAdditionalFeatures && <th className="px-4 py-2 text-center whitespace-nowrap">GST</th>}
+                  {selectedAdditionalFeatures && <th className="px-4 py-2 text-center whitespace-nowrap">Amount Paid</th>}
               </tr>
             </thead>
             <tbody>
               {data.map((booking: any, index: number) => (
                 <tr key={index} className="bg-white border-b">
-                  <td className="px-4 py-2">{booking.Date}</td>
+                  <td className="px-4 py-2">{booking.bookingDate}</td>
+                  <td className="px-4 py-2">{booking.confirmationDate}</td>
+                  <td className="px-4 py-2">{booking.eventDate}</td>
                   <td className="px-4 py-2">{booking.Session}</td>
                   <td className="px-4 py-2">{booking.From}</td>
                   <td className="px-4 py-2">{booking.To}</td>
@@ -344,8 +485,34 @@ function Report7() {
                   <td className="px-4 py-2">{booking["Customer Name"]}</td>
                   <td className="px-4 py-2">{booking["Contact Person"]}</td>
                   <td className="px-4 py-2">{booking["Contact Details"]}</td>
+                  {selectedAdditionalFeatures && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Booking Amount"]}</td>}
+                      {selectedAdditionalFeatures && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Security Deposit"]}</td>}
+                      {selectedAdditionalFeatures && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["GST"]}</td>}
+                      {selectedAdditionalFeatures && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Amount Paid"]}</td>}
                 </tr>
               ))}
+              <tr className="font-semibold">
+                  <td className="px-4 py-2 text-center whitespace-nowrap">Total</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">Total</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalBookingAmount()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalSecurityDeposit()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalGST()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalAmountPaid()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap"></td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap"></td>
+                  {/* Add other cells as needed */}
+                </tr>
             </tbody>
           </table>
         </div>

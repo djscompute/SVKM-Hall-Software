@@ -17,6 +17,7 @@ import {
   getAdminHandler,
   getAdmins,
   getHallsforAdminHandler,
+  getManagerByHallId,
   loginAdminHandler,
   logoutAdminHandler,
   updateAdminByIdHandler,
@@ -58,6 +59,7 @@ import {
   getBookingsByUserandHallHandler,
   removeBookingHandler,
   sendEmailHandler,
+  generateCancellationHandler,
 } from "./controller/booking.controller";
 
 //Constants
@@ -87,6 +89,7 @@ import { MultipleBookingSchema, CheckBookingInMultipleSchema } from "./schema/mu
 import { addMultipleBookingHandler, getMultipleBookingHandler,  checkBookingInMultipleHandler } from "./controller/multipleBooking.controller";
 //try 
 import { getSessionName } from "./service/getSessionName";
+import { generateCancellation } from "./utils/cancellation";
 
 // const upload = multer({ dest: "uploads/" });
 const upload = multer({ storage: multer.memoryStorage() });
@@ -164,7 +167,8 @@ export default function routes(app: Express) {
   ]);
   app.get("/getAllConstants", [
     validateCookie,
-    requireMasterRole,
+    // removed require master role as it is not required for this route
+    // requireMasterRole,
     getAllConstantsHandler,
   ]);
   app.post("/updateConstant" ,[
@@ -283,13 +287,16 @@ export default function routes(app: Express) {
   ]);
 
   // Multiple Booking routes
+  // create  multiple bookings
   app.post("/multipleBookings", [
     validateRequest(MultipleBookingSchema),
     addMultipleBookingHandler
   ]);
 
+  // get  multiple booking by id
   app.get("/multipleBookings/:id", getMultipleBookingHandler);
 
+  // check if booking exists in multiple bookings
   app.get("/checkBookingInMultiple/:id", [
     validateRequest(CheckBookingInMultipleSchema),
     checkBookingInMultipleHandler
@@ -383,7 +390,15 @@ export default function routes(app: Express) {
     '/getSessionAndCategoryByHall',
     getSessionsWithCategoriesByHallNameHandler
   )
+
+  app.get(
+    '/getManagerByHallId',
+    validateRequest(getBookingByIdZodSchema),
+    getManagerByHallId,
+  )
   {/********************* Helper Routes End*********************/}
+
+  {/********************* Email Routes Begin *********************/}
 
   app.post(
     "/generateInquiry",
@@ -398,8 +413,16 @@ export default function routes(app: Express) {
   )
 
   app.post(
+    "/generateCancellation",
+    validateRequest(ConfirmationSchema),
+    generateCancellationHandler,
+  )
+
+  app.post(
     "/sendEmail",
     validateRequest(EmailZodSchema),
     sendEmailHandler,
   )
+  {/********************* Email Routes End *********************/}
+
 }

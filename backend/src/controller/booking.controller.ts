@@ -4,6 +4,8 @@ import { getBookingZodSchema } from "../schema/booking.schema";
 import { sendEmail } from "../utils/email";
 import { generateConfirmation } from "../utils/confirmation";
 import { generateInquiry } from "../utils/inquiry";
+import { generateCancellation } from "../utils/cancellation";
+import { removeBookingFromMultiple } from "../service/multipleBooking";
 
 
 export async function addBookingHandler(req: Request, res: Response) {
@@ -25,6 +27,7 @@ export async function addBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
+      additionalInfo,
       enquiryNumber
     } = req.body as HallBookingType;
 
@@ -72,6 +75,7 @@ export async function addBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
+      additionalInfo,
       enquiryNumber
     });
     await newBooking.save();
@@ -102,10 +106,13 @@ export async function editBookingHandler(req: Request, res: Response) {
       to,
       time,
       purpose,
+      additionalInfo,
       cancellationReason,
-      enquiryNumber
+      enquiryNumber,
+      managerEmail,
+      managerName
     } = req.body as HallBookingType; // Ensure this matches your schema type
-
+    const totalPayable = req.body.totalPayable;
     const bookingId: string = req.params.id;
 
     const updatedBooking = await BookingModel.findByIdAndUpdate(
@@ -128,11 +135,19 @@ export async function editBookingHandler(req: Request, res: Response) {
         to,
         time,
         purpose,
+        additionalInfo,
         cancellationReason,
-        enquiryNumber
+        enquiryNumber,
+        managerEmail,
+        managerName,
       },
       { new: true }
     );
+
+    // if booking is cancelled or status is enquiry, remove it from multiple booking
+    if(status === 'CANCELLED' || status === 'ENQUIRY') {
+      await removeBookingFromMultiple(bookingId,totalPayable);
+    }
 
     if (!updatedBooking) {
       return res
@@ -237,14 +252,19 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       contactNo, 
       enquiryNumber, 
       hallName, 
+      hallLocation,
+      hallRestrictions,
       dateOfEvent, 
-      slotTime, 
+      slotTime,
+      sessionName, 
       purposeOfBooking, 
+      additionalInfo,
       hallCharges, 
       additionalFacilities, 
       hallDeposit, 
       totalPayable,
-      hallContact 
+      managerEmail,
+      managerName, 
     } = req.body;
 
     const pdfPath = await generateInquiry({
@@ -254,14 +274,19 @@ export async function generateInquiryHandler(req: Request, res: Response) {
       contactNo,
       enquiryNumber,
       hallName,
+      hallLocation,
+      hallRestrictions,
       dateOfEvent,
       slotTime,
+      sessionName,
       purposeOfBooking,
+      additionalInfo, 
       hallCharges,
       additionalFacilities,
       hallDeposit,
       totalPayable,
-      hallContact
+      managerEmail,
+      managerName
     });
     res.json(pdfPath);
   } catch (error) {
@@ -283,20 +308,27 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       modeOfPayment, 
       additionalPaymentDetails, 
       hallName, 
+      hallLocation,
+      hallRestrictions,
       dateOfEvent, 
       slotTime, 
       sessionType,
       purposeOfBooking, 
+      additionalInfo,
       hallCharges, 
       additionalFacilities, 
       discountPercent,
       sgst, 
-      cgst, 
+      cgst,
+      cgstRate,
+      sgstRate, 
       hallDeposit, 
       depositDiscount, 
       totalPayable,
+      grandTotal,
       email,
-      hallContact 
+      managerEmail,
+      managerName 
     } = req.body;
     
     const pdfUrl = await generateConfirmation({
@@ -310,6 +342,83 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       modeOfPayment, 
       additionalPaymentDetails, 
       hallName, 
+      hallLocation,
+      hallRestrictions,
+      dateOfEvent, 
+      slotTime, 
+      sessionType,
+      purposeOfBooking, 
+      hallCharges, 
+      additionalFacilities, 
+      discountPercent,
+      sgst, 
+      cgst,
+      cgstRate,
+      sgstRate, 
+      hallDeposit, 
+      depositDiscount, 
+      totalPayable,
+      grandTotal,
+      email,
+      managerEmail,
+      managerName 
+    });
+    res.json({ pdfUrl });
+  } catch (error) {
+    console.error("Error in generating confirmation:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+}
+
+export async function generateCancellationHandler(req: Request, res: Response) {
+  try {
+    const { 
+      date, 
+      customerName, 
+      contactPerson, 
+      contactNo, 
+      enquiryNumber, 
+      gstNo, 
+      pan, 
+      modeOfPayment, 
+      additionalPaymentDetails, 
+      hallName, 
+      hallLocation,
+      hallRestrictions,
+      dateOfEvent, 
+      slotTime, 
+      sessionType,
+      purposeOfBooking, 
+      additionalInfo,
+      hallCharges, 
+      additionalFacilities, 
+      discountPercent,
+      sgst, 
+      cgst,
+      cgstRate,
+      sgstRate, 
+      hallDeposit, 
+      depositDiscount, 
+      totalPayable,
+      grandTotal,
+      email,
+      managerEmail,
+      managerName 
+    } = req.body;
+    
+    const pdfUrl = await generateCancellation({
+      date, 
+      customerName, 
+      contactPerson, 
+      contactNo, 
+      enquiryNumber, 
+      gstNo, 
+      pan, 
+      modeOfPayment, 
+      additionalPaymentDetails, 
+      hallName, 
+      hallLocation,
+      hallRestrictions,
       dateOfEvent, 
       slotTime, 
       sessionType,
@@ -319,11 +428,15 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
       discountPercent,
       sgst, 
       cgst, 
+      cgstRate,
+      sgstRate,
       hallDeposit, 
       depositDiscount, 
       totalPayable,
+      grandTotal,
       email,
-      hallContact
+      managerEmail,
+      managerName 
     });
     res.json({ pdfUrl });
   } catch (error) {
@@ -331,6 +444,8 @@ export async function generateConfirmationHandler(req: Request, res: Response) {
     res.status(500).json({ message: "Internal server error", error });
   }
 }
+
+
 export async function sendEmailHandler(req: Request, res: Response) {
   try {    
     const { to, subject, text, filename, path } = req.body;

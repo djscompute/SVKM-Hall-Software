@@ -61,8 +61,11 @@ const BookingSchema = new mongoose.Schema<HallBookingType>(
     from: { type: String, required: true },
     to: { type: String, required: true },
     purpose: { type: String, required: true },
+    additionalInfo: { type: String },
     cancellationReason: { type: String },
     enquiryNumber: { type: String },
+    managerEmail: {type: String},
+    managerName: {type: String},
   },
   { timestamps: true }
 );

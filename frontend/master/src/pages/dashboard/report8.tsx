@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axiosMasterInstance from "../../config/axiosMasterInstance";
 import { toast } from "react-toastify";
 import "chart.js/auto";
@@ -176,26 +176,43 @@ function Report8() {
 
     // const newresp=await axiosMasterInstance.post("/getSessionName",{sessionName:data[0].Session});
     // console.log("session name",newresp.data);
-
     setData(response.data);
   };
 
   const downloadCsv = () => {
     if (!data) return;
     const csvRows = [];
-    
+
     // Create headers
     const headers = [
-      "Confirmation Date", "Event Date", "Hall Name", "Session Name", "Session Time",
-      "Additional Facility", "Manager Name", "Customer Category", "Customer Name",
-      "Contact Person", "Contact No.", "Booking Amount", "Security Deposit", "GST",
-      "Amount Paid", "Transaction Type", "Date", "Payee Name", "Cheque No.", "Bank"
+      "Booking Date",
+      "Confirmation Date",
+      "Event Date",
+      "Hall Name",
+      "Session Name",
+      "Session Time",
+      "Additional Facility",
+      "Manager Name",
+      "Customer Category",
+      "Customer Name",
+      "Contact Person",
+      "Contact No.",
+      "Booking Amount",
+      "Security Deposit",
+      "GST",
+      "Amount Paid",
+      "Transaction Type",
+      "Date",
+      "Payee Name",
+      "Cheque No.",
+      "Bank",
     ];
     csvRows.push(headers.join(","));
-  
+
     // Flatten and format data
     for (const row of data) {
       const values = [
+        row.bookingDate,
         row.confirmationDate || "-",
         row.eventDate,
         row["Hall Name"],
@@ -215,18 +232,18 @@ function Report8() {
         row["date"],
         row["payee Name"],
         row["cheque no"],
-        row["bank"]
+        row["bank"],
       ];
-      
+
       // Escape and quote each value
-      const escapedValues = values.map(value => {
+      const escapedValues = values.map((value) => {
         const escaped = ("" + value).replace(/"/g, '""');
         return `"${escaped}"`;
       });
-      
+
       csvRows.push(escapedValues.join(","));
     }
-  
+
     const csvString = csvRows.join("\n");
     const blob = new Blob([csvString], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -237,7 +254,18 @@ function Report8() {
     link.click();
     document.body.removeChild(link);
   };
- 
+  const handleGetData = useCallback(() => {
+    getData({
+      displayPeriod: selectedDisplayPeriod,
+      fromDate: date.from,
+      toDate: date.to,
+      displayHall: selectedHall,
+      displayCustomerCategory: selectedCategory || "All",
+      displaySession: selectedSession,
+      displayHallCharges: hallCharges,
+      displayBookingStatus: selectedBookingStatus,
+    });
+  }, [getData, selectedDisplayPeriod, date, selectedHall, selectedCategory, selectedSession, hallCharges, selectedBookingStatus]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
@@ -325,17 +353,21 @@ function Report8() {
         {/* SELECT CATEGORY */}
         <div className="mt-4 flex items-center gap-4 justify-between">
           <label htmlFor="category-select" className="font-medium text-nowrap">
-            Select Category:
+            Select Customer Category:
           </label>
           <select
             id="category-select"
             className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
+            value={selectedCategory}
             onChange={(e) => {
               setSelectedCategory(e.target.value);
             }}
           >
-            <option value="">Select Category</option>
             <option value="All">All</option>
+            <option value="SVKM INSTITUTE">SVKM INSTITUTE</option>
+            <option value="OTHER THAN SVKM INSTITUTE">
+              OTHER THAN SVKM INSTITUTE
+            </option>
             {selectedSession === "All"
               ? hallData
                   .find((hall) => hall.name === selectedHall)
@@ -376,27 +408,28 @@ function Report8() {
           </select>
         </div>
 
-
-      {/* SELECT HALL CHARGES */}
-      <div className="mt-4 flex items-center gap-4 justify-between">
-        <label htmlFor="hall-charges-select" className="font-medium text-nowrap">
-          Hall Charges:
-        </label>
-        <select
-          id="hall-charges-select"
-          className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
-          onChange={(e) => {
-            e.target.value === "true"
-              ? setHallCharges(true)
-              : setHallCharges(false);
-          }}
-        >
-          <option value="">Display Hall Charges</option>
-          <option value="true">YES</option>
-          <option value="false">NO</option>
-        </select>
-      </div>
-
+        {/* SELECT HALL CHARGES */}
+        <div className="mt-4 flex items-center gap-4 justify-between">
+          <label
+            htmlFor="hall-charges-select"
+            className="font-medium text-nowrap"
+          >
+            Hall Charges:
+          </label>
+          <select
+            id="hall-charges-select"
+            className="bg-gray-100 border border-gray-300 shadow-sm px-2 py-1 rounded-md text-center w-full"
+            onChange={(e) => {
+              e.target.value === "true"
+                ? setHallCharges(true)
+                : setHallCharges(false);
+            }}
+          >
+            {/* <option value="">Display Hall Charges</option> */}
+            <option value="true">YES</option>
+            <option value="false">NO</option>
+          </select>
+        </div>
       </div>
       <hr className=" bg-gray-300 h-[1.5px] w-[50%] my-2" />
       {/* SELECT TIME PERIOD */}
@@ -411,6 +444,7 @@ function Report8() {
                 From:
               </label>
               <BasicDateTimePicker
+                id="fromDate"
                 timeModifier={(time) => {
                   setDate((prev) => ({ ...prev, from: time }));
                 }}
@@ -425,6 +459,7 @@ function Report8() {
                 To:
               </label>
               <BasicDateTimePicker
+                id="toDate"
                 timeModifier={(time) => {
                   setDate((prev) => ({ ...prev, to: time }));
                 }}
@@ -436,20 +471,7 @@ function Report8() {
       )}
       <button
         className="bg-blue-500 text-white px-2 py-1 rounded-md"
-        onClick={() => {
-          if (selectedHallId && selectedCategory) {
-            getData({
-              displayPeriod: selectedDisplayPeriod,
-              fromDate: date.from,
-              toDate: date.to,
-              displayHall: selectedHallId,
-              displayCustomerCategory: selectedCategory,
-              displaySession: selectedSession,
-              displayHallCharges: hallCharges,
-              displayBookingStatus: selectedBookingStatus,
-            });
-          }
-        }}
+        onClick={handleGetData}
       >
         Get for Time Period
       </button>
@@ -500,6 +522,9 @@ function Report8() {
               <thead className="bg-gray-800 text-white">
                 <tr>
                   <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Booking Date
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
                     Confirmation Date
                   </th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">
@@ -516,6 +541,9 @@ function Report8() {
                   </th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">
                     Manager Name
+                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">
+                    Remark
                   </th>
                   <th className="px-4 py-2 text-center whitespace-nowrap">
                     Customer Category
@@ -576,11 +604,16 @@ function Report8() {
                   .filter(
                     (booking: any) =>
                       selectedBookingStatus === "All" ||
-                      booking["Booking Status"] === selectedBookingStatus
+                      booking["Booking Status"] === selectedBookingStatus &&
+                      booking["Session"]
                   )
                   .map((booking: any, index: number) => (
                     <tr key={index} className="bg-white border-b">
-
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking.bookingDate
+                          ? booking.bookingDate
+                          : "-"}
+                      </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking.confirmationDate
                           ? booking.confirmationDate
@@ -594,8 +627,25 @@ function Report8() {
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {/* {booking["Session"]} */}
-                        {booking["Session"].name} {booking["Session"].time.from}{" "}
-                        - {booking["Session"].time.to}
+
+                        {/* {booking["Session"].name} {booking["Session"].time.from}{" "}
+                        - {booking["Session"].time.to} */}
+                        {booking["Session"] ? (
+                          <>
+                            {booking["Session"].name}{" "}
+                            {booking["Session"].time ? (
+                              <>
+                                {booking["Session"].time.from} -{" "}
+                                {booking["Session"].time.to}
+                              </>
+                            ) : (
+                              "Time not available"
+                            )}
+                          </>
+                        ) : (
+                          "Session not available"
+                        )}
+
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Additional Facility"]
@@ -604,6 +654,9 @@ function Report8() {
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Manager Name"]}
+                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">
+                        {booking["Remark"]} 
                       </td>
                       <td className="px-4 py-2 text-center whitespace-nowrap">
                         {booking["Customer Category"]}

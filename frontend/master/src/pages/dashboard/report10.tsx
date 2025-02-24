@@ -6,7 +6,7 @@ import { EachHallType } from "../../../../../types/global.ts";
 import { useQuery } from "@tanstack/react-query";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-
+import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat.ts";
 function Report10() {
   const [hallData, setHallData] = useState<EachHallType[]>([]);
 
@@ -151,7 +151,7 @@ function Report10() {
                     <ul className="list-disc list-inside text-gray-700">
                       {hall.sessions.map((session) => (
                         <li key={session._id}>
-                          {session.name}: {session.from} - {session.to}
+                          {session.name}: {convert_IST_TimeString_To12HourFormat(session.from)} - {convert_IST_TimeString_To12HourFormat(session.to)}
                         </li>
                       ))}
                     </ul>

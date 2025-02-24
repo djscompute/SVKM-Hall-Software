@@ -29,20 +29,27 @@ type confirmationType = {
   modeOfPayment: string;
   additionalPaymentDetails: string;
   hallName: string;
+  hallLocation: string;
+  hallRestrictions: string;
   dateOfEvent: string;
   slotTime: string;
   sessionType: string;
   purposeOfBooking: string;
+  additionalInfo?: string;
   hallCharges: number;
   additionalFacilities: number;
   discountPercent: number;
   sgst: number;
   cgst: number;
+  cgstRate: number;
+  sgstRate: number;
   hallDeposit: number;
   depositDiscount: number;
   totalPayable: number;
+  grandTotal: number;
   email: string;
-  hallContact: string
+  managerEmail: string;
+  managerName: string;
 };
 
 function formatIndianCurrency(num: number): string {
@@ -126,47 +133,56 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hall Booking Confirmation</title>
+    <title>Hall Booking Confirmation Cum Receipt</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; }
+        body { font-family: Arial, sans-serif; font-size: 13px; }
         .header { text-align: center; }
         .content { margin: 20px; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th, td { border: 1px solid black; padding: 5px; font-size: 12px; }
+        .nogap {line-height: 5px; margin: 20px 0px}
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { border: 1px solid black; padding: 5px; font-size: 14px; }
         .terms-conditions { font-size: 16px; }
         .page-break { page-break-before: always; }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="https://static.wixstatic.com/media/2d8aca_ab298473c57c4d32b13b1544c84d5ac9~mv2.png/v1/fill/w_196,h_236,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/svkm%20logo.png" alt="SVKM Logo" width="100">
+        <img src="https://static.wixstatic.com/media/2d8aca_ab298473c57c4d32b13b1544c84d5ac9~mv2.png/v1/fill/w_196,h_236,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/svkm%20logo.png" alt="SVKM Logo" width="90" height="90">
+        <h1>SHRI VILE PARLE KELVANI MANDAL</h1>
+        <h2>Hall Booking Confirmation Cum Receipt</h2>
     </div>
     <div class="content">
-        <p><strong>Date:</strong> ${props.date}</p>
-        <p><strong>Customer Name:</strong> ${props.customerName}</p>
-        <p><strong>Contact Person:</strong> ${props.contactPerson}</p>
-        <p><strong>Contact No:</strong> ${props.contactNo}</p>
-        <p><strong>Enquiry Number:</strong> ${props.enquiryNumber}</p>
-        <p><strong>GST No:</strong> ${props.gstNo}</p>
-        <p><strong>PAN:</strong> ${props.pan}</p>
+        <div class="nogap">
+          <p><strong>Date:</strong> ${props.date}</p>
+          <p><strong>Customer Name:</strong> ${props.customerName}</p>
+          <p><strong>Contact Person:</strong> ${props.contactPerson}</p>
+          <p><strong>Contact No:</strong> ${props.contactNo}</p>
+          <p><strong>Enquiry Number:</strong> ${props.enquiryNumber}</p>
+          <p><strong>GST No:</strong> ${props.gstNo}</p>
+          <p><strong>PAN:</strong> ${props.pan}</p>
+        </div>
         
-        <p>Thank you for payment towards your hall booking as per below details.</p>
-        
-        <p><strong>Mode of payment:</strong> ${props.modeOfPayment}</p>
-        <p><strong>Additional payment details:</strong> ${props.additionalPaymentDetails}</p>
-        
-        <p><strong>Hall Name:</strong> ${props.hallName}</p>
-        <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
-        <p><strong>Slot Time:</strong> ${props.sessionType} ${props.slotTime}</p>
-        <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
-        
+        <div class="nogap">
+          <p><strong>Mode of payment:</strong> ${props.modeOfPayment}</p>
+        </div>
+
+  <div class="nogap">
+    <p><strong>Additional payment details:</strong> ${props.additionalPaymentDetails}</p>
+    <p><strong>Hall Name:</strong> ${props.hallName} &nbsp <strong>Restrictions:</strong>${props.hallRestrictions}</p>
+    <p style="margin:-3px 0px;"><strong>Hall Address:</strong> <span style="line-height: 12px;">${props.hallLocation}</span></p>
+    <p><strong>Date of Event:</strong> ${props.dateOfEvent}</p>
+    <p><strong>Slot Time:</strong> ${props.sessionType} ${props.slotTime}</p>
+    <p><strong>Purpose of Booking:</strong> ${props.purposeOfBooking}</p>
+    <p><strong>Additional Information</strong> ${props.additionalInfo?props.additionalInfo:"-"}</p>
+  </div>
+
         <table>
             <tr>
                 <th>Description</th>
                 <th>Amt (INR)</th>
             </tr>
             <tr>
-                <td>Hall Charges</td>
+                <td>Hall Charges (SAC:997212)</td>
                 <td>${formatIndianCurrency(props.hallCharges)}</td>
             </tr>
             <tr>
@@ -186,11 +202,11 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
                 <td><strong>${formatIndianCurrency((props.hallCharges + props.additionalFacilities) * (1 - props.discountPercent / 100))}</strong></td>
             </tr>
             <tr>
-                <td>SGST - 9 %</td>
+                <td>SGST - ${props.cgstRate}%</td>
                 <td>${formatIndianCurrency(props.sgst)}</td>
             </tr>
             <tr>
-                <td>CGST - 9 %</td>
+                <td>CGST - ${props.sgstRate}%</td>
                 <td>${formatIndianCurrency(props.cgst)}</td>
             </tr>
             <tr>
@@ -205,31 +221,47 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
                 <td><strong>Total Payable</strong></td>
                 <td><strong>${formatIndianCurrency(props.totalPayable)}</strong></td>
             </tr>
+            <tr>
+                <td><strong>Grand Total</strong></td>
+                <td><strong>${formatIndianCurrency(props.grandTotal)}</strong></td>
+            </tr>
         </table>
         
         <p>Rupees ${numberToWordsIndian(props.totalPayable)} Only</p>
 
         
-        <p>Demand Draft / Account Payee Cheque to be drawn in favour of <strong>"SVKM HALL."</strong></p>
+        <p>Demand Draft / Account Payee Cheque to be drawn in favour of <strong>"SVKM HALL"</strong></p>
         
-        <h4>For Online payment, details as under</h4>
-        <p>Account Name: SVKM HALL</p>
-        <p>Bank name: ICICI BANK</p>
-        <p>Branch: Juhu Vile Parle</p>
-        <p>NEFT/ IFSC code: ICIC0000366</p>
-        <p>Account No. : 036601009123</p>
-        <p>Account Type: Saving</p>
-        
-        <p>SVKM PAN: AABTS8228H</p>
-        <p>SVKM GSTIN: 27AABTS8228H1Z8</p>
-        
-        <p>Invoice & Receipt of payment will be emailed at your email ID ${props.email}. For hard copy please contact ${props.hallContact} at ${props.hallName}.</p>
-    </div>
+       <div style="display: flex; justify-content: space-between; align-items: flex-end; margin: -30px 0px;">
+            <div class="nogap">
+                <h4>For Online payment, details as under</h4>
+                <p>Account Name: SVKM HALL</p>
+                <p>Bank name: ICICI BANK</p>
+                <p>Branch: Juhu Vile Parle</p>
+                <p>NEFT/ IFSC code: ICIC0000366</p>
+                <p>Account No. : 036601009123</p>
+                <p>Account Type: Saving</p>
+            </div>
+            <div style="text-align: right; margin-right:30px">
+                <p><strong>For SVKM Halls</strong></p>
+                <br><br>
+                <p>____________________</p>
+                <p>Authorised Signatory</p>
+            </div>
+        </div>
+
+        <div class="nogap">
+            <p><strong>SVKM PAN: AABTS8228H</strong></p>
+            <p><strong>SVKM GSTIN: 27AABTS8228H1Z8</strong></p>
+        </div>
+
+        <p><strong>For GST invoice with IRN please contact ${props.managerName} at ${props.managerEmail} within one month.</strong></p>
+         </div>
     <div class="page-break"></div>
 <div class="content terms-conditions">
-        <h4>Terms & Conditions</h4>
-        <p><strong>General:</strong></p>
-        <ul>
+        <h4>Terms & Conditions:</h4>
+        <p><strong>General -</strong></p>
+        <ol>
             <li>Extra hour charges are applicable for BJ Hall and Mukesh Patel Auditorium.</li>
             <li>Extra payment for electrical service charges (as per meter reading) will have to be paid by customer for booking the B.J. Hall.</li>
             <li>GST will be applicable on Total Payable amount excluding security deposit, if any.</li>
@@ -242,23 +274,35 @@ const confirmationHtmlTemplate = (props: confirmationType) => `
                     <li>50% of the charges provided, the hall is rebooked by some other party.</li>
                     <li>10% of the charges if the function is cancelled due to death in the family.</li>
                 </ul>
-                In any other cases, no refund will be allowed.
+                In any other cases no refund will be allowed.
             </li>
             <li>Serving of non-vegetarian food and/or hard drink is strictly prohibited.</li>
             <li>Use of Band within the premises is strictly prohibited.</li>
             <li>Bursting of crackers will be allowed beyond 100 metres of the periphery of the premises. Deposit shall be forfeited if the above rule is violated.</li>
             <li>Photo Studio/Umbrella and halogen stand are not allowed inside the hall.</li>
             <li>Flowers are not allowed in Hall Carpet Area.</li>
-        </ul>
+        </ol>
         
-        <p><strong>For Mukesh Patel Auditorium:</strong></p>
-        <ul>
-            <li>Each session if for a period not exceeding 3 hours</li>
-            <li>Full day is for a period not exceeding 6 hours and shall, in any case, not last beyond 6 PM on the day.</li>
+        <p><strong>For Mukesh Patel Auditorium -</strong></p>
+        <ol>
+            <li>Each session is for a period not exceeding 3 hours</li>
+            <li>Full day is for a period not exceeding 6 hours and shall, in any case not last beyond 6 PM on the day.</li>
             <li>Service of Ushers: The services of Ushers shall be provided by the auditorium and the party booking the auditorium will have to pay Rs.4000/- (Rupees Four Thousand only) per session (three hours and for ten persons) for the services rendered before the commencement of the show and the cheque should be drawn in favour of "THE FORT AND COLABA WELFARE SOCIETY".</li>
             <li>Police Bandobast: Police Bandobast is compulsory on the day of performance and will be made by the party booking the auditorium. For this purpose, the party should contact well in advance with an application, the Inspector of Police, Juhu Police Station, Vile Parle (West), Mumbai - 400 056, pay the necessary charges and obtain receipt of the same. This should be shown to the Auditorium Manager at the time of the programme.</li>
-            <li>Police Permission & Licenses: Permission from the police for the following must be obtained before the sale of tickets and the necessary certificate must be shown to the Auditorium Manager. The contents of the performance or the drama to be performed has to be got approved by the Commissioner of Police, Theatre Branch, Mumbai - 400 001. It is necessary to obtain the permission of the author before staging performance.</li>
-        </ul>
+            <li>Police Permission & Licenses: Permission from the police for the following must be obtained before the sale of tickets and the necessary certificate must be shown to the Auditorium Manager.
+                The contents of the performance or the drama to be performed must be got approved by the Commissioner of Police, Theatre Branch, Mumbai - 400 001. It is necessary to obtain the permission of the author before staging performance.</li>
+        </ol>
+        <h4>Rules for MPSTME Seminar Halls Booking:</h4>
+        <ol>
+            <li>MPSTME Big Seminar Hall requires a minimum crowd of 300.</li>
+            <li>Requests for booking should be made at least one week in advance.</li>
+            <li>Food & Beverages are not allowed inside the halls.</li>
+            <li>Sound system is available in halls, no DJ sets or other related equipment to be connected.</li>
+            <li>All arrangements like table booking(Form Popular Decorator), standee arrangement, printing, stationary, coordination with canteen manager needs to be taken care by the organizer.</li>
+            <li>The college authorities (user) of the event booking team is responsible for maintaining decorum and cleanliness in the halls.</li>
+            <li>Any damage caused to the halls/property will be the responsibility of the user.</li>
+            <li>Booking of canteen space is not possible during college academics times due to rush.</li>
+        </ol>
     </div>
 </body>
 </html>

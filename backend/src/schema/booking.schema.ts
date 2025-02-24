@@ -57,10 +57,12 @@ export const AddBookingZodSchema = z.object({
     from: z.string(stringErrorHandler("from")),
     to: z.string(stringErrorHandler("to")),
     purpose: z.string(stringErrorHandler("purpose")),
+    additionalInfo: z.string(stringErrorHandler("additionalInfo")).optional(),
     cancellationReason: z
       .string(stringErrorHandler("cancellationReason"))
       .optional(),
     enquiryNumber: z.string(stringErrorHandler("enquiryNumber")).optional(),
+    totalPayable: z.number(numberErrorHandler("totalPayable")).optional(),
   }),
 });
 
@@ -117,14 +119,19 @@ export const InquirySchema = z.object({
     contactNo: z.string(),
     enquiryNumber: z.string(),
     hallName: z.string(),
+    hallLocation: z.string(),
+    hallRestrictions: z.string(),
     dateOfEvent: z.string(),
     slotTime: z.string(),
+    sessionName: z.string(),
     purposeOfBooking: z.string(),
+    additionalInfo: z.string(),
     hallCharges: z.number(),
     additionalFacilities: z.number(),
     hallDeposit: z.number(),
     totalPayable: z.number(),
-    hallContact: z.string(),
+    managerEmail: z.string(),
+    managerName: z.string(),
   }),
 });
 
@@ -140,20 +147,27 @@ export const ConfirmationSchema = z.object({
     modeOfPayment: z.string(),
     additionalPaymentDetails: z.string().optional(),
     hallName: z.string(),
+    hallLocation: z.string(),
+    hallRestrictions: z.string(),
     dateOfEvent: z.string(),
     slotTime: z.string(),
     sessionType: z.string(),
     purposeOfBooking: z.string(),
+    additionalInfo: z.string(),
     hallCharges: z.number(),
     additionalFacilities: z.number(),
     discountPercent: z.number().min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     sgst: z.number(),
     cgst: z.number(),
+    cgstRate: z.number(),
+    sgstRate: z.number(),
     hallDeposit: z.number(),
     depositDiscount: z.number().min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     totalPayable: z.number(),
+    grandTotal: z.number(),
     email: z.string().email(), // Ensuring a valid email format
-    hallContact: z.string(),
+    managerEmail: z.string(),
+    managerName: z.string(),
   }),
 });
 export const getBookingsByHallZodSchema = z.object({

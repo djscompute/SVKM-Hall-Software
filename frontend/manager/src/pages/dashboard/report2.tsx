@@ -127,6 +127,8 @@ function Report2() {
   const [data, setData] = useState<any>();
   const now = dayjs();
 
+  const formatDate = (date: dayjs.Dayjs) => date.format("DD-MM-YYYY");
+
   const startOfWeek = now.startOf("week").format("YYYY-MM-DDT00:00:00");
   const endOfWeek = now.endOf("week").format("YYYY-MM-DDT23:59:59");
 
@@ -186,10 +188,10 @@ function Report2() {
     let humanReadableFrom = "";
     let humanReadableTo = "";
     if (from) {
-      humanReadableFrom = dayjs(from)?.format("MMMM D, YYYY");
+      humanReadableFrom = formatDate(dayjs(from));
     }
     if (to) {
-      humanReadableTo = dayjs(to)?.format("MMMM D, YYYY");
+      humanReadableTo = formatDate(dayjs(to));
     }
     console.log(humanReadableFrom, humanReadableTo);
     setHumanReadable({
@@ -218,12 +220,14 @@ function Report2() {
       <span className=" text-xl font-medium mt-5">Session Wise Bookings</span>
       <div className="flex gap-2">
         <BasicDateTimePicker
+          id="fromDate"
           timeModifier={(time) => {
             setQueryFilter((prev) => ({ ...prev, from: time }));
           }}
           timePickerName="from"
         />
         <BasicDateTimePicker
+          id="toDate"
           timeModifier={(time) => {
             setQueryFilter((prev) => ({ ...prev, to: time }));
           }}

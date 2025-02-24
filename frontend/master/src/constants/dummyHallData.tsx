@@ -5,6 +5,8 @@ const dummyHallData: EachHallType[] = [
     _id: "hall001",
     name: "Grand Conference Center",
     person: "John Doe",
+    contactName: "John Doe",  
+    contactEmail: "john.doe@example.com",  
     location: {
       desc1: "GCC",
       desc2: "12345 Conference Blvd, Event City, EC 54321",
@@ -68,6 +70,8 @@ const dummyHallData: EachHallType[] = [
     _id: "hall002",
     name: "Urban Art Gallery",
     person: "Jane Smith",
+    contactName: "Jane Smith",  
+    contactEmail: "jane.smith@example.com",   
     location: {
       desc1: "UAG",
       desc2: "67890 Art St, Culture District, CD 67890",

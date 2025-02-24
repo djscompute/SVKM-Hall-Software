@@ -1,5 +1,5 @@
 import { start } from "repl";
-import { BookingModel, HallBookingType } from "../../models/booking.model";
+import { BookingModel, HallBookingType, CustomerSchema } from "../../models/booking.model";
 import { getHallNameById } from "../getHallName";
 import { getManagerNamesByHallId } from "../getManagerName";
 import { getSessionName, getSessionTime } from "../getSessionName";
@@ -40,6 +40,16 @@ const calculateAmountPaid = (data: any): number => {
       deposit
   );
 };
+function formatDateToDDMMYYYY(date: {
+  getDate: () => any;
+  getMonth: () => number;
+  getFullYear: () => any;
+}) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
 
 export async function getBookingInformationReport(
   params: BookingInformationReportRequest
@@ -252,6 +262,7 @@ export async function getBookingInformationReport(
     }
     const formattedBookings = await Promise.all(
       bookings.map(async (booking) => ({
+        bookingDate: formatDateToDDMMYYYY(booking.createdAt),
         confirmationDate: booking.date,
         eventDate: parseDateTime(booking.from).date,
         "Hall Name": await getHallNameById(booking.hallId),
@@ -265,6 +276,7 @@ export async function getBookingInformationReport(
           .map((feature) => feature.heading)
           .join(", "),
         "Manager Name": await getManagerNamesByHallId(booking.hallId),
+        "Remark": booking.user.remark,
         "Customer Category": booking.booking_type,
         "Customer Name": booking.user.username,
         "Contact Person": booking.user.contact,

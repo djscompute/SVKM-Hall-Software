@@ -8,10 +8,12 @@ type Props = {
 };
 
 export default function Card({ hallData }: Props) {
+
   console.log(hallData);
   return (
     <Link
-      to={`/halls/${hallData._id}`}
+   
+      to={`/halls/${hallData._id}`} 
       className="flex flex-col justify-between rounded-lg overflow-hidden h-auto w-full lg:w-1/4 m-3 md:m-10 lg:m-2"
     >
       <img

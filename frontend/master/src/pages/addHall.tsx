@@ -31,6 +31,8 @@ function AddHall() {
       "The decor team takes care of the decoration for your big day. Babubhai Jagjivandas Hall has a lush green lawn that can accommodate a huge crowd for an open-air outdoor evening reception. It also has a banquet hall for having an indoor wedding or reception ceremony.",
       "BJ Hall Vile Parle has an inviting ambiance which makes everyone feel welcomed. The elegant décor of the venue makes it an ideal option for a grand wedding. Host your events at BJ Hall Mumbai to make them outstanding. Ticking all the right boxes, this one must certainly be on your cards.",
     ],
+    contactEmail: "manager@gmail.com",
+    contactName: "Manager",
     capacity: "500 people",
     additionalFeatures: [
       {
@@ -132,6 +134,28 @@ function AddHall() {
       <HallLocation location={hallData.location} setHallData={setHallData} />
       <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <AboutHall about={hallData.about} setHallData={setHallData} />
+      <div className="flex gap-3 items-center w-full">
+        <h1 className="w-1/5 ">Contact Email:</h1>
+        <textarea
+          name="contactEmail"
+          value={hallData.contactEmail}
+          onChange={(e) =>
+            setHallData((prev) => ({ ...prev, contactEmail: e.target.value }))
+          }
+          className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
+        />
+      </div>
+      <div className="flex gap-3 items-center w-full">
+        <h1 className="w-1/5 ">Contact Name:</h1>
+        <textarea
+          name="contactName"
+          value={hallData.contactName}
+          onChange={(e) =>
+            setHallData((prev) => ({ ...prev, contactName: e.target.value }))
+          }
+          className="bg-gray-300  px-3 py-1 rounded w-full h-auto"
+        />
+      </div>
       <hr className=" bg-gray-300 h-[1.5px] w-full" />
       <h2 className="font-semibold text-xl mb-3 text-center">
         Capacity, Deposit, Restrictions

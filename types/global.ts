@@ -37,6 +37,8 @@ export interface EachHallType {
   person: string;
   location: EachHallLocationType; // location of the hall
   about: string[]; // description of the hall. can be buletins
+  contactEmail: string; 
+  contactName: string; 
   capacity: string; // obvio
   additionalFeatures?: EachHallAdditonalFeaturesType[]; // additional features and amenities for the hall
   images: string[]; // array of images of the hall. should be in a file storage. PLS DONT STORE BASE64
@@ -70,6 +72,7 @@ export type bookingTransactionType = {
 // ================================================
 export type HallBookingType = {
   readonly _id: string;
+  readonly createdAt: Date;
   date?: string;
   user: CustomerType; // the User who booked this hall
   features: EachHallAdditonalFeaturesType[]; // the Ammenities which the user has booked for himself
@@ -90,8 +93,11 @@ export type HallBookingType = {
     to: string; // end time
   };
   purpose: string; //purpose for which the hall is being booked by the user (event type)
+  additionalInfo?: string; // additional info about the booking (mainly a phone number)
   cancellationReason?: string; // reason for cancellation
-  enquiryNumber?: string
+  enquiryNumber?: string;
+  managerEmail?: string,
+  managerName?: string,
 };
 
 // ================================================

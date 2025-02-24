@@ -1,18 +1,22 @@
 "use client";
 import { useEffect, useState } from "react";
-import { EachHallType, bookingStatusType } from "../../types/Hall.types";
+import { EachHallType } from "../../types/Hall.types";
 import EachDay from "./eachDay";
 import EachMobileDay from "./eachMobileDay";
-import axiosClientInstance from "../../config/axiosClientInstance";
+import dayjs from "dayjs";
+import axiosManagerInstance from "../../config/axiosClientInstance";
 import { useQuery } from "@tanstack/react-query";
 import Legends from "./legends";
-import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers";
 
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
+
+// CHANGE 1: Add constants for start and end years
+const START_YEAR = new Date().getFullYear();
+const END_YEAR = START_YEAR + 2;
 
 type Props = {
   hallId: string;
@@ -22,11 +26,14 @@ type Props = {
 //calendar
 const Calendar = ({ hallId, HallData }: Props) => {
   dayjs.extend(utc);
-console.log("session",HallData);
 
-  const [currentDate, setCurrentDate] = useState(
-    dayjs().startOf("month").toDate()
-  );
+  const [currentDate, setCurrentDate] = useState(() => {
+    const now = dayjs();
+    return now.year() < START_YEAR
+      ? dayjs(`${START_YEAR}-01-01`).toDate()
+      : now.startOf("month").toDate();
+  });
+
   const [selectedMobileDate, setSelectedMobileDate] = useState<number>(1);
 
   const startDate = dayjs(currentDate)
@@ -43,14 +50,14 @@ console.log("session",HallData);
   } = useQuery({
     queryKey: [`bookings-${startDate}-${endDate}`],
     queryFn: async () => {
-      const response = await axiosClientInstance.get("getBooking", {
+      const response = await axiosManagerInstance.get("getBooking", {
         params: {
           from: startDate,
           to: endDate,
           hallId: hallId,
         },
       });
-      console.log("res",response.data);
+      console.log("data is here ", response.data);
       if (response.data.message == "No bookings found for the specified range.")
         return [];
       // sort based of from
@@ -60,21 +67,22 @@ console.log("session",HallData);
     staleTime: 1 * 60 * 1000, // Data is considered fresh for 1 minutes
   });
 
+  console.log(allBookingData);
+
   const daysInMonth = dayjs(currentDate).daysInMonth();
 
   const firstDayOfMonth = dayjs(currentDate).startOf("month").day();
 
   const onNextMonth = () => {
-    if(dayjs(currentDate).isAfter(dayjs().add(2,'y').subtract(1, 'month'))) return;
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-    );
+    const nextMonth = dayjs(currentDate).add(1, "month");
+    if (nextMonth.year() > END_YEAR) return;
+    setCurrentDate(nextMonth.toDate());
   };
 
   const onPreviousMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-    );
+    const previousMonth = dayjs(currentDate).subtract(1, "month");
+    if (previousMonth.year() < START_YEAR) return;
+    setCurrentDate(previousMonth.toDate());
   };
 
   const totalSlots = Math.ceil((firstDayOfMonth + daysInMonth) / 7) * 7;
@@ -95,17 +103,24 @@ console.log("session",HallData);
           <DatePicker
             value={dayjs(currentDate)}
             onChange={(newState): any => {
-              console.log(newState);
-              setCurrentDate(dayjs(newState).startOf("month").toDate());
+              if (newState) {
+                setCurrentDate(newState.startOf("month").toDate());
+              }
             }}
             views={["year", "month"]}
-            maxDate={dayjs().add(2,'y')}
+            minDate={dayjs(`${START_YEAR}-01-01`)}
+            maxDate={dayjs(`${END_YEAR}-12-31`)}
           />
         </LocalizationProvider>
         {/* Top heading */}
-        <div className="flex justify-between items-center my-4 w-3/4 mx-auto">
+        <div className="flex justify-between items-center mb-4 w-3/4 mx-auto">
           <svg
-            className=" cursor-pointer"
+            className={`cursor-pointer ${
+              dayjs(currentDate).year() === START_YEAR &&
+              dayjs(currentDate).month() === 0
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
             onClick={onPreviousMonth}
             width="8"
             height="14"
@@ -134,7 +149,6 @@ console.log("session",HallData);
           </svg>
         </div>
         <Legends />
-
         {/* CALENDER GRId */}
         <div className="grid grid-cols-7 gap-[2px]">
           {/* Week Days */}
@@ -160,7 +174,6 @@ console.log("session",HallData);
               hallId={hallId}
               currentDate={currentDate}
               HallSessionsArray={HallData}
-
               selectedMobileDate={selectedMobileDate}
               setSelectedMobileDate={setSelectedMobileDate}
               allBookingData={allBookingData}

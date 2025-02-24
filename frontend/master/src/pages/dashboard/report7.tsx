@@ -174,6 +174,25 @@ function Report7() {
     "cheque no."?: string;
     bank?: string;
   }
+  const calculateTotalBookingAmount = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Booking Amount"] || 0), 0);
+  };
+
+  const calculateTotalAmountPaid = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Amount Paid"] || 0), 0);
+  };
+
+  const calculateTotalSecurityDeposit = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Security Deposit"] || 0), 0);
+  };
+
+  const calculateTotalGST = () => {
+    if (!data || !selectedAdditionalFeatures) return 0;
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["GST"] || 0), 0);
+  };
   const downloadCsv = () => {
     if (!data) return;
 
@@ -198,10 +217,16 @@ function Report7() {
       (sum, row) => sum + (Number(row["Amount Paid"]) || 0),
       0
     );
+    const totalBookingAmount = flattenedData.reduce((sum, row) => sum + (Number(row["Booking Amount"]) || 0), 0);
+    const totalSecurityDeposit = flattenedData.reduce((sum, row) => sum + (Number(row["Security Deposit"]) || 0), 0);
+    const totalGST = flattenedData.reduce((sum, row) => sum + (Number(row["GST"]) || 0), 0);
 
     flattenedData.push({
       "Manager Name": "Total",
+      "Booking Amount": totalBookingAmount.toFixed(2),
       "Amount Paid": totalAmountPaid.toFixed(2),
+      "Security Deposit": totalSecurityDeposit.toFixed(2),
+      GST: totalGST.toFixed(2),
     } as FlattenedBookingData);
 
     const headers = Object.keys(flattenedData[0]);
@@ -376,6 +401,9 @@ function Report7() {
             <thead className="bg-gray-800 text-white">
               <tr>
                 <th className="px-4 py-2 text-center whitespace-nowrap">
+                  Booking Date
+                </th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">
                   Confirmation Date
                 </th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">
@@ -386,7 +414,9 @@ function Report7() {
                 <th className="px-4 py-2 text-center whitespace-nowrap">To</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Hall Name</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Facility</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Description</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Manager</th>
+                <th className="px-4 py-2 text-center whitespace-nowrap">Remark</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Category</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Customer Name</th>
                 <th className="px-4 py-2 text-center whitespace-nowrap">Contact Person</th>
@@ -417,19 +447,26 @@ function Report7() {
                 <tr key={index} className="bg-white border-b">
 
                   <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking.bookingDate ? booking.bookingDate : "-"}
+                  </td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
                     {booking.confirmationDate ? booking.confirmationDate : "-"}
                   </td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">
                     {booking.eventDate}
                   </td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking.Session}</td>
-                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking.From}</td>
-                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking.To}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{convert_IST_TimeString_To12HourFormat(booking.From)}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{convert_IST_TimeString_To12HourFormat(booking.To)}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Hall Name"]}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">
                     {booking["Additional Facility"]}
                   </td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">
+                    {booking["Description"]}
+                  </td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Manager Name"]}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Remark"]}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Customer Category"]}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Customer Name"]}</td>
                   <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Contact Person"]}</td>
@@ -456,6 +493,34 @@ function Report7() {
                   </td>
                 </tr>
               ))}
+              <tr className="font-semibold">
+                  <td className="px-4 py-2 text-center whitespace-nowrap">Total</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalBookingAmount()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalSecurityDeposit()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalGST()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalAmountPaid()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap"></td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap"></td>
+                  {/* Add other cells as needed */}
+                </tr>
             </tbody>
           </table>
           </div>

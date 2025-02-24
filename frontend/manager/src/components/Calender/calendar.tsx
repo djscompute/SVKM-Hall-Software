@@ -12,8 +12,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers";
 
-
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
+
+// CHANGE 1: Add constants for start and end years
+const START_YEAR = new Date().getFullYear();
+const END_YEAR = START_YEAR + 2;
 
 type Props = {
   hallId: string;
@@ -23,9 +26,14 @@ type Props = {
 //calendar
 const Calendar = ({ hallId, HallData }: Props) => {
   dayjs.extend(utc);
-  const [currentDate, setCurrentDate] = useState(
-    dayjs().startOf("month").toDate()
-  );
+
+  const [currentDate, setCurrentDate] = useState(() => {
+    const now = dayjs();
+    return now.year() < START_YEAR
+      ? dayjs(`${START_YEAR}-01-01`).toDate()
+      : now.startOf("month").toDate();
+  });
+
   const [selectedMobileDate, setSelectedMobileDate] = useState<number>(1);
 
   const startDate = dayjs(currentDate)
@@ -46,10 +54,10 @@ const Calendar = ({ hallId, HallData }: Props) => {
         params: {
           from: startDate,
           to: endDate,
-          hallId:hallId
+          hallId: hallId,
         },
       });
-      console.log("data is here ",response.data);
+      console.log("data is here ", response.data);
       if (response.data.message == "No bookings found for the specified range.")
         return [];
       // sort based of from
@@ -66,16 +74,15 @@ const Calendar = ({ hallId, HallData }: Props) => {
   const firstDayOfMonth = dayjs(currentDate).startOf("month").day();
 
   const onNextMonth = () => {
-    if(dayjs(currentDate).isAfter(dayjs().add(2,'y').subtract(1, 'month'))) return;
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-    );
+    const nextMonth = dayjs(currentDate).add(1, "month");
+    if (nextMonth.year() > END_YEAR) return;
+    setCurrentDate(nextMonth.toDate());
   };
 
   const onPreviousMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-    );
+    const previousMonth = dayjs(currentDate).subtract(1, "month");
+    if (previousMonth.year() < START_YEAR) return;
+    setCurrentDate(previousMonth.toDate());
   };
 
   const totalSlots = Math.ceil((firstDayOfMonth + daysInMonth) / 7) * 7;
@@ -87,7 +94,6 @@ const Calendar = ({ hallId, HallData }: Props) => {
         <p>LOADING</p>
       </>
     );
-  
 
   return (
     <div className=" flex justify-center items-center">
@@ -97,17 +103,24 @@ const Calendar = ({ hallId, HallData }: Props) => {
           <DatePicker
             value={dayjs(currentDate)}
             onChange={(newState): any => {
-              console.log(newState);
-              setCurrentDate(dayjs(newState).startOf("month").toDate());
+              if (newState) {
+                setCurrentDate(newState.startOf("month").toDate());
+              }
             }}
             views={["year", "month"]}
-            maxDate={dayjs().add(2,'y')}
+            minDate={dayjs(`${START_YEAR}-01-01`)}
+            maxDate={dayjs(`${END_YEAR}-12-31`)}
           />
         </LocalizationProvider>
         {/* Top heading */}
         <div className="flex justify-between items-center mb-4 w-3/4 mx-auto">
           <svg
-            className=" cursor-pointer"
+            className={`cursor-pointer ${
+              dayjs(currentDate).year() === START_YEAR &&
+              dayjs(currentDate).month() === 0
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
             onClick={onPreviousMonth}
             width="8"
             height="14"

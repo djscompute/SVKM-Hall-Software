@@ -64,6 +64,7 @@ export async function getAdditionalFeatureReport(
 
     const formattedBookings = await Promise.all(
       bookings.map(async (booking) => ({
+        bookingDate: formatDateToDDMMYYYY(booking.createdAt),
         confirmationDate: booking.date,
         eventDate: formatDateToDDMMYYYY(new Date(parseDateTime(booking.from).date)),
         From: parseDateTime(booking.from).time,
@@ -71,6 +72,7 @@ export async function getAdditionalFeatureReport(
         "Hall Name": hall.name,
         Session: await getSessionName(booking.session_id),
         "Manager Name": await getManagerNamesByHallId(booking.hallId),
+        "Remark": booking.user.remark,
         "Customer Category": booking.booking_type,
         "Customer Name": booking.user.username,
         "Contact Person": booking.user.contact,
@@ -83,6 +85,7 @@ export async function getAdditionalFeatureReport(
         "Additional Facility": booking.features
           .map((feature) => feature.heading)
           .join(", "),
+        "Description":booking.features.map((feature) => feature.desc).join(", "),
       }))
     );
     return formattedBookings;

@@ -6,10 +6,7 @@ import dayjs from "dayjs";
 import BasicDateTimePicker from "../../components/editHall/BasicDateTimePicker";
 import { EachHallType } from "../../../../../types/global.ts";
 import { useQuery } from "@tanstack/react-query";
-import {
-  getFinancialYearEnd,
-  getFinancialYearStart,
-} from "../../utils/financialYearRange.tsx";
+import { getFinancialYearEnd, getFinancialYearStart } from "../../utils/financialYearRange.tsx";
 import { convert_IST_TimeString_To12HourFormat } from "../../utils/convert_IST_TimeString_To12HourFormat.ts";
 function Report9() {
   const [hallData, setHallData] = useState<EachHallType[]>([]);
@@ -39,10 +36,9 @@ function Report9() {
   const [selectedHallId, setSelectedHallId] = useState<string>("All");
   const [selectedSession, setSelectedSession] = useState<string>("All");
   const [selectedCategory, setSelectedCategory] = useState<string>();
-  const [hallCharges, setHallCharges] = useState<boolean>(false);
+  const [hallCharges, setHallCharges] = useState<boolean>(true);
   const [responseHallCharges, setresponseHallCharges] = useState<boolean>();
-  const [selectedDisplayPeriod, setSelectedDisplayPeriod] =
-    useState<string>("Select");
+  const [selectedDisplayPeriod, setSelectedDisplayPeriod] = useState<string>("Select");
 
   const [date, setDate] = useState<{
     from: string;
@@ -151,53 +147,39 @@ function Report9() {
       };
     }
 
-    const responsePromise = axiosMasterInstance.post(
-      "dashboard/generateBookingConfirmationReport",
-      request
-    );
+    const responsePromise = axiosMasterInstance.post("dashboard/generateBookingConfirmationReport", request);
     toast.promise(responsePromise, {
       pending: "Fetching Report...",
       error: "Failed to fetch Report. Please contact maintainer.",
     });
     const response = await responsePromise;
-    console.log("data here ", response.data);
-    setData(response.data);
+    const processedData = response.data.map((booking: BookingData) => ({
+      ...booking,
+      Remark: booking.Remark || "", // Convert null Remark values to an empty string
+    }));
+
+    console.log("Processed data:", processedData);
+    setData(processedData);
   };
 
   const calculateTotalBookingAmount = () => {
     if (!data || !responseHallCharges) return 0;
-    return data.reduce(
-      (sum: number, booking: { [x: string]: any }) =>
-        sum + Number(booking["Booking Amount"] || 0),
-      0
-    );
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Booking Amount"] || 0), 0);
   };
 
   const calculateTotalAmountPaid = () => {
     if (!data || !responseHallCharges) return 0;
-    return data.reduce(
-      (sum: number, booking: { [x: string]: any }) =>
-        sum + Number(booking["Amount Paid"] || 0),
-      0
-    );
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Amount Paid"] || 0), 0);
   };
 
   const calculateTotalSecurityDeposit = () => {
     if (!data || !responseHallCharges) return 0;
-    return data.reduce(
-      (sum: number, booking: { [x: string]: any }) =>
-        sum + Number(booking["Security Deposit"] || 0),
-      0
-    );
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["Security Deposit"] || 0), 0);
   };
 
   const calculateTotalGST = () => {
     if (!data || !responseHallCharges) return 0;
-    return data.reduce(
-      (sum: number, booking: { [x: string]: any }) =>
-        sum + Number(booking["GST"] || 0),
-      0
-    );
+    return data.reduce((sum: number, booking: { [x: string]: any }) => sum + Number(booking["GST"] || 0), 0);
   };
 
   interface TransactionData {
@@ -212,6 +194,7 @@ function Report9() {
 
   interface BookingData {
     "Manager Name": string;
+    "Remark": string;
     "Customer Category": string;
     "Customer Name": string;
     "Contact Person": string;
@@ -235,31 +218,44 @@ function Report9() {
   const downloadCsv = () => {
     if (!data) return;
 
-    const flattenedData: FlattenedBookingData[] = data.map(
-      (row: BookingData) => {
-        const flatRow: FlattenedBookingData = { ...row };
-        if (row.transaction) {
-          flatRow["transaction type"] = row.transaction.type || "";
-          flatRow["transaction date"] = row.transaction.date || "";
-          flatRow["transaction id"] = row.transaction.transactionID || "";
-          flatRow["payee Name"] = row.transaction.payeeName || "";
-          flatRow["utr no."] = row.transaction.utrNo || "";
-          flatRow["cheque no."] = row.transaction.chequeNo || "";
-          flatRow["bank"] = row.transaction.bank || "";
-        }
-        delete (flatRow as any).transaction;
-        return flatRow;
+    const flattenedData: FlattenedBookingData[] = data.map((row: BookingData) => {
+      const flatRow: FlattenedBookingData = { ...row };
+      // Add transaction data to flattened row
+      if (row.transaction) {
+        flatRow["transaction type"] = row.transaction.type || "";
+        flatRow["transaction date"] = row.transaction.date || "";
+        flatRow["transaction id"] = row.transaction.transactionID || "";
+        flatRow["payee Name"] = row.transaction.payeeName || "";
+        flatRow["utr no."] = row.transaction.utrNo || "";
+        flatRow["cheque no."] = row.transaction.chequeNo || "";
+        flatRow["bank"] = row.transaction.bank || "";
       }
-    );
 
-    const totalAmountPaid = flattenedData.reduce(
-      (sum, row) => sum + (Number(row["Amount Paid"]) || 0),
-      0
-    );
+      // Replace session ID with session name
+      const hall = hallData.find((hall) => hall.name === row["Hall Name"]);
+      const session = hall?.sessions.find((session) => session._id === row["Session"]);
+      if (session) {
+        flatRow["Session"] = `${session.name} ${convert_IST_TimeString_To12HourFormat(session.from)} - ${convert_IST_TimeString_To12HourFormat(session.to)}`;
+      } else {
+        flatRow["Session"] = "N/A";
+      }
 
+      delete (flatRow as any).transaction;
+      return flatRow;
+    });
+
+    const totalAmountPaid = flattenedData.reduce((sum, row) => sum + (Number(row["Amount Paid"]) || 0), 0);
+    const totalBookingAmount = flattenedData.reduce((sum, row) => sum + (Number(row["Booking Amount"]) || 0), 0);
+    const totalSecurityDeposit = flattenedData.reduce((sum, row) => sum + (Number(row["Security Deposit"]) || 0), 0);
+    const totalGST = flattenedData.reduce((sum, row) => sum + (Number(row["GST"]) || 0), 0);
+
+    // Add totals row
     flattenedData.push({
       "Manager Name": "Total",
+      "Booking Amount": totalBookingAmount.toFixed(2),
       "Amount Paid": totalAmountPaid.toFixed(2),
+      "Security Deposit": totalSecurityDeposit.toFixed(2),
+      GST: totalGST.toFixed(2),
     } as FlattenedBookingData);
 
     const headers = Object.keys(flattenedData[0]);
@@ -286,9 +282,7 @@ function Report9() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-2 mb-20">
-      <span className="text-xl font-medium mt-5">
-        Booking Confirmation Report
-      </span>
+      <span className="text-xl font-medium mt-5">Booking Confirmation Report</span>
       {/* SELECT DISPLAY PERIOD */}
       <div>
         <div className="mt-4 flex items-center gap-4 justify-between">
@@ -322,9 +316,7 @@ function Report9() {
                 setSelectedHallId("All");
               } else {
                 const selectedHallName = e.target.value;
-                const selectedHallId = hallData.find(
-                  (hall) => hall.name === selectedHallName
-                )?._id;
+                const selectedHallId = hallData.find((hall) => hall.name === selectedHallName)?._id;
                 setSelectedHall(selectedHallName);
                 if (selectedHallId) {
                   setSelectedHallId(selectedHallId);
@@ -368,7 +360,7 @@ function Report9() {
         {/* SELECT CATEGORY */}
         <div className="my-4 flex items-center gap-4 justify-between">
           <label htmlFor="category" className="font-medium text-nowrap">
-            Select Category:
+            Select Customer Category:
           </label>
           <select
             id="category"
@@ -379,14 +371,13 @@ function Report9() {
           >
             <option value="">Select Category</option>
             <option value="All">All</option>
+            <option value="SVKM INSTITUTE">SVKM INSTITUTE</option>
+            <option value="OTHER THAN SVKM INSTITUTE">OTHER THAN SVKM INSTITUTE</option>
             {selectedSession === "All"
               ? hallData
                   .find((hall) => hall.name === selectedHall)
                   ?.sessions[0]?.price.map((category) => (
-                    <option
-                      key={category.categoryName}
-                      value={category.categoryName}
-                    >
+                    <option key={category.categoryName} value={category.categoryName}>
                       {category.categoryName}
                     </option>
                   ))
@@ -394,10 +385,7 @@ function Report9() {
                   .find((hall) => hall.name === selectedHall)
                   ?.sessions.find((session) => session._id === selectedSession)
                   ?.price.map((category) => (
-                    <option
-                      key={category.categoryName}
-                      value={category.categoryName}
-                    >
+                    <option key={category.categoryName} value={category.categoryName}>
                       {category.categoryName}
                     </option>
                   ))}
@@ -416,7 +404,7 @@ function Report9() {
               setHallCharges(e.target.value === "true");
             }}
           >
-            <option value="">Select</option>
+            {/* <option value="">Select</option> */}
             <option value="true">Yes</option>
             <option value="false">No</option>
           </select>
@@ -429,7 +417,7 @@ function Report9() {
         <div className={`flex flex-col items-center justify-center gap-2 `}>
           <div className="flex gap-2">
             <BasicDateTimePicker
-               id="fromDate"
+              id="fromDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, from: formattedTime }));
@@ -437,7 +425,7 @@ function Report9() {
               timePickerName="from"
             />
             <BasicDateTimePicker
-             id="toDate"
+              id="toDate"
               timeModifier={(time) => {
                 const formattedTime = formatToDDMMYYYY(time);
                 setDate((prev) => ({ ...prev, to: formattedTime }));
@@ -471,121 +459,55 @@ function Report9() {
         <div className="flex flex-col w-full mt-5">
           <div className="flex flex-col w-full items-center ">
             <span className="font-medium text-lg my-5">
-              Showing analytics from {humanReadableRequest.fromHuman} to{" "}
-              {humanReadableRequest.toHuman}
+              Showing analytics from {humanReadableRequest.fromHuman} to {humanReadableRequest.toHuman}
             </span>
             <div className=" flex flex-row items-center gap-3 mb-3">
-              <span className="font-medium ">
-                {data?.length} entries found{" "}
-              </span>
+              <span className="font-medium ">{data?.length} entries found </span>
               <button
                 onClick={downloadCsv}
                 className="flex items-center gap-2 bg-green-500 border-green-600 border text-white text-sm font-bold px-2 py-1 rounded-lg shadow-xl"
               >
                 Download
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="2.5"
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" className="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
                 </svg>
               </button>
             </div>
           </div>
-          <div className=" w-full overflow-x-auto">
+          <div className="w-full">
             <table className="">
               <thead className="bg-gray-800 text-white">
                 <tr>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    Confirmation Date
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    Event Date
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    Hall Name
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    Session
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    Additional Facility
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    Manager Name
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    Customer Category
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    Customer Name
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    Contact Person
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    Contact No.
-                  </th>
-                  {responseHallCharges && (
-                    <th className="px-4 py-2 text-center whitespace-nowrap">
-                      Booking Amount
-                    </th>
-                  )}
-                  {responseHallCharges && (
-                    <th className="px-4 py-2 text-center whitespace-nowrap">
-                      Security Deposit
-                    </th>
-                  )}
-                  {responseHallCharges && (
-                    <th className="px-4 py-2 text-center whitespace-nowrap">
-                      GST
-                    </th>
-                  )}
-                  {responseHallCharges && (
-                    <th className="px-4 py-2 text-center whitespace-nowrap">
-                      Amount Paid
-                    </th>
-                  )}
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    transaction type
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    date
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    transaction id
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    payee Name
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    utr no.
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    cheque no.
-                  </th>
-                  <th className="px-4 py-2 text-center whitespace-nowrap">
-                    bank
-                  </th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Booking Date</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Confirmation Date</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Event Date</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Hall Name</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Session</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Additional Facility</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Manager Name</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Remark</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Customer Category</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Customer Name</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Contact Person</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">Contact No.</th>
+                  {responseHallCharges && <th className="px-4 py-2 text-center whitespace-nowrap">Booking Amount</th>}
+                  {responseHallCharges && <th className="px-4 py-2 text-center whitespace-nowrap">Security Deposit</th>}
+                  {responseHallCharges && <th className="px-4 py-2 text-center whitespace-nowrap">GST</th>}
+                  {responseHallCharges && <th className="px-4 py-2 text-center whitespace-nowrap">Amount Paid</th>}
+                  <th className="px-4 py-2 text-center whitespace-nowrap">transaction type</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">date</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">transaction id</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">payee Name</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">utr no.</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">cheque no.</th>
+                  <th className="px-4 py-2 text-center whitespace-nowrap">bank</th>
                 </tr>
               </thead>
               <tbody>
                 {data.map((booking: any, index: number) => {
-                  const hall = hallData.find(
-                    (hall) => hall.name === booking["Hall Name"]
-                  );
+                  const hall = hallData.find((hall) => hall.name === booking["Hall Name"]);
 
-                  const session = hall?.sessions.find(
-                    (session) => session._id === booking["Session"]
-                  );
+                  const session = hall?.sessions.find((session) => session._id === booking["Session"]);
 
                   const sessionName = session?.name;
                   const sessionFromTime = session?.from;
@@ -593,138 +515,62 @@ function Report9() {
 
                   return (
                     <tr key={index} className="bg-white border-b">
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking.confirmationDate}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking.eventDate}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["Hall Name"]}
-                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking.bookingDate}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking.confirmationDate}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking.eventDate}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Hall Name"]}</td>
 
                       <td className="px-4 py-2 text-center">
-                        {sessionName || "N/A"} {convert_IST_TimeString_To12HourFormat(sessionFromTime || "")} - {convert_IST_TimeString_To12HourFormat(sessionToTime || "")}
-
+                        {sessionName || "N/A"} {convert_IST_TimeString_To12HourFormat(sessionFromTime || "")} -{" "}
+                        {convert_IST_TimeString_To12HourFormat(sessionToTime || "")}
                       </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["Additional Facility"]
-                          ? booking["Additional Facility"]
-                          : "None"}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["Manager Name"]}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["Customer Category"]}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["Customer Name"]}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["Contact Person"]}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["Contact No."]}
-                      </td>
-                      {responseHallCharges && (
-                        <td className="px-4 py-2 text-center whitespace-nowrap">
-                          {booking["Booking Amount"]}
-                        </td>
-                      )}
-                      {responseHallCharges && (
-                        <td className="px-4 py-2 text-center whitespace-nowrap">
-                          {booking["Security Deposit"]}
-                        </td>
-                      )}
-                      {responseHallCharges && (
-                        <td className="px-4 py-2 text-center whitespace-nowrap">
-                          {booking["GST"]}
-                        </td>
-                      )}
-                      {responseHallCharges && (
-                        <td className="px-4 py-2 text-center whitespace-nowrap">
-                          {booking["Amount Paid"]}
-                        </td>
-                      )}
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["transaction"]?.type}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["transaction"]?.date}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["transaction"]?.transactionID}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["transaction"]?.payeeName}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["transaction"]?.utrNo}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["transaction"]?.chequeNo}
-                      </td>
-                      <td className="px-4 py-2 text-center whitespace-nowrap">
-                        {booking["transaction"]?.bank}
-                      </td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Additional Facility"] ? booking["Additional Facility"] : "None"}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Manager Name"]}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Remark"]}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Customer Category"]}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Customer Name"]}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Contact Person"]}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Contact No."]}</td>
+                      {responseHallCharges && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Booking Amount"]}</td>}
+                      {responseHallCharges && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Security Deposit"]}</td>}
+                      {responseHallCharges && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["GST"]}</td>}
+                      {responseHallCharges && <td className="px-4 py-2 text-center whitespace-nowrap">{booking["Amount Paid"]}</td>}
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["transaction"]?.type}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["transaction"]?.date}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["transaction"]?.transactionID}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["transaction"]?.payeeName}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["transaction"]?.utrNo}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["transaction"]?.chequeNo}</td>
+                      <td className="px-4 py-2 text-center whitespace-nowrap">{booking["transaction"]?.bank}</td>
                     </tr>
                   );
                 })}
+                <tr className="font-semibold">
+                  <td className="px-4 py-2 text-center whitespace-nowrap">Total</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalBookingAmount()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalSecurityDeposit()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalGST()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">{calculateTotalAmountPaid()}</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap">-</td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap"></td>
+                  <td className="px-4 py-2 text-center whitespace-nowrap"></td>
+                  {/* Add other cells as needed */}
+                </tr>
               </tbody>
-
-              {responseHallCharges && (
-                <tfoot>
-                  <tr className="bg-gray-200 font-bold">
-                    <td
-                      colSpan={responseHallCharges ? 10 : 9}
-                      className="px-4 py-2 text-right"
-                    >
-                      Total Booking Amount:
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {calculateTotalBookingAmount().toFixed(2)}
-                    </td>
-                    <td colSpan={16}></td>
-                  </tr>
-                  <tr className="bg-gray-200 font-bold">
-                    <td
-                      colSpan={responseHallCharges ? 10 : 9}
-                      className="px-4 py-2 text-right"
-                    >
-                      Total Security Deposit:
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {calculateTotalSecurityDeposit().toFixed(2)}
-                    </td>
-                    <td colSpan={16}></td>
-                  </tr>
-                  <tr className="bg-gray-200 font-bold">
-                    <td
-                      colSpan={responseHallCharges ? 10 : 9}
-                      className="px-4 py-2 text-right"
-                    >
-                      Total GST:
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {calculateTotalGST().toFixed(2)}
-                    </td>
-                    <td colSpan={16}></td>
-                  </tr>
-                  <tr className="bg-gray-200 font-bold">
-                    <td
-                      colSpan={responseHallCharges ? 10 : 9}
-                      className="px-4 py-2 text-right"
-                    >
-                      Total Amount Paid:
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {calculateTotalAmountPaid().toFixed(2)}
-                    </td>
-                    <td colSpan={16}></td>
-                  </tr>
-                </tfoot>
-              )}
             </table>
           </div>
         </div>

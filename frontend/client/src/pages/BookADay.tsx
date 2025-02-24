@@ -13,6 +13,8 @@ import { queryClient } from "../App";
 import { isValidEmail } from "../utils/validateEmail";
 import { isValidMobile } from "../utils/validateMobile";
 import { AxiosError } from "axios";
+import { adminType } from "../../../../types/global";
+// import { add } from "date-fns";
 
 function BookADay() {
   const navigate = useNavigate();
@@ -27,12 +29,14 @@ function BookADay() {
   //const [panCard, setPanCard] = useState("");
   //const [address, setAddress] = useState("");
   const [purpose, setPurpose] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
   const [errors, setErrors] = useState({
     name: "",
     person: "",
     email: "",
     mobileNumber: "",
     purpose: "",
+    additionalInfo: "",
     sessionType: "",
     bookingType: "",
   });
@@ -49,6 +53,7 @@ function BookADay() {
   const { data: HallData } = useQuery({
     queryKey: ["bookaday", `${humanReadableDate}`],
     queryFn: async () => {
+      // eslint-disable-next-line no-useless-catch
       try {
         const responsePromise = axiosClientInstance.get(`getHall/${id}`);
         toast.promise(responsePromise, {
@@ -64,6 +69,33 @@ function BookADay() {
     },
     staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
   });
+  
+  const { data: managerData } = useQuery({
+    queryKey: ["manager", HallData?._id],
+    queryFn: async () => {
+      if (!HallData?._id) {
+        throw new Error("Hall ID is not available");
+      }
+      // eslint-disable-next-line no-useless-catch
+      try {
+        const responsePromise = axiosClientInstance.get(`getManagerByHallId`, {
+          params: { _id: HallData._id }
+        });
+        toast.promise(responsePromise, {
+          pending: "Fetching manager...",
+          error: "Failed to fetch Manager. Please try again.",
+        });
+        const response = await responsePromise;
+        console.log("The emails of managers are ",response.data);
+        return response.data.admin as adminType; // Adjust the type accordingly
+      } catch (error) {
+        throw error;
+      }
+    },
+    enabled: !!HallData?._id, // Query will be enabled only if HallData._id is available
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
+  });
+
 
   useEffect(() => {
     if (selectedCategory?.toLowerCase() === "svkm institute") {
@@ -104,6 +136,7 @@ function BookADay() {
               ?.to as string
           }`,
           purpose: purpose,
+          additionalInfo: additionalInfo,
           enquiryNumber: enquiryNumber,
         })
         .then((response) => {
@@ -148,6 +181,7 @@ function BookADay() {
               }`,
               status: "ENQUIRY",
               eventPurpose: purpose,
+              additionalInfo: additionalInfo,
             },
           },
         });
@@ -177,6 +211,8 @@ function BookADay() {
             contactNo: mobileNumber,
             enquiryNumber: enquiryNumber, // Generate a unique enquiry number
             hallName: HallData?.name,
+            hallLocation: `${HallData?.location.desc1},${HallData?.location.desc2}`,
+            hallRestrictions: HallData?.eventRestrictions,
             dateOfEvent: dateOfEvent,
             slotTime: `${convert_IST_TimeString_To12HourFormat(
               HallData?.sessions.find((ss) => ss._id === selectedSessionId)
@@ -184,12 +220,17 @@ function BookADay() {
             )} - ${convert_IST_TimeString_To12HourFormat(
               HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to!
             )}`,
+            sessionName: `${HallData?.sessions.find(
+              (ss) => ss._id === selectedSessionId
+            )?.name!}`,
             purposeOfBooking: purpose,
+            additionalInfo: additionalInfo,
             hallCharges: sessionPrice,
             additionalFacilities: additionalFacilities,
             hallDeposit: securityDeposit,
             totalPayable: totalPayable,
-            hallContact: "Email to be entered",
+            managerEmail: HallData?.contactEmail,
+            managerName: HallData?.contactName,
           })
           .then((response) => {
             axiosClientInstance
@@ -230,12 +271,13 @@ function BookADay() {
   });
 
   const handleSubmit = () => {
-    let newErrors = {
+    const newErrors = {
       name: "",
       person: "",
       email: "",
       mobileNumber: "",
       purpose: "",
+      additionalInfo: "",
       sessionType: "",
       bookingType: "",
     };
@@ -298,7 +340,7 @@ function BookADay() {
     }
     // Proceed with mutation
     if (isDetailsConfirmed) {
-      const enquiryNumber = "ENQ" + new Date().getTime();
+      // const enquiryNumber = "ENQ" + new Date().getTime();
       const bookingData = {
         user: {
           username: name,
@@ -323,6 +365,7 @@ function BookADay() {
           HallData?.sessions.find((ss) => ss._id === selectedSessionId)?.to
         }`,
         purpose: purpose,
+        additionalInfo: additionalInfo,
       };
       console.log(bookingData);
       // Perform mutation
@@ -354,7 +397,7 @@ function BookADay() {
 
   
   HallData?.sessions?.sort((a,b)=>{
-    const getNumber = (name:String) => {
+    const getNumber = (name:string) => {
       if (!name) {
         return Infinity; // Or another value to handle undefined or null names
       }
@@ -523,6 +566,27 @@ function BookADay() {
         {errors.mobileNumber && (
           <p className="text-red-500">{errors.mobileNumber}</p>
         )}
+
+        {/* additional field */}
+        <div>
+          <label htmlFor="person">
+            <b>Additional Information</b>
+          </label>
+          <p className=" text-xs text-orange-500 font-semibold">
+             You can add an additional phone number here
+            </p>
+          <br />
+          <input
+            className="p-2 border-gray-300 border rounded-md px-2 w-full"
+            type="text"
+            placeholder="Additional Information"  
+            value={additionalInfo}
+            onChange={(e) => setAdditionalInfo(e.target.value)}
+          />
+          
+        </div>
+
+
         {/* Purpose of Booking */}
         <div>
           <label htmlFor="person">
