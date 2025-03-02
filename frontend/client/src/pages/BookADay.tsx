@@ -259,15 +259,17 @@ function BookADay() {
         queryKey: ["bookaday", `${humanReadableDate}`],
       });
     },
-    onError: (error: AxiosError) => {
+    onError: (error: AxiosError<{ name: string; message: string }>) => {
       if (error.response && error.response.status === 400) {
-        toast.error(
-          "Oops!!Session booked already. Cannot enquire for a session which is already booked. Please try to enquire for the sessions not booked."
-        );
+        const errorMessage = error.response.data?.message || 
+          "Oops! Something went wrong. Please try again.";
+        
+        toast.error(errorMessage);
       } else {
         console.error("An error occurred:", error);
+        toast.error("Unexpected error occurred. Please try again later.");
       }
-    },
+    }
   });
 
   const handleSubmit = () => {
