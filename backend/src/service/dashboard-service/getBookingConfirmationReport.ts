@@ -37,11 +37,19 @@ interface BookingConfirmationReportRequest {
 
 let gst: number;
 let depositAmount: number;
+const calculateTotalFeatureCharges = (features: any[]): number => {
+  if (Array.isArray(features)) {
+    return features.reduce((acc, feature) => acc + (feature.price || 0), 0);
+  }
+  return 0;
+};
+
 const calculateAmountPaid = (data: any): number => {
   const basePrice = data?.price || 0;
   const discountedPrice =
     basePrice - 0.01 * (data?.baseDiscount || 0) * basePrice;
-  gst = data?.booking_type === "SVKM INSTITUTE" ? 0 : 0.18 * discountedPrice;
+  const featureCharges = calculateTotalFeatureCharges(data.features);
+  gst = data?.booking_type === "SVKM INSTITUTE" ? 0 : 0.18 * (discountedPrice + featureCharges);
   depositAmount = data?.isDeposit
     ? (data?.deposit || 0) -
       0.01 * (data?.depositDiscount || 0) * (data?.deposit || 0)
@@ -49,7 +57,7 @@ const calculateAmountPaid = (data: any): number => {
   // console.log(`price1 of ${data.from}`, discountedPrice);
   // console.log(`price2 of ${data.from}`, gst);
   // console.log(`price3 of ${data.from}`, depositAmount);
-  return discountedPrice + gst + depositAmount;
+  return discountedPrice + featureCharges + gst + depositAmount;
 };
 
 export async function getBookingConfirmationReport(
