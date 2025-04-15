@@ -2836,7 +2836,6 @@ function Booking() {
                       : "" // Fallback to an empty string for an uncontrolled input
                   }
                   max={new Date(new Date().setFullYear(new Date().getFullYear() + 2)).toISOString().split("T")[0]}
-                  min={new Date().toISOString().split("T")[0]}
                   onChange={(e) =>
                     setEditedData((prev) => {
                       if (!prev) return undefined;
