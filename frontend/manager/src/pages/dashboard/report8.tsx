@@ -146,13 +146,14 @@ function Report8() {
     if (!displayPeriod) return;
     setresponseHallCharges(displayHallCharges);
     setHumanReadableRequest(humanReadable);
+    const hallIdToSend = displayHall === "All" ? "All" : selectedHallId;
     let request;
     if (displayPeriod === "Select") {
       request = {
         displayPeriod: displayPeriod,
         fromDate: fromDate,
         toDate: toDate,
-        displayHall: displayHall,
+        displayHall: hallIdToSend,
         displayCustomerCategory: displayCustomerCategory,
         displaySession: displaySession,
         displayHallCharges: displayHallCharges,
@@ -268,7 +269,7 @@ function Report8() {
       displayPeriod: selectedDisplayPeriod,
       fromDate: date.from,
       toDate: date.to,
-      displayHall: selectedHall,
+      displayHall: selectedHall === "All" ? "All" : selectedHallId,
       displayCustomerCategory: selectedCategory || "All",
       displaySession: selectedSession,
       displayHallCharges: hallCharges,
