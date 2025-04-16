@@ -200,11 +200,11 @@ function EachDay({
       {HallSessionsArray.sessions.map((session) =>
         session.active ? (
           <>
-            <span className="overflow-x-auto font-medium pt-2 px-1 text-center bg-gray-300 w-[-webkit-fill-available]">
+            <span className="overflow-x-auto font-medium pt-2 px-1 text-center bg-gray-300 w-[inherit]">
               {session.name}
             </span>
             {finalArr.map((eachSessionGroup) => (
-              <div className="w-[-webkit-fill-available]" key={eachSessionGroup.sessionId}>
+              <div className="w-[inherit]" key={eachSessionGroup.sessionId}>
                 {eachSessionGroup.subarray
                   .filter(
                     (eachBookingInfo) =>
