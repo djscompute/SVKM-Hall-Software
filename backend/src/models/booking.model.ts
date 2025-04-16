@@ -52,6 +52,8 @@ const BookingSchema = new mongoose.Schema<HallBookingType>(
       bank: { type: String },
     },
     baseDiscount: { type: Number, required: true },
+    cgstRate: { type: Number, required: false },
+    sgstRate: { type: Number, required: false },
     deposit : { type: Number, required: true },
     isDeposit : { type: Boolean, required: true },
     depositDiscount : { type: Number, required: true },

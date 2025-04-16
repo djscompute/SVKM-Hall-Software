@@ -1,16 +1,17 @@
-import { Link } from "react-router-dom";
 import { EachHallType } from "../../types/Hall.types";
 import markerImage from "../../assets/location-marker-red.svg";
 import sparkle from "../../assets/sparkle.svg";
+import { Link } from "react-router-dom";
 
 type Props = {
   hallData: EachHallType;
 };
 
 export default function Card({ hallData }: Props) {
+  if (!hallData) return null; // Return null if hallData is not available
   return (
-    <Link
-      to={`/halls/${hallData._id}`}
+    <a
+      href={`/halls/${hallData._id}`}
       className="flex flex-col justify-between rounded-lg overflow-hidden h-auto w-full lg:w-1/4 m-3 md:m-10 lg:m-2"
     >
       <img
@@ -57,6 +58,6 @@ export default function Card({ hallData }: Props) {
         </div>
         <div className="mt-3 h-1 w-full bg-[#5AA7A0]" />
       </div>
-    </Link>
+    </a>
   );
 }

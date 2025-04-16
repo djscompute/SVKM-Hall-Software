@@ -143,6 +143,8 @@ function Booking() {
           date: dayjs().format("DD-MM-YYYY"),
           status: "CONFIRMED" as bookingStatusType,
           cancellationReason: "",
+          cgstRate: cgstRate,
+          sgstRate: sgstRate,
         }
       );
       toast.promise(responsePromise, {
@@ -173,6 +175,8 @@ function Booking() {
         transaction: multipleTransactionData,
         totalPayable: grandTotal,
         status: "CONFIRMED",
+        cgstRate: cgstRate,
+        sgstRate: sgstRate,
       });
       const responsePromise = axiosManagerInstance.post(`/multipleBookings`, {
         booking_ids: selectedBookings,
@@ -676,24 +680,33 @@ function Booking() {
   // }, [editingMode, editedData, data]);
 
   // for cgst and sgst constants
-  useEffect(() => {
-    const fetchConstants = async () => {
-      try {
-        const response = await axiosManagerInstance.get("getAllConstants");
-        const cgst = response.data.find((item: any) => item.constantName === "CGSTRate");
-        const sgst = response.data.find((item: any) => item.constantName === "SGSTRate");
-        
-        if (cgst) setCgstRate(cgst.value / 100);
-        if (sgst) setSgstRate(sgst.value / 100);
-      } catch (error) {
-        console.error("Error fetching GST rates:", error);
-        // Optionally show an error toast
-        toast.error("Failed to fetch GST rates. Using default values.");
+// for cgst and sgst constants
+useEffect(() => {
+  const fetchConstants = async () => {
+    try {
+      // If booking is already CONFIRMED and has stored rates, use those instead
+      if (data?.status === "CONFIRMED" && data?.cgstRate !== undefined && data?.sgstRate !== undefined) {
+        setCgstRate(data.cgstRate);
+        setSgstRate(data.sgstRate);
+        console.log("Using stored GST rates from booking:", data.cgstRate, data.sgstRate);
+        return;
       }
-    };
-  
-    fetchConstants();
-  }, []);
+      
+      // Otherwise fetch from constants
+      const response = await axiosManagerInstance.get("getAllConstants");
+      const cgst = response.data.find((item: any) => item.constantName === "CGSTRate");
+      const sgst = response.data.find((item: any) => item.constantName === "SGSTRate");
+      
+      if (cgst) setCgstRate(cgst.value / 100);
+      if (sgst) setSgstRate(sgst.value / 100);
+    } catch (error) {
+      console.error("Error fetching GST rates:", error);
+      toast.error("Failed to fetch GST rates. Using default values.");
+    }
+  };
+
+  fetchConstants();
+}, [data]);
 
   useEffect(() => {
     const calculateTotalFeatureCharges = (features: any) => {
@@ -893,6 +906,15 @@ function Booking() {
       setEditedData(data);
     }
   }, [data]);
+
+  useEffect(() => {
+    // When displaying a specific booking in multiple selection mode
+    if (selectedBookingData && selectedBookingData.status === "CONFIRMED" && 
+        selectedBookingData.cgstRate !== undefined && selectedBookingData.sgstRate !== undefined) {
+      setCgstRate(selectedBookingData.cgstRate);
+      setSgstRate(selectedBookingData.sgstRate);
+    }
+  }, [selectedBookingData]);
 
   const handleSave = async () => {
     const clearedFields = clearFieldsForTransactionType(
