@@ -492,7 +492,7 @@ function Booking() {
 
     if (booking.booking_type !== "SVKM INSTITUTE") {
       // Add 18% tax for non-SVKM bookings
-      totalPrice += 0.18 * totalPrice;
+      totalPrice += (cgstRate + sgstRate) * totalPrice;
     }
     // alert("total price is with tax"+totalPrice)
 
@@ -558,7 +558,7 @@ function Booking() {
       // console.log(`${selectedBookingData.from} is ${selectedBookingData.booking_type} calculated as: 
       //   Total Payable Amount (non-SVKM) = ((${multiplePriceEntry?.price || 0} + ${totalFeatureCharges}) - 
       //   (0.01 * ${selectedBookingData.baseDiscount} * (${multiplePriceEntry?.price || 0} + ${totalFeatureCharges}))) + 
-      //   (0.18 * ((${multiplePriceEntry?.price || 0} + ${totalFeatureCharges}) - 
+      //   ((cgstRate+sgstRate) * ((${multiplePriceEntry?.price || 0} + ${totalFeatureCharges}) - 
       //   (0.01 * ${selectedBookingData.baseDiscount} * (${multiplePriceEntry?.price || 0} + ${totalFeatureCharges})))) + 
       //   (${selectedBookingData.isDeposit ? (selectedBookingData.deposit - (0.01 * selectedBookingData.depositDiscount * selectedBookingData.deposit)) : 0})`);
 
@@ -568,7 +568,7 @@ function Booking() {
         0.01 *
           selectedBookingData!.baseDiscount *
           ((multiplePriceEntry?.price || 0) + totalFeatureCharges) +
-        0.18 *
+        (cgstRate + sgstRate) *
           ((multiplePriceEntry?.price || 0) +
             totalFeatureCharges -
             0.01 *
@@ -610,7 +610,7 @@ function Booking() {
       // console.log(`${data.from} is ${data.booking_type} calculated as: 
       //   Total Payable Amount (non-SVKM) = ((${priceEntry?.price || 0} + ${totalFeatureCharges}) - 
       //   (0.01 * ${data.baseDiscount} * (${priceEntry?.price || 0} + ${totalFeatureCharges}))) + 
-      //   (0.18 * ((${priceEntry?.price || 0} + ${totalFeatureCharges}) - 
+      //   ((cgstRate + sgstRate) * ((${priceEntry?.price || 0} + ${totalFeatureCharges}) - 
       //   (0.01 * ${data.baseDiscount} * (${priceEntry?.price || 0} + ${totalFeatureCharges})))) + 
       //   (${data.isDeposit ? (data.deposit - (0.01 * data.depositDiscount * data.deposit)) : 0})`);
 
@@ -620,7 +620,7 @@ function Booking() {
         0.01 *
           data.baseDiscount *
           ((priceEntry?.price || 0) + totalFeatureCharges) +
-        0.18 *
+        (cgstRate+sgstRate) *
           ((priceEntry?.price || 0) +
             totalFeatureCharges -
             0.01 *
@@ -651,7 +651,7 @@ function Booking() {
         (priceEntry?.price || 0) +
         totalFeatureCharges -
         0.01 * data!.baseDiscount * ((priceEntry?.price || 0) + totalFeatureCharges) +
-        0.18 * ((priceEntry?.price || 0) + totalFeatureCharges - 0.01 * data!.baseDiscount * ((priceEntry?.price || 0) + totalFeatureCharges)) +
+        (cgstRate+sgstRate) * ((priceEntry?.price || 0) + totalFeatureCharges - 0.01 * data!.baseDiscount * ((priceEntry?.price || 0) + totalFeatureCharges)) +
         (data?.isDeposit
           ? data.deposit - 0.01 * data.depositDiscount * data.deposit
           : 0)
