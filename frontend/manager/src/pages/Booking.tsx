@@ -1275,16 +1275,61 @@ useEffect(() => {
     return !hasErrors;
   };
 
-  const confirmExists = () => {
-    // Iterate through each booking in the array
+  const confirmExists = async () => {
+
+    // Check for existing confirmed bookings in the same hall during the same time
     for (const booking of allBookingData) {
-      // Check if the status of the current booking is "CONFIRMED"
-      if (booking.status === "CONFIRMED") {
-        toast.error("There is already a confirmed hall in this session");
+      if (booking.status === "CONFIRMED" && booking._id !== bookingId) {
+        toast.error("There is already a confirmed booking in this hall at this time");
         return true;
       }
     }
-    // If no booking with status "CONFIRMED" is found, return false
+    
+    // For multiple bookings, check if any selected booking overlaps with an existing confirmed booking
+    if (selectedOption === "multiple" && selectedBookings.length > 0) {
+      
+      
+      // Get all bookings from the same hall that overlap with any selected booking
+      const selectedBookingsDetails = allBookingsOfUser.filter(booking => 
+      selectedBookings.includes(booking._id));
+      
+      
+      for (const selectedBooking of selectedBookingsDetails) {
+        // For each selected booking, check if it overlaps with a confirmed booking
+        try {
+          const overlappingBookingsResponse = await axiosManagerInstance.get("getBooking", {
+            params: {
+              from: selectedBooking.from,
+              to: selectedBooking.to,
+              hallId: data?.hallId
+            },
+          });
+          
+          let overlappingBookings = [];
+          
+          // Check if we got an array of bookings or an error message
+          if (Array.isArray(overlappingBookingsResponse.data)) {
+            // Filter for CONFIRMED bookings only
+            overlappingBookings = overlappingBookingsResponse.data.filter(
+              booking => booking.status === "CONFIRMED" && booking._id !== selectedBooking._id
+            );
+          }
+          
+          
+          
+          // If we found any confirmed bookings that aren't the current booking, there's a conflict
+          if (overlappingBookings.length > 0) {
+            toast.error(`Booking for ${dayjs(selectedBooking.from).format("MMM D, YYYY h:mm A")} overlaps with an existing confirmed booking`);
+            return true;
+          }
+      } catch (error) {
+        console.error("Error checking for booking conflicts:", error);
+        toast.error("Error checking for booking conflicts. Please try again.");
+        return true; // Prevent confirmation on error
+      }
+      }
+    }
+    
     return false;
   };
 
@@ -2228,8 +2273,16 @@ useEffect(() => {
                 <button
                   onClick={async () => {
                     setShowCancellationReason(false);
-                    await confirmAndSaveMultipleBooking.mutateAsync();
-                    generateConfirmationForMultiple();
+
+                    const hasConflicts = await confirmExists();
+                    if (
+                      !hasConflicts &&
+                      paymentDetails() &&
+                      detailsExists()
+                    ) {
+                      await confirmAndSaveMultipleBooking.mutateAsync();
+                      generateConfirmationForMultiple();
+                    }
                   }}
                   className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
                 >
@@ -3103,8 +3156,9 @@ useEffect(() => {
                 <button
                   onClick={async () => {
                     setShowCancellationReason(false);
+                    const hasConflicts = await confirmExists();
                     if (
-                      !confirmExists() &&
+                      !hasConflicts &&
                       paymentDetails() &&
                       detailsExists()
                     ) {
