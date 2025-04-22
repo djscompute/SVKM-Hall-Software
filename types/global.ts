@@ -80,6 +80,8 @@ export type HallBookingType = {
   price: number; // obvio bro
   transaction: bookingTransactionType;
   baseDiscount: number;
+  cgstRate: number;
+  sgstRate: number;
   deposit: number;
   isDeposit: boolean;
   depositDiscount: number;

@@ -49,6 +49,8 @@ export const AddBookingZodSchema = z.object({
       .optional(),
     baseDiscount: z.number(numberErrorHandler("baseDiscount")).min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     deposit: z.number(numberErrorHandler("deposit")),
+    cgstRate: z.number(numberErrorHandler("CGST Rate")).optional(),
+    sgstRate: z.number(numberErrorHandler("SGST Rate")).optional(),
     isDeposit: z.boolean(booleanErrorHandler("isDeposit")),
     depositDiscount: z.number(numberErrorHandler("depositDiscount")).min(0, {message: "Discount can't be below 0"}).max(100, {message: "Discount can't exceed 100"}),
     hallId: z.string(stringErrorHandler("hallId")),
