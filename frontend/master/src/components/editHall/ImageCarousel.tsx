@@ -28,7 +28,7 @@ export default function ImageCarousel({ images, setHallData }: props) {
       const formData = new FormData();
       formData.append("image", newImage);
       const responsePromise = axiosMasterInstance.post(
-        "http://localhost:3000/uploadImage",
+        "/uploadImage",
         formData,
         {
           headers: {
