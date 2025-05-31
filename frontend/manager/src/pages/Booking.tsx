@@ -1354,12 +1354,10 @@ useEffect(() => {
           <option value="multiple">Multiple</option>
         </select>
       </div>
-      {editingMode ? (
-        <></>
-      ) : (
+      {!editingMode && data?.status !== "CONFIRMED" && (
         <button
           onClick={handleEdit}
-          className=" mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
+          className="mb-2 bg-blue-600 px-4 text-white py-1 rounded-lg"
         >
           Edit Details
         </button>
@@ -3131,7 +3129,7 @@ useEffect(() => {
             </div>
           )}
 
-          {editingMode ? (
+          {(editingMode || data?.status == "CONFIRMED") ? (
             <>
               <h1 className="text-lg font-medium">Set Booking Status</h1>
               <span className="space-x-4 space-y-4">
@@ -3166,7 +3164,7 @@ useEffect(() => {
                       generateConfirmationAndEmail();
                     }
                   }}
-                  className="mb-2 bg-green-600 px-4 text-white py-1 rounded-lg"
+                  className={`mb-2 bg-green-600 px-4 text-white py-1 rounded-lg ${data?.status === "CONFIRMED" ? "hidden" : ""}`}
                 >
                   Confirmed
                 </button>
